@@ -1,0 +1,51 @@
+# Creator: Gene Cluster Tools (ver 1.0)
+
+>> PARTS
+
+> P1
+type: Promoter
+seq: AAAAAAAAAAAA
+attribs: 
+
+> P2
+type: Promoter
+seq: AAAAAAAAAAAA
+attribs: 
+
+> G1
+type: CDS
+seq: GGGGGGGGGGGG
+attribs: 
+
+> G2
+type: CDS
+seq: GGGGGGGGGGGG
+attribs: 
+
+> T1
+type: Terminator
+seq: TTTTTTTTTTTT
+attribs: 
+
+> T2
+type: Terminator
+seq: TTTTTTTTTTTT
+attribs: 
+
+
+>> VARIANTS
+
+> V1
+seq: AAAAAAAAAAAAGGGGGGGGGGGGTTTTTTTTTTTTAAAAAAAAAAAAGGGGGGGGGGGGTTTTTTTTTTTT
+part_list: P1,F,0,12; G1,F,12,12; T1,F,24,12; P2,F,36,12; G2,F,48,12; T2,F,60,12
+attribs: 
+
+> V2
+seq: TTTTTTTTTTTTGGGGGGGGGGGGAAAAAAAAAAAATTTTTTTTTTTTGGGGGGGGGGGGAAAAAAAAAAAA
+part_list: T2,R,0,12; G2,R,12,12; P2,R,24,12; T1,R,36,12; G1,R,48,12; P1,R,60,12
+attribs: 
+
+> V3
+seq: AAAAAAAAAAAAGGGGGGGGGGGGTTTTTTTTTTTT
+part_list: P1,F,0,12; G1,F,12,12; T1,F,24,12
+attribs: 

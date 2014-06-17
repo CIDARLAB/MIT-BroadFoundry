@@ -40,13 +40,13 @@ class GeneClusterLibrary:
 	                  'Spacer':'s'}
 
 	def __init__(self):
-		"""Constructor the generate an empty GeneCluster.
+		"""Constructor the generate an empty GeneClusterLibrary.
 		"""
 		self.parts = {}
 		self.variants = {}
 
 	def clear (self):
-		"""Clear all data associated with the GeneCluster.
+		"""Clear all data associated with the GeneClusterLibrary.
 		"""
 		self.parts = {}
 		self.variants = {}
@@ -993,12 +993,14 @@ class GeneClusterLibrary:
 			collated.append(variant_data[v])
 		return collated
 
-def promoter_strength (trace, edge_len_5=25, edge_len_3=25):
+
+
+def promoter_strength (trace, edge_start=50, edge_skip_end=200, edge_end=50):
 	"""Calculate the promoter strength (delta F) of trace
 	"""
 	
 
-	start_depth = np.median(trace[0:edge_length])
+	start_depth = np.median(trace[0:edge_start])
 	end_depth = np.median(trace[-edge_length:])
 	return None
 

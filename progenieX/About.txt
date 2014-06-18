@@ -1,0 +1,9 @@
+Pro_GenieX is a tool for creating yeast promoters.
+
+It uses a greedy constraint based algorithm to generate sequences of defined nucleotide content
+and then splices in motifs, which is also a greedy constraint algorithm.
+
+As I am learning Python as I go, I apologize for the many unPythonic infractions and possibly
+ugly, incomprehensible way I have organized this program.  I have tried to make up for the 
+lack of experience with frequent comments in all of the files. It works in IDLE, and I will work
+to get a functional version up and running here.

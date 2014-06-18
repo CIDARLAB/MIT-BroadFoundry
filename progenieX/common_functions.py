@@ -3,7 +3,6 @@ def maine() :
     lister(FASTA_file)
     fasta_out(seqlist, prefix)
     fastaD_out(seqD, output_file)
-    promoter_analysis(prefix)
     
 def clear(filename) :
 

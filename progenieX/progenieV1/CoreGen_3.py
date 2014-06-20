@@ -16,10 +16,11 @@ contained in an Excel spreadsheet that makes editing parameters much more straig
 '''
 
 import re
-from common_functions import *
 from random import random
+from common_functions import *
 from SeqGen_5 import seqgen
 from re_eraser import re_erase
+from pro_analysis import promoter_analysis
 
 def maine() :
     coregen(int(raw_input("Number (must be a multiple of 4):")))

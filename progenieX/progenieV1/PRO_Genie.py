@@ -11,6 +11,7 @@ this enables statistics and motif substitution data for entire hypothetical prom
 from common_functions import *
 from CoreGen_3 import coregen
 from UASGen_2 import uasgen
+from pro_analysis import promoter_analysis
 
 def maine() :
     pro_genie(int(raw_input("Number of sequences (must be multiple of 4):")))

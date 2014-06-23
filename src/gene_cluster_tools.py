@@ -976,26 +976,39 @@ class GeneClusterLibrary:
 		return collated
 
 def __make_float_if_needed(s):
-		"""Helper function to automatically convert a string to a number if possible.
+	"""Helper function to automatically convert a string to a number if possible.
 
-	    Parameters
-	    ----------
-		s : string
-			Value to attempt conversion to float.
+    Parameters
+    ----------
+	s : string
+		Value to attempt conversion to float.
 
-	    Returns
-	    -------
-	    s : string or float
-	    	If successful the float version will be returned, otherwise the original
-	    	string is returned.
-		"""
-		try:
-			float(s)
-			return float(s)
-		except ValueError:
-			return s
+    Returns
+    -------
+    s : string or float
+    	If successful the float version will be returned, otherwise the original
+    	string is returned.
+	"""
+	try:
+		float(s)
+		return float(s)
+	except ValueError:
+		return s
 
 def load_part_attribs (parts_filename):
+	"""Load part attributes from CSV file.
+
+    Parameters
+    ----------
+	parts_filename : string
+		CSV filename.
+
+    Returns
+    -------
+    part_data : dict(list)
+    	Converts the CSV file into a dictionary of parts with each key returning a
+    	list of the part details and attributes.
+	"""
 	part_data = {}
 	parts_reader = csv.reader(open(parts_filename, 'rU'), delimiter=',')
 	header = next(parts_reader)
@@ -1007,7 +1020,8 @@ def load_part_attribs (parts_filename):
 		# Make the attributes map
 		part_attribs_map = {}
 		for k in attrib_keys:
-			part_attribs_map[k] = __make_float_if_needed(row[header_map[k]])
+			if row[header_map[k]] != '':
+				part_attribs_map[k] = __make_float_if_needed(row[header_map[k]])
 		part_name = row[header_map['Part']]
 		part_type = row[header_map['Part Type']]
 		part_seq = row[header_map['Part Sequence']]
@@ -1015,6 +1029,19 @@ def load_part_attribs (parts_filename):
 	return part_data
 
 def load_variant_attribs (variant_attribs_filename):
+	"""Load variant attributes from CSV file.
+
+    Parameters
+    ----------
+	variant_attribs_filename : string
+		CSV filename.
+
+    Returns
+    -------
+    variant_attribs_data : dict(dict)
+    	Converts the CSV file into a dictionary of variants with each key returning a
+    	list of the variant attributes also stored as a dictionary.
+	"""
 	variant_attribs_data = {}
 	variant_attribs_reader = csv.reader(open(variant_attribs_filename, 'rU'), delimiter=',')
 	header = next(variant_attribs_reader)
@@ -1025,12 +1052,26 @@ def load_variant_attribs (variant_attribs_filename):
 	for row in variant_attribs_reader:
 		variant_attribs_map = {}
 		for k in attrib_keys:
-			variant_attribs_map[k] = __make_float_if_needed(row[header_map[k]])
+			if row[header_map[k]] != '':
+				variant_attribs_map[k] = __make_float_if_needed(row[header_map[k]])
 		variant_name = row[header_map['Variant']]
 		variant_attribs_data[variant_name] = variant_attribs_map
 	return variant_attribs_data
 
 def load_variant_designs (variant_designs_filename):
+	"""Load variant designs from CSV file.
+
+    Parameters
+    ----------
+	variant_designs_filename : string
+		CSV filename.
+
+    Returns
+    -------
+    variant_designs_data : dict(list)
+    	Converts the CSV file into a dictionary of variants with each key returning a
+    	list of the part names that make up the variant design.
+	"""
 	# Dictionary keyed on ID and then list returned of all parts present
 	variant_designs_data = {}
 	variant_designs_reader = csv.reader(open(variant_designs_filename, 'rU'), delimiter=',')
@@ -1045,6 +1086,21 @@ def load_variant_designs (variant_designs_filename):
 	return variant_designs_data
 
 def load_variant_part_attribs (variant_part_attribs_filename):
+	"""Load variant part attributes from CSV file.
+
+    Parameters
+    ----------
+	variant_part_attribs_filename : string
+		CSV filename.
+
+    Returns
+    -------
+    variant_part_attribs_data : dict(dict(dict(string)))
+    	Converts the CSV file into a dictionary of dictionaries with the keys:
+    	variant, part, attribute and the element returned the attribute value. This
+    	allows for data to be stored at the variant-part level e.g., transcriptomic
+    	data for genes.
+	"""
 	variant_part_attribs_data = {}
 	variant_part_attribs_reader = csv.reader(open(variant_part_attribs_filename, 'rU'), delimiter=',')
 	header = next(variant_part_attribs_reader)
@@ -1060,11 +1116,31 @@ def load_variant_part_attribs (variant_part_attribs_filename):
 				variant_part_attribs_data[variant_name] = {}
 			if part not in variant_part_attribs_data[variant_name].keys():
 				variant_part_attribs_data[variant_name][part] = {}
-			variant_part_attribs_data[variant_name][part][attrib_name] = __make_float_if_needed(row[header_map[part]])
+			if row[header_map[part]] != '':
+				variant_part_attribs_data[variant_name][part][attrib_name] = __make_float_if_needed(row[header_map[part]])
 	return variant_part_attribs_data
 
 def make_library_from_csv (part_attribs_fn, variant_designs_fn, variant_attribs_fn, 
 	                       variant_part_attribs_fn, output_fn):
+	"""Create a GeneClusterLibrary from a set of CSV files.
+
+    Parameters
+    ----------
+	part_attribs_fn : string
+		Part attributes CSV filename.
+
+	variant_designs_fn : string
+		Variant designs CSV filename.
+
+	variant_attribs_fn : string
+		Variant attributes CSV filename.
+
+	variant_part_attribs_fn : string
+		Variant part attributes CSV filename.
+
+	output_fn : string
+		Output file containing the GeneClusterLibrary.
+	"""
 	# Load the data
 	part_attribs = load_part_attribs(part_attribs_fn)
 	variant_designs = load_variant_designs(variant_designs_fn)

@@ -19,7 +19,7 @@ __version__ = '1.0'
 
 import sys
 import getopt
-import gene_cluster_tools as gct
+import gene_cluster_library as gcl
 
 def main():
     # parse command line options
@@ -35,7 +35,7 @@ def main():
             print __doc__
             sys.exit(0)
     # process arguments
-    gct.make_library_from_csv(args[0], args[1], args[2], args[3], args[4])
+    gcl.make_library_from_csv(args[0], args[1], args[2], args[3], args[4])
 
 if __name__ == "__main__":
     main()

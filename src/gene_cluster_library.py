@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """
-Gene Cluster Tools
-==================
+Gene Cluster Library
+====================
 
-    Gene Cluster Tools is a small library designed for creating, querying
+    Gene Cluster Library is a small library designed for creating, querying
     and saving information related to refactored gene clusters. It provides
     data structures and functions to manipulate light-weight text based
     files that contain all sequence, part and cluster variant information,
@@ -57,7 +57,7 @@ class GeneClusterLibrary:
 		"""Create a new part to use in the variants.
 
 		Parts are the pieces that make up the gene clusters. A part consists
-		of a name, type and sequence, and can additional attributes associated
+		of a name, type and sequence, and can contain additional attributes associated
 		with it e.g., performance information such as REU. All attributes are
 		held as a dict to enable easy and fast keyed access. Parts that have
 		been defined can be accessed using the 'parts' instance variable.

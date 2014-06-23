@@ -998,8 +998,6 @@ class GeneClusterLibrary:
 def promoter_strength (trace, edge_start=50, edge_skip_end=200, edge_end=50):
 	"""Calculate the promoter strength (delta F) of trace
 	"""
-	
-
 	start_depth = np.median(trace[0:edge_start])
 	end_depth = np.median(trace[-edge_length:])
 	return None

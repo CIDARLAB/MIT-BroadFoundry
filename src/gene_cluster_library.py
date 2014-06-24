@@ -975,7 +975,7 @@ def __collate_variant_data_value (variant_data):
 		collated.append(variant_data[v])
 	return collated
 
-def __make_float_if_needed(s):
+def __make_float_if_needed (s):
 	"""Helper function to automatically convert a string to a number if possible.
 
     Parameters

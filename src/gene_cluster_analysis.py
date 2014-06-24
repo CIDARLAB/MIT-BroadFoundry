@@ -26,25 +26,168 @@ __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
 
 def transcriptional_units (gcl):
-	return None
+	"""Extract all valid transcriptional units from a GeneClusterLibrary.
+
+    Parameters
+    ----------
+    gcl : GeneClusterLibrary
+        Gene cluster library to consider.
+
+    Returns
+    -------
+    units: dict(list([PromoterID, TerminatorID]))
+        All valid transcriptional units i.e., Promoter -> Terminator. Dictionary 
+        indexed by variant name with elements stored as a list of promoter, 
+        terminator pairs (also stored as a list).
+	"""
+	# Find all promoters in the library
+	p_insts = gcl.find_part_type_instances('Promoter')
+	# Find all the downstream terminators from the promoters
+	t_insts = gcl.find_next_part_idxs(p_insts, part_type='Terminator')
+	# Combine the data to give the full transcriptional unit boundaries
+	units = {}
+	for v_key in p_insts.keys():
+		if v_key in t_insts.keys():
+			cur_p_data = p_insts[v_key]
+			cur_t_data = t_insts[v_key]
+			for idx in range(len(cur_p_data)):
+				if cur_t_data[idx] != None:
+					if v_key not in units.keys():
+						units[v_key] = []
+					units[v_key].append([cur_p_data[idx], cur_t_data[idx]])
+	return units
 
 def monocistronic_units (gcl):
-	return None
+	"""Extract all monocistronic transcriptional units from a GeneClusterLibrary.
 
-def polycistronic_units (gcl):
-	return None
+    Parameters
+    ----------
+    gcl : GeneClusterLibrary
+        Gene cluster library to consider.
+
+    Returns
+    -------
+    units: dict(list([PromoterID, TerminatorID]))
+        All monocistronic transcriptional units. Dictionary indexed by variant name 
+        with elements stored as a list of promoter, terminator pairs (also stored as 
+        a list).
+	"""
+	# Find all promoters in the library
+	p_insts = gcl.find_part_type_instances('Promoter')
+	# Find all the downstream terminators from the promoters
+	t_insts = gcl.find_next_part_idxs(p_insts, part_type='Terminator')
+	# For each valid pair count number of CDS part types between only include if == 1
+
+	units = {}
+	return units
+
+def polycistronic_units (gcl, number_of_CDSs=None):
+	"""Extract all polycistronic transcriptional units from a GeneClusterLibrary.
+
+    Parameters
+    ----------
+    gcl : GeneClusterLibrary
+        Gene cluster library to consider.
+
+    number_of_CDSs : int (default=None)
+    	Number of CDS parts required between promoter and terminator to be included.
+    	If == None then all counts > 1 are included.
+
+    Returns
+    -------
+    units: dict(list([PromoterID, TerminatorID]))
+        All polycistronic transcriptional units. Dictionary indexed by variant name 
+        with elements stored as a list of promoter, terminator pairs (also stored as 
+        a list).
+	"""
+	units = {}
+	return units
 
 def extract_ranges_for_transcriptional_units (gcl, units):
-	return None
+	"""Extract sequences ranges for a set of transcriptional units.
+
+    Parameters
+    ----------
+    gcl : GeneClusterLibrary
+        Gene cluster library to consider.
+
+    units : dict(list([start index, end index]))
+    	Transcriptional unit start and end locations to extract.
+
+    Returns
+    -------
+    ranges: dict(list([start seq idx, end seq index]))
+        Sequence ranges for each transcriptional unit in the library. Stored as 
+        a dictionary keyed on variant and then a list of tuples containing the 
+        start and end sequence locations of the transcriptional units.
+	"""
+	ranges = {}
+	return ranges
 
 def double_promoters (gcl):
+	"""Extract all double promoters from a GeneClusterLibrary.
+
+    Parameters
+    ----------
+    gcl : GeneClusterLibrary
+        Gene cluster library to consider.
+
+    Returns
+    -------
+    locations: dict(list(list))
+        Locations of double promoters in the library. Stored as dictionary keyed
+        on variant and then a list of tuples containing the locations of the 
+        promoters.
+	"""
 	return None
 
 def divergent_promoters (gcl):
+	"""Extract all divergent promoters from a GeneClusterLibrary.
+
+    Parameters
+    ----------
+    gcl : GeneClusterLibrary
+        Gene cluster library to consider.
+
+    Returns
+    -------
+    locations: dict(list(list))
+        Locations of divergent promoters in the library. Stored as dictionary keyed
+        on variant and then a list of tuples containing the locations of the 
+        promoter pairs.
+	"""
 	return None
 
 def convergent_promoters (gcl):
+	"""Extract all convergent promoters from a GeneClusterLibrary.
+
+    Parameters
+    ----------
+    gcl : GeneClusterLibrary
+        Gene cluster library to consider.
+
+    Returns
+    -------
+    locations: dict(list(list))
+        Locations of convergent promoters in the library. Stored as dictionary keyed
+        on variant and then a list of tuples containing the locations of the 
+        promoter pairs.
+	"""
 	return None
 
 def double_terminators (gcl):
+	"""Extract all double terminators from a GeneClusterLibrary.
+
+    Parameters
+    ----------
+    gcl : GeneClusterLibrary
+        Gene cluster library to consider.
+
+    Returns
+    -------
+    locations: dict(list(list))
+        Locations of double terminators in the library. Stored as dictionary keyed
+        on variant and then a list of tuples containing the locations of the 
+        terminators.
+	"""
 	return None

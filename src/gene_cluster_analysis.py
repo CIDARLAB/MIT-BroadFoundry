@@ -141,25 +141,19 @@ def extract_ranges_for_transcriptional_units (gcl, units):
         a dictionary keyed on variant and then a list of tuples containing the 
         start and end sequence locations of the transcriptional units.
 	"""
+	# Cycle through all promoter/terminator pairs and find start/end indexes
 	ranges = {}
+	for v_key in units.keys():
+		for el in units[v_key]:
+			p_start_idx = gcl.variants[v_key]['part_list'][el[0]]['seq_idx']
+			p_end_idx = p_start_idx + gcl.variants[v_key]['part_list'][el[0]]['seq_len']
+			t_start_idx = gcl.variants[v_key]['part_list'][el[0]]['seq_idx']
+			t_end_idx = t_start_idx + gcl.variants[v_key]['part_list'][el[0]]['seq_len']
+			if v_key not in ranges.keys():
+				ranges[v_key] = []
+			# We return the full length of the transcriptional unit promoter start -> terminator end
+			ranges[v_key].append([p_start_idx, t_end_idx])
 	return ranges
-
-def double_promoters (gcl):
-	"""Extract all double promoters from a GeneClusterLibrary.
-
-    Parameters
-    ----------
-    gcl : GeneClusterLibrary
-        Gene cluster library to consider.
-
-    Returns
-    -------
-    locations: dict(list(list))
-        Locations of double promoters in the library. Stored as dictionary keyed
-        on variant and then a list of tuples containing the locations of the 
-        promoters.
-	"""
-	return None
 
 def divergent_promoters (gcl):
 	"""Extract all divergent promoters from a GeneClusterLibrary.
@@ -192,6 +186,23 @@ def convergent_promoters (gcl):
         Locations of convergent promoters in the library. Stored as dictionary keyed
         on variant and then a list of tuples containing the locations of the 
         promoter pairs.
+	"""
+	return None
+
+def double_promoters (gcl):
+	"""Extract all double promoters from a GeneClusterLibrary.
+
+    Parameters
+    ----------
+    gcl : GeneClusterLibrary
+        Gene cluster library to consider.
+
+    Returns
+    -------
+    locations: dict(list(list))
+        Locations of double promoters in the library. Stored as dictionary keyed
+        on variant and then a list of tuples containing the locations of the 
+        promoters.
 	"""
 	return None
 

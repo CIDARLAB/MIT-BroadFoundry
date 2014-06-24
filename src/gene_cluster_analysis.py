@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Gene Cluster Analysis Tools
-===========================
+Gene Cluster Library Analysis Tools
+===================================
 
     Gene Cluster Analysis Tools are a set of methods to robustly perform 
     general queries of gene cluster libraries.
@@ -26,4 +26,16 @@ __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
 
 
+
+def transcriptional_units (gcl):
+	return None
+
+def monocistronic_units (gcl):
+	return None
+
+def polycistronic_units (gcl):
+	return None
+
+def seq_ranges_for_transcriptional_units (gcl, units):
+	return None
 

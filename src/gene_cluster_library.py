@@ -432,7 +432,7 @@ class GeneClusterLibrary:
 				v_idxs.append(self.find_next_part_idx(v, i, part_type, next_count))
 			part_idxs[v] = v_idxs
 		if remove_nones:
-			return self.__remove_nones_variant_data(part_idxs)
+			return __remove_nones_variant_data(part_idxs)
 		else:
 			return part_idxs
 
@@ -526,7 +526,7 @@ class GeneClusterLibrary:
 				v_idxs.append(self.find_prev_part_idx(v, i, part_type, next_count))
 			part_idxs[v] = v_idxs
 		if remove_nones:
-			return self.__remove_nones_variant_data(part_idxs)
+			return __remove_nones_variant_data(part_idxs)
 		else:
 			return part_idxs
 
@@ -610,7 +610,7 @@ class GeneClusterLibrary:
 					v_attribs.append(self.variants[v]['part_list'][i][attrib_name])
 			part_attribs[v] = v_attribs
 		if collate:
-			return self.__collate_variant_data_list(part_attribs)
+			return __collate_variant_data_list(part_attribs)
 		else:
 			return part_attribs
 
@@ -638,7 +638,7 @@ class GeneClusterLibrary:
 		for v in variant_list:
 			variant_attribs[v] = self.variants[v][attrib_name]
 		if collate:
-			return self.__collate_variant_data_value(variant_attribs)
+			return __collate_variant_data_value(variant_attribs)
 		else:
 			return variant_attribs
 
@@ -908,72 +908,72 @@ class GeneClusterLibrary:
 		f_out.write('# Arcs\n')
 		f_out.close()
 
-	def __remove_nones_variant_data (self, variant_data):
-		"""Helper function to remove None values from variant data.
+def __remove_nones_variant_data (variant_data):
+	"""Helper function to remove None values from variant data.
 
-		Many of the internal functions return results as a dictionary separating
-		them into the specific variants in which they are found. Sometimes these
-		will include None value elements. This function will remove these elements.
+	Many of the internal functions return results as a dictionary separating
+	them into the specific variants in which they are found. Sometimes these
+	will include None value elements. This function will remove these elements.
 
-	    Parameters
-	    ----------
-		variant_data : dict(list)
-			Variant data to remove None values from.
+    Parameters
+    ----------
+	variant_data : dict(list)
+		Variant data to remove None values from.
 
-	    Returns
-	    -------
-	    variant_data : dict(list)
-	    	Cleaned version of variant_data with no None values.
-		"""
-		for v in variant_data.keys():
-			variant_data[v] = [x for x in variant_data[v] if x is not None]
-		return variant_data
+    Returns
+    -------
+    variant_data : dict(list)
+    	Cleaned version of variant_data with no None values.
+	"""
+	for v in variant_data.keys():
+		variant_data[v] = [x for x in variant_data[v] if x is not None]
+	return variant_data
 
-	def __collate_variant_data_list (self, variant_data):
-		"""Helper function to collate variant separated data.
+def __collate_variant_data_list (variant_data):
+	"""Helper function to collate variant separated data.
 
-		Many of the internal functions return results as a dictionary separating
-		them into the specific variants in which they are found. This function 
-		will take a dictionary of data values and collate all the data lists 
-		into a single list.
+	Many of the internal functions return results as a dictionary separating
+	them into the specific variants in which they are found. This function 
+	will take a dictionary of data values and collate all the data lists 
+	into a single list.
 
-	    Parameters
-	    ----------
-		variant_data : dict(list)
-			Variant data to collate.
+    Parameters
+    ----------
+	variant_data : dict(list)
+		Variant data to collate.
 
-	    Returns
-	    -------
-	    variant_data : list
-	    	Single list containing the collated data.
-		"""
-		collated = []
-		for v in variant_data.keys():
-			collated = collated + variant_data[v]
-		return collated
+    Returns
+    -------
+    variant_data : list
+    	Single list containing the collated data.
+	"""
+	collated = []
+	for v in variant_data.keys():
+		collated = collated + variant_data[v]
+	return collated
 
-	def __collate_variant_data_value (self, variant_data):
-		"""Helper function to collate variant separated data.
+def __collate_variant_data_value (variant_data):
+	"""Helper function to collate variant separated data.
 
-		Many of the internal functions return results as a dictionary separating
-		them into the specific variants in which they are found. This function 
-		will take a dictionary of data values and collate all the data values 
-		into a single list.
+	Many of the internal functions return results as a dictionary separating
+	them into the specific variants in which they are found. This function 
+	will take a dictionary of data values and collate all the data values 
+	into a single list.
 
-	    Parameters
-	    ----------
-		variant_data : dict(list)
-			Variant data to collate.
+    Parameters
+    ----------
+	variant_data : dict(list)
+		Variant data to collate.
 
-	    Returns
-	    -------
-	    variant_data : list
-	    	Single list containing the collated data.
-		"""
-		collated = []
-		for v in variant_data.keys():
-			collated.append(variant_data[v])
-		return collated
+    Returns
+    -------
+    variant_data : list
+    	Single list containing the collated data.
+	"""
+	collated = []
+	for v in variant_data.keys():
+		collated.append(variant_data[v])
+	return collated
 
 def __make_float_if_needed(s):
 	"""Helper function to automatically convert a string to a number if possible.

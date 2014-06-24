@@ -25,8 +25,6 @@ __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
 
-
-
 def transcriptional_units (gcl):
 	return None
 
@@ -36,6 +34,17 @@ def monocistronic_units (gcl):
 def polycistronic_units (gcl):
 	return None
 
-def seq_ranges_for_transcriptional_units (gcl, units):
+def extract_ranges_for_transcriptional_units (gcl, units):
 	return None
 
+def double_promoters (gcl):
+	return None
+
+def divergent_promoters (gcl):
+	return None
+
+def convergent_promoters (gcl):
+	return None
+
+def double_terminators (gcl):
+	return None

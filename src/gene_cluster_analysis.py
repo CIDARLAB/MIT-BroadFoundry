@@ -72,14 +72,7 @@ def monocistronic_units (gcl):
         with elements stored as a list of promoter, terminator pairs (also stored as 
         a list).
 	"""
-	# Find all promoters in the library
-	p_insts = gcl.find_part_type_instances('Promoter')
-	# Find all the downstream terminators from the promoters
-	t_insts = gcl.find_next_part_idxs(p_insts, part_type='Terminator')
-	# For each valid pair count number of CDS part types between only include if == 1
-
-	units = {}
-	return units
+	return polycistronic_units(gcl, number_of_CDSs=1)
 
 def polycistronic_units (gcl, number_of_CDSs=None):
 	"""Extract all polycistronic transcriptional units from a GeneClusterLibrary.
@@ -100,7 +93,34 @@ def polycistronic_units (gcl, number_of_CDSs=None):
         with elements stored as a list of promoter, terminator pairs (also stored as 
         a list).
 	"""
+	# Find all promoters in the library
+	p_insts = gcl.find_part_type_instances('Promoter')
+	# Find all the downstream terminators from the promoters
+	t_insts = gcl.find_next_part_idxs(p_insts, part_type='Terminator')
+	# For each valid pair, count number of CDS part types between only include if == 1
 	units = {}
+	for v_key in p_insts.keys():
+		if v_key in t_insts.keys():
+			cur_p_data = p_insts[v_key]
+			cur_t_data = t_insts[v_key]
+			for idx in range(len(cur_p_data)):
+				cur_p = cur_p_data[idx]
+				cur_t = cur_t_data[idx]
+				# Cycle through all parts between promoter and terminator and count CDSs
+				cds_count = 0
+				for cur_part_idx in range(cur_p+1,cur_t):
+					cur_part_name = gcl.variants[v_key]['part_list'][cur_part_idx]
+					if gcl.parts[cur_part_name]['type'] == 'CDS':
+						cds_count += 1
+				if number_of_CDSs == None:
+					if cds_count > 1:
+						if v_key not in units.keys():
+							units[v_key] = []
+						units[v_key].append([cur_p, cut_t])
+				elif number_of_CDSs == cds_count:
+					if v_key not in units.keys():
+							units[v_key] = []
+						units[v_key].append([cur_p, cut_t])
 	return units
 
 def extract_ranges_for_transcriptional_units (gcl, units):

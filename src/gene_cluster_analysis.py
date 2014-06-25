@@ -45,7 +45,7 @@ def filter_tu_insts (gcl, tu_insts, filter_insts, idx=0):
 			for tu_val in tu_data:
 				filter_flag = False
 				for f_val in filter_data:
-					if tu_val[idx] == f_val[0] and tu_val[idx] == f_val[1]:
+					if tu_val[idx] == f_val[0] or tu_val[idx] == f_val[1]:
 						# This item should be filtered
 						filter_flag = True
 						break

@@ -30,14 +30,31 @@ def abs_promoter_strength (gcl, variant, p_idx, t_idx, tx_profile):
 	"""
 	return None
 
-
 def abs_promoter_strengths (gcl, tu_insts, tx_profiles):
 	"""Calculate an absolute promoter strengths of a set of transcriptional units.
 	"""
 	return None
 
 def filter_tu_insts (gcl, tu_insts, filter_insts, idx=0):
-	return None
+	results = {}
+	for v_key in tu_insts.keys():
+		if v_key in filter_insts.keys():
+			new_tu_data = []
+			tu_data = tu_insts[v_key]
+			filter_data = filter_insts[v_key]
+			for tu_val in tu_data:
+				filter_flag = False
+				for f_val in filter_data:
+					if tu_val[idx] == f_val[0] and tu_val[idx] == f_val[1]:
+						# This item should be filtered
+						filter_flag = True
+						break
+				if filter_flag == False:
+					new_tu_data.append(list(tu_val))
+			results[v_key] = new_tu_data
+		else:
+			results[v_key] = list(tu_insts[v_key])
+	return results
 
 def filter_tu_insts_on_promoters (gcl, tu_insts, filter_insts):
 	return filter_tu_insts(gcl, tu_insts, filter_insts, idx=0)
@@ -63,17 +80,8 @@ def tu_meta_data (gcl, variant, tu):
 
 	Returns
 	-------
-	promoter : string
-		Name of promoter in transcriptional unit.
-
-	rbs : string
-		Name of 1st RBS in transcriptional unit.
-
-	cds : string
-		Name of 1st CDS in transcriptional unit.
-
-	terminator : string
-		Name of terminator in transcriptional unit.
+	metadata : list(string) ([promoter, rbs, cds, terminator])
+		Metadata for the transcriptional unit (part names)
 	"""
 	p = None
 	r = None
@@ -85,8 +93,9 @@ def tu_meta_data (gcl, variant, tu):
 	    step_dir = -1
 	# Cycle through all parts to extract meta data
 	for cur_part_idx in range(tu[0], tu[1]+step_dir, step_dir):
-		cur_name = gcl.variants[variant][part_list][cur_part_idx]['part_name']
+		cur_name = gcl.variants[variant]['part_list'][cur_part_idx]['part_name']
 		cur_type = gcl.parts[cur_name]['type']
+		# Check to see if found relevant part
 		if p == None and cur_type == 'Promoter':
 			p = cur_name
 		if r == None and cur_type == 'RBS':
@@ -95,7 +104,33 @@ def tu_meta_data (gcl, variant, tu):
 			c = cur_name
 		if t == None and cur_type == 'Terminator':
 			t = cur_name
-	return p, r, c, t
+	return [p, r, c, t]
 
 def tu_insts_meta_data (gcl, tu_insts):
-	return None
+	"""Find meta data for a set of transcriptional unit instances.
+
+	If any of the following components are not found then None is returned.
+
+	Parameters
+	----------
+	gcl : GeneClusterLibrary
+		Gene cluster library to perform query using.
+
+	variant : string
+		Gene cluster variant name.
+
+	tu : list([start_part_idx, end_part_idx])
+		Transcriptional unit start and end part indexes.
+
+	Returns
+	-------
+	metadata : dict(list(string)) ([promoter, rbs, cds, terminator])
+		Metadata for the transcriptional units (part names) with dictionary
+		keyed by variant name.
+	"""
+	results = {}
+	for v_key in tu_insts.keys():
+		results[v_key] = []
+		for tu in tu_insts[v_key]:
+			results[v_key].append(tu_meta_data(gcl, v_key, tu))
+	return results

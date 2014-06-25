@@ -1031,8 +1031,8 @@ class GeneClusterLibrary:
 			for el in units[v_key]:
 				p_start_idx = self.variants[v_key]['part_list'][el[0]]['seq_idx']
 				p_end_idx = p_start_idx + self.variants[v_key]['part_list'][el[0]]['seq_len']
-				t_start_idx = self.variants[v_key]['part_list'][el[0]]['seq_idx']
-				t_end_idx = t_start_idx + self.variants[v_key]['part_list'][el[0]]['seq_len']
+				t_start_idx = self.variants[v_key]['part_list'][el[1]]['seq_idx']
+				t_end_idx = t_start_idx + self.variants[v_key]['part_list'][el[1]]['seq_len']
 				if v_key not in ranges.keys():
 					ranges[v_key] = []
 				# We return the full length of the transcriptional unit promoter start -> terminator end
@@ -1054,30 +1054,34 @@ class GeneClusterLibrary:
 		p_insts = self.find_part_type_instances('Promoter')
 		# For each promoter search upstream to see if another promoter exists
 		for v_key in p_insts.keys():
-		    for cur_p in p_insts[p]:
+		    for cur_p in p_insts[v_key]:
 		        prev_p = self.find_prev_part_idx(v_key, cur_p, part_type='Promoter', next_count=1)
 		        if prev_p != None:
-		            step_dir = 1
-		            if prev_p < cur_p:
-		                step_dir = -1
-		            # Check that no terminators, CDSs or RBSs between (ignore spacers and scars)
-		            valid_promoter = True
-		            for to_check_idx in range(cur_p+step_dir, prev_p, step_dir):
-		                part_name = self.variants[v_key]['part_list'][to_check_idx]['part_name']
-		                if self.parts[part_name]['type'] in ['CDS', 'RBS', 'Terminator']:
-		                    valid_promoter = False
-		                    break
-		            if valid_promoter == True:
-		                # Check to see if already exists (if not then add)
-		                if v_key not in results.keys():
-		                    results[v_key] = []
-		                exists = False
-		                for el in results[v_key]:
-		                    if el == [cur_p, prev_p] or el == [prev_p, cur_p]:
-		                        exists = True
-		                        break
-		                if exists == False:
-		                    results[v_key].append([cur_p, prev_p])
+		        	# Compare directions
+		            cur_p_dir = self.variants[v_key]['part_list'][cur_p]['dir']
+		            prev_p_dir = self.variants[v_key]['part_list'][prev_p]['dir']
+		            if cur_p_dir != prev_p_dir:
+			            step_dir = 1
+			            if prev_p < cur_p:
+			                step_dir = -1
+			            # Check that no terminators, CDSs or RBSs between (ignore spacers and scars)
+			            valid_promoter = True
+			            for to_check_idx in range(cur_p+step_dir, prev_p, step_dir):
+			                part_name = self.variants[v_key]['part_list'][to_check_idx]['part_name']
+			                if self.parts[part_name]['type'] in ['CDS', 'RBS', 'Terminator']:
+			                    valid_promoter = False
+			                    break
+			            if valid_promoter == True:
+			                # Check to see if already exists (if not then add)
+			                if v_key not in results.keys():
+			                    results[v_key] = []
+			                exists = False
+			                for el in results[v_key]:
+			                    if el == [cur_p, prev_p] or el == [prev_p, cur_p]:
+			                        exists = True
+			                        break
+			                if exists == False:
+			                    results[v_key].append([cur_p, prev_p])
 		return results
 
 	def convergent_promoters (self):
@@ -1095,7 +1099,7 @@ class GeneClusterLibrary:
 		p_insts = self.find_part_type_instances('Promoter')
 		# For each promoter search upstream to see if another promoter exists
 		for v_key in p_insts.keys():
-		    for cur_p in p_insts[p]:
+		    for cur_p in p_insts[v_key]:
 		        next_p = self.find_next_part_idx(v_key, cur_p, part_type='Promoter', next_count=1)
 		        if next_p != None:
 		            # Compare directions
@@ -1130,7 +1134,7 @@ class GeneClusterLibrary:
 	    p_insts = self.find_part_type_instances(part_type)
 	    # For each promoter search upstream to see if another promoter exists
 	    for v_key in p_insts.keys():
-	        for cur_p in p_insts[p]:
+	        for cur_p in p_insts[v_key]:
 	            next_p = self.find_next_part_idx(v_key, cur_p, part_type=part_type, next_count=1)
 	            if next_p != None:
 	                # Compare directions
@@ -1170,7 +1174,7 @@ class GeneClusterLibrary:
 	        on variant and then a list of tuples containing the locations of the 
 	        promoters.
 	    """
-	    return double_parts(gcl, 'Promoter')
+	    return self.double_parts('Promoter')
 
 	def double_terminators (self):
 		"""Extract all double terminators from a GeneClusterLibrary.
@@ -1182,7 +1186,7 @@ class GeneClusterLibrary:
 	        on variant and then a list of tuples containing the locations of the 
 	        terminators.
 		"""
-		return double_parts(gcl, 'Terminator')
+		return self.double_parts('Terminator')
 
 	def convergent_terminators (self):
 	    """Extract all convergent terminators from a GeneClusterLibrary.
@@ -1199,7 +1203,7 @@ class GeneClusterLibrary:
 	    p_insts = self.find_part_type_instances('Terminator')
 	    # For each promoter search upstream to see if another promoter exists
 	    for v_key in p_insts.keys():
-	        for cur_p in p_insts[p]:
+	        for cur_p in p_insts[v_key]:
 	            next_p = self.find_next_part_idx(v_key, cur_p, part_type='Terminator', next_count=1)
 	            if next_p != None:
 	                # Compare directions
@@ -1207,16 +1211,27 @@ class GeneClusterLibrary:
 	                next_p_dir = self.variants[v_key]['part_list'][next_p]['dir']
 	                if cur_p_dir != next_p_dir:
 	                    # Terminators are convergent so add.
-	                    # Check to see if already exists (if not then add)
-	                    if v_key not in results.keys():
-	                        results[v_key] = []
-	                    exists = False
-	                    for el in results[v_key]:
-	                        if el == [cur_p, next_p] or el == [next_p, cur_p]:
-	                            exists = True
+	                    # Check that no terminators, CDSs or RBSs between (ignore spacers and scars)
+	                    step_dir = 1
+	                    if next_p < cur_p:
+	                        step_dir = -1
+	                    valid_part = True
+	                    for to_check_idx in range(cur_p+step_dir, next_p, step_dir):
+	                        part_name = self.variants[v_key]['part_list'][to_check_idx]['part_name']
+	                        if self.parts[part_name]['type'] in ['Promoter', 'CDS', 'RBS']:
+	                            valid_part = False
 	                            break
-	                    if exists == False:
-	                        results[v_key].append([cur_p, next_p])
+	                    if valid_part == True:
+		                    # Check to see if already exists (if not then add)
+		                    if v_key not in results.keys():
+		                        results[v_key] = []
+		                    exists = False
+		                    for el in results[v_key]:
+		                        if el == [cur_p, next_p] or el == [next_p, cur_p]:
+		                            exists = True
+		                            break
+		                    if exists == False:
+		                        results[v_key].append([cur_p, next_p])
 	    return results
 
 	def __make_float_if_needed (self, s):

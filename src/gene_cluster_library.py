@@ -354,7 +354,7 @@ class GeneClusterLibrary:
 			part_seqs[v] = v_seqs
 		return part_seqs
 
-	def find_next_part_idx (self, variant_name, part_idx, part_type=None, next_count=1):
+	def find_next_part_idx (self, variant_name, part_idx, part_type=None, next_count=1, dir_check=False):
 		"""Find the next part in the design from specific part in a variant.
 
 	    Parameters
@@ -393,10 +393,17 @@ class GeneClusterLibrary:
 			else:
 				for i in range(part_idx+1, len(self.variants[variant_name]['part_list'])):
 					if self.parts[self.variants[variant_name]['part_list'][i]['part_name']]['type'] == part_type:
-						if cur_next_count == next_count:
-							return i
+						if dir_check == True:
+							if self.variants[variant_name]['part_list'][i]['dir'] == 'F':
+								if cur_next_count == next_count:
+									return i
+								else:
+									cur_next_count += 1
 						else:
-							cur_next_count += 1
+							if cur_next_count == next_count:
+								return i
+							else:
+								cur_next_count += 1
 		else:
 			if part_type == None:
 				next_part_idx = part_idx-next_count
@@ -407,13 +414,20 @@ class GeneClusterLibrary:
 			else:
 				for i in range(part_idx-1, -1, -1):
 					if self.parts[self.variants[variant_name]['part_list'][i]['part_name']]['type'] == part_type:
-						if cur_next_count == next_count:
-							return i
+						if dir_check == True:
+							if self.variants[variant_name]['part_list'][i]['dir'] == 'R':
+								if cur_next_count == next_count:
+									return i
+								else:
+									cur_next_count += 1
 						else:
-							cur_next_count += 1
+							if cur_next_count == next_count:
+								return i
+							else:
+								cur_next_count += 1
 		return None
 
-	def find_next_part_idxs (self, variant_insts, part_type=None, next_count=1, remove_nones=False):
+	def find_next_part_idxs (self, variant_insts, part_type=None, next_count=1, remove_nones=False, dir_check=False):
 		"""Find the next parts in the design from variant part instances.
 
 	    Parameters
@@ -441,14 +455,14 @@ class GeneClusterLibrary:
 		for v in variant_insts.keys():
 			v_idxs = []
 			for i in variant_insts[v]:
-				v_idxs.append(self.find_next_part_idx(v, i, part_type, next_count))
+				v_idxs.append(self.find_next_part_idx(v, i, part_type, next_count, dir_check))
 			part_idxs[v] = v_idxs
 		if remove_nones:
 			return self.__remove_nones_variant_data(part_idxs)
 		else:
 			return part_idxs
 
-	def find_prev_part_idx (self, variant_name, part_idx, part_type=None, next_count=1):
+	def find_prev_part_idx (self, variant_name, part_idx, part_type=None, next_count=1, dir_check=False):
 		"""Find the previous part in the design from specific part in a variant.
 
 	    Parameters
@@ -487,10 +501,17 @@ class GeneClusterLibrary:
 			else:
 				for i in range(part_idx-1, -1, -1):
 					if self.parts[self.variants[variant_name]['part_list'][i]['part_name']]['type'] == part_type:
-						if cur_next_count == next_count:
-							return i
+						if dir_check == True:
+							if self.variants[variant_name]['part_list'][i]['dir'] == 'F':
+								if cur_next_count == next_count:
+									return i
+								else:
+									cur_next_count += 1
 						else:
-							cur_next_count += 1
+							if cur_next_count == next_count:
+								return i
+							else:
+								cur_next_count += 1
 		else:
 			if part_type == None:
 				next_part_idx = part_idx+next_count
@@ -501,13 +522,20 @@ class GeneClusterLibrary:
 			else:
 				for i in range(part_idx+1, len(self.variants[variant_name]['part_list'])):
 					if self.parts[self.variants[variant_name]['part_list'][i]['part_name']]['type'] == part_type:
-						if cur_next_count == next_count:
-							return i
+						if dir_check == True:
+							if self.variants[variant_name]['part_list'][i]['dir'] == 'F':
+								if cur_next_count == next_count:
+									return i
+								else:
+									cur_next_count += 1
 						else:
-							cur_next_count += 1
+							if cur_next_count == next_count:
+								return i
+							else:
+								cur_next_count += 1
 		return None
 	
-	def find_prev_part_idxs (self, variant_insts, part_type=None, next_count=1, remove_nones=False):
+	def find_prev_part_idxs (self, variant_insts, part_type=None, next_count=1, remove_nones=False, dir_check=False):
 		"""Find the previous parts in the design from variant part instances.
 
 	    Parameters
@@ -535,7 +563,7 @@ class GeneClusterLibrary:
 		for v in variant_insts.keys():
 			v_idxs = []
 			for i in variant_insts[v]:
-				v_idxs.append(self.find_prev_part_idx(v, i, part_type, next_count))
+				v_idxs.append(self.find_prev_part_idx(v, i, part_type, next_count, dir_check))
 			part_idxs[v] = v_idxs
 		if remove_nones:
 			return self.__remove_nones_variant_data(part_idxs)
@@ -654,7 +682,7 @@ class GeneClusterLibrary:
 		else:
 			return variant_attribs
 
-	def find_next_parts (self, variant_insts, n_next=1):
+	def find_next_parts (self, variant_insts, n_next=1, dir_check=False):
 		"""Extract part names up to a given distance forward from a current part.
 
 	    Parameters
@@ -673,11 +701,11 @@ class GeneClusterLibrary:
 		"""
 		next_parts = []
 		for i in range(1, n_next+1):
-			part_insts = self.find_next_part_idxs(variant_insts, next_count=i, remove_nones=True)
+			part_insts = self.find_next_part_idxs(variant_insts, next_count=i, remove_nones=True, dir_check=dir_check)
 			next_parts = next_parts + self.extract_part_names_from_idxs(part_insts)
 		return next_parts
 
-	def find_prev_parts (self, variant_insts, n_prev=1):
+	def find_prev_parts (self, variant_insts, n_prev=1, dir_check=False):
 		"""Extract part names up to a given distance in reverse from a current part.
 
 	    Parameters
@@ -696,7 +724,7 @@ class GeneClusterLibrary:
 		"""
 		prev_parts = []
 		for i in range(1, n_prev+1):
-			part_insts = self.find_prev_part_idxs(variant_insts, next_count=i, remove_nones=True)
+			part_insts = self.find_prev_part_idxs(variant_insts, next_count=i, remove_nones=True, dir_check=dir_check)
 			prev_parts = prev_parts + self.extract_part_names_from_idxs(part_insts)
 		return prev_parts
 
@@ -940,7 +968,7 @@ class GeneClusterLibrary:
 		# Find all promoters in the library
 		p_insts = self.find_part_type_instances('Promoter')
 		# Find all the downstream terminators from the promoters
-		t_insts = self.find_next_part_idxs(p_insts, part_type='Terminator')
+		t_insts = self.find_next_part_idxs(p_insts, part_type='Terminator', dir_check=True)
 		# Combine the data to give the full transcriptional unit boundaries
 		units = {}
 		for v_key in p_insts.keys():
@@ -983,7 +1011,7 @@ class GeneClusterLibrary:
 		# Find all promoters in the library
 		p_insts = self.find_part_type_instances('Promoter')
 		# Find all the downstream terminators from the promoters
-		t_insts = self.find_next_part_idxs(p_insts, part_type='Terminator')
+		t_insts = self.find_next_part_idxs(p_insts, part_type='Terminator', dir_check=True)
 		# For each valid pair, count number of CDS part types between only include if == 1
 		units = {}
 		for v_key in p_insts.keys():

@@ -29,6 +29,10 @@ __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
 
+###############################################################################
+# MAIN OBJECT FOR GENE CLUSTER LIBRARIES
+###############################################################################
+
 class GeneClusterLibrary:
 	"""Class encapsulating the concept of a gene cluster and potential variants.
 	"""
@@ -40,6 +44,11 @@ class GeneClusterLibrary:
 	                  'Terminator':'t',
 	                  'Scar':'x',
 	                  'Spacer':'s'}
+
+	STD_PART_TYPES = ['Promoter',
+	                  'RBS',
+	                  'CDS',
+	                  'Terminator']
 
 	def __init__(self):
 		"""Constructor the generate an empty GeneClusterLibrary.
@@ -432,7 +441,7 @@ class GeneClusterLibrary:
 				v_idxs.append(self.find_next_part_idx(v, i, part_type, next_count))
 			part_idxs[v] = v_idxs
 		if remove_nones:
-			return __remove_nones_variant_data(part_idxs)
+			return self.__remove_nones_variant_data(part_idxs)
 		else:
 			return part_idxs
 
@@ -526,7 +535,7 @@ class GeneClusterLibrary:
 				v_idxs.append(self.find_prev_part_idx(v, i, part_type, next_count))
 			part_idxs[v] = v_idxs
 		if remove_nones:
-			return __remove_nones_variant_data(part_idxs)
+			return self.__remove_nones_variant_data(part_idxs)
 		else:
 			return part_idxs
 
@@ -610,7 +619,7 @@ class GeneClusterLibrary:
 					v_attribs.append(self.variants[v]['part_list'][i][attrib_name])
 			part_attribs[v] = v_attribs
 		if collate:
-			return __collate_variant_data_list(part_attribs)
+			return self.__collate_variant_data_list(part_attribs)
 		else:
 			return part_attribs
 
@@ -638,7 +647,7 @@ class GeneClusterLibrary:
 		for v in variant_list:
 			variant_attribs[v] = self.variants[v][attrib_name]
 		if collate:
-			return __collate_variant_data_value(variant_attribs)
+			return self.__collate_variant_data_value(variant_attribs)
 		else:
 			return variant_attribs
 
@@ -774,7 +783,7 @@ class GeneClusterLibrary:
 					if part_attribs_txt != ['']:
 						for a in part_attribs_txt:
 							key_val = a.split('=')
-							part_attribs[key_val[0]] = __make_float_if_needed(key_val[1])
+							part_attribs[key_val[0]] = self.__make_float_if_needed(key_val[1])
 					self.new_part(part_name, part_type, part_seq, attribs=part_attribs)
 					l_idx += 3
 				if reading_variants:
@@ -792,14 +801,14 @@ class GeneClusterLibrary:
 						cur_part_attribs_txt = p_split[4::]
 						for a in cur_part_attribs_txt:
 							key_val = a.split('=')
-							cur_part[key_val[0]] = __make_float_if_needed(key_val[1])
+							cur_part[key_val[0]] = self.__make_float_if_needed(key_val[1])
 						var_part_list.append(cur_part)
 					var_attribs = {}
 					var_attribs_txt = lines[l_idx+3][9::].split(',')
 					if var_attribs_txt != ['']:
 						for a in var_attribs_txt:
 							key_val = a.split('=')
-							var_attribs[key_val[0]] = __make_float_if_needed(key_val[1])
+							var_attribs[key_val[0]] = self.__make_float_if_needed(key_val[1])
 					self.new_variant(var_name, var_part_list, seq=var_seq, attribs=var_attribs)
 					l_idx += 3
 			# Move to next line
@@ -908,72 +917,398 @@ class GeneClusterLibrary:
 		f_out.write('# Arcs\n')
 		f_out.close()
 
-def __remove_nones_variant_data (variant_data):
-	"""Helper function to remove None values from variant data.
+	def transcriptional_units (self):
+		"""Extract all valid transcriptional units from a GeneClusterLibrary.
 
-	Many of the internal functions return results as a dictionary separating
-	them into the specific variants in which they are found. Sometimes these
-	will include None value elements. This function will remove these elements.
+		Note: double promoters will generate two transcriptional units.
 
-    Parameters
-    ----------
-	variant_data : dict(list)
-		Variant data to remove None values from.
+	    Parameters
+	    ----------
+	    gcl : GeneClusterLibrary
+	        Gene cluster library to consider.
 
-    Returns
-    -------
-    variant_data : dict(list)
-    	Cleaned version of variant_data with no None values.
-	"""
-	for v in variant_data.keys():
-		variant_data[v] = [x for x in variant_data[v] if x is not None]
-	return variant_data
+	    Returns
+	    -------
+	    units: dict(list([PromoterID, TerminatorID]))
+	        All valid transcriptional units i.e., Promoter -> Terminator. Dictionary 
+	        indexed by variant name with elements stored as a list of promoter, 
+	        terminator pairs (also stored as a list).
+		"""
+		# Find all promoters in the library
+		p_insts = self.find_part_type_instances('Promoter')
+		# Find all the downstream terminators from the promoters
+		t_insts = self.find_next_part_idxs(p_insts, part_type='Terminator')
+		# Combine the data to give the full transcriptional unit boundaries
+		units = {}
+		for v_key in p_insts.keys():
+			if v_key in t_insts.keys():
+				cur_p_data = p_insts[v_key]
+				cur_t_data = t_insts[v_key]
+				for idx in range(len(cur_p_data)):
+					if cur_t_data[idx] != None:
+						if v_key not in units.keys():
+							units[v_key] = []
+						units[v_key].append([cur_p_data[idx], cur_t_data[idx]])
+		return units
 
-def __collate_variant_data_list (variant_data):
-	"""Helper function to collate variant separated data.
+	def monocistronic_units (self):
+		"""Extract all monocistronic transcriptional units from a GeneClusterLibrary.
 
-	Many of the internal functions return results as a dictionary separating
-	them into the specific variants in which they are found. This function 
-	will take a dictionary of data values and collate all the data lists 
-	into a single list.
+	    Returns
+	    -------
+	    units: dict(list([PromoterID, TerminatorID]))
+	        All monocistronic transcriptional units. Dictionary indexed by variant name 
+	        with elements stored as a list of promoter, terminator pairs (also stored as 
+	        a list).
+		"""
+		return self.polycistronic_units(number_of_CDS=1)
 
-    Parameters
-    ----------
-	variant_data : dict(list)
-		Variant data to collate.
+	def polycistronic_units (self, number_of_CDS=None):
+		"""Extract all polycistronic transcriptional units from a GeneClusterLibrary.
 
-    Returns
-    -------
-    variant_data : list
-    	Single list containing the collated data.
-	"""
-	collated = []
-	for v in variant_data.keys():
-		collated = collated + variant_data[v]
-	return collated
+	    number_of_CDSs : int (default=None)
+	    	Number of CDS parts required between promoter and terminator to be included.
+	    	If == None then all counts > 1 are included.
 
-def __collate_variant_data_value (variant_data):
-	"""Helper function to collate variant separated data.
+	    Returns
+	    -------
+	    units: dict(list([PromoterID, TerminatorID]))
+	        All polycistronic transcriptional units. Dictionary indexed by variant name 
+	        with elements stored as a list of promoter, terminator pairs (also stored as 
+	        a list).
+		"""
+		# Find all promoters in the library
+		p_insts = self.find_part_type_instances('Promoter')
+		# Find all the downstream terminators from the promoters
+		t_insts = self.find_next_part_idxs(p_insts, part_type='Terminator')
+		# For each valid pair, count number of CDS part types between only include if == 1
+		units = {}
+		for v_key in p_insts.keys():
+			if v_key in t_insts.keys():
+				cur_p_data = p_insts[v_key]
+				cur_t_data = t_insts[v_key]
+				for idx in range(len(cur_p_data)):
+					cur_p = cur_p_data[idx]
+					cur_t = cur_t_data[idx]
+					if cur_t != None:
+						# Make sure we cycle in the right direction
+						step_dir = 1   
+						if cur_t < cur_p:
+						    step_dir = -1
+						# Cycle through all parts between promoter and terminator and count CDSs
+						cds_count = 0
+						for cur_part_idx in range(cur_p+step_dir, cur_t, step_dir):
+							cur_part_name = self.variants[v_key]['part_list'][cur_part_idx]['part_name']
+							if self.parts[cur_part_name]['type'] == 'CDS':
+								cds_count += 1
+						if number_of_CDS == None:
+							if cds_count > 1:
+								if v_key not in units.keys():
+									units[v_key] = []
+								units[v_key].append([cur_p, cur_t])
+						elif number_of_CDS == cds_count:
+							if v_key not in units.keys():
+								units[v_key] = []
+							units[v_key].append([cur_p, cur_t])
+		return units
 
-	Many of the internal functions return results as a dictionary separating
-	them into the specific variants in which they are found. This function 
-	will take a dictionary of data values and collate all the data values 
-	into a single list.
+	def extract_ranges_for_transcriptional_units (self, units):
+		"""Extract sequences ranges for a set of transcriptional units.
 
-    Parameters
-    ----------
-	variant_data : dict(list)
-		Variant data to collate.
+	    units : dict(list([start index, end index]))
+	    	Transcriptional unit start and end locations to extract.
 
-    Returns
-    -------
-    variant_data : list
-    	Single list containing the collated data.
-	"""
-	collated = []
-	for v in variant_data.keys():
-		collated.append(variant_data[v])
-	return collated
+	    Returns
+	    -------
+	    ranges: dict(list([start seq idx, end seq index]))
+	        Sequence ranges for each transcriptional unit in the library. Stored as 
+	        a dictionary keyed on variant and then a list of tuples containing the 
+	        start and end sequence locations of the transcriptional units.
+		"""
+		# Cycle through all promoter/terminator pairs and find start/end indexes
+		ranges = {}
+		for v_key in units.keys():
+			for el in units[v_key]:
+				p_start_idx = self.variants[v_key]['part_list'][el[0]]['seq_idx']
+				p_end_idx = p_start_idx + self.variants[v_key]['part_list'][el[0]]['seq_len']
+				t_start_idx = self.variants[v_key]['part_list'][el[0]]['seq_idx']
+				t_end_idx = t_start_idx + self.variants[v_key]['part_list'][el[0]]['seq_len']
+				if v_key not in ranges.keys():
+					ranges[v_key] = []
+				# We return the full length of the transcriptional unit promoter start -> terminator end
+				ranges[v_key].append([p_start_idx, t_end_idx])
+		return ranges
+
+	def divergent_promoters (self):
+		"""Extract all divergent promoters from a GeneClusterLibrary.
+
+	    Returns
+	    -------
+	    locations: dict(list(list))
+	        Locations of divergent promoters in the library. Stored as dictionary keyed
+	        on variant and then a list of tuples containing the locations of the 
+	        promoter pairs.
+		"""
+		results = {}
+		# Find all promoters in the library
+		p_insts = self.find_part_type_instances('Promoter')
+		# For each promoter search upstream to see if another promoter exists
+		for v_key in p_insts.keys():
+		    for cur_p in p_insts[p]:
+		        prev_p = self.find_prev_part_idx(v_key, cur_p, part_type='Promoter', next_count=1)
+		        if prev_p != None:
+		            step_dir = 1
+		            if prev_p < cur_p:
+		                step_dir = -1
+		            # Check that no terminators, CDSs or RBSs between (ignore spacers and scars)
+		            valid_promoter = True
+		            for to_check_idx in range(cur_p+step_dir, prev_p, step_dir):
+		                part_name = self.variants[v_key]['part_list'][to_check_idx]['part_name']
+		                if self.parts[part_name]['type'] in ['CDS', 'RBS', 'Terminator']:
+		                    valid_promoter = False
+		                    break
+		            if valid_promoter == True:
+		                # Check to see if already exists (if not then add)
+		                if v_key not in results.keys():
+		                    results[v_key] = []
+		                exists = False
+		                for el in results[v_key]:
+		                    if el == [cur_p, prev_p] or el == [prev_p, cur_p]:
+		                        exists = True
+		                        break
+		                if exists == False:
+		                    results[v_key].append([cur_p, prev_p])
+		return results
+
+	def convergent_promoters (self):
+		"""Extract all convergent promoters from a GeneClusterLibrary.
+
+	    Returns
+	    -------
+	    locations: dict(list(list))
+	        Locations of convergent promoters in the library. Stored as dictionary keyed
+	        on variant and then a list of tuples containing the locations of the 
+	        promoter pairs.
+		"""
+		results = {}
+		# Find all promoters in the library
+		p_insts = self.find_part_type_instances('Promoter')
+		# For each promoter search upstream to see if another promoter exists
+		for v_key in p_insts.keys():
+		    for cur_p in p_insts[p]:
+		        next_p = self.find_next_part_idx(v_key, cur_p, part_type='Promoter', next_count=1)
+		        if next_p != None:
+		            # Compare directions
+		            cur_p_dir = self.variants[v_key]['part_list'][cur_p]['dir']
+		            next_p_dir = self.variants[v_key]['part_list'][next_p]['dir']
+		            if cur_p_dir != next_p_dir:
+		                # Promoters are convergent so add.
+		                # Check to see if already exists (if not then add)
+		                if v_key not in results.keys():
+		                    results[v_key] = []
+		                exists = False
+		                for el in results[v_key]:
+		                    if el == [cur_p, next_p] or el == [next_p, cur_p]:
+		                        exists = True
+		                        break
+		                if exists == False:
+		                    results[v_key].append([cur_p, next_p])
+		return results
+
+	def double_parts (self, part_type):
+	    """Extract all double promoters from a GeneClusterLibrary.
+
+	    Returns
+	    -------
+	    locations: dict(list(list))
+	        Locations of double promoters in the library. Stored as dictionary keyed
+	        on variant and then a list of tuples containing the locations of the 
+	        promoters.
+	    """
+	    results = {}
+	    # Find all promoters in the library
+	    p_insts = self.find_part_type_instances(part_type)
+	    # For each promoter search upstream to see if another promoter exists
+	    for v_key in p_insts.keys():
+	        for cur_p in p_insts[p]:
+	            next_p = self.find_next_part_idx(v_key, cur_p, part_type=part_type, next_count=1)
+	            if next_p != None:
+	                # Compare directions
+	                cur_p_dir = self.variants[v_key]['part_list'][cur_p]['dir']
+	                next_p_dir = self.variants[v_key]['part_list'][next_p]['dir']
+	                if cur_p_dir == next_p_dir:
+	                    # Check that no terminators, CDSs or RBSs between (ignore spacers and scars)
+	                    step_dir = 1
+	                    if next_p < cur_p:
+	                        step_dir = -1
+	                    valid_part = True
+	                    for to_check_idx in range(cur_p+step_dir, next_p, step_dir):
+	                        part_name = self.variants[v_key]['part_list'][to_check_idx]['part_name']
+	                        if self.parts[part_name]['type'] in [x for x in ['Promoter', 'CDS', 'RBS', 'Terminator'] if x != part_type]:
+	                            valid_part = False
+	                            break
+	                    if valid_part == True:
+	                        # Check to see if already exists (if not then add)
+	                        if v_key not in results.keys():
+	                            results[v_key] = []
+	                        exists = False
+	                        for el in results[v_key]:
+	                            if el == [cur_p, next_p] or el == [next_p, cur_p]:
+	                                exists = True
+	                                break
+	                        if exists == False:
+	                            results[v_key].append([cur_p, next_p])
+	    return results
+
+	def double_promoters (self):
+	    """Extract all double promoters from a GeneClusterLibrary.
+
+	    Returns
+	    -------
+	    locations: dict(list(list))
+	        Locations of double promoters in the library. Stored as dictionary keyed
+	        on variant and then a list of tuples containing the locations of the 
+	        promoters.
+	    """
+	    return double_parts(gcl, 'Promoter')
+
+	def double_terminators (self):
+		"""Extract all double terminators from a GeneClusterLibrary.
+
+	    Returns
+	    -------
+	    locations: dict(list(list))
+	        Locations of double terminators in the library. Stored as dictionary keyed
+	        on variant and then a list of tuples containing the locations of the 
+	        terminators.
+		"""
+		return double_parts(gcl, 'Terminator')
+
+	def convergent_terminators (self):
+	    """Extract all convergent terminators from a GeneClusterLibrary.
+
+	    Returns
+	    -------
+	    locations: dict(list(list))
+	        Locations of convergent terminators in the library. Stored as dictionary keyed
+	        on variant and then a list of tuples containing the locations of the 
+	        terminators.
+	    """
+	    results = {}
+	    # Find all promoters in the library
+	    p_insts = self.find_part_type_instances('Terminator')
+	    # For each promoter search upstream to see if another promoter exists
+	    for v_key in p_insts.keys():
+	        for cur_p in p_insts[p]:
+	            next_p = self.find_next_part_idx(v_key, cur_p, part_type='Terminator', next_count=1)
+	            if next_p != None:
+	                # Compare directions
+	                cur_p_dir = self.variants[v_key]['part_list'][cur_p]['dir']
+	                next_p_dir = self.variants[v_key]['part_list'][next_p]['dir']
+	                if cur_p_dir != next_p_dir:
+	                    # Terminators are convergent so add.
+	                    # Check to see if already exists (if not then add)
+	                    if v_key not in results.keys():
+	                        results[v_key] = []
+	                    exists = False
+	                    for el in results[v_key]:
+	                        if el == [cur_p, next_p] or el == [next_p, cur_p]:
+	                            exists = True
+	                            break
+	                    if exists == False:
+	                        results[v_key].append([cur_p, next_p])
+	    return results
+
+	def __make_float_if_needed (self, s):
+		"""Helper function to automatically convert a string to a number if possible.
+
+	    Parameters
+	    ----------
+		s : string
+			Value to attempt conversion to float.
+
+	    Returns
+	    -------
+	    s : string or float
+	    	If successful the float version will be returned, otherwise the original
+	    	string is returned.
+		"""
+		try:
+			float(s)
+			return float(s)
+		except ValueError:
+			return s
+
+	def __remove_nones_variant_data (self, variant_data):
+		"""Helper function to remove None values from variant data.
+
+		Many of the internal functions return results as a dictionary separating
+		them into the specific variants in which they are found. Sometimes these
+		will include None value elements. This function will remove these elements.
+
+	    Parameters
+	    ----------
+		variant_data : dict(list)
+			Variant data to remove None values from.
+
+	    Returns
+	    -------
+	    variant_data : dict(list)
+	    	Cleaned version of variant_data with no None values.
+		"""
+		for v in variant_data.keys():
+			variant_data[v] = [x for x in variant_data[v] if x is not None]
+		return variant_data
+
+	def __collate_variant_data_list (self, variant_data):
+		"""Helper function to collate variant separated data.
+
+		Many of the internal functions return results as a dictionary separating
+		them into the specific variants in which they are found. This function 
+		will take a dictionary of data values and collate all the data lists 
+		into a single list.
+
+	    Parameters
+	    ----------
+		variant_data : dict(list)
+			Variant data to collate.
+
+	    Returns
+	    -------
+	    variant_data : list
+	    	Single list containing the collated data.
+		"""
+		collated = []
+		for v in variant_data.keys():
+			collated = collated + variant_data[v]
+		return collated
+
+	def __collate_variant_data_value (self, variant_data):
+		"""Helper function to collate variant separated data.
+
+		Many of the internal functions return results as a dictionary separating
+		them into the specific variants in which they are found. This function 
+		will take a dictionary of data values and collate all the data values 
+		into a single list.
+
+	    Parameters
+	    ----------
+		variant_data : dict(list)
+			Variant data to collate.
+
+	    Returns
+	    -------
+	    variant_data : list
+	    	Single list containing the collated data.
+		"""
+		collated = []
+		for v in variant_data.keys():
+			collated.append(variant_data[v])
+		return collated
+
+###############################################################################
+# GLOBAL FUNCTIONS
+###############################################################################
 
 def __make_float_if_needed (s):
 	"""Helper function to automatically convert a string to a number if possible.

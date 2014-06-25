@@ -5,77 +5,77 @@
 > P1
 type: Promoter
 seq: taatacaactcactagagagaga
-attribs: Strength=0.025
+attribs: REU=0.025,REU_SD=0.009
 
 > P2
 type: Promoter
 seq: taatacgactcactagagagaga
-attribs: Strength=0.084
+attribs: REU=0.084,REU_SD=0.037
 
 > P3
 type: Promoter
 seq: taatacgactcactaatgggaga
-attribs: Strength=0.121
+attribs: REU=0.121,REU_SD=0.041
 
 > Rm1
 type: RBS
 seq: tcagagactgaagttattacccaggaggtctata
-attribs: 
+attribs: REU=0.26,REU_SD=0.07
 
 > Rm2
 type: RBS
 seq: taataagtacaacatcccccaggagcttcacagc
-attribs: 
+attribs: REU=0.08,REU_SD=0.004
 
 > Rs1
 type: RBS
 seq: gatacccgtagaccattctgaaatcgaaggaggttttcc
-attribs: 
+attribs: REU=2.89,REU_SD=0.27
 
 > Rs2
 type: RBS
 seq: aactccgcccaccacaataagccggaagagt
-attribs: 
+attribs: REU=0.12,REU_SD=0.008
 
 > Ru1
 type: RBS
 seq: cagatactgacaaataaaccagcgaaggaggttccta
-attribs: 
+attribs: REU=11.5,REU_SD=0.77
 
 > Ru2
 type: RBS
 seq: aaggcgatcccaacgtagaggaggaaaccag
-attribs: 
+attribs: REU=5.91,REU_SD=0.75
 
 > Rv1
 type: RBS
 seq: gcgactaggagcctaactcgccacaaggaaacat
-attribs: 
+attribs: REU=0.23,REU_SD=0.005
 
 > Rv2
 type: RBS
 seq: accagcatacaattctttaaggataaccact
-attribs: 
+attribs: REU=0.04,REU_SD=0.006
 
 > Rw1
 type: RBS
 seq: cagaaggcgagaactagatttaagggccattatag
-attribs: 
+attribs: REU=0.14,REU_SD=0.002
 
 > Rw2
 type: RBS
 seq: ccgatagtttcaagagaaagggagtagaaacaga
-attribs: 
+attribs: REU=0.23,REU_SD=0.01
 
 > Rz1
 type: RBS
 seq: acaagtcccgtattataaccgcctaggaggtgttgg
-attribs: 
+attribs: REU=0.49,REU_SD=0.02
 
 > Rz2
 type: RBS
 seq: ttcaccagcccgaatcaatataggtcataca
-attribs: 
+attribs: REU=0.05,REU_SD=0.009
 
 > S0
 type: Spacer
@@ -115,7 +115,7 @@ attribs:
 > T1
 type: Terminator
 seq: tagcataaccccttggggcctctaaacgggtcttgaggggttttttgt
-attribs: Strength=2.62
+attribs: Strength=2.62,Strength_SD=0.58
 
 > nifM
 type: CDS

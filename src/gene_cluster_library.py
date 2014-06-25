@@ -37,7 +37,7 @@ class GeneClusterLibrary:
 	"""Class encapsulating the concept of a gene cluster and potential variants.
 	"""
 
-	# Static class variable holding standard mapping of part type to PigeonCAD type
+	# Static class variable holding standard mapping of part type to PigeonCAD type.
 	STD_PIGEON_MAP = {'Promoter':'p',
 	                  'CDS':'c',
 	                  'RBS':'r',
@@ -45,13 +45,16 @@ class GeneClusterLibrary:
 	                  'Scar':'x',
 	                  'Spacer':'s'}
 
+	# Static class variable listing the standard parts generally used.
 	STD_PART_TYPES = ['Promoter',
 	                  'RBS',
 	                  'CDS',
-	                  'Terminator']
+	                  'Terminator',
+	                  'Scar',
+	                  'Spacer']
 
 	def __init__(self):
-		"""Constructor the generate an empty GeneClusterLibrary.
+		"""Constructor to generate an empty GeneClusterLibrary.
 		"""
 		self.parts = {}
 		self.variants = {}
@@ -77,7 +80,7 @@ class GeneClusterLibrary:
 	        Part name.
 
 	    part_type : string
-	    	Part type (see STD_PIGEON_MAP for examples)
+	    	Part type (see STD_PART_TYPES for examples)
 
 	    seq : string
 	    	Part sequence.

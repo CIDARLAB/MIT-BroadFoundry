@@ -66,18 +66,16 @@ def abs_promoter_strengths (gcl, tu_insts, tx_profiles, fwd_skip=200, fwd_len=10
 				                  rev_skip=rev_skip, rev_len=rev_len))
 	return results
 
-
-
 def attrib_promoter_strength (gcl, variant, p_idx, attrib_name='rpkm'):
 	"""Calculate promoter strength based on attribute data.
 	"""
 	# Find the CDS downstream of the promoter
-	cds = 
+	cds_idx = gcl.find_next_part_idx(variant, p_idx, part_type='CDS')
 	# Use the attrib_name attribute as strength
-	p_strength = 0.0
+	p_strength = gcl.variants[variant]['part_list'][cds_idx][attrib_name]
 	return p_strength
 
-def attrib_promoter_strength (gcl, tu_insts, tx_profiles, attrib_name='rpkm'):
+def attrib_promoter_strengths (gcl, tu_insts, attrib_name='rpkm'):
 	"""Calculate promoter strength based on attribute data for a set of 
 	transcriptional units.
 	"""

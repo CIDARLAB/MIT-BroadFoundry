@@ -1265,6 +1265,73 @@ class GeneClusterLibrary:
 		                        results[v_key].append([cur_p, next_p])
 	    return results
 
+	def tu_meta_data (self, variant, tu):
+		"""Find meta data for the transcriptional unit.
+
+		If any of the following components are not found then None is returned.
+
+		Parameters
+		----------
+		variant : string
+			Gene cluster variant name.
+
+		tu : list([start_part_idx, end_part_idx])
+			Transcriptional unit start and end part indexes.
+
+		Returns
+		-------
+		metadata : list(string) ([promoter, rbs, cds, terminator])
+			Metadata for the transcriptional unit (part names)
+		"""
+		p = None
+		r = None
+		c = None
+		t = None
+		# Make sure we cycle in the right direction
+		step_dir = 1
+		if tu[1] < tu[0]:
+		    step_dir = -1
+		# Cycle through all parts to extract meta data
+		for cur_part_idx in range(tu[0], tu[1]+step_dir, step_dir):
+			cur_name = self.variants[variant]['part_list'][cur_part_idx]['part_name']
+			cur_type = self.parts[cur_name]['type']
+			# Check to see if found relevant part
+			if p == None and cur_type == 'Promoter':
+				p = cur_name
+			if r == None and cur_type == 'RBS':
+				r = cur_name
+			if c == None and cur_type == 'CDS':
+				c = cur_name
+			if t == None and cur_type == 'Terminator':
+				t = cur_name
+		return [p, r, c, t]
+
+	def tu_insts_meta_data (self, tu_insts):
+		"""Find meta data for a set of transcriptional unit instances.
+
+		If any of the following components are not found then None is returned.
+
+		Parameters
+		----------
+		variant : string
+			Gene cluster variant name.
+
+		tu : list([start_part_idx, end_part_idx])
+			Transcriptional unit start and end part indexes.
+
+		Returns
+		-------
+		metadata : dict(list(string)) ([promoter, rbs, cds, terminator])
+			Metadata for the transcriptional units (part names) with dictionary
+			keyed by variant name.
+		"""
+		results = {}
+		for v_key in tu_insts.keys():
+			results[v_key] = []
+			for tu in tu_insts[v_key]:
+				results[v_key].append(self.tu_meta_data(v_key, tu))
+		return results
+
 	def __make_float_if_needed (self, s):
 		"""Helper function to automatically convert a string to a number if possible.
 

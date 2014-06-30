@@ -10,6 +10,7 @@ def utr_lister(pname, tname):
         utr5list = utr5.readlines()
 
     nom5list = [line[:line.find('>')] for line in utr5list]
+
     
     slice5list = [line[line.find('>')+1:line.find('-')] for line in utr5list]
 

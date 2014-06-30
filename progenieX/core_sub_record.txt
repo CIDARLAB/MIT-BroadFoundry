@@ -1,0 +1,76 @@
+
+VH
+tbp
+ 1
+ 2
+     TTTTTTTTTTTTT
+ 1
+     TTTTTTTTTTTTT
+ 1
+
+VH
+tss
+ 1
+     TTTTCAAT
+ 2
+
+VH
+utr
+ 1
+     AAAAGTAAA
+ 2
+     AAAAGTAAA
+
+H
+tbp
+     TTAATTTAATTTT
+ 1
+ 1
+
+H
+tss
+ 1
+     TTCTCACC
+ 2
+
+H
+utr
+ 1
+     AAAAGTAAA
+ 2
+     AAAAGTAAA
+
+M
+tbp
+     TTAATTTAATTTT
+ 1
+ 1
+
+M
+tss
+ 1
+ 2
+
+M
+utr
+ 1
+     AAAAGTAAA
+ 2
+     AAAAGTAAA
+
+L
+tbp
+ 1
+ 1
+
+L
+tss
+ 1
+ 2
+     AGCGACAA
+
+L
+utr
+ 1
+ 2
+     CCACCGGCG

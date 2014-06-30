@@ -1,27 +1,8 @@
-'''
-This function and associated helper functions handles the sequence generation and motif substution for the two UAS
-in the promoter design.  
-
-First, sequences are generated using SeqGen_5.  Then, based on intended strength and whether the UAS is 1 or 2, 
-different transcription factor binding sites (TFBS) and poly dA:dT (pdW) motifs are substituted at defined locations.
-Some of these motifs are postitively correlated with strength, while a few are negatively correlated with strength.
-All motifs are drawn from literature and databases such as YEASTRACT.  
-
-Once the substitutions are made, they are wiped of potential TypeIIS sites and the correct junctions and TypeIIS sites
-added to the ends of the sequence for proper cloning.  Finally, the funciton uses the analysis package to provide
-motif frequency and nucleotide content information in the form of txt files.
-
-NOTE: This version of PRO_Genie has all parameters hard coded into the script.  PRO_GenieX has the xlrd functions 
-that allow use of a spreadsheet to hold all parameters.
-'''
-
-
 import re
 from random import random
 from common_functions import *
 from SeqGen_5 import seqgen
 from re_eraser import re_erase
-from pro_analysis import promoter_analysis
 
 def maine() :
     uasgen(int(raw_input("Number (must be a multiple of 4):")))

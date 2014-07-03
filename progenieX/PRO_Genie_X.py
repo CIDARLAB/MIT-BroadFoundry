@@ -1,3 +1,32 @@
+"""
+PRO_Genie_X
+===========
+    PRO_Genie_X is a greedy constraint-based algorithm for generating
+    nucleotide sequences that have the same features as yeast promoters.
+    It is composed of a variety of functions, which are distributed among
+    various python scripts according to the task that function performs.
+
+    Running this function, PRO_Genie_X.py, will execute all other scripts
+    to create a specified number of promoters according to the parameters
+    set in ProGenie_Parameters.xlsx.  Therefore, the user need only set
+    the desired parameters in Excel and then run this function to create
+    promoters!!
+
+    For more information, see ABOUT_PROGENIE.txt.
+"""
+
+#   Yeast Promoter Generation in Python
+#   Copyright (C) 2014 by
+#   Eric M. Young <ericyoung7@gmail.com>
+#   All rights reserved.
+
+__author__ = 'Eric M. Young <ericyoung7@gmail.com>, Voigt Lab, MIT'
+__version__ = '2.0'
+
+###########################################################################
+# MAIN SCRIPT FOR CREATING YEAST PROMOTERS
+###########################################################################
+
 from common_functions import *
 from CoreGen_X import coregen
 from UASGen_X import uasgen

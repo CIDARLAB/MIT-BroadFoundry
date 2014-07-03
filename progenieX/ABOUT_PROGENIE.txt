@@ -1,0 +1,74 @@
+PRO_Genie_X
+===========
+
+   Introduction
+   ------------
+
+        PRO_Genie_X is a greedy constraint-based algorithm for generating
+        nucleotide sequences that have the same features as yeast promoters.
+        It is composed of a variety of functions, which are distributed among
+        various python scripts according to the task that function performs.
+
+        Running this function, PRO_Genie_X.py, will execute all other scripts
+        to create a specified number of promoters according to the parameters
+        set in ProGenie_Parameters.xlsx.  Therefore, the user need only set
+        the desired parameters in Excel and then run this function to create
+        promoters!!
+
+
+    Overview of Theory, Implementation, and Flow
+    --------------------------------------------
+
+        What follows is a brief description of how sequences are generated
+        and modified to create promoters. More information can be found
+        in the individual scripts for specific tasks.
+        
+        I. Strength
+        -----------
+        Throughout PRO_Genie scripts there is a concept of desired promoter
+        strength. Four different sets of parameters (very high (VH or V),
+        high (H), medium (M), or low (L) anticipated strength) are set for
+        most functions.  This allows diversity in composition without large
+        combinatorial explosion of potential designs.
+        
+        II. Generation
+        --------------
+        The primary sequence generation function is SeqGen_5.  This is a
+        greedy constraint-based algorithm that will generate a given number
+        of sequences of a given length that meet a given nucleotide content
+        within a set tolerance.
+
+        III. Substitution and Formatting
+        --------------------------------
+        The SeqGen_5 function is called by two scripts for creating the main
+        components of a yeast promoter: the core, handled by CoreGen_X, and
+        upstream activating sequences (UAS), handled by UASGen_X. These
+        functions perform the tasks of passing the appropriate nucleotide
+        content for each region to SeqGen_5, pulling the sequences, passing
+        the sequences to the various substitution and modification functions
+        for each region, and formatting the sequences for Type IIS cloning.
+
+        The descriptions for all of the substitution and modification functions
+        is too long to include here, see the appropriate scripts for a more
+        detailed explanation of how each operates.  However, they are all
+        unified by a basic structure.  Random number generators determine
+        whether a site is to be substituted and what motif is to be
+        substituted. The probabilities of a given substitution change with
+        anticipated strength.  All of these probabilities and sites are set in
+        ProGenie_Parameters.xlsx.
+        
+        There is also a group of eraser functions that eliminate TypeIIS sites
+        as well as motifs that are shown to induce mRNA decay (NAB1 and NRD3).
+
+        IV. Common Functions
+        --------------------
+        There are also a number of shared functions among all scripts that 
+	handle reading from ProGenie_Parameters.xlsx, and manipulating text 
+	files.
+
+	V. Analysis
+	-----------
+	In addition to outputting a log of all substitutions made to every 
+	sequence, there is an included analysis package of functions using 
+	regular expressions that will find all substituted motifs as well
+	as any motifs that may arise by chance.

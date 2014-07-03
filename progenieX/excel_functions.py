@@ -2,22 +2,36 @@ import re
 from itertools import product
 from xlrd import *
 
+global cache
+cache = {}
+
 def maine() :
     cell(workbook, worksheet, cellname)
 
 def cell(workbook, worksheet, cellname) :
 
-    book = open_workbook(workbook)
-    sheet = book.sheet_by_name(worksheet)
+    k = workbook+worksheet+cellname
 
-    row = int(re.sub("\D", "", cellname))-1
-    col = re.sub("\d", "", cellname)
+    if k in cache :
+
+        value = cache[k]
+
+    else :
+        
+        book = open_workbook(workbook)
+        
+        sheet = book.sheet_by_name(worksheet)
+
+        row = int(re.sub("\D", "", cellname))-1
+        col = re.sub("\d", "", cellname)
     
-    col_list = generate_colnames()
+        col_list = generate_colnames()
 
-    ncol = col_list.index(col)
+        ncol = col_list.index(col)
 
-    value = sheet.cell(row, ncol).value
+        value = sheet.cell(row, ncol).value
+
+        cache[k] = value
 
     return value
 

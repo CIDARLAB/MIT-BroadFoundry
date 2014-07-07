@@ -1,14 +1,7 @@
 #!/usr/bin/env python
 """
-Gene Cluster Visualization
-==========================
-
-    This module contains functions to enable easier visualization of Gene Cluster
-    Libraries. It can plot traces in addition to standard promoter, RBS, gene 
-    lke figures. To simplify export of results, all plotting is performed by 
-    matplotlib which ensures portability.
+Test the visualization functionality of the library.
 """
-#    Gene Cluster Visualization
 #    Copyright (C) 2014 by
 #    Thomas E. Gorochowski <tom@chofski.co.uk>
 #    All rights reserved.

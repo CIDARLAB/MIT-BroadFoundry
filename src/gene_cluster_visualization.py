@@ -22,13 +22,11 @@ del sys
 
 import csv
 import numpy as np
-import matplotlib.pyplot as plt
 import gene_cluster_library as gcl
 
 from matplotlib.patches import Polygon
 from matplotlib.patches import FancyArrowPatch
 from matplotlib.lines import Line2D
-import matplotlib.gridspec as gridspec
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
@@ -158,75 +156,3 @@ def plot_traces_with_arch (ax_arch, ax_traces, gcl, variant, traces, start_idx=N
 	ax_traces.set_xticks([])
 	ax_traces.get_yaxis().tick_left()
 	ax_traces.tick_params(axis='x', labelsize=8)
-
-def load_strand_data (filename):
-	data = {}
-	reader = csv.reader(open(filename, 'rb'), delimiter=',')
-	# Use the header to get the names of the keys for the prediction data
-	header = reader.next()
-	for el in header[1:]:
-		el_name = el[6:-1]
-		# Only consider the first of the replicates
-		if el_name.count('.') == 1:
-			el_name = el_name[0]
-		if el_name not in data.keys():
-			data[el_name] = [[],[]]
-	for row in reader:
-		for el_idx in range(1, len(row)):
-			el_name = header[el_idx][6:-1]
-			# Only consider the first of the replicates
-			if el_name.count('.') == 1:
-				el_name = el_name[0]
-			strand = header[el_idx][-1]
-			if strand == '+':
-				data[el_name][0].append(float(row[el_idx]))
-			else:
-				data[el_name][1].append(float(row[el_idx]))
-	return data
-
-# Load the Stata nif library data
-nifs = gcl.GeneClusterLibrary()
-nifs.load('./data/nif_stata_library.txt')
-
-# Example plot testing promoter/CDS/terminator renderings
-fig = plt.figure(figsize=(6,5))
-ax = fig.add_subplot(1,1,1)
-ax.plot([0,200], [0,0], color=(0,0,0), linewidth=2, zorder=1)
-draw_promoter(ax, 5, 25)
-draw_cds(ax, 35, 75)
-draw_terminator(ax, 76, 90)
-draw_promoter(ax, 195, 155)
-draw_cds(ax, 150, 120, hatch='////')
-draw_terminator(ax, 119, 100)
-ax.set_xlim([0,200])
-ax.set_ylim([-30,30])
-ax.set_axis_off()
-
-# Example plot testing full variant rendering
-fig = plt.figure(figsize=(14,3))
-ax = fig.add_subplot(3,1,1)
-plot_variant_arch(ax, nifs, '25', start_idx=1, end_idx=-1, linewidth=1.2)
-ax = fig.add_subplot(3,1,2)
-plot_variant_arch(ax, nifs, '10', start_idx=1, end_idx=-1, linewidth=1.2)
-ax = fig.add_subplot(3,1,3)
-plot_variant_arch(ax, nifs, '1', start_idx=1, end_idx=-1, linewidth=1.2)
-plt.tight_layout()
-
-# Example plot of the whole library
-fig = plt.figure(figsize=(14,84))
-plot_library_arch(fig, nifs, linewidth=1.2)
-plt.tight_layout()
-
-# Example plot of architecture with Tx traces
-gs = gridspec.GridSpec(2, 1, height_ratios=[2,1])
-fig = plt.figure(figsize=(14,4))
-ax_arch = plt.subplot(gs[1])
-ax_traces = plt.subplot(gs[0],sharex=ax_arch)
-# Load the traces for predicted and measured
-phys_reads = load_strand_data('./data/phys_depths3.csv')
-plot_traces_with_arch(ax_arch, ax_traces, nifs, '10', phys_reads, start_idx=1, end_idx=-1, linewidth=1.2)
-plt.tight_layout()
-
-# Show the examples
-plt.show()
-

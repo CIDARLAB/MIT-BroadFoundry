@@ -18,6 +18,7 @@ if sys.version_info[:2] < (2, 6):
     raise ImportError(m % sys.version_info[:2])
 del sys
 
+import csv
 import numpy as np
 import gene_cluster_library as gcl
 
@@ -114,3 +115,28 @@ def filter_tu_insts_on_promoters (tu_insts, filter_insts):
 
 def filter_tu_insts_on_terminators (tu_insts, filter_insts):
 	return filter_tu_insts(tu_insts, filter_insts, idx=1)
+
+def load_strand_data (filename):
+	data = {}
+	reader = csv.reader(open(filename, 'rb'), delimiter=',')
+	# Use the header to get the names of the keys for the prediction data
+	header = reader.next()
+	for el in header[1:]:
+		el_name = el[6:-1]
+		# Only consider the first of the replicates
+		if el_name.count('.') == 1:
+			el_name = el_name[0]
+		if el_name not in data.keys():
+			data[el_name] = [[],[]]
+	for row in reader:
+		for el_idx in range(1, len(row)):
+			el_name = header[el_idx][6:-1]
+			# Only consider the first of the replicates
+			if el_name.count('.') == 1:
+				el_name = el_name[0]
+			strand = header[el_idx][-1]
+			if strand == '+':
+				data[el_name][0].append(float(row[el_idx]))
+			else:
+				data[el_name][1].append(float(row[el_idx]))
+	return data

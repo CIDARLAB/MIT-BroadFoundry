@@ -4,8 +4,8 @@ Gene Cluster Visualization
 ==========================
 
     This module contains functions to enable easier visualization of Gene Cluster
-    Libraries. It can plot traces in addition to standard promoter, RBS, gene 
-    lke figures. To simplify export of results, all plotting is performed by 
+    Libraries. It can plot traces in addition to standard promoter, gene, terminator 
+    like figures. To simplify export of results, all plotting is performed by 
     matplotlib which ensures portability.
 """
 #    Gene Cluster Visualization
@@ -25,7 +25,6 @@ import numpy as np
 import gene_cluster_library as gcl
 
 from matplotlib.patches import Polygon
-from matplotlib.patches import FancyArrowPatch
 from matplotlib.lines import Line2D
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
@@ -133,9 +132,7 @@ def plot_traces_with_arch (ax_arch, ax_traces, gcl, variant, traces, start_idx=N
 	plot_variant_arch(ax_arch, gcl, variant, start_idx=start_idx, end_idx=end_idx, linewidth=linewidth)
 	# Plot the traces (shared axis ensures only valid region plotted)
 	ts = np.array(traces[variant])
-	
 	trace_len = len(ts[0])
-
 	ax_traces.fill_between(range(trace_len),ts[0],np.zeros(trace_len), color='pink', edgecolor='red', linewidth=linewidth, zorder=1)
 	ax_traces.fill_between(range(trace_len),-ts[1],np.zeros(trace_len), color='lightblue', edgecolor='blue', linewidth=linewidth, zorder=1)
 	ax_traces.plot(range(trace_len), np.zeros(trace_len), color=(0,0,0), linewidth=linewidth, zorder=2)
@@ -145,9 +142,8 @@ def plot_traces_with_arch (ax_arch, ax_traces, gcl, variant, traces, start_idx=N
 	if max_read_depth_1 > max_read_depth:
 		max_read_depth = max_read_depth_1
 	max_read_depth *= 1.05
-
+	# Update axis visibility
 	ax_traces.set_ylim([-max_read_depth,max_read_depth])
-
 	ax_traces.spines["right"].set_visible(False)
 	ax_traces.spines["top"].set_visible(False)
 	ax_traces.spines["bottom"].set_visible(False)

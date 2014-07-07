@@ -997,6 +997,8 @@ class GeneClusterLibrary:
 	def polycistronic_units (self, number_of_CDS=None):
 		"""Extract all polycistronic transcriptional units from a GeneClusterLibrary.
 
+		Parameters
+	    ----------
 	    number_of_CDSs : int (default=None)
 	    	Number of CDS parts required between promoter and terminator to be included.
 	    	If == None then all counts > 1 are included.
@@ -1046,6 +1048,8 @@ class GeneClusterLibrary:
 	def extract_ranges_for_transcriptional_units (self, units):
 		"""Extract sequences ranges for a set of transcriptional units.
 
+		Parameters
+	    ----------
 	    units : dict(list([start index, end index]))
 	    	Transcriptional unit start and end locations to extract.
 

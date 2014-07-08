@@ -23,6 +23,7 @@ MAX_RANDOM_ITERATIONS = 10000
 def scar_compatible (scar_set, new_scar, max_homology=3):
 	"""Check if scar compaible with current set at given level of homology.
 	"""
+	scar_len = len(new_scar)
 	if new_scar == 'A'*scar_len or new_scar == 'T'*scar_len or new_scar == 'G'*scar_len or new_scar == 'C'*scar_len:
 		return False
 	if scar_set != []:
@@ -91,6 +92,9 @@ def find_scars (scar_len, seed_set=[], max_homology=3, num_to_find=None, random_
 		else:
 			removed_from_seed(cur_scar)
 	# 3. Search for orthogonal scars (use random search or enumerate all)
+	if num_to_find == None and random_search:
+		# Only perform random search for less that all scars
+		random_search = False
 	if random_search:
 		# Perform a random search (gives greater variability in output set)
 		for i in range(num_to_find):
@@ -120,12 +124,3 @@ def find_scars (scar_len, seed_set=[], max_homology=3, num_to_find=None, random_
 		if num_to_find != None and scars_found < num_to_find:
 			return None, None, None
 	return full_scar_set, new_scars, removed_from_seed
-
-scar_len = 4
-print find_scars(scar_len, seed_set=[], max_homology=3, num_to_find=3, random_search=True)
-print '---------'
-print find_scars(scar_len, seed_set=['AATA'], max_homology=3, num_to_find=3, random_search=True)
-print '---------'
-print find_scars(scar_len, seed_set=['AATA'], max_homology=3, num_to_find=3, random_search=True)
-print '---------'
-print find_scars(scar_len, seed_set=['AATA'], max_homology=3, num_to_find=3, random_search=False)

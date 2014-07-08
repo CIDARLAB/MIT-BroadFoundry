@@ -50,14 +50,15 @@ def reverse_complement(s):
 def random_scar (scar_len, exclude_set=[]):
 	"""Generate a random scar of a given length that is not in the excluded set.
 	"""
-	# From: http://stackoverflow.com/questions/21205836/generating-random-sequences-of-dna
+	# Used to ensure we don't get involved in infinite loop
 	i = 0
-	# Must not also be in the reverse complement set so generate for cheking
+	# Must not also be in the reverse complement set so generate for checking
 	rc_exclude_set = []
 	for scar in exclude_set:
 		rc_exclude_set.append(reverse_complement(scar))
 	# Randomly generate candidates until valid scar found (or maximum iterations reached)
 	while True:
+		# From: http://stackoverflow.com/questions/21205836/generating-random-sequences-of-dna
 		new_scar = ''.join(random.choice('ATGC') for _ in xrange(scar_len))
 		# Check it is not one in the excluded list
 		if new_scar != 'A'*scar_len and new_scar != 'T'*scar_len and new_scar != 'G'*scar_len and new_scar != 'C'*scar_len and new_scar not in exclude_set and new_scar not in rc_exclude_set:
@@ -68,12 +69,24 @@ def random_scar (scar_len, exclude_set=[]):
 			break
 	return new_scar
 
+def enumerate_scars (scar_len, depth, cur_scar, full_scar_set, new_scars, max_homology=3, found=[0], num_to_find=None):
+	"""Recursive method to enumerate all possible scars (be careful memory usage high for large lengths)
+	"""
+	if depth == scar_len:
+		if num_to_find == None or found[0] < num_to_find:
+			if scar_compatible(full_scar_set, cur_scar, max_homology=max_homology):
+					full_scar_set.append(cur_scar)
+					new_scars.append(cur_scar)
+					found[0] = found[0] + 1
+	else:
+		bases = list('ATGC')
+		for base in bases:
+			enumerate_scars(scar_len, depth + 1, cur_scar + base, full_scar_set, new_scars, max_homology=max_homology, found=found, num_to_find=num_to_find)
+
 def find_scars (scar_len, seed_set=[], max_homology=3, num_to_find=None, random_search=True):
 	"""Find a required number of scars orthogonal for a seed set with a 
 	maximim number of bp homology.
 	"""
-	# Check that number to find is valid
-	# TODO
 	# 1. Check if seed needs to be generated
 	if seed_set == []:
 		new_scar = random_scar(scar_len)
@@ -93,7 +106,7 @@ def find_scars (scar_len, seed_set=[], max_homology=3, num_to_find=None, random_
 			removed_from_seed(cur_scar)
 	# 3. Search for orthogonal scars (use random search or enumerate all)
 	if num_to_find == None and random_search:
-		# Only perform random search for less that all scars
+		# Only perform random search for less than all scars
 		random_search = False
 	if random_search:
 		# Perform a random search (gives greater variability in output set)
@@ -106,21 +119,14 @@ def find_scars (scar_len, seed_set=[], max_homology=3, num_to_find=None, random_
 				full_scar_set.append(new_scar)
 				new_scars.append(new_scar)
 	else:
-		# Enumerate all possibilities until all required number of scars are found
+		# Enumerate all possibilities until all required number of scars are found (or all)
 		cur_scar = seed_set[0]
 		new_scar = cur_scar
-		scars_found = 0
-		for cur_idx in range(len(cur_scar)):
-			for base in 'ATGC':
-				temp = list(new_scar)
-				temp[cur_idx] = base
-				new_scar = ''.join(temp)
-				if base != cur_scar[cur_idx] and scar_compatible(full_scar_set, new_scar, max_homology=max_homology):
-					full_scar_set.append(new_scar)
-					new_scars.append(new_scar)
-					scars_found += 1
-					if num_to_find != None and scars_found == num_to_find:
-						return full_scar_set, new_scars, removed_from_seed
-		if num_to_find != None and scars_found < num_to_find:
-			return None, None, None
+		if num_to_find == None:
+			enumerate_scars(scar_len, 0, '', full_scar_set, new_scars, max_homology=max_homology)
+		else:
+			found = [0]
+			enumerate_scars(scar_len, 0, '', full_scar_set, new_scars, max_homology=max_homology, found=found, num_to_find=num_to_find)
+			if found[0] < num_to_find:
+				return None, None, None
 	return full_scar_set, new_scars, removed_from_seed

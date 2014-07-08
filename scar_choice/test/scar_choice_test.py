@@ -17,12 +17,12 @@ __version__ = '1.0'
 
 import scar_choice as sc
 
-print sc.find_scars(4, seed_set=[], max_homology=3, num_to_find=3, random_search=True)
+print sc.find_scars(4, seed_set=[], max_homology=2, num_to_find=3, random_search=True)
 print '---------'
-print sc.find_scars(4, seed_set=['AATA'], max_homology=3, num_to_find=3, random_search=True)
+print sc.find_scars(4, seed_set=['AATA'], max_homology=2, num_to_find=3, random_search=True)
 print '---------'
-print sc.find_scars(4, seed_set=['AATA'], max_homology=3, num_to_find=3, random_search=True)
+print sc.find_scars(4, seed_set=['AATA'], max_homology=2, num_to_find=3, random_search=True)
 print '---------'
-print sc.find_scars(4, seed_set=['AATA'], max_homology=3, num_to_find=3, random_search=False)
+print sc.find_scars(4, seed_set=['AATA'], max_homology=2, num_to_find=3, random_search=False)
 print '---------'
-print sc.find_scars(4, seed_set=['AATA'], max_homology=3, num_to_find=None, random_search=False)
+print sc.find_scars(4, seed_set=['AATA'], max_homology=2, num_to_find=None, random_search=False)

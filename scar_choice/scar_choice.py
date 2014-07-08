@@ -27,7 +27,11 @@ def scar_compatible (scar_set, new_scar, max_homology=3):
 	if new_scar == 'A'*scar_len or new_scar == 'T'*scar_len or new_scar == 'G'*scar_len or new_scar == 'C'*scar_len:
 		return False
 	if scar_set != []:
+		# Must not also be in the reverse complement set so generate for checking
+		full_check_set = list(scar_set)
 		for scar in scar_set:
+			full_check_set.append(reverse_complement(scar))
+		for scar in full_check_set:
 			homology_count = 0
 			for scar_bp in range(len(scar)):
 				if scar[scar_bp] == new_scar[scar_bp]:

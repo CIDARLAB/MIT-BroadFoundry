@@ -20,12 +20,16 @@ __version__ = '1.0'
 
 
 
-def 
+def find_scars (seed_set=[], max_homology=3, num_to_find=None):
+	"""Find a required number of scars orthogonal for a seed set with a 
+	maximim number of bp homology.
+	"""
 
+	return full_set, new_scars, removed_from_seed
 
 
 def scar_compatible (scar_set, scar, max_homology=3):
-	"""Check if scar compaible with current set at given level of homology
+	"""Check if scar compaible with current set at given level of homology.
 	"""
 
 	if 

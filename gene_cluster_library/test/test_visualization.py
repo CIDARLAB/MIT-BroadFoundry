@@ -26,9 +26,11 @@ fig = plt.figure(figsize=(6,5))
 ax = fig.add_subplot(1,1,1)
 ax.plot([0,200], [0,0], color=(0,0,0), linewidth=2, zorder=1)
 gcv.draw_promoter(ax, 5, 25)
+gcv.draw_rbs(ax, 29, 34)
 gcv.draw_cds(ax, 35, 75)
 gcv.draw_terminator(ax, 76, 90)
 gcv.draw_promoter(ax, 195, 155)
+gcv.draw_rbs(ax, 154, 151)
 gcv.draw_cds(ax, 150, 120, hatch='////')
 gcv.draw_terminator(ax, 119, 100)
 ax.set_xlim([0,200])
@@ -47,9 +49,49 @@ gcv.plot_variant_arch(ax, nifs, '1', start_idx=1, end_idx=-1, linewidth=1.2)
 plt.tight_layout()
 fig.savefig('./visualizations/VariantRendering.pdf')
 
+# Color mapping to use in library rendering
+cmap = {}
+# Promoters
+cmap['P1'] = (1.0,0.0,0.0)
+cmap['P2'] = (1.0,0.5,0.5)
+cmap['P3'] = (1.0,0.8,0.8)
+# Terminator
+cmap['T1'] = (0.0,0.0,1.0)
+# nif Genes
+cmap['nifM'] = (0.5,0.77,0.56)
+cmap['nifS'] = (0.37,0.78,0.78)
+cmap['nifU'] = (0.76,0.47,0.76)
+cmap['nifV'] = (0.78,0.78,0.49)
+cmap['nifW'] = (0.94,0.74,0.4)
+cmap['nifZ'] = (0.91,0.6,0.58)
+
+rbsStrong = (0.16,0.68,0.15)
+rbsWeak = (0.47,0.83,0.46)
+cmap['Rm1'] = rbsStrong
+cmap['Rm2'] = rbsWeak
+cmap['Rs1'] = rbsStrong
+cmap['Rs2'] = rbsWeak
+cmap['Ru1'] = rbsStrong
+cmap['Ru2'] = rbsWeak
+cmap['Rv1'] = rbsStrong
+cmap['Rv2'] = rbsWeak
+cmap['Rw1'] = rbsStrong
+cmap['Rw2'] = rbsWeak
+cmap['Rz1'] = rbsStrong
+cmap['Rz2'] = rbsWeak
+
+# Hatch mapping to use in library rendering
+hmap = {}
+hmap['nifM'] = ''
+hmap['nifS'] = '/'
+hmap['nifU'] = '//'
+hmap['nifV'] = '///'
+hmap['nifW'] = '////'
+hmap['nifZ'] = '/////'
+
 # Example plot of the whole library
 fig = plt.figure(figsize=(14,84))
-gcv.plot_library_arch(fig, nifs, linewidth=1.2)
+gcv.plot_library_arch(fig, nifs, linewidth=1.2, colormap=cmap, hatchmap=hmap)
 plt.tight_layout()
 fig.savefig('./visualizations/LibraryRendering.pdf')
 
@@ -60,7 +102,7 @@ ax_arch = plt.subplot(gs[1])
 ax_traces = plt.subplot(gs[0],sharex=ax_arch)
 # Load the traces for predicted and measured
 phys_reads = gca.load_strand_data('./data/phys_depths3.csv')
-gcv.plot_traces_with_arch(ax_arch, ax_traces, nifs, '25', phys_reads, start_idx=1, end_idx=-1, linewidth=1.2)
+gcv.plot_traces_with_arch(ax_arch, ax_traces, nifs, '25', phys_reads, start_idx=1, end_idx=-1, linewidth=1.2, colormap=cmap, hatchmap=hmap)
 plt.tight_layout()
 fig.savefig('./visualizations/ArchAndTrace.pdf')
 

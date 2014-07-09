@@ -24,6 +24,12 @@ header h1.logo {
   color: #fff;
   text-transform: uppercase;
   float: left;
+  padding-bottom: 2px;
+}
+
+header img {
+  padding: 2px;
+  float: right;
 }
  
 /*
@@ -55,7 +61,7 @@ h2 {
   font-size: 2.5em;
   margin-top: 20px;
   text-align: center;
-  letter-spacing: -2px;
+  letter-spacing: -1px;
 }
  
 h3 {

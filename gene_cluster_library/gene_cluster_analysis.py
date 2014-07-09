@@ -170,10 +170,14 @@ def abs_cds_rnap_decay_rates (gcl, cds_insts, tx_profiles, start_skip=100,
 	for v_key in cds_insts.keys():
 		results[v_key] = []
 		for cds in cds_insts[v_key]:
+			promoter = gcl.find_prev_part_idx(v_key, cds, part_type='Promoter', next_count=1, dir_check=False)
+			rbs = gcl.find_prev_part_idx(v_key, cds, part_type='RBS', next_count=1, dir_check=False)
 			# For each TU, calculate strength and store
 			results[v_key].append([abs_cds_rnap_decay_rate(gcl, v_key, cds, tx_profiles[v_key], 
 				                  start_skip=start_skip, end_skip=end_skip, 
 				                  averaging_len=averaging_len), 
+			                      gcl.variants[v_key]['part_list'][promoter]['part_name'],
+			                      gcl.variants[v_key]['part_list'][rbs]['part_name'],
 			                      gcl.variants[v_key]['part_list'][cds]['part_name']])
 	return results
 

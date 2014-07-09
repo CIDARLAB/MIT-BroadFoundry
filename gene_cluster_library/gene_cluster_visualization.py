@@ -6,7 +6,8 @@ Gene Cluster Visualization
     This module contains functions to enable easier visualization of Gene Cluster
     Libraries. It can plot traces in addition to standard promoter, gene, terminator 
     like figures. To simplify export of results, all plotting is performed by 
-    matplotlib which ensures portability.
+    matplotlib which ensures portability and vector based output for publication
+    quality figures.
 """
 #    Gene Cluster Visualization
 #    Copyright (C) 2014 by

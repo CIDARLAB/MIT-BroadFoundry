@@ -40,14 +40,14 @@ def scar_compatible (scar_set, new_scar, max_homology=3):
 				return False
 	return True
 
-# Compliment function: http://stackoverflow.com/questions/19570800/reverse-complement-dna
+# Complement function: http://stackoverflow.com/questions/19570800/reverse-complement-dna
 def complement(s): 
 	basecomplement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'} 
 	letters = list(s) 
 	letters = [basecomplement[base] for base in letters] 
 	return ''.join(letters)
 
-# Reverse compliment function: http://stackoverflow.com/questions/19570800/reverse-complement-dna
+# Reverse complement function: http://stackoverflow.com/questions/19570800/reverse-complement-dna
 def reverse_complement(s):
 	return complement(s[::-1])
 

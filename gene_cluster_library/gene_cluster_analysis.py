@@ -140,3 +140,50 @@ def load_strand_data (filename):
 			else:
 				data[el_name][1].append(float(row[el_idx]))
 	return data
+
+def abs_cds_rnap_decay_rate (gcl, variant, c_idx, tx_profile, start_skip=100, 
+	                         end_skip=100, averaging_len=30):
+	"""Calculate RNAP decay rate along transcript.
+	"""
+	var_data = gcl.variants[variant]
+	pre_tx = []
+	post_tx = []
+	if var_data['part_list'][c_idx]['dir'] == 'F':
+		c_start = var_data['part_list'][c_idx]['seq_idx']
+		c_end = c_start + var_data['part_list'][c_idx]['seq_len']
+		pre_tx = tx_profile[0][c_start+start_skip:c_start+start_skip+averaging_len]
+		post_tx = tx_profile[0][c_end-end_skip-averaging_len:c_end-end_skip]
+	else:
+		c_end = var_data['part_list'][c_idx]['seq_idx']
+		c_start = c_end + var_data['part_list'][c_idx]['seq_len']
+		pre_tx = tx_profile[1][c_start-start_skip-averaging_len:c_start-start_skip]
+		post_tx = tx_profile[1][c_end+end_skip:c_end+end_skip+averaging_len]
+	# Estimate gradient
+	norm_by = float(var_data['part_list'][c_idx]['seq_len'])-start_skip-end_skip-averaging_len
+	return (np.median(pre_tx)-np.median(post_tx)) / norm_by
+
+def abs_cds_rnap_decay_rates (gcl, cds_insts, tx_profiles, start_skip=100, 
+	                          end_skip=100, averaging_len=30):
+	"""Calculate RNAP decay rate along transcripts for a set of CDS
+	"""
+	results = {}
+	for v_key in cds_insts.keys():
+		results[v_key] = []
+		for cds in cds_insts[v_key]:
+			# For each TU, calculate strength and store
+			results[v_key].append([abs_cds_rnap_decay_rate(gcl, v_key, cds, tx_profiles[v_key], 
+				                  start_skip=start_skip, end_skip=end_skip, 
+				                  averaging_len=averaging_len), 
+			                      gcl.variants[v_key]['part_list'][cds]['part_name']])
+	return results
+
+def cds_from_tu (gcl, variant, tu):
+	return gcl.find_next_part_idx(variant, tu[0], part_type='CDS', next_count=1, dir_check=False)
+
+def cds_insts_from_tu_insts (gcl, tu_insts):
+	results = {}
+	for v_key in tu_insts.keys():
+		results[v_key] = []
+		for tu in tu_insts[v_key]:
+			results[v_key].append(cds_from_tu(gcl, v_key, tu))
+	return results

@@ -7,6 +7,7 @@ cache = {}
 
 def maine() :
     cell(workbook, worksheet, cellname)
+    w_cell(workbook, worksheet, cellname, cellvalue)
 
 def cell(workbook, worksheet, cellname) :
 
@@ -34,6 +35,20 @@ def cell(workbook, worksheet, cellname) :
         cache[k] = value
 
     return value
+
+def w_cell(workbook, worksheet, cellname, cellvalue) :
+
+    book = workbook
+    sheet = worksheet
+
+    row = int(re.sub("\D", "", cellname))-1
+    col = re.sub("\d", "", cellname)
+    
+    col_list = generate_colnames()
+
+    ncol = col_list.index(col)
+
+    sheet.write(row, ncol, cellvalue)
 
 def generate_colnames():
     

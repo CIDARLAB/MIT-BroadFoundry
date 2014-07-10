@@ -1,5 +1,6 @@
 from random import random
 from xlrd import *
+from xlwt import *
 from excel_functions import cell
 from common_functions import clear
 
@@ -111,9 +112,9 @@ def pro_ter_sub(design_number) :
 
                 with open('Design_%(n)s.txt' % {'n': design_number}, 'a') as output_file :
 
-                    output_file.write("%(p)s %(g)s %(c)s %(s)s\n"
+                    output_file.write("%(p)s %(g)s %(c)s %(l)s %(s)s\n"
                                       % {'p': pathway_number+1, 'g': gene_number+1,
-                                         'c': combination[0], 's': int(combination[1])}) 
+                                         'c': combination[0], 'l': level, 's': int(combination[1])}) 
                 
                 already_used.append(level+opt)
 

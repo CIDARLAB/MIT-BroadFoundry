@@ -22,13 +22,13 @@ def elmsub(seq, strength, uas, iB, uS) :
     # (polyAT after site & TFBS before site for UAS1)
 
     tflociD = {1 : [int(cell(iB,uS,'A13')), int(cell(iB,uS,'A14'))],
-               2 : [int(cell(iB,uS,'B13')), int(cell(iB,uS,'B14')),
-                    int(cell(iB,uS,'B15')), int(cell(iB,uS,'B16'))]}
+               2 : [int(cell(iB,uS,'C13')), int(cell(iB,uS,'C14')),
+                    int(cell(iB,uS,'C15')), int(cell(iB,uS,'C16'))]}
     
     seq = tfsub(uas, seq, strength, tfsiteD[uas], tflociD[uas], iB, uS)
     
-    polyATlociD = {1 : [int(cell(iB,uS,'C13')), int(cell(iB,uS,'C14')),
-                        int(cell(iB,uS,'C15')), int(cell(iB,uS,'C16'))],
+    polyATlociD = {1 : [int(cell(iB,uS,'B13')), int(cell(iB,uS,'B14')),
+                        int(cell(iB,uS,'B15')), int(cell(iB,uS,'B16'))],
                    2 : [int(cell(iB,uS,'D13'))]}
 
     seq = polyAT_sub(uas, seq, strength, polyATsiteD[uas], polyATlociD[uas], iB, uS)
@@ -53,8 +53,11 @@ def tfsub(uas, seq, strength, sites, locilist, iB, uS) :
                     'M': float(cell(iB,uS,'D20')), 'L': float(cell(iB,uS,'E20'))},
                2 : {'VH': float(cell(iB,uS,'B21')), 'H' : float(cell(iB,uS,'C21')),
                     'M': float(cell(iB,uS,'D21')), 'L': float(cell(iB,uS,'E21'))}}
-
-        if tfnum <= tfD[uas][x] :
+        
+        # This ensures the first site is always inserted with a TF site.  For UAS2, the other
+        # three are inserted with the probability in the ProGenie_Parameters.xlsx.  For UAS1,
+        # there is only one other site that has the probability of insertion.
+        if count =< 1 :
 
             # Generate another random number to choose which TF to substitute, likelihood
             #of choosing a particular transcription factor is determined in the tf_probs list.
@@ -104,6 +107,58 @@ def tfsub(uas, seq, strength, sites, locilist, iB, uS) :
             R = seq[tfsliceD[uas][1]:]
 
             seq = L+tf+R
+            
+        if count > 1:
+            if tfnum <= tfD[uas][x] :
+
+                # Generate another random number to choose which TF to substitute, likelihood
+                #of choosing a particular transcription factor is determined in the tf_probs list.
+                #(0): REB1, (0-1): RAP1, (1-2): GCR1, (2-3): ABF1,(3-4): MCM1, (4): RSC3.
+                # In UAS2, to limit the number of patterns, as well as eliminate those TFs that act
+                # close to the transcription start site, only allow REB1, RAP1, and GCR1 sites.
+                tf_choose = random()
+            
+                tf_probs = {1: [float(cell(iB,uS,'C25')), float(cell(iB,uS,'C26')),
+                            float(cell(iB,uS,'C27')), float(cell(iB,uS,'C28')),
+                            float(cell(iB,uS,'C29'))],
+                            2: [float(cell(iB,uS,'E25')), float(cell(iB,uS,'E26')),
+                            float(cell(iB,uS,'E27')), 1, 1]}
+
+                if tf_choose <= tf_probs[uas][0] :
+                    tf = reb1_site_chooser(x, iB, uS)
+                    tfn = 'REB1'
+                if tf_probs[uas][0] < tf_choose <= tf_probs[uas][1] :
+                    tf = rap1_site_chooser(x, iB, uS)
+                    tfn = 'RAP1'
+                if tf_probs[uas][1] < tf_choose <= tf_probs[uas][2] :
+                    tf = gcr1_site_chooser(x, iB, uS)
+                    tfn = 'GCR1'
+                if tf_probs[uas][2] < tf_choose <= tf_probs[uas][3] :
+                    tf = abf1_site_chooser(x, iB, uS)
+                    tfn = 'ABF1'
+                if tf_probs[uas][3] < tf_choose <= tf_probs[uas][4] :
+                    tf = mcm1_site_chooser(x, iB, uS)
+                    tfn = 'MCM1'
+                if tf_probs[uas][4] < tf_choose <= 1 :
+                    tf = rsc3_site(x, iB, uS)
+                    tfn = 'RSC3'
+                
+                # In UAS2, the polyAT will be before the TFBS.  In UAS1, the TFBS will be before the polyAT site.
+                # The purpose of this is to wrap the TFBS region in nucleosome-disfavoring sequence and also to
+                # separate the TFBS region further from the core TSS, in the manner of native promoters.
+                    tfsliceD = {1: [slice_loc-len(tf), slice_loc], 2 : [slice_loc, slice_loc+len(tf)]}
+
+                with open('uas%(y)s_sub_record.txt' % {'y': uas}, 'a') as rec :
+                    rec.write('tf %(c)s %(l)s %(t)s %(s)s\n' % {'c':count, 'l':tfsliceD[uas][0], 't': tfn, 's':tf})
+                
+                # This is the actual code for replacement. I didn't use .replace() because that searches the whole
+                # string for instances of the 12 bp sequence.  There is a low chance it repeats in the UAS, but it
+                # is nonzero.  Therefore, slicing seq on either side of the substitution location and then
+                # concatenating ensures that only one substitution will be made at the desired location.
+                L = seq[:tfsliceD[uas][0]]
+                R = seq[tfsliceD[uas][1]:]
+
+                seq = L+tf+R
 
     return seq
 

@@ -156,23 +156,8 @@ def polyAT_tbp_sub(seq, strength, iB, uS):
             # inserted into the sequences.
             psliceL = [slice_loc, slice_loc+13]
             
-            # This random generator decides which of the polydA:dT sequences to insert.  It will choose either
-            # (0): polyT, (1): polyA, (2): random mix.  As polyA will likely decrease strength of the promoter
-            # Or at least increase strength less than T or a mix), make polyA less likely as the strength increases.
-            seq_choose = random()
-            seq_choiceD = {'VH' : [float(cell(iB,uS,'J45')), float(cell(iB,uS,'J46'))],
-                           'H' : [float(cell(iB,uS,'L45')), float(cell(iB,uS,'L46'))],
-                           'M' : [float(cell(iB,uS,'N45')), float(cell(iB,uS,'N46'))],
-                           'L' : [float(cell(iB,uS,'P45')), float(cell(iB,uS,'P46'))]}
-            
-            # Define the potential sequences to substitute. Poly dA:dT - 1 T, 1 A, 1 random mix
-            polyAT = [cell(iB,uS,'S47'), cell(iB,uS,'S45'), cell(iB,uS,'S46')]
-
-            index = 0
-            if seq_choose <= seq_choiceD[strength][0] :
-                index = 1
-            if seq_choiceD[strength][0] < seq_choose <= seq_choiceD[strength][1] :
-                index = 2
+            # For the core, only a T/A mix sequence will be inserted.
+            polyAT = cell(iB,cS,'R39')
 
             # This is the actual code for replacement. I didn't use .replace() because that searches the whole
             # string for instances of the 12 bp sequence.  There is a low chance it repeats in the UAS, but it

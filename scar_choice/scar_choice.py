@@ -95,6 +95,12 @@ def enumerate_scars (scar_len, depth, cur_scar, full_scar_set, new_scars, max_ho
 		for base in bases:
 			enumerate_scars(scar_len, depth + 1, cur_scar + base, full_scar_set, new_scars, max_homology=max_homology, found=found, num_to_find=num_to_find, allowed_set=allowed_set)
 
+def formatted_output_list (scar_list):
+	"""Output the list in the desired format with reverse complement in tuple.
+	"""
+	return [(x, reverse_complement(x)) for x in scar_list]
+
+
 def find_scars (scar_len, seed_set=[], max_homology=3, num_to_find=None, random_search=True, allowed_set=[]):
 	"""Find a required number of scars orthogonal for a seed set with a 
 	maximim number of bp homology.
@@ -135,4 +141,4 @@ def find_scars (scar_len, seed_set=[], max_homology=3, num_to_find=None, random_
 			enumerate_scars(scar_len, 0, '', full_scar_set, new_scars, max_homology=max_homology, found=found, num_to_find=num_to_find, allowed_set=allowed_set)
 			if found[0] < num_to_find:
 				return None, None, None
-	return full_scar_set, new_scars, removed_from_seed
+	return formatted_output_list(full_scar_set), formatted_output_list(new_scars), formatted_output_list(removed_from_seed)

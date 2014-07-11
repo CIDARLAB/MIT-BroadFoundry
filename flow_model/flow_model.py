@@ -15,9 +15,9 @@ Flow Model
     molecule. Input is a region of a GeneClusterLibrary variant and output
     is the steady-state RNAP density distribution along the DNA.
 
-    Note: this is a deterministic model, not taking stochastic aspects
+    Note: this is a deterministic model not taking stochastic aspects
     into consideration. As the data we generally compare to (RNA-seq)
-    is averaged across the entire populations, stochastic effects will
+    is averaged across entire populations, stochastic effects will
     become smoothed (although may have significant effect at the single
     cell level).
 """
@@ -48,7 +48,7 @@ def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=10
 	# 	3 - terminator
 	sites = [[],[]]
 	# Abstract the DNA sequence from the library into a site model using types above
-
+	
 
 
 	# Rates for transitions between sites
@@ -63,40 +63,80 @@ def flow_derivative(y, time, rate_fwd, rate_rev, rate_int, rate_ext):
 	# vector to hold output
 	out = np.zeros(y)
 	# Output vetor is actually a concatentation of [+ve,-ve] strand data
-	s_num = np.size(out, 0)/2.0
+	s_num = int(np.size(out, 0)/2)
 	# Cycle through each pair (+ve,-ve) sites and calculate derivative
 	for i in range(s_num):
+		# y[i]
+		y_i_f = y[i]
+		y_i_r = y[i+s_num]
+		y_i_all = y_i_f + y_i_r
 		if i == 0:
 			# Handle start points
-			out[i] = y[i]*rate_int[i] + y[i+1]*rate_rev[i+1] - y[i]*rate_fwd[i] - y[i]*rate_rev[i] - y[i]*rate_ext[i]
+			# y[next]
+			y_i_next_f = y[i+1]
+			y_i_next_r = y[i+1+s_num]
+			y_i_next_all = y_i_f + y_i_r
+			# Update +ve strand
+			out[i] = (  rate_int[i]*(1.0-y_i_all)
+                      + y_i_next_f*rate_rev[i+1]*(1.0-y_i_all)
+                      - y_i_f*rate_fwd[i]*(1.0-y_i_next_all)
+                      - y_i_f*rate_rev[i]
+                      - rate_ext[i]*y_i_f )
+			# Update -ve strand
+			out[i+s_num] = (  rate_int[i+s_num]*(1.0-y_i_all)
+                      + y_i_next_r*rate_fwd[i+1+s_num]*(1.0-y_i_all)
+                      - y_i_r*rate_fwd[i+s_num]
+                      - y_i_r*rate_rev[i+s_num]*(1.0-y_i_next_all)
+                      - rate_ext[i+s_num]*y_i_r )
 		elif i == s_num-1:
 			# Handle end points
-			out[i] = y[i]*rate_int[i] + y[i-1]*rate_fwd[i-1] - y[i]*rate_fwd[i] - y[i]*rate_rev[i] - y[i]*rate_ext[i]
-		else:
-			# Handle all other positions
-			# y[i]
-			y_i_f = y[i]
-			y_i_r = y[i+s_num]
-			y_i_all = y_i_f + y_i_r
-			# y[i-1]
+			# y[prev]
 			y_i_prev_f = y[i-1]
 			y_i_prev_r = y[i-1+s_num]
 			y_i_prev_all = y_i_f + y_i_r
-			# y[i+1]
-			y_i_next_f = y[i-1]
-			y_i_next_r = y[i-1+s_num]
+			# Update +ve strand
+			out[i] = (  rate_int[i]*(1.0-y_i_all)
+                      + y_i_prev_f*rate_fwd[i-1]*(1.0-y_i_all)
+                      - y_i_f*rate_fwd[i]
+                      - y_i_f*rate_rev[i]*(1.0-y_i_prev_all)
+                      - rate_ext[i]*y_i_f )
+			# Update -ve strand
+			out[i+s_num] = (  rate_int[i+s_num]*(1.0-y_i_all)
+                      + y_i_prev_r*rate_rev[i-1+s_num]*(1.0-y_i_all)
+                      - y_i_r*rate_fwd[i+s_num]*(1.0-y_i_prev_all)
+                      - y_i_r*rate_rev[i+s_num]
+                      - rate_ext[i+s_num]*y_i_r )
+		else:
+			# Handle all other positions
+			# y[prev]
+			y_i_prev_f = y[i-1]
+			y_i_prev_r = y[i-1+s_num]
+			y_i_prev_all = y_i_f + y_i_r
+			# y[next]
+			y_i_next_f = y[i+1]
+			y_i_next_r = y[i+1+s_num]
 			y_i_next_all = y_i_f + y_i_r
 			# Update +ve strand
-			out[i] = y_i_all*rate_int[i] + y_i_prev_all*rate_fwd[i-1] + y_i_next_all*rate_rev[i+1] - y_i_f*rate_fwd[i] - y_i_f*rate_rev[i] - y_i_f*rate_ext[i]
+			out[i] = (  rate_int[i]*(1.0-y_i_all)
+                      + y_i_prev_f*rate_fwd[i-1]*(1.0-y_i_all)
+                      + y_i_next_f*rate_rev[i+1]*(1.0-y_i_all)
+                      - y_i_f*rate_fwd[i]*(1.0-y_i_next_all)
+                      - y_i_f*rate_rev[i]*(1.0-y_i_prev_all)
+                      - rate_ext[i]*y_i_f )
 			# Update -ve strand
-			out[i+s_num] = 0.0
+			out[i+s_num] = (  rate_int[i+s_num]*(1.0-y_i_all)
+                      + y_i_prev_r*rate_rev[i-1+s_num]*(1.0-y_i_all)
+                      + y_i_next_r*rate_fwd[i+1+s_num]*(1.0-y_i_all)
+                      - y_i_r*rate_fwd[i+s_num]*(1.0-y_i_prev_all)
+                      - y_i_r*rate_rev[i+s_num]*(1.0-y_i_next_all)
+                      - rate_ext[i+s_num]*y_i_r )
 	return out
 
-def run_flow_model (model, t_vec):
+def run_flow_model (site_model, t_vec):
 	# TODO: add steady state checks (continue until stability reached)
-	sites = model[0]
-	rates = model[1]
-	init_cond = np.zeros(len(sites)*2)
+	sites = site_model[0]
+	rates = site_model[1]
+	init_cond = np.zeros(sites)
 	y, info = odeint(flow_derivative, init_cond, time_vec, 
 		             args=(rates[0], rates[1], rates[2], rates[3]), 
 		             full_output=True)

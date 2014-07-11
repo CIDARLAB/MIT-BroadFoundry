@@ -23,6 +23,10 @@ print sc.find_scars(4, seed_set=['AATA'], max_homology=2, num_to_find=3, random_
 print '---------'
 print sc.find_scars(4, seed_set=['AATA'], max_homology=2, num_to_find=3, random_search=True)
 print '---------'
-print sc.find_scars(4, seed_set=['AATA'], max_homology=2, num_to_find=3, random_search=False)
+print sc.find_scars(4, seed_set=['AATA', 'AGTA'], max_homology=2, num_to_find=3, random_search=False)
 print '---------'
-print sc.find_scars(4, seed_set=['AATA'], max_homology=2, num_to_find=None, random_search=False)
+full_scar_set, new_scars, removed_from_seed = sc.find_scars(4, seed_set=[], max_homology=2, num_to_find=None, random_search=False, allowed_set=[])
+print 'Should be 32 scars in total:', len(full_scar_set)
+print 'Full set =', len(full_scar_set), full_scar_set
+print 'Added set =', len(new_scars), new_scars
+print 'Removed =', len(removed_from_seed), removed_from_seed

@@ -133,7 +133,7 @@ if False:
 	plt.tight_layout()
 
 
-if False:
+if True:
 	# Example plot of architecture with Tx traces
 	gs = gridspec.GridSpec(2, 1, height_ratios=[2,1])
 	fig = plt.figure(figsize=(14,4))

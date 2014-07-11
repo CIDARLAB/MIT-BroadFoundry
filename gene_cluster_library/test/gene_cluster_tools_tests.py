@@ -1,7 +1,7 @@
 
 import sys
 sys.path.append('../')
-import gene_cluster_tools as gct
+import gene_cluster_library as gct
 
 a = gct.GeneCluster()
 a.load('test_find_functions.txt')

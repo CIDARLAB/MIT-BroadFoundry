@@ -112,11 +112,11 @@ def draw_cds (ax, start_bp, end_bp, color=None, linewidth=2, arrow_extent=16, bo
 		          facecolor=color, edgecolor=(0.0,0.0,0.0), linewidth=linewidth, hatch=hatch, zorder=11)
 	ax.add_patch(p1)
 
-def plot_library_arch (fig, gcl, linewidth=1.0, colormap=None, hatchmap=None):
+def plot_library_arch (fig, gcl, start_idx=0, end_idx=None, linewidth=1.0, colormap=None, hatchmap=None):
 	for v_idx in range(len(gcl.variants.keys())):
 		v = gcl.variants.keys()[v_idx]
 		ax = fig.add_subplot(len(gcl.variants.keys()),1,v_idx)
-		plot_variant_arch(ax, gcl, v, start_idx=1, end_idx=-1, linewidth=linewidth, colormap=colormap, hatchmap=hatchmap)
+		plot_variant_arch(ax, gcl, v, start_idx=start_idx, end_idx=end_idx, linewidth=linewidth, colormap=colormap, hatchmap=hatchmap)
 
 def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.0, colormap=None, hatchmap=None):
 	# Calculate start and end bp
@@ -124,7 +124,7 @@ def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.
 	if end_idx == None:
 		end_idx = len(part_list)-1
 	if end_idx < 0:
-		end_idx = len(part_list)-1+end_idx
+		end_idx = len(part_list)+end_idx
 	# Draw the parts
 	for el_idx in range(start_idx, end_idx+1):
 		part_name = part_list[el_idx]['part_name']

@@ -73,11 +73,11 @@ if False:
 	# Example plot testing full variant rendering
 	fig = plt.figure(figsize=(14,3))
 	ax = fig.add_subplot(3,1,1)
-	gcv.plot_variant_arch(ax, nifs, '25', start_idx=1, end_idx=-1, linewidth=1.2)
+	gcv.plot_variant_arch(ax, nifs, '25', start_idx=1, end_idx=-2, linewidth=1.2)
 	ax = fig.add_subplot(3,1,2)
-	gcv.plot_variant_arch(ax, nifs, '10', start_idx=1, end_idx=-1, linewidth=1.2)
+	gcv.plot_variant_arch(ax, nifs, '10', start_idx=1, end_idx=-2, linewidth=1.2)
 	ax = fig.add_subplot(3,1,3)
-	gcv.plot_variant_arch(ax, nifs, '1', start_idx=1, end_idx=-1, linewidth=1.2)
+	gcv.plot_variant_arch(ax, nifs, '1', start_idx=1, end_idx=-2, linewidth=1.2)
 	plt.tight_layout()
 
 
@@ -129,7 +129,7 @@ hmap['nifZ'] = '/////'
 if False:
 	# Example plot of the whole library
 	fig = plt.figure(figsize=(14,84))
-	gcv.plot_library_arch(fig, nifs, linewidth=1.2, colormap=cmap, hatchmap=hmap)
+	gcv.plot_library_arch(fig, nifs, start_idx=1, end_idx=-2, linewidth=1.2, colormap=cmap, hatchmap=hmap)
 	plt.tight_layout()
 
 
@@ -145,7 +145,7 @@ if True:
 
 	# Plot trace and the architecture
 	gcv.plot_traces_with_arch(ax_arch, ax_traces, nifs, '79', phys_reads, start_idx=1, 
-		                      end_idx=-1, linewidth=1.2, colormap=cmap, hatchmap=hmap)
+		                      end_idx=-2, linewidth=1.2, colormap=cmap, hatchmap=hmap)
 	plt.tight_layout()
 
 

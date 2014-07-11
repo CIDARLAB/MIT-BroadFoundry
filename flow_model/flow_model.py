@@ -34,7 +34,7 @@ __version__ = '1.0'
 import numpy as np
 from scipy.integrate import odeint
 
-FLOW_MODEL_PARAMS = {'fwd_rate' : 0.2,
+FLOW_MODEL_PARAMS = {'fwd_rate' : 0.1,
                      'rev_rate' : 0.01,
                      'int_rate' : 0.4,
                      'ext_rate' : 0.9}
@@ -42,7 +42,15 @@ FLOW_MODEL_PARAMS = {'fwd_rate' : 0.2,
 def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=20):
 	# Abstract the DNA sequence from the library into a site model using types below
 	start_bp = 0
-	end_bp = 1
+	end_bp = 0
+	# Generate valid indexes
+	if part_start_idx < 0:
+		part_start_idx = len(gcl.variants[variant]['part_list']) - part_start_idx
+	if part_end_idx < 0:
+		part_end_idx = len(gcl.variants[variant]['part_list']) + part_end_idx
+	# Calculate positions in bp
+	start_bp = gcl.variants[variant]['part_list'][part_start_idx]['seq_idx']
+	end_bp = gcl.variants[variant]['part_list'][part_end_idx]['seq_idx'] + gcl.variants[variant]['part_list'][part_end_idx]['seq_len']
 	# Generate the sites (initially classify as generic DNA)
 	num_of_sites = int((end_bp-start_bp)/site_len)
 	if (end_bp-start_bp) % site_len != 0:
@@ -94,25 +102,25 @@ def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=20
 	rate_fwd = [[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites]
 	rate_rev = [[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites]
 	rate_int = [[0.0]*num_of_sites,[0.0]*num_of_sites]
-	rate_ext = [[0.0]*num_of_sites,[0.0]*num_of_sites]
+	rate_ext = [[0.01]*num_of_sites,[0.01]*num_of_sites]
 	# Update the initation and termination rates based on site structure
-
-
-
-
-
-	# TODO in progress
-
-
-
-
-
+	for i in range(num_of_sites):
+		# Promoter so add initiation rate
+		if sites[0] == 1:
+			rate_int[0][i] = FLOW_MODEL_PARAMS['int_rate']
+		if sites[1] == 1:
+			rate_int[1][i] = FLOW_MODEL_PARAMS['int_rate']
+		# Terminator so add termination rate
+		if sites[0] == 3:
+			rate_int[0][i] = FLOW_MODEL_PARAMS['ext_rate']
+		if sites[1] == 3:
+			rate_int[1][i] = FLOW_MODEL_PARAMS['ext_rate']
 	rates = [rate_fwd, rate_rev, rate_int, rate_ext]
 	return (sites, rates)
 
 def flow_derivative(y, time, rate_fwd, rate_rev, rate_int, rate_ext):
-	# vector to hold output
-	out = np.zeros(y)
+	# Vector to hold output derivative
+	out = np.zeros(np.size(y, 0))
 	# Output vetor is actually a concatentation of [+ve,-ve] strand data
 	s_num = int(np.size(out, 0)/2)
 	# Cycle through each pair (+ve,-ve) sites and calculate derivative
@@ -126,7 +134,7 @@ def flow_derivative(y, time, rate_fwd, rate_rev, rate_int, rate_ext):
 			# y[next]
 			y_i_next_f = y[i+1]
 			y_i_next_r = y[i+1+s_num]
-			y_i_next_all = y_i_f + y_i_r
+			y_i_next_all = y_i_next_f + y_i_next_r
 			# Update +ve strand
 			out[i] = (  rate_int[i]*(1.0-y_i_all)
                       + y_i_next_f*rate_rev[i+1]*(1.0-y_i_all)
@@ -144,7 +152,7 @@ def flow_derivative(y, time, rate_fwd, rate_rev, rate_int, rate_ext):
 			# y[prev]
 			y_i_prev_f = y[i-1]
 			y_i_prev_r = y[i-1+s_num]
-			y_i_prev_all = y_i_f + y_i_r
+			y_i_prev_all = y_i_prev_f + y_i_prev_r
 			# Update +ve strand
 			out[i] = (  rate_int[i]*(1.0-y_i_all)
                       + y_i_prev_f*rate_fwd[i-1]*(1.0-y_i_all)
@@ -162,11 +170,11 @@ def flow_derivative(y, time, rate_fwd, rate_rev, rate_int, rate_ext):
 			# y[prev]
 			y_i_prev_f = y[i-1]
 			y_i_prev_r = y[i-1+s_num]
-			y_i_prev_all = y_i_f + y_i_r
+			y_i_prev_all = y_i_prev_f + y_i_prev_r
 			# y[next]
 			y_i_next_f = y[i+1]
 			y_i_next_r = y[i+1+s_num]
-			y_i_next_all = y_i_f + y_i_r
+			y_i_next_all = y_i_next_f + y_i_next_r
 			# Update +ve strand
 			out[i] = (  rate_int[i]*(1.0-y_i_all)
                       + y_i_prev_f*rate_fwd[i-1]*(1.0-y_i_all)
@@ -187,19 +195,78 @@ def run_flow_model (site_model, t_vec):
 	# TODO: add steady state checks (continue until stability reached)
 	# Make model suitable for standard ODE solver (flatten structure)
 	sites = site_model[0][0] + site_model[0][1]
-	rates[0] = site_model[1][0][0] + site_model[1][0][1] # FWD
-	rates[1] = site_model[1][1][0] + site_model[1][1][1] # REV
-	rates[2] = site_model[1][2][0] + site_model[1][2][1] # INT
-	rates[3] = site_model[1][3][0] + site_model[1][3][1] # EXT
+	rates = []
+	rates.append(site_model[1][0][0] + site_model[1][0][1]) # FWD
+	rates.append(site_model[1][1][0] + site_model[1][1][1]) # REV
+	rates.append(site_model[1][2][0] + site_model[1][2][1]) # INT
+	rates.append(site_model[1][3][0] + site_model[1][3][1]) # EXT
 	# Set up solver and run
-	init_cond = np.zeros(sites)
-	y, info = odeint(flow_derivative, init_cond, time_vec, 
+	init_cond = np.ones(np.size(sites, 0)) * 0.01
+	y, info = odeint(flow_derivative, init_cond, t_vec, 
 		             args=(rates[0], rates[1], rates[2], rates[3]), 
-		             full_output=True)
+                     full_output=True)
 	# Return the trajectory
 	return y, info
 
+
+import gene_cluster_library as gcl
+import gene_cluster_visualization as gcv
+
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+
+# Load the Stata nif library data
+nifs = gcl.GeneClusterLibrary()
+nifs.load('../gene_cluster_library/test/data/nif_stata_library.txt')
+
 # Test the model
-model = generate_site_model(nifs, '1', 1, -1, site_len=10)
-t_vec = np.linspace(0, 100, 40)
+model = generate_site_model(nifs, '1', 1, -2, site_len=10)
+t_vec = np.linspace(0, 100, 10)
 y, info = run_flow_model(model, t_vec)
+
+# Plot the results with architecture
+gs = gridspec.GridSpec(2, 1, height_ratios=[2,1])
+fig = plt.figure(figsize=(14,4))
+ax_arch = plt.subplot(gs[1])
+ax_traces = plt.subplot(gs[0])
+
+# Load the traces for predicted and measured
+ts = []
+rnap_len = len(model[0][0])
+ts.append(y[9][0:rnap_len])
+ts.append(y[9][rnap_len:])
+trace_len = len(ts[0])
+
+ax_traces.fill_between(range(trace_len),ts[0],np.zeros(trace_len), color='pink', edgecolor='red', linewidth=1.2, zorder=1)
+ax_traces.fill_between(range(trace_len),-ts[1],np.zeros(trace_len), color='lightblue', edgecolor='blue', linewidth=1.2, zorder=1)
+ax_traces.plot(range(trace_len), np.zeros(trace_len), color=(0,0,0), linewidth=1.2, zorder=2)
+
+# Scale the y-axis of the traces appropriately
+max_read_depth = max(ts[0])
+max_read_depth_1 = max(ts[1])
+if max_read_depth_1 > max_read_depth:
+	max_read_depth = max_read_depth_1
+max_read_depth *= 1.05
+# Update axis visibility
+ax_traces.set_ylim([-max_read_depth,max_read_depth])
+ax_traces.set_xlim([0,rnap_len])
+ax_traces.spines["right"].set_visible(False)
+ax_traces.spines["top"].set_visible(False)
+ax_traces.spines["bottom"].set_visible(False)
+ax_traces.tick_params(axis='both', direction='out')
+ax_traces.get_xaxis().tick_bottom()   # remove unneeded ticks 
+ax_traces.set_xticks([])
+ax_traces.get_yaxis().tick_left()
+ax_traces.tick_params(axis='x', labelsize=8)
+
+# Plot the architecture below (scaling should be correct)
+gcv.plot_variant_arch(ax_arch, nifs, '1', start_idx=1, end_idx=-2, linewidth=1.2)
+
+
+
+
+plt.tight_layout()
+
+
+plt.show()
+

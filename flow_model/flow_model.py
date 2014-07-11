@@ -39,23 +39,32 @@ FLOW_MODEL_PARAMS = {'fwd_rate' : 0.2,
                      'int_rate' : 0.4,
                      'ext_rate' : 0.9}
 
-def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=10):
+def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=20):
 	# Sites along the DNA molecule (0 = +ve strand, 1 = -ve strand)
 	# Sites can have the following classifications:
-	# 	0 - non-coding DNA
+	# 	0 - generic DNA
 	# 	1 - coding DNA (CDS)
 	# 	2 - promoter 
 	# 	3 - terminator
 	sites = [[],[]]
 	# Abstract the DNA sequence from the library into a site model using types above
-	
-
+	start_bp = 0
+	end_bp = 1
+	# Generate the sites (initially classify as generic DNA)
+	num_of_sites = (end_bp-start_bp)/site_len
+	if (end_bp-start_bp) % site_len != 0:
+		num_of_sites += 1
+	sites = [[0]*num_of_sites, [0]*num_of_sites]
+	# Cycle through all parts 
+	for cur_idx in range(part_start_idx, part_end_idx+1):
+		# Extract the part and find site it belongs
+		print 'test'
 
 	# Rates for transitions between sites
-	rate_fwd = [[],[]]
-	rate_rev = [[],[]]
-	rate_int = [[],[]]
-	rate_ext = [[],[]]
+	rate_fwd = [[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites]
+	rate_rev = [[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites]
+	rate_int = [[0.0]*num_of_sites,[0.0]*num_of_sites]
+	rate_ext = [[0.0]*num_of_sites,[0.0]*num_of_sites]
 	rates = [rate_fwd, rate_rev, rate_int, rate_ext]
 	return (sites, rates)
 
@@ -134,18 +143,21 @@ def flow_derivative(y, time, rate_fwd, rate_rev, rate_int, rate_ext):
 
 def run_flow_model (site_model, t_vec):
 	# TODO: add steady state checks (continue until stability reached)
-	sites = site_model[0]
-	rates = site_model[1]
+	# Make model suitable for standard ODE solver (flatten structure)
+	sites = site_model[0][0] + site_model[0][1]
+	rates[0] = site_model[1][0][0] + site_model[1][0][1] # FWD
+	rates[1] = site_model[1][1][0] + site_model[1][1][1] # REV
+	rates[2] = site_model[1][2][0] + site_model[1][2][1] # INT
+	rates[3] = site_model[1][3][0] + site_model[1][3][1] # EXT
+	# Set up solver and run
 	init_cond = np.zeros(sites)
 	y, info = odeint(flow_derivative, init_cond, time_vec, 
 		             args=(rates[0], rates[1], rates[2], rates[3]), 
 		             full_output=True)
+	# Return the trajectory
 	return y, info
-
 
 # Test the model
 model = generate_site_model(nifs, '1', 1, -1, site_len=10)
 t_vec = np.linspace(0, 100, 40)
 y, info = run_flow_model(model, t_vec)
-
-

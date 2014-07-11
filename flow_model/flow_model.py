@@ -40,31 +40,73 @@ FLOW_MODEL_PARAMS = {'fwd_rate' : 0.2,
                      'ext_rate' : 0.9}
 
 def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=20):
-	# Sites along the DNA molecule (0 = +ve strand, 1 = -ve strand)
-	# Sites can have the following classifications:
-	# 	0 - generic DNA
-	# 	1 - coding DNA (CDS)
-	# 	2 - promoter 
-	# 	3 - terminator
-	sites = [[],[]]
-	# Abstract the DNA sequence from the library into a site model using types above
+	# Abstract the DNA sequence from the library into a site model using types below
 	start_bp = 0
 	end_bp = 1
 	# Generate the sites (initially classify as generic DNA)
-	num_of_sites = (end_bp-start_bp)/site_len
+	num_of_sites = int((end_bp-start_bp)/site_len)
 	if (end_bp-start_bp) % site_len != 0:
 		num_of_sites += 1
+	# Sites along the DNA molecule (0 = +ve strand, 1 = -ve strand)
+	# Sites can have the following classifications:
+	# 	0 - generic DNA
+	# 	1 - promoter
+	# 	2 - coding DNA (CDS)
+	# 	3 - terminator
 	sites = [[0]*num_of_sites, [0]*num_of_sites]
 	# Cycle through all parts 
 	for cur_idx in range(part_start_idx, part_end_idx+1):
 		# Extract the part and find site it belongs
-		print 'test'
-
-	# Rates for transitions between sites
+		cur_el = gcl.variants[variant]['part_list'][cur_idx]
+		cur_type = gcl.parts[cur_el['part_name']]['type']
+		cur_start_bp = cur_el['seq_idx']
+		cur_end_bp = cur_el['seq_idx'] + cur_el['seq_len']
+		if cur_el['dir'] == 'R':
+			cur_start_bp = temp
+			cur_start_bp = cur_end_bp
+			cur_end_bp = temp
+		site_start = int((cur_start_bp-start_bp)/site_len)
+		site_end = int((cur_end_bp-start_bp)/site_len)
+		# Check part type and how to handle
+		if cur_type == 'Promoter':
+			# It's a promoter - use end bp
+			if cur_el['dir'] == 'F':
+				sites[0][site_end] = 1
+			else:
+				sites[1][site_end] = 1
+		if cur_type == 'Terminator':
+			# It's a terminator - use start bp
+			if cur_el['dir'] == 'F':
+				sites[0][site_start] = 3
+			else:
+				sites[1][site_start] = 3
+		if cur_type == 'CDS':
+			# It's a coding region - extend across (make sure not to overwrite promoter)
+			if cur_el['dir'] == 'F':
+				for s in range(site_start, site_end+1):
+					if sites[0][s] == 0:
+						sites[0][s] = 2
+			else:
+				for s in range(site_end, site_start+1):
+					if sites[1][s] == 0:
+						sites[1][s] = 2
+	# Rates for transitions between sites (use defaults for fwd and rev rates - maybe change later)
 	rate_fwd = [[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites]
 	rate_rev = [[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites]
 	rate_int = [[0.0]*num_of_sites,[0.0]*num_of_sites]
 	rate_ext = [[0.0]*num_of_sites,[0.0]*num_of_sites]
+	# Update the initation and termination rates based on site structure
+
+
+
+
+
+	# TODO in progress
+
+
+
+
+
 	rates = [rate_fwd, rate_rev, rate_int, rate_ext]
 	return (sites, rates)
 

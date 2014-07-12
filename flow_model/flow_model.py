@@ -34,8 +34,8 @@ __version__ = '1.0'
 import numpy as np
 from scipy.integrate import odeint
 
-FLOW_MODEL_PARAMS = {'fwd_rate' : 0.1,
-                     'rev_rate' : 0.01,
+FLOW_MODEL_PARAMS = {'fwd_rate' : 0.2,
+                     'rev_rate' : 0.005,
                      'int_rate' : 0.4,
                      'ext_rate' : 0.9}
 
@@ -70,7 +70,7 @@ def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=20
 		cur_start_bp = cur_el['seq_idx']
 		cur_end_bp = cur_el['seq_idx'] + cur_el['seq_len']
 		if cur_el['dir'] == 'R':
-			cur_start_bp = temp
+			temp = cur_start_bp
 			cur_start_bp = cur_end_bp
 			cur_end_bp = temp
 		site_start = int((cur_start_bp-start_bp)/site_len)
@@ -102,18 +102,18 @@ def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=20
 	rate_fwd = [[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites]
 	rate_rev = [[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites]
 	rate_int = [[0.0]*num_of_sites,[0.0]*num_of_sites]
-	rate_ext = [[0.01]*num_of_sites,[0.01]*num_of_sites]
+	rate_ext = [[0.001]*num_of_sites,[0.001]*num_of_sites]
 	# Update the initation and termination rates based on site structure
 	for i in range(num_of_sites):
 		# Promoter so add initiation rate
-		if sites[0] == 1:
+		if sites[0][i] == 1:
 			rate_int[0][i] = FLOW_MODEL_PARAMS['int_rate']
-		if sites[1] == 1:
+		if sites[1][i] == 1:
 			rate_int[1][i] = FLOW_MODEL_PARAMS['int_rate']
 		# Terminator so add termination rate
-		if sites[0] == 3:
+		if sites[0][i] == 3:
 			rate_int[0][i] = FLOW_MODEL_PARAMS['ext_rate']
-		if sites[1] == 3:
+		if sites[1][i] == 3:
 			rate_int[1][i] = FLOW_MODEL_PARAMS['ext_rate']
 	rates = [rate_fwd, rate_rev, rate_int, rate_ext]
 	return (sites, rates)
@@ -201,13 +201,17 @@ def run_flow_model (site_model, t_vec):
 	rates.append(site_model[1][2][0] + site_model[1][2][1]) # INT
 	rates.append(site_model[1][3][0] + site_model[1][3][1]) # EXT
 	# Set up solver and run
-	init_cond = np.ones(np.size(sites, 0)) * 0.01
+	init_cond = np.ones(np.size(sites, 0)) * 0.0001
 	y, info = odeint(flow_derivative, init_cond, t_vec, 
 		             args=(rates[0], rates[1], rates[2], rates[3]), 
                      full_output=True)
 	# Return the trajectory
 	return y, info
 
+
+#######################################################################
+# EXAMPLE ANALYSIS
+#######################################################################
 
 import gene_cluster_library as gcl
 import gene_cluster_visualization as gcv
@@ -218,9 +222,11 @@ import matplotlib.gridspec as gridspec
 # Load the Stata nif library data
 nifs = gcl.GeneClusterLibrary()
 nifs.load('../gene_cluster_library/test/data/nif_stata_library.txt')
+# Variant to model
+variant = '75' 
 
 # Test the model
-model = generate_site_model(nifs, '1', 1, -2, site_len=10)
+model = generate_site_model(nifs, variant, 1, -2, site_len=10)
 t_vec = np.linspace(0, 100, 10)
 y, info = run_flow_model(model, t_vec)
 
@@ -230,13 +236,12 @@ fig = plt.figure(figsize=(14,4))
 ax_arch = plt.subplot(gs[1])
 ax_traces = plt.subplot(gs[0])
 
-# Load the traces for predicted and measured
+# Load the rnap densities and plot
 ts = []
 rnap_len = len(model[0][0])
 ts.append(y[9][0:rnap_len])
 ts.append(y[9][rnap_len:])
 trace_len = len(ts[0])
-
 ax_traces.fill_between(range(trace_len),ts[0],np.zeros(trace_len), color='pink', edgecolor='red', linewidth=1.2, zorder=1)
 ax_traces.fill_between(range(trace_len),-ts[1],np.zeros(trace_len), color='lightblue', edgecolor='blue', linewidth=1.2, zorder=1)
 ax_traces.plot(range(trace_len), np.zeros(trace_len), color=(0,0,0), linewidth=1.2, zorder=2)
@@ -260,13 +265,7 @@ ax_traces.get_yaxis().tick_left()
 ax_traces.tick_params(axis='x', labelsize=8)
 
 # Plot the architecture below (scaling should be correct)
-gcv.plot_variant_arch(ax_arch, nifs, '1', start_idx=1, end_idx=-2, linewidth=1.2)
-
-
-
-
+gcv.plot_variant_arch(ax_arch, nifs, variant, start_idx=1, end_idx=-2, linewidth=1.2)
 plt.tight_layout()
-
-
+fig.savefig('flow_example.pdf')
 plt.show()
-

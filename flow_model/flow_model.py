@@ -35,9 +35,10 @@ import numpy as np
 from scipy.integrate import odeint
 
 FLOW_MODEL_PARAMS = {'fwd_rate' : 0.2,
-                     'rev_rate' : 0.005,
-                     'int_rate' : 0.4,
-                     'ext_rate' : 0.9}
+                     'rev_rate' : 0.01,
+                     'int_rate' : 0.1,
+                     'ext_rate' : 0.15,
+                     'drop_rate': 0.005}
 
 def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=20):
 	# Abstract the DNA sequence from the library into a site model using types below
@@ -102,7 +103,7 @@ def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=20
 	rate_fwd = [[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites]
 	rate_rev = [[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites]
 	rate_int = [[0.0]*num_of_sites,[0.0]*num_of_sites]
-	rate_ext = [[0.001]*num_of_sites,[0.001]*num_of_sites]
+	rate_ext = [[FLOW_MODEL_PARAMS['drop_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['drop_rate']]*num_of_sites]
 	# Update the initation and termination rates based on site structure
 	for i in range(num_of_sites):
 		# Promoter so add initiation rate
@@ -112,9 +113,9 @@ def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=20
 			rate_int[1][i] = FLOW_MODEL_PARAMS['int_rate']
 		# Terminator so add termination rate
 		if sites[0][i] == 3:
-			rate_int[0][i] = FLOW_MODEL_PARAMS['ext_rate']
+			rate_ext[0][i] += FLOW_MODEL_PARAMS['ext_rate']
 		if sites[1][i] == 3:
-			rate_int[1][i] = FLOW_MODEL_PARAMS['ext_rate']
+			rate_ext[1][i] += FLOW_MODEL_PARAMS['ext_rate']
 	rates = [rate_fwd, rate_rev, rate_int, rate_ext]
 	return (sites, rates)
 
@@ -223,14 +224,15 @@ import matplotlib.gridspec as gridspec
 nifs = gcl.GeneClusterLibrary()
 nifs.load('../gene_cluster_library/test/data/nif_stata_library.txt')
 # Variant to model
-variant = '75' 
+variant = '24' # 75 interesting
+sim_len = 1500
 
 # Test the model
-model = generate_site_model(nifs, variant, 1, -2, site_len=10)
-t_vec = np.linspace(0, 100, 10)
+model = generate_site_model(nifs, variant, 1, -2, site_len=25)
+t_vec = np.linspace(0, sim_len, 3)
 y, info = run_flow_model(model, t_vec)
 
-# Plot the results with architecture
+# Plot the results with architecture (including RNA-seq data)
 gs = gridspec.GridSpec(2, 1, height_ratios=[2,1])
 fig = plt.figure(figsize=(14,4))
 ax_arch = plt.subplot(gs[1])
@@ -239,8 +241,8 @@ ax_traces = plt.subplot(gs[0])
 # Load the rnap densities and plot
 ts = []
 rnap_len = len(model[0][0])
-ts.append(y[9][0:rnap_len])
-ts.append(y[9][rnap_len:])
+ts.append(y[-1][0:rnap_len])
+ts.append(y[-1][rnap_len:])
 trace_len = len(ts[0])
 ax_traces.fill_between(range(trace_len),ts[0],np.zeros(trace_len), color='pink', edgecolor='red', linewidth=1.2, zorder=1)
 ax_traces.fill_between(range(trace_len),-ts[1],np.zeros(trace_len), color='lightblue', edgecolor='blue', linewidth=1.2, zorder=1)

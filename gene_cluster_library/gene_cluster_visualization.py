@@ -179,7 +179,7 @@ def plot_traces_with_arch (ax_arch, ax_traces, gcl, variant, traces, start_idx=N
 	max_read_depth *= 1.05
 	# Update axis visibility
 	ax_traces.set_ylim([-max_read_depth,max_read_depth])
-	ax_traces.set_xlim([0,trace_len])
+	#ax_traces.set_xlim([0,trace_len])
 	ax_traces.spines["right"].set_visible(False)
 	ax_traces.spines["top"].set_visible(False)
 	ax_traces.spines["bottom"].set_visible(False)

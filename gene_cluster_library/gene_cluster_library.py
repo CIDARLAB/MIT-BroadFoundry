@@ -24,6 +24,7 @@ if sys.version_info[:2] < (2, 6):
 del sys
 
 import csv
+import datetime
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
@@ -44,6 +45,13 @@ class GeneClusterLibrary:
 	                  'Terminator':'t',
 	                  'Scar':'x',
 	                  'Spacer':'s'}
+
+	STD_GENBANK_MAP = {'Promoter':'promoter',
+	                  'CDS':'CDS',
+	                  'RBS':'RBS',
+	                  'Terminator':'terminator',
+	                  'Scar':'misc_feature',
+	                  'Spacer':'misc_feature'}
 
 	# Static class variable listing the standard parts generally used.
 	STD_PART_TYPES = ['Promoter',
@@ -895,6 +903,54 @@ class GeneClusterLibrary:
 			for a in attribs_keys:
 				attribs_str = attribs_str + str(a) + '=' + str(self.variants[v][a]) + ','
 			f.write(attribs_str[:-1] + '\n\n')
+		f.close()
+
+	def save_variant_genbank (self, variant, filename, methylated=1, dna_type='linear', mapping=STD_GENBANK_MAP):
+		"""Save gene cluster variant to a genbank format file.
+
+	    Parameters
+	    ----------
+	    variant : string
+	    	Variant to save to file
+
+	    filename : string
+	        Name of the file to save.
+		"""
+		f = open(filename, 'w')
+		variant_name = variant + (' '*(24-len(variant)))
+		var_seq = self.variants[variant]['seq'].upper()
+		seq_len = len(var_seq)
+		today = datetime.date.today()
+		date_str = today.strftime('%d-%b-%Y')
+		f.write('LOCUS       ' + variant_name +  str(seq_len) + ' bp ds-DNA     ' + dna_type + '       ' + date_str + '\n')
+		f.write('DEFINITION  .\nACCESSION   \nVERSION     \nSOURCE      .\n  ORGANISM  .\nCOMMENT     \nCOMMENT     \nCOMMENT     ApEinfo:methylated:' + str(methylated) + '\n')
+		f.write('FEATURES             Location/Qualifiers\n')
+		# Save all the features as correct annotation
+		for el in self.variants[variant]['part_list']:
+			f.write(' '*5)
+			part_name = el['part_name']
+			part_type = self.parts[part_name]['type']
+			part_gb_type = 'misc_feature'
+			if part_type in mapping:
+				part_gb_type = mapping[part_type]
+			part_start_bp = str(el['seq_idx']+1)
+			part_end_bp = str(el['seq_idx']+el['seq_len'])
+			f.write(part_gb_type + ' '*(16-len(part_gb_type)))
+			f.write(part_start_bp + '..' + part_end_bp + '\n')
+			f.write('                     /label=' + part_name + '\n')
+		# Save the sequence
+		f.write('ORIGIN')
+		for bp in range(0,len(var_seq),10):
+			if bp % 60 == 0:
+				bp_num = bp + 1
+				# New line and add number at the start of the line
+				f.write('\n' + ' '*(9-len(str(bp_num))) + str(bp_num))
+			start_bp = bp
+			end_bp = start_bp + 10
+			if start_bp + 10 > len(var_seq):
+				end_bp = len(var_seq)
+			f.write(' ' + var_seq[start_bp:end_bp])
+		f.write('\n//\n')
 		f.close()
 
 	def save_PigeonCAD (self, filename_prefix, mapping=STD_PIGEON_MAP, col_mapping=None):

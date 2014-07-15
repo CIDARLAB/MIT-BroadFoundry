@@ -11,13 +11,13 @@ Scar Choice
     python scar_choice.py LENGTH MAX_HOMOLOGY NUMBER SEARCH_METHOD
     	SEED_SET_FILENAME ALLOWED_SET_FILENAME OUTPUT_FILENAME 
            
-	LENGTH - Length of scar to generate.
-	MAX_HOMOLOGY - Maximum homology in bp.
-	NUMBER - Number of scars to generate (-1 = All).
-	SEARCH_METHOD - Method to search (1 = Random, 2 = Enumerate).
-	SEED_SET_FILENAME - Seed scars to include ('None' if no file).
+	LENGTH               - Length of scar to generate.
+	MAX_HOMOLOGY         - Maximum homology in bp.
+	NUMBER               - Number of scars to generate (-1 = All).
+	SEARCH_METHOD        - Method to search (1 = Random, 2 = Enumerate).
+	SEED_SET_FILENAME    - Seed scars to include ('None' if no file).
 	ALLOWED_SET_FILENAME - Allowed scars to consider ('None' if no file).
-	OUTPUT_FILENAME - Output filename to save results to.
+	OUTPUT_FILENAME      - Output filename to save results to.
 """
 #    Scar Choice
 #    Copyright (C) 2014 by

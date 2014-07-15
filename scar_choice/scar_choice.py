@@ -5,6 +5,19 @@ Scar Choice
 
     Script to help with the selection of orthogonal scars used for 
     Golden-Gate like assembly of constructs.
+
+    Usage:
+    ------
+    python scar_choice.py LENGTH MAX_HOMOLOGY NUMBER SEARCH_METHOD
+    	SEED_SET_FILENAME ALLOWED_SET_FILENAME OUTPUT_FILENAME 
+           
+	LENGTH - Length of scar to generate.
+	MAX_HOMOLOGY - Maximum homology in bp.
+	NUMBER - Number of scars to generate (-1 = All).
+	SEARCH_METHOD - Method to search (1 = Random, 2 = Enumerate).
+	SEED_SET_FILENAME - Seed scars to include ('None' if no file).
+	ALLOWED_SET_FILENAME - Allowed scars to consider ('None' if no file).
+	OUTPUT_FILENAME - Output filename to save results to.
 """
 #    Scar Choice
 #    Copyright (C) 2014 by
@@ -16,11 +29,13 @@ __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
 
+import sys
+import getopt
 import random
 
 MAX_RANDOM_ITERATIONS = 10000
 
-def scar_compatible (scar_set, new_scar, max_homology=3, allowed_set=[]):
+def scar_compatible (scar_set, new_scar, max_homology=2, allowed_set=[]):
 	"""Check if scar compaible with current set at given level of homology.
 	"""
 	# Check if not allowed... then test properties
@@ -60,7 +75,7 @@ def complement(s):
 def reverse_complement(s):
 	return complement(s[::-1])
 
-def random_scar (scar_len, exclude_set=[], max_homology=3, allowed_set=[]):
+def random_scar (scar_len, exclude_set=[], max_homology=2, allowed_set=[]):
 	"""Generate a random scar of a given length that is not in the excluded set.
 	"""
 	# Used to ensure we don't get involved in infinite loop
@@ -81,7 +96,7 @@ def random_scar (scar_len, exclude_set=[], max_homology=3, allowed_set=[]):
 			break
 	return new_scar
 
-def enumerate_scars (scar_len, depth, cur_scar, full_scar_set, new_scars, max_homology=3, found=[0], num_to_find=None, allowed_set=[]):
+def enumerate_scars (scar_len, depth, cur_scar, full_scar_set, new_scars, max_homology=2, found=[0], num_to_find=None, allowed_set=[]):
 	"""Recursive method to enumerate all possible scars (be careful memory usage high for large lengths)
 	"""
 	if depth == scar_len:
@@ -101,7 +116,7 @@ def formatted_output_list (scar_list):
 	return [(x, reverse_complement(x)) for x in scar_list]
 
 
-def find_scars (scar_len, seed_set=[], max_homology=3, num_to_find=None, random_search=True, allowed_set=[]):
+def find_scars (scar_len, seed_set=[], max_homology=2, num_to_find=None, random_search=True, allowed_set=[]):
 	"""Find a required number of scars orthogonal for a seed set with a 
 	maximim number of bp homology.
 	"""
@@ -142,3 +157,61 @@ def find_scars (scar_len, seed_set=[], max_homology=3, num_to_find=None, random_
 			if found[0] < num_to_find:
 				return None, None, None
 	return formatted_output_list(full_scar_set), formatted_output_list(new_scars), formatted_output_list(removed_from_seed)
+
+def main():
+	# parse command line options
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "h", ["help"])
+	except getopt.error, msg:
+		print msg
+		print "for help use --help"
+		sys.exit(2)
+    # process options
+	for o, a in opts:
+		if o in ("-h", "--help"):
+			print __doc__
+			sys.exit(0)
+	# process arguments
+	scar_len = int(args[0])
+	max_homology = int(args[1])
+	num_to_find = int(args[2])
+	if num_to_find == -1:
+		num_to_find = None
+	random_search = int(args[3])
+	if random_search == 1:
+		random_search = True
+	else:
+		random_search = False
+	seed_set_filename = args[4]
+	seed_set = []
+	if seed_set_filename != 'None':
+		handle = open(seed_set_filename, 'r')
+		seed_set = handle.readlines()
+		seed_set = [x.strip() for x in seed_set if x.strip() != '']
+		handle.close()
+	allowed_set_filename = args[5]
+	allowed_set = []
+	if allowed_set_filename != 'None':
+		handle = open(allowed_set_filename, 'r')
+		allowed_set = handle.readlines()
+		allowed_set = [x.strip() for x in allowed_set if x.strip() != '']
+		handle.close()
+	output_filename = args[6]
+	scars_full, scars_added, scars_removed = find_scars(scar_len, seed_set=seed_set, max_homology=max_homology, 
+		                                                num_to_find=num_to_find, random_search=random_search, 
+		                                                allowed_set=allowed_set)
+	# Save the results to file
+	fout = open(output_filename, 'w')
+	fout.write('>> FULL SET OF SCARS\n')
+	for el in scars_full:
+		fout.write(str(el[0]) + ',' + str(el[1]) + '\n')
+	fout.write('\n>> ADDED SCARS\n')
+	for el in scars_added:
+		fout.write(str(el[0]) + ',' + str(el[1]) + '\n')
+	fout.write('\n>> REMOVED SCARS\n')
+	for el in scars_removed:
+		fout.write(str(el[0]) + ',' + str(el[1]) + '\n')
+	fout.write('\n')
+
+if __name__ == "__main__":
+	main()

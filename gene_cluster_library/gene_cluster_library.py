@@ -947,7 +947,7 @@ class GeneClusterLibrary:
 				f.write('\n' + ' '*(9-len(str(bp_num))) + str(bp_num))
 			start_bp = bp
 			end_bp = start_bp + 10
-			if start_bp + 10 > len(var_seq):
+			if end_bp > len(var_seq):
 				end_bp = len(var_seq)
 			f.write(' ' + var_seq[start_bp:end_bp])
 		f.write('\n//\n')

@@ -22,9 +22,9 @@ Flow Model
     Note: this is a deterministic model not taking stochastic aspects
     into consideration. As the data we generally compare to (RNA-seq)
     is averaged across entire populations, stochastic effects will
-    become smoothed (although may have significant effect at the single
+    become smoothed (although may have significant affect at the single
     cell level). Comparison is also difficult due to shearing bias that
-	needs to be corrected for.
+	needs to be corrected for as output from model is actual densities.
 """
 #    Flow Model
 #    Copyright (C) 2014 by
@@ -39,14 +39,18 @@ __version__ = '1.0'
 import numpy as np
 from scipy.integrate import odeint
 
+# Default (homogeneous) rates to use
 FLOW_MODEL_PARAMS = {'fwd_rate' : 0.2,
                      'rev_rate' : 0.01,
                      'int_rate' : 0.1,
                      'ext_rate' : 0.15,
                      'drop_rate': 0.005}
 
-def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=25):
-	"""Generates a site based model for use with the flow simulator.
+def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=25):
+	"""Generates a homogeneoug site based model for use with the flow simulator.
+
+	All rates for promoters and terminators are assumed to be identical and fixed
+	to values provided by the FLOW_MODEL_PARAMS dictionary.
 
     Parameters
     ----------
@@ -339,7 +343,7 @@ nifs.load('../gene_cluster_library/test/data/nif_stata_library.txt')
 variant = '75'
 
 # Test the model
-model = generate_site_model(nifs, variant, 1, -2, site_len=25)
+model = generate_homogeneous_site_model(nifs, variant, 1, -2, site_len=25)
 y, info = run_flow_model(model, converged_site_err=0.00001, sim_step_time=25.0,
 	                     max_sim_time=99999.0, verbose=True)
 

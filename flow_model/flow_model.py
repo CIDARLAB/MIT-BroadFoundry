@@ -9,6 +9,10 @@ Flow Model
     Edri et al. The RNA Polymerase Flow Model of Gene Transcription. 
     IEEE Transactions on Biomedical Circuits and Systems, 8:1, 2014.
 
+    The major extention is to enable bi-directional flow that is needed
+    to capture potential interactions taking place during transcriptional
+    interference and more multi-directional genetic architectures.
+
     This enables the assessment of RNAP movement and final steady state 
     densities along a stretch of DNA taking into consideration interactions 
     between RNAPs moving potentially in different directions along the 
@@ -19,7 +23,8 @@ Flow Model
     into consideration. As the data we generally compare to (RNA-seq)
     is averaged across entire populations, stochastic effects will
     become smoothed (although may have significant effect at the single
-    cell level).
+    cell level). Comparison is also difficult due to shearing bias that
+	needs to be corrected for.
 """
 #    Flow Model
 #    Copyright (C) 2014 by
@@ -40,7 +45,31 @@ FLOW_MODEL_PARAMS = {'fwd_rate' : 0.2,
                      'ext_rate' : 0.15,
                      'drop_rate': 0.005}
 
-def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=20):
+def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=25):
+	"""Generates a site based model for use with the flow simulator.
+
+    Parameters
+    ----------
+    gcl : GeneClusterLibrary
+        The gene cluster library to use.
+
+    variant : string
+    	Variant name to model.
+
+    part_start_idx : int
+    	Start part index to include in the model.
+
+    part_end_idx : int
+    	End part index to include in the model.
+
+    site_len : int (default=25)
+    	Length of each site (in bp).
+
+    Returns
+    -------
+    (sites, rates): (list, list)
+        The site model containing the site definitions and separated rates.
+	"""
 	# Abstract the DNA sequence from the library into a site model using types below
 	start_bp = 0
 	end_bp = 0
@@ -120,6 +149,39 @@ def generate_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=20
 	return (sites, rates)
 
 def flow_derivative(y, time, rate_fwd, rate_rev, rate_int, rate_ext):
+	"""Calcuates the derivative for the site model ODE.
+
+	Because our model considers sites as pairs of states (RNAPs travelling
+	on +ve and -ve strands), the state vector is a flattened version where
+	+ve strand sites are followed by -ve stand sites. Each site value 
+	corrisponds to the probability of finding a RNAP there.
+
+    Parameters
+    ----------
+    y : array(float)
+        Current state of the sites.
+
+    time : float
+    	Current simulation time (not used).
+
+    rate_fwd : list(float)
+    	Forward transcription rates (polymerase/time unit).
+
+    rate_rev : list(float)
+    	Reverse (back-tracking) transcription rates (polymerase/time unit).
+
+    rate_int : list(float)
+    	Initiation rates (polymerase/time unit at promoter sites).
+
+    rate_ext : list(float)
+    	Termination of transcription rates either through general dropoff or
+    	location of terminator (polymerase/time unit).
+
+    Returns
+    -------
+    y_new: array(float)
+        dy/dt derivative for the model.
+	"""
 	# Vector to hold output derivative
 	out = np.zeros(np.size(y, 0))
 	# Output vetor is actually a concatentation of [+ve,-ve] strand data
@@ -192,9 +254,38 @@ def flow_derivative(y, time, rate_fwd, rate_rev, rate_int, rate_ext):
                       - rate_ext[i+s_num]*y_i_r )
 	return out
 
-def run_flow_model (site_model, t_vec):
-	# TODO: add steady state checks (continue until stability reached)
-	# Make model suitable for standard ODE solver (flatten structure)
+def run_flow_model (site_model, converged_site_err=0.01, sim_step_time=25.0, 
+	                max_sim_time=99999.0, verbose=False):
+	"""Runs the flow model.
+
+	This requires a valid site based model which can be generated using the
+	generate_site_model() function.
+
+    Parameters
+    ----------
+    site_model : (list, list)
+        Site model to simulate.
+
+    converged_site_err : float (default=0.0001)
+    	Site-based error allowed to assume convergence to steady state and 
+    	end of simluation.
+
+    max_time : float (default=99999.0)
+    	Maximum time to run simulation for before exiting with error due
+    	to no convergence of the model.
+
+    Returns
+    -------
+    y: array(float)
+        Final steady state of the model. If error occurs will return None.
+
+    info: dict
+        Dictionary of information about the simulation (passed from odeint
+       	function).
+	"""
+	if verbose == True:
+		print 'Running flow model...'
+	# Make model suitable for standard ODE solver (flatten, concatenate)
 	sites = site_model[0][0] + site_model[0][1]
 	rates = []
 	rates.append(site_model[1][0][0] + site_model[1][0][1]) # FWD
@@ -203,12 +294,32 @@ def run_flow_model (site_model, t_vec):
 	rates.append(site_model[1][3][0] + site_model[1][3][1]) # EXT
 	# Set up solver and run
 	init_cond = np.ones(np.size(sites, 0)) * 0.0001
-	y, info = odeint(flow_derivative, init_cond, t_vec, 
-		             args=(rates[0], rates[1], rates[2], rates[3]), 
-                     full_output=True)
-	# Return the trajectory
-	return y, info
-
+	cur_y = init_cond
+	info = {}
+	# Simulate in steps until max_time reached
+	for i in range(int(max_sim_time/sim_step_time)):
+		if verbose == True:
+			print 't =', i*sim_step_time, 'to', (i+1)*sim_step_time
+		# Run the simulation for the step size
+		t_vec = np.linspace(0, sim_step_time, 3)
+		new_y, info = odeint(flow_derivative, cur_y, t_vec, 
+			             args=(rates[0], rates[1], rates[2], rates[3]), 
+	                     full_output=True)
+		# Calculate error
+		cur_max_site_err = max(cur_y-new_y[-1])
+		if verbose == True:
+				print 'Current max site error =', cur_max_site_err
+		# Check for convergence
+		if cur_max_site_err <= converged_site_err:
+			if verbose == True:
+				print 'Converged with max site error =', cur_max_site_err
+			# Return the trajectory if converged
+			return new_y[-1], info
+		cur_y = new_y[-1]
+	if verbose == True:
+		print 'Simulation did not converge'
+	# Simulation didn't converge
+	return None, None
 
 #######################################################################
 # EXAMPLE ANALYSIS
@@ -223,14 +334,15 @@ import matplotlib.gridspec as gridspec
 # Load the Stata nif library data
 nifs = gcl.GeneClusterLibrary()
 nifs.load('../gene_cluster_library/test/data/nif_stata_library.txt')
-# Variant to model
-variant = '24' # 75 interesting
+
+# Variant to model and simulation time
+variant = '75'
 sim_len = 1500
 
 # Test the model
 model = generate_site_model(nifs, variant, 1, -2, site_len=25)
-t_vec = np.linspace(0, sim_len, 3)
-y, info = run_flow_model(model, t_vec)
+y, info = run_flow_model(model, converged_site_err=0.00001, sim_step_time=25.0, 
+	                     max_sim_time=99999.0, verbose=True)
 
 # Plot the results with architecture (including RNA-seq data)
 gs = gridspec.GridSpec(2, 1, height_ratios=[2,1])
@@ -241,11 +353,13 @@ ax_traces = plt.subplot(gs[0])
 # Load the rnap densities and plot
 ts = []
 rnap_len = len(model[0][0])
-ts.append(y[-1][0:rnap_len])
-ts.append(y[-1][rnap_len:])
+ts.append(y[0:rnap_len])
+ts.append(y[rnap_len:])
 trace_len = len(ts[0])
-ax_traces.fill_between(range(trace_len),ts[0],np.zeros(trace_len), color='pink', edgecolor='red', linewidth=1.2, zorder=1)
-ax_traces.fill_between(range(trace_len),-ts[1],np.zeros(trace_len), color='lightblue', edgecolor='blue', linewidth=1.2, zorder=1)
+ax_traces.fill_between(range(trace_len),ts[0],np.zeros(trace_len), color='pink', 
+	                   edgecolor='red', linewidth=1.2, zorder=1)
+ax_traces.fill_between(range(trace_len),-ts[1],np.zeros(trace_len), color='lightblue', 
+	                   edgecolor='blue', linewidth=1.2, zorder=1)
 ax_traces.plot(range(trace_len), np.zeros(trace_len), color=(0,0,0), linewidth=1.2, zorder=2)
 
 # Scale the y-axis of the traces appropriately
@@ -254,6 +368,7 @@ max_read_depth_1 = max(ts[1])
 if max_read_depth_1 > max_read_depth:
 	max_read_depth = max_read_depth_1
 max_read_depth *= 1.05
+
 # Update axis visibility
 ax_traces.set_ylim([-max_read_depth,max_read_depth])
 ax_traces.set_xlim([0,rnap_len])

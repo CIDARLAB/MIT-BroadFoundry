@@ -9,7 +9,7 @@ Gene Cluster Library
     files that contain all sequence, part and cluster variant information,
     in addition to search capabilities to facilitate easy querying of data
     during analysis. It can output clusters to PigeonCAD format to generate
-    a visual representation.
+    a visual representation or matplotlib from vector based figures.
 """
 #    Gene Cluster Tools for Python
 #    Copyright (C) 2014 by

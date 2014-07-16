@@ -194,6 +194,194 @@ class GeneClusterLibrary:
 		self.variants[name] = the_var
 		return the_var
 
+	def get_variant_part_idx_name (self, variant, part_idx):
+		"""Get method for part name from variant and part index
+
+	    Parameters
+	    ----------
+	    variant : string
+	        Variant name.
+
+	    part_idx : int
+	    	Part index.
+
+	    Returns
+	    -------
+	    part_name: string
+	        Name of the part.
+		"""
+		return self.variants[variant]['part_list'][part_idx]['part_name']
+
+	def get_variant_part_idx_type (self, variant, part_idx):
+		"""Get method for part type from variant and part index
+
+	    Parameters
+	    ----------
+	    variant : string
+	        Variant name.
+
+	    part_idx : int
+	    	Part index.
+
+	    Returns
+	    -------
+	    part_type: string
+	        Type of the part.
+		"""
+		return self.parts[self.get_variant_part_idx_name(variant, part_idx)]['type']
+
+	def get_variant_part_idx_direction (self, variant, part_idx):
+		"""Get method for part direction from variant and part index
+
+	    Parameters
+	    ----------
+	    variant : string
+	        Variant name.
+
+	    part_idx : int
+	    	Part index.
+
+	    Returns
+	    -------
+	    dir: string
+	        Direction of part ('F' = Forward, 'R' = Reverse).
+		"""
+		return self.variants[variant]['part_list'][part_idx]['dir']
+
+	def get_variant_part_idx_seq_idx (self, variant, part_idx):
+		"""Get method for start bp from variant and part index
+
+	    Parameters
+	    ----------
+	    variant : string
+	        Variant name.
+
+	    part_idx : int
+	    	Part index.
+
+	    Returns
+	    -------
+	    seq_idx: int
+	        Index of the start bp on +ve strand of the part.
+		"""
+		return self.variants[variant]['part_list'][part_idx]['seq_idx']
+
+	def get_variant_part_idx_seq_len (self, variant, part_idx):
+		"""Get method for part sequence length from variant and part index
+
+	    Parameters
+	    ----------
+	    variant : string
+	        Variant name.
+
+	    part_idx : int
+	    	Part index.
+
+	    Returns
+	    -------
+	    seq_len: int
+	        Length of the part.
+		"""
+		return self.variants[variant]['part_list'][part_idx]['seq_len']
+
+	def get_variant_part_idx_attrib (self, variant, part_idx, attrib_key):
+		"""Get method for a part's attribute from variant, part index and key
+
+	    Parameters
+	    ----------
+	    variant : string
+	        Variant name.
+
+	    part_idx : int
+	    	Part index.
+
+	    attrib_key : string
+	    	Attribute key.
+
+	    Returns
+	    -------
+	    attrib_value: undefined object
+	        Attribute data.
+		"""
+		if attrib_key in self.variants[variant]['part_list'][part_idx].keys():
+			return self.variants[variant]['part_list'][part_idx][attrib_key]
+		else:
+			return None
+
+	def set_variant_part_idx_attrib (self, variant, part_idx, attrib_key, attrib_value):
+		"""Set method for a part's attribute from variant, part index and key
+
+	    Parameters
+	    ----------
+	    variant : string
+	        Variant name.
+
+	    part_idx : int
+	    	Part index.
+
+	    attrib_key : string
+	    	Attribute key.
+
+	    attrib_value : string
+	    	Attribute value.
+		"""
+		self.variants[variant]['part_list'][part_idx][attrib_key] = attrib_value
+
+	def get_part_attrib (self, part_name, attrib_key):
+		"""Get method for a part's attribute from a part name and key
+
+	    Parameters
+	    ----------
+	    part_name : string
+	    	Part name.
+
+	    attrib_key : string
+	    	Attribute key.
+
+	    Returns
+	    -------
+	    attrib_value: undefined object
+	        Attribute data.
+		"""
+		if part_name in self.parts.keys():
+			if attrib_key in self.parts[part_name].keys():
+				return self.parts[part_name][attrib_key]
+		return None
+
+	def get_part_type (self, part_name):
+		"""Get method for a part's type from a part name
+
+	    Parameters
+	    ----------
+	    part_name : string
+	    	Part name.
+
+	    Returns
+	    -------
+	    part_type: string
+	        Part type.
+		"""
+		if part_name in self.parts.keys():
+			return self.parts[part_name]['type']
+		return None
+
+	def get_part_seq (self, part_name):
+		"""Get method for a part's sequence from a part name
+
+	    Parameters
+	    ----------
+	    part_name : string
+	    	Part name.
+
+	    Returns
+	    -------
+	    part_seq: string
+	        Part sequence.
+		"""
+		if part_name in self.parts.keys():
+			return self.parts[part_name]['seq']
+		return None
+
 	def find_part_instances (self, part_name):
 		"""Find instances of a part in all the variants.
 

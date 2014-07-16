@@ -335,13 +335,12 @@ import matplotlib.gridspec as gridspec
 nifs = gcl.GeneClusterLibrary()
 nifs.load('../gene_cluster_library/test/data/nif_stata_library.txt')
 
-# Variant to model and simulation time
+# Variant to simulate
 variant = '75'
-sim_len = 1500
 
 # Test the model
 model = generate_site_model(nifs, variant, 1, -2, site_len=25)
-y, info = run_flow_model(model, converged_site_err=0.00001, sim_step_time=25.0, 
+y, info = run_flow_model(model, converged_site_err=0.00001, sim_step_time=25.0,
 	                     max_sim_time=99999.0, verbose=True)
 
 # Plot the results with architecture (including RNA-seq data)

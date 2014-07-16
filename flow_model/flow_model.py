@@ -46,7 +46,8 @@ FLOW_MODEL_PARAMS = {'fwd_rate' : 0.2,
                      'ext_rate' : 0.15,
                      'drop_rate': 0.005}
 
-def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx, site_len=25):
+def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx, 
+	                                 site_len=25):
 	"""Generates a homogeneoug site based model for use with the flow simulator.
 
 	All rates for promoters and terminators are assumed to be identical and fixed
@@ -84,7 +85,8 @@ def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx,
 		part_end_idx = len(gcl.variants[variant]['part_list']) + part_end_idx
 	# Calculate positions in bp
 	start_bp = gcl.variants[variant]['part_list'][part_start_idx]['seq_idx']
-	end_bp = gcl.variants[variant]['part_list'][part_end_idx]['seq_idx'] + gcl.variants[variant]['part_list'][part_end_idx]['seq_len']
+	end_bp = (gcl.variants[variant]['part_list'][part_end_idx]['seq_idx'] + 
+		      gcl.variants[variant]['part_list'][part_end_idx]['seq_len']
 	# Generate the sites (initially classify as generic DNA)
 	num_of_sites = int((end_bp-start_bp)/site_len)
 	if (end_bp-start_bp) % site_len != 0:
@@ -132,11 +134,14 @@ def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx,
 				for s in range(site_end, site_start+1):
 					if sites[1][s] == 0:
 						sites[1][s] = 2
-	# Rates for transitions between sites (use defaults for fwd and rev rates - maybe change later)
-	rate_fwd = [[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites]
-	rate_rev = [[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites]
+	# Rates for transitions between sites (use defaults for fwd and rev rates)
+	rate_fwd = [[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites,
+	            [FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites]
+	rate_rev = [[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites,
+	            [FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites]
 	rate_int = [[0.0]*num_of_sites,[0.0]*num_of_sites]
-	rate_ext = [[FLOW_MODEL_PARAMS['drop_rate']]*num_of_sites,[FLOW_MODEL_PARAMS['drop_rate']]*num_of_sites]
+	rate_ext = [[FLOW_MODEL_PARAMS['drop_rate']]*num_of_sites,
+	            [FLOW_MODEL_PARAMS['drop_rate']]*num_of_sites]
 	# Update the initation and termination rates based on site structure
 	for i in range(num_of_sites):
 		# Promoter so add initiation rate

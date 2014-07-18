@@ -38,37 +38,113 @@ import math
 import numpy as np
 
 def frag_factor_profile (mrna_len, frag_mean, frag_sd):
-	"""Generate the expected fragmentation correction factor for
-	a given length mRNA and fragments of given mean length with
+	"""Generate the expected fragmentation correction factor profile
+	for a given length mRNA and fragments of given mean length and
 	standard deviation.
+
+	Parameters
+	----------
+	mrna_len : int
+	    Length of the mRNA (bp).
+
+	frag_mean : float
+		Mean fragment length used during sequencing
+
+	frag_sd : float
+		Standard deviation in the fragment lengths.
+
+	Returns
+	-------
+	profile: array
+	    Profile of fragmentation factor along the mRNA.
 	"""
 	d = np.zeros(mrna_len)
 	for bp in range(mrna_len):
-		d[bp] = frag_at_base (bp, mrna_len, frag_mean, frag_sd)
+		d[bp] = frag_at_base(bp, mrna_len, frag_mean, frag_sd)
 	return d
 
 def frag_at_base (bp, mrna_len, frag_mean, frag_sd):
+	"""Calculate the fragmentation factor at a given base in an mRNA.
+
+	Parameters
+	----------
+	bp : int
+		Base pair being considered in mRNA.
+
+	mrna_len : int
+	    Length of the mRNA (bp).
+
+	frag_mean : float
+		Mean fragment length used during sequencing
+
+	frag_sd : float
+		Standard deviation in the fragment lengths.
+
+	Returns
+	-------
+	factor: float
+	    Fragmentation factor at that base.
+	"""
 	result = 0.0
 	for i in range(1, mrna_len):
-		result += (1.0/(frag_sd*math.sqrt(2.0*frag_mean))) * math.exp(
-			       math.pow(-(i-2.0*frag_mean),2.0) / (2.0*math.pow(frag_sd,2.0))) * frag_combinations(i,bp,mrna_len)
+		result += ( (1.0/(frag_sd*math.sqrt(2.0*math.pi))) * math.exp(
+			       -(math.pow(i-2.0*frag_mean,2.0)
+			       / (2.0*math.pow(frag_sd,2.0)))) 
+		           * frag_combinations(bp,i,mrna_len) )
+	return result
 
 def frag_c (i, x):
+	"""Helper function to handle edge cases.
+
+	Parameters
+	----------
+	i : int
+	    Index of base in mRNA.
+
+	x : int
+		Fragment length being considered
+
+	Returns
+	-------
+	combinations: int
+	    Number of ways base can be positioned on one side.
+	"""
 	if i <= x:
 		return 0.0
 	else:
 		return i-x
 
 def frag_combinations (i, x, x_max):
+	"""Number of ways a fragment of a given length can be uniquely positioned
+	across a particular base in the mRNA.
+
+	Parameters
+	----------
+	i : int
+	    Index of base in mRNA.
+
+	x : int
+		Fragment length being considered
+
+	x_max : int
+		Maximum fragment length (length of mRNA).
+
+	Returns
+	-------
+	combinations: int
+	    Number of unique ways a fragment of that length can take across
+	    that base.
+	"""
 	return i - frag_c(i,x) - frag_c(i,x_max-x)
 
 
-frag_mean = 250
-frag_sd = 70
 
-mrna1_len = 200
-mrna2_len = 300
-mrna3_len = 1000
+frag_mean = 250
+frag_sd = 75
+
+mrna1_len = 500
+mrna2_len = 1000
+mrna3_len = 2000
 
 p1 = frag_factor_profile(mrna1_len, frag_mean, frag_sd)
 p2 = frag_factor_profile(mrna2_len, frag_mean, frag_sd)

@@ -137,18 +137,31 @@ def frag_combinations (i, x, x_max):
 	"""
 	return i - frag_c(i,x) - frag_c(i,x_max-x)
 
+def run_fragmentation_test ():
+	"""Test and plot some fragmentation profiles.
+	"""
+	# We need to do some plotting
+	import matplotlib.pyplot as plt
+	# Some default values for the fragmentation data
+	frag_mean = 250
+	frag_sd = 75
+	# Some example mRNA lengths
+	mrna1_len = 500
+	mrna2_len = 1000
+	mrna3_len = 2000
+	# Generate the profiles
+	p1 = frag_factor_profile(mrna1_len, frag_mean, frag_sd)
+	p2 = frag_factor_profile(mrna2_len, frag_mean, frag_sd)
+	p3 = frag_factor_profile(mrna3_len, frag_mean, frag_sd)
+	# Plot the profiles
+	fig = plt.figure(figsize=(8,3))
+	ax = fig.add_subplot(1,1,1)
+	ax.plot(range(mrna1_len), p1, 'r')
+	ax.plot(range(mrna2_len), p2, 'g')
+	ax.plot(range(mrna3_len), p3, 'b')
+	ax.set_xlim([0,mrna3_len])
+	plt.tight_layout()
+	plt.show()
 
-
-frag_mean = 250
-frag_sd = 75
-
-mrna1_len = 500
-mrna2_len = 1000
-mrna3_len = 2000
-
-p1 = frag_factor_profile(mrna1_len, frag_mean, frag_sd)
-p2 = frag_factor_profile(mrna2_len, frag_mean, frag_sd)
-p3 = frag_factor_profile(mrna3_len, frag_mean, frag_sd)
-
-
-
+# Test the functions
+run_fragmentation_test()

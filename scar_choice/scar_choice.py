@@ -97,7 +97,7 @@ def random_scar (scar_len, exclude_set=[], max_homology=2, allowed_set=[]):
 	return new_scar
 
 def enumerate_scars (scar_len, depth, cur_scar, full_scar_set, new_scars, max_homology=2, found=[0], num_to_find=None, allowed_set=[]):
-	"""Recursive method to enumerate all possible scars (be careful memory usage high for large lengths)
+	"""Recursive method to enumerate all possible scars (be careful memory usage could be high for large scar lengths)
 	"""
 	if depth == scar_len:
 		if num_to_find == None or found[0] < num_to_find:
@@ -150,10 +150,13 @@ def find_scars (scar_len, seed_set=[], max_homology=2, num_to_find=None, random_
 	else:
 		# Enumerate all possibilities until all required number of scars are found (or all)
 		if num_to_find == None:
-			enumerate_scars(scar_len, 0, '', full_scar_set, new_scars, max_homology=max_homology, allowed_set=allowed_set)
+			enumerate_scars(scar_len, 0, '', full_scar_set, new_scars, 
+				            max_homology=max_homology, allowed_set=allowed_set)
 		else:
 			found = [0]
-			enumerate_scars(scar_len, 0, '', full_scar_set, new_scars, max_homology=max_homology, found=found, num_to_find=num_to_find, allowed_set=allowed_set)
+			enumerate_scars(scar_len, 0, '', full_scar_set, new_scars, 
+				            max_homology=max_homology, found=found, 
+				            num_to_find=num_to_find, allowed_set=allowed_set)
 			if found[0] < num_to_find:
 				return None, None, None
 	return formatted_output_list(full_scar_set), formatted_output_list(new_scars), formatted_output_list(removed_from_seed)

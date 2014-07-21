@@ -157,6 +157,11 @@ def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx,
 	rates = [rate_fwd, rate_rev, rate_int, rate_ext]
 	return (sites, rates)
 
+def generate_nonhomogeneous_site_model (gcl, variant, part_start_idx, part_end_idx, 
+	                                 site_len=25, p_rate_attrib='REU', 
+	                                 t_rate_attrib='Strength'):
+	return None
+
 def flow_derivative(y, time, rate_fwd, rate_rev, rate_int, rate_ext):
 	"""Calcuates the derivative for the site model ODE.
 
@@ -333,6 +338,26 @@ def run_flow_model (site_model, converged_site_err=0.0001, sim_step_time=25.0,
 	return None, None
 
 def site_profile_to_bp_profile (site_profile, site_len=25):
+	"""Convert site model profile into one for bps (duplicate values 
+		for whole site length)
+
+    Parameters
+    ----------
+    site_profile : array(float)
+        Site profile.
+
+    site_len : int (default=25)
+    	Site length.
+
+    max_time : float (default=99999.0)
+    	Maximum time to run simulation for before exiting with error due
+    	to no convergence of the model.
+
+    Returns
+    -------
+    bp_profile: array(float)
+        Profile at bp resolution.
+	"""
 	bp_profile = np.zeros(np.size(site_profile, 0))
 	for i in site_profile:
 		start_bp = i*site_len

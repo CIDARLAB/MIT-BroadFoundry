@@ -332,6 +332,14 @@ def run_flow_model (site_model, converged_site_err=0.0001, sim_step_time=25.0,
 	# Simulation didn't converge
 	return None, None
 
+def site_profile_to_bp_profile (site_profile, site_len=25):
+	bp_profile = np.zeros(np.size(site_profile, 0))
+	for i in site_profile:
+		start_bp = i*site_len
+		end_bp = start_bp + site_len
+		bp_profile[start_bp:end_bp] = np.ones(site_len)*site_profile[i]
+	return bp_profile
+
 #######################################################################
 # EXAMPLE ANALYSIS
 #######################################################################

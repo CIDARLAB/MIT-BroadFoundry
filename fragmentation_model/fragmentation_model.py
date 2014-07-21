@@ -7,7 +7,7 @@ Fragmentation Model
     correction of read depths to account for differences in mRNA
     length and edge effects due to sequencing being performed on 
     fragements of a certain average size and standard deviation.
-    This is based on the approach taken by Ben Gordon but rather
+    This is based on the approach taken by Ben Gordon, but rather
     than using a sampling approach attempts to calculate the 
     result analytically.
 
@@ -136,6 +136,42 @@ def frag_combinations (i, x, x_max):
 	    that base.
 	"""
 	return i - frag_c(i,x) - frag_c(i,x_max-x)
+
+def frag_profile_for_variant (gcl, variant, start_part_idx, end_part_idx, 
+	                          frag_mean=280, frag_sd=70):
+	# Get the variants data
+	var_data = gcl.get_variant_data(variant)
+	# Check the start and end part indexes
+	if start_part_idx < 0:
+		start_part_idx =  len(var_data['part_list']) + start_part_idx
+	if end_part_idx < 0:
+		end_part_idx =  len(var_data['part_list']) + end_part_idx
+	if end_part_idx < start_part_idx:
+		return None
+	# Extract all transcriptional units from the GeneClusterLibrary
+	tus = gcl.transcriptional_units()
+	# Filter to make sure they fall within the part range specified
+	valid_variant_tus = []
+	for tu in tus[v_key]:
+		
+		if tu[0] < start_part_idx:
+			# Check direction
+
+
+
+
+
+	# Calculate the forward and reverse strands separately
+
+
+	# For each TU generate a profile
+	fwd_profiles = []
+	rev_profiles = []
+
+	fwd_profiles.append([p_idx, t_idx, profile])
+
+
+	return fwd_profiles, rev_profiles
 
 def run_fragmentation_test ():
 	"""Test and plot some fragmentation profiles.

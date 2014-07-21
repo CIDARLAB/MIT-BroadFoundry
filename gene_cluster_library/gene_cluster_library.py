@@ -194,6 +194,21 @@ class GeneClusterLibrary:
 		self.variants[name] = the_var
 		return the_var
 
+	def get_variant_data (self, variant):
+		"""Get method for variant data from a name
+
+	    Parameters
+	    ----------
+	    variant : string
+	        Variant name.
+
+	    Returns
+	    -------
+	    vairant_data: dict
+	        Dictionary of the variant data.
+		"""
+		return self.variants[variant]
+
 	def get_variant_part_idx_name (self, variant, part_idx):
 		"""Get method for part name from variant and part index
 
@@ -326,6 +341,21 @@ class GeneClusterLibrary:
 	    	Attribute value.
 		"""
 		self.variants[variant]['part_list'][part_idx][attrib_key] = attrib_value
+
+	def get_part_data (self, part_name):
+		"""Get method for variant data from a name
+
+	    Parameters
+	    ----------
+	    part_name : string
+	        Part name.
+
+	    Returns
+	    -------
+	    part_data: dict
+	        Dictionary of the part data.
+		"""
+		return self.parts[part_name]
 
 	def get_part_attrib (self, part_name, attrib_key):
 		"""Get method for a part's attribute from a part name and key

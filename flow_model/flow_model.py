@@ -41,10 +41,10 @@ from scipy.integrate import odeint
 
 # Default (homogeneous) rates to use
 FLOW_MODEL_PARAMS = {'fwd_rate' : 0.2,
-                     'rev_rate' : 0.01,
+                     'rev_rate' : 0.00001, # 0.001
                      'int_rate' : 0.1,
-                     'ext_rate' : 0.15,
-                     'drop_rate': 0.005}
+                     'ext_rate' : 0.9,
+                     'drop_rate': 0.000001} # 0.005
 
 def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx, 
 	                                 site_len=25):
@@ -86,7 +86,7 @@ def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx,
 	# Calculate positions in bp
 	start_bp = gcl.variants[variant]['part_list'][part_start_idx]['seq_idx']
 	end_bp = (gcl.variants[variant]['part_list'][part_end_idx]['seq_idx'] + 
-		      gcl.variants[variant]['part_list'][part_end_idx]['seq_len']
+		      gcl.variants[variant]['part_list'][part_end_idx]['seq_len'])
 	# Generate the sites (initially classify as generic DNA)
 	num_of_sites = int((end_bp-start_bp)/site_len)
 	if (end_bp-start_bp) % site_len != 0:
@@ -263,8 +263,8 @@ def flow_derivative(y, time, rate_fwd, rate_rev, rate_int, rate_ext):
                       - rate_ext[i+s_num]*y_i_r )
 	return out
 
-def run_flow_model (site_model, converged_site_err=0.01, sim_step_time=25.0, 
-	                max_sim_time=99999.0, verbose=False):
+def run_flow_model (site_model, converged_site_err=0.0001, sim_step_time=25.0, 
+	                max_sim_time=99999.0, min_iter=10, verbose=False):
 	"""Runs the flow model.
 
 	This requires a valid site based model which can be generated using the
@@ -302,9 +302,10 @@ def run_flow_model (site_model, converged_site_err=0.01, sim_step_time=25.0,
 	rates.append(site_model[1][2][0] + site_model[1][2][1]) # INT
 	rates.append(site_model[1][3][0] + site_model[1][3][1]) # EXT
 	# Set up solver and run
-	init_cond = np.ones(np.size(sites, 0)) * 0.0001
+	init_cond = np.ones(np.size(sites, 0)) * 0.01
 	cur_y = init_cond
 	info = {}
+	cur_iter = 0
 	# Simulate in steps until max_time reached
 	for i in range(int(max_sim_time/sim_step_time)):
 		if verbose == True:
@@ -319,12 +320,13 @@ def run_flow_model (site_model, converged_site_err=0.01, sim_step_time=25.0,
 		if verbose == True:
 				print 'Current max site error =', cur_max_site_err
 		# Check for convergence
-		if cur_max_site_err <= converged_site_err:
+		if cur_max_site_err <= converged_site_err and cur_iter >= min_iter:
 			if verbose == True:
 				print 'Converged with max site error =', cur_max_site_err
 			# Return the trajectory if converged
 			return new_y[-1], info
 		cur_y = new_y[-1]
+		cur_iter += 1
 	if verbose == True:
 		print 'Simulation did not converge'
 	# Simulation didn't converge
@@ -349,8 +351,8 @@ variant = '75'
 
 # Test the model
 model = generate_homogeneous_site_model(nifs, variant, 1, -2, site_len=25)
-y, info = run_flow_model(model, converged_site_err=0.00001, sim_step_time=25.0,
-	                     max_sim_time=99999.0, verbose=True)
+y, info = run_flow_model(model, converged_site_err=0.005, sim_step_time=20.0,
+	                     max_sim_time=10000.0, min_iter=20, verbose=True)
 
 # Plot the results with architecture (including RNA-seq data)
 gs = gridspec.GridSpec(2, 1, height_ratios=[2,1])

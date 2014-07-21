@@ -40,14 +40,14 @@ import numpy as np
 from scipy.integrate import odeint
 
 # Default (homogeneous) rates to use
-FLOW_MODEL_PARAMS = {'fwd_rate' : 0.2,
+FLOW_MODEL_RATES = { 'fwd_rate' : 0.2,
                      'rev_rate' : 0.00001, # 0.001
                      'int_rate' : 0.1,
                      'ext_rate' : 0.9,
-                     'drop_rate': 0.000001} # 0.005
+                     'drop_rate': 0.000001 } # 0.005
 
 def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx, 
-	                                 site_len=25):
+	                                 site_len=25, rates=FLOW_MODEL_RATES):
 	"""Generates a homogeneoug site based model for use with the flow simulator.
 
 	All rates for promoters and terminators are assumed to be identical and fixed
@@ -135,25 +135,25 @@ def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx,
 					if sites[1][s] == 0:
 						sites[1][s] = 2
 	# Rates for transitions between sites (use defaults for fwd and rev rates)
-	rate_fwd = [[FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites,
-	            [FLOW_MODEL_PARAMS['fwd_rate']]*num_of_sites]
-	rate_rev = [[FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites,
-	            [FLOW_MODEL_PARAMS['rev_rate']]*num_of_sites]
+	rate_fwd = [[rates['fwd_rate']]*num_of_sites,
+	            [rates['fwd_rate']]*num_of_sites]
+	rate_rev = [[rates['rev_rate']]*num_of_sites,
+	            [rates['rev_rate']]*num_of_sites]
 	rate_int = [[0.0]*num_of_sites,[0.0]*num_of_sites]
-	rate_ext = [[FLOW_MODEL_PARAMS['drop_rate']]*num_of_sites,
-	            [FLOW_MODEL_PARAMS['drop_rate']]*num_of_sites]
+	rate_ext = [[rates['drop_rate']]*num_of_sites,
+	            [rates['drop_rate']]*num_of_sites]
 	# Update the initation and termination rates based on site structure
 	for i in range(num_of_sites):
 		# Promoter so add initiation rate
 		if sites[0][i] == 1:
-			rate_int[0][i] = FLOW_MODEL_PARAMS['int_rate']
+			rate_int[0][i] = rates['int_rate']
 		if sites[1][i] == 1:
-			rate_int[1][i] = FLOW_MODEL_PARAMS['int_rate']
+			rate_int[1][i] = rates['int_rate']
 		# Terminator so add termination rate
 		if sites[0][i] == 3:
-			rate_ext[0][i] += FLOW_MODEL_PARAMS['ext_rate']
+			rate_ext[0][i] += rates['ext_rate']
 		if sites[1][i] == 3:
-			rate_ext[1][i] += FLOW_MODEL_PARAMS['ext_rate']
+			rate_ext[1][i] += rates['ext_rate']
 	rates = [rate_fwd, rate_rev, rate_int, rate_ext]
 	return (sites, rates)
 

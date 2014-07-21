@@ -12,6 +12,7 @@ import flow_model as flow
 
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import numpy as np
 
 # Load the Stata nif library data
 nifs = gcl.GeneClusterLibrary()

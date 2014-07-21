@@ -154,61 +154,68 @@ def frag_combinations (i, x, x_max):
 	return i - frag_c(i,x) - frag_c(i,x_max-x)
 
 def variant_frag_factor_profile (gcl, variant, frag_mean=280, frag_sd=70, bp_cutoff=None):
+	"""Generate the expected fragmentation correction factor profile for all TUs in variant.
+
+	Parameters
+	----------
+	gcl : GeneClusterLibrary
+		Gene cluster library to use.
+
+	variant : string
+		Vairant name
+
+	mrna_len : int
+	    Length of the mRNA (bp).
+
+	frag_mean : float
+		Mean fragment length used during sequencing
+
+	frag_sd : float
+		Standard deviation in the fragment lengths.
+
+	bp_cutoff : int (default=None)
+		Limit of size of potential fragment. None assumes up to length of TU.
+
+	Returns
+	-------
+	fwd_profiles: list
+	    List containing elements of form [p_idx, t_idx, p_bp, t_bp, profile] for each
+	    TU on the forward (+) strand.
+
+	rev_profiles: list
+	    List containing elements of form [p_idx, t_idx, p_bp, t_bp, profile] for each
+	    TU on the reverse (-) strand.
+	"""
 	# Get the variant data
-	var_data = gcl.get_variant_data(variant)
+	var_data = gcl.variant_data(variant)
 	# Extract all transcriptional units from the GeneClusterLibrary
-	tus = gcl.transcriptional_units()
+	tus = gcl.transcriptional_units(non_terminated=True)
 	# For each TU generate a profile
 	fwd_profiles = []
 	rev_profiles = []
-	for tu in tus[v_key]:
+	for tu in tus[variant]:
+		p_bp = gcl.variant_part_idx_end_bp(variant, tu[0])
 		tu_has_no_end = False
+		t_bp = 0
 		if tu[1] == None:
 			tu_has_no_end = True
-			if gcl.variant_part_idx_dir(tu[0]) == 'F':
+			if gcl.variant_part_idx_dir(variant, tu[0]) == 'F':
 				tu[1] = len(var_data['part_list'])-1
+				t_bp = gcl.variant_part_idx_end_bp(variant, tu[1])
 			else:
 				tu[1] = 0
-		p_bp = variant_part_idx_end_bp(variant, tu[0])
-		t_bp = variant_part_idx_start_bp(variant, tu[1])
+				t_bp = gcl.variant_part_idx_start_bp(variant, tu[1])
+		else:
+			t_bp = gcl.variant_part_idx_start_bp(variant, tu[1])
+		# Check direction and generate profile
 		if p_bp < t_bp:
 			profile = frag_factor_profile(t_bp-p_bp, frag_mean, frag_sd, 
 				                          bp_cutoff=bp_cutoff, no_end=tu_has_no_end)
 			# Forward strand
-			fwd_profiles.append([p_idx, t_idx, p_bp, t_bp, profile])
+			fwd_profiles.append([tu[0], tu[1], p_bp, t_bp, profile])
 		else:
 			profile = frag_factor_profile(p_bp-t_bp, frag_mean, frag_sd,
 				                          bp_cutoff=bp_cutoff, no_end=tu_has_no_end)
 			# Forward strand
-			rev_profiles.append([p_idx, t_idx, p_bp, t_bp, profile])
+			rev_profiles.append([tu[0], tu[1], p_bp, t_bp, profile])
 	return fwd_profiles, rev_profiles
-
-def run_fragmentation_test ():
-	"""Test and plot some fragmentation profiles.
-	"""
-	# We need to do some plotting
-	import matplotlib.pyplot as plt
-	# Some default values for the fragmentation data
-	frag_mean = 250
-	frag_sd = 75
-	# Some example mRNA lengths
-	mrna1_len = 500
-	mrna2_len = 1000
-	mrna3_len = 2000
-	# Generate the profiles
-	p1 = frag_factor_profile(mrna1_len, frag_mean, frag_sd, bp_cutoff=10*frag_sd, no_end=False)
-	p2 = frag_factor_profile(mrna2_len, frag_mean, frag_sd, bp_cutoff=10*frag_sd, no_end=False)
-	p3 = frag_factor_profile(mrna3_len, frag_mean, frag_sd, bp_cutoff=10*frag_sd, no_end=True)
-	# Plot the profiles
-	fig = plt.figure(figsize=(8,3))
-	ax = fig.add_subplot(1,1,1)
-	ax.plot(range(mrna1_len), p1, 'r')
-	ax.plot(range(mrna2_len), p2, 'g')
-	ax.plot(range(mrna3_len), p3, 'b')
-	ax.set_xlim([0,mrna3_len])
-	ax.set_ylim([0,max(p3)*1.1])
-	plt.tight_layout()
-	plt.show()
-
-# Test the functions
-run_fragmentation_test()

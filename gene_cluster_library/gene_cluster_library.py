@@ -245,7 +245,7 @@ class GeneClusterLibrary:
 		"""
 		return self.parts[self.get_variant_part_idx_name(variant, part_idx)]['type']
 
-	def variant_part_idx_direction (self, variant, part_idx):
+	def variant_part_idx_dir (self, variant, part_idx):
 		"""Get method for part direction from variant and part index
 
 	    Parameters
@@ -431,7 +431,7 @@ class GeneClusterLibrary:
 		if part_idx == None:
 			return None
 		else:
-			part_data = variants[variant]['part_list'][part_idx]
+			part_data = self.variants[variant]['part_list'][part_idx]
 			if part_data['dir'] == 'F':
 				return part_data['seq_idx']
 			else:
@@ -456,7 +456,7 @@ class GeneClusterLibrary:
 		if part_idx == None:
 			return None
 		else:
-			part_data = variants[variant]['part_list'][part_idx]
+			part_data = self.variants[variant]['part_list'][part_idx]
 			if part_data['dir'] == 'F':
 				return part_data['seq_idx'] + part_data['seq_len']
 			else:
@@ -1272,7 +1272,7 @@ class GeneClusterLibrary:
 		f_out.write('# Arcs\n')
 		f_out.close()
 
-	def transcriptional_units (self):
+	def transcriptional_units (self, non_terminated=False):
 		"""Extract all valid transcriptional units from a GeneClusterLibrary.
 
 		Note: double promoters will generate two transcriptional units.
@@ -1300,7 +1300,7 @@ class GeneClusterLibrary:
 				cur_p_data = p_insts[v_key]
 				cur_t_data = t_insts[v_key]
 				for idx in range(len(cur_p_data)):
-					if cur_t_data[idx] != None:
+					if cur_t_data[idx] != None or non_terminated == True:
 						if v_key not in units.keys():
 							units[v_key] = []
 						units[v_key].append([cur_p_data[idx], cur_t_data[idx]])

@@ -194,7 +194,7 @@ class GeneClusterLibrary:
 		self.variants[name] = the_var
 		return the_var
 
-	def get_variant_data (self, variant):
+	def variant_data (self, variant):
 		"""Get method for variant data from a name
 
 	    Parameters
@@ -209,7 +209,7 @@ class GeneClusterLibrary:
 		"""
 		return self.variants[variant]
 
-	def get_variant_part_idx_name (self, variant, part_idx):
+	def variant_part_idx_name (self, variant, part_idx):
 		"""Get method for part name from variant and part index
 
 	    Parameters
@@ -227,7 +227,7 @@ class GeneClusterLibrary:
 		"""
 		return self.variants[variant]['part_list'][part_idx]['part_name']
 
-	def get_variant_part_idx_type (self, variant, part_idx):
+	def variant_part_idx_type (self, variant, part_idx):
 		"""Get method for part type from variant and part index
 
 	    Parameters
@@ -245,7 +245,7 @@ class GeneClusterLibrary:
 		"""
 		return self.parts[self.get_variant_part_idx_name(variant, part_idx)]['type']
 
-	def get_variant_part_idx_direction (self, variant, part_idx):
+	def variant_part_idx_direction (self, variant, part_idx):
 		"""Get method for part direction from variant and part index
 
 	    Parameters
@@ -263,7 +263,7 @@ class GeneClusterLibrary:
 		"""
 		return self.variants[variant]['part_list'][part_idx]['dir']
 
-	def get_variant_part_idx_seq_idx (self, variant, part_idx):
+	def variant_part_idx_seq_idx (self, variant, part_idx):
 		"""Get method for start bp from variant and part index
 
 	    Parameters
@@ -281,7 +281,7 @@ class GeneClusterLibrary:
 		"""
 		return self.variants[variant]['part_list'][part_idx]['seq_idx']
 
-	def get_variant_part_idx_seq_len (self, variant, part_idx):
+	def variant_part_idx_seq_len (self, variant, part_idx):
 		"""Get method for part sequence length from variant and part index
 
 	    Parameters
@@ -299,7 +299,7 @@ class GeneClusterLibrary:
 		"""
 		return self.variants[variant]['part_list'][part_idx]['seq_len']
 
-	def get_variant_part_idx_attrib (self, variant, part_idx, attrib_key):
+	def variant_part_idx_attrib (self, variant, part_idx, attrib_key):
 		"""Get method for a part's attribute from variant, part index and key
 
 	    Parameters
@@ -342,7 +342,7 @@ class GeneClusterLibrary:
 		"""
 		self.variants[variant]['part_list'][part_idx][attrib_key] = attrib_value
 
-	def get_part_data (self, part_name):
+	def part_data (self, part_name):
 		"""Get method for variant data from a name
 
 	    Parameters
@@ -357,7 +357,7 @@ class GeneClusterLibrary:
 		"""
 		return self.parts[part_name]
 
-	def get_part_attrib (self, part_name, attrib_key):
+	def part_attrib (self, part_name, attrib_key):
 		"""Get method for a part's attribute from a part name and key
 
 	    Parameters
@@ -378,7 +378,7 @@ class GeneClusterLibrary:
 				return self.parts[part_name][attrib_key]
 		return None
 
-	def get_part_type (self, part_name):
+	def part_type (self, part_name):
 		"""Get method for a part's type from a part name
 
 	    Parameters
@@ -395,7 +395,7 @@ class GeneClusterLibrary:
 			return self.parts[part_name]['type']
 		return None
 
-	def get_part_seq (self, part_name):
+	def part_seq (self, part_name):
 		"""Get method for a part's sequence from a part name
 
 	    Parameters
@@ -411,6 +411,56 @@ class GeneClusterLibrary:
 		if part_name in self.parts.keys():
 			return self.parts[part_name]['seq']
 		return None
+
+	def variant_part_idx_start_bp (self, variant, part_idx):
+		"""Find the start bp of a variant part (consdiers direction)
+
+	    Parameters
+	    ----------
+	    variant : string
+	    	Variant name.
+
+	    part_name : string
+	    	Part name.
+
+	    Returns
+	    -------
+	    start_bp: int
+	        Index (bp) of the start of the part.
+		"""
+		if part_idx == None:
+			return None
+		else:
+			part_data = variants[variant]['part_list'][part_idx]
+			if part_data['dir'] == 'F':
+				return part_data['seq_idx']
+			else:
+				return part_data['seq_idx'] + part_data['seq_len'] 
+
+	def variant_part_idx_end_bp (self, variant, part_idx):
+		"""Find the end bp of a variant part (consdiers direction)
+
+	    Parameters
+	    ----------
+	    variant : string
+	    	Variant name.
+
+	    part_name : string
+	    	Part name.
+
+	    Returns
+	    -------
+	    end_bp: int
+	        Index (bp) of the end of the part.
+		"""
+		if part_idx == None:
+			return None
+		else:
+			part_data = variants[variant]['part_list'][part_idx]
+			if part_data['dir'] == 'F':
+				return part_data['seq_idx'] + part_data['seq_len']
+			else:
+				return part_data['seq_idx'] 
 
 	def find_part_instances (self, part_name):
 		"""Find instances of a part in all the variants.

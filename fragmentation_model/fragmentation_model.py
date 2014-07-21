@@ -137,25 +137,21 @@ def frag_combinations (i, x, x_max):
 	"""
 	return i - frag_c(i,x) - frag_c(i,x_max-x)
 
-def frag_profile_for_variant (gcl, variant, start_part_idx, end_part_idx, 
-	                          frag_mean=280, frag_sd=70):
+def frag_profile_for_variant (gcl, variant, frag_mean=280, frag_sd=70):
 	# Get the variants data
 	var_data = gcl.get_variant_data(variant)
-	# Check the start and end part indexes
-	if start_part_idx < 0:
-		start_part_idx =  len(var_data['part_list']) + start_part_idx
-	if end_part_idx < 0:
-		end_part_idx =  len(var_data['part_list']) + end_part_idx
-	if end_part_idx < start_part_idx:
-		return None
 	# Extract all transcriptional units from the GeneClusterLibrary
 	tus = gcl.transcriptional_units()
 	# Filter to make sure they fall within the part range specified
 	valid_variant_tus = []
 	for tu in tus[v_key]:
 		
-		if tu[0] < start_part_idx:
-			# Check direction
+
+		p_end_bp = variant_part_idx_end_bp(variant, part_idx)
+		t_start_bp = variant_part_idx_start_bp(variant, part_idx)
+
+		
+			
 
 
 

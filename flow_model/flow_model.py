@@ -11,13 +11,24 @@ Flow Model
 
     The major extention is to enable bi-directional flow that is needed
     to capture potential interactions taking place during transcriptional
-    interference and more multi-directional genetic architectures.
+    interference and multi-directional genetic architectures.
 
     This enables the assessment of RNAP movement and final steady state 
     densities along a stretch of DNA taking into consideration interactions 
     between RNAPs moving potentially in different directions along the 
     molecule. Input is a region of a GeneClusterLibrary variant and output
     is the steady-state RNAP density distribution along the DNA.
+
+    We consider two cases:
+    	
+    	(i) Homogeneous Rates: under this scenario each of the transition
+    			types in the model have a fixed rate. This is more for use
+    			in analysing the model and not actual gene clusters as rates
+    			will not be fixed.
+    	
+    	(ii) Non-homogeneous Rates: under this scenario the rates for 
+    			promoters and terminators come directly from characterisation
+    			data. This enables more complex flow models and behaviours.
 
     Note: this is a deterministic model not taking stochastic aspects
     into consideration. As the data we generally compare to (RNA-seq)
@@ -413,9 +424,19 @@ def run_flow_model (site_model, converged_site_err=0.0001, sim_step_time=25.0,
     	Site-based error allowed to assume convergence to steady state and 
     	end of simluation.
 
-    max_time : float (default=99999.0)
+    sim_step_time : float (default=25.0)
+    	Default minimal time to simulate between time points.
+
+    max_sim_time : float (default=99999.0)
     	Maximum time to run simulation for before exiting with error due
     	to no convergence of the model.
+
+    min_iter : float (default=10)
+    	Minumim number of simulation iterations to perform before checking
+    	error bounds.
+
+    verbose : bool (default=False)
+    	Print out intermediate information (for debugging).
 
     Returns
     -------

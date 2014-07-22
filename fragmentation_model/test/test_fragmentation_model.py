@@ -42,7 +42,8 @@ def run_fragmentation_variant_test ():
 	nifs = gcl.GeneClusterLibrary()
 	nifs.load('../../data_sets/clean_nif_stata_library.txt')
 	# Generate profiles
-	fwd_profiles, rev_profiles = fm.variant_frag_factor_profile(nifs, '75', frag_mean=280, frag_sd=70, bp_cutoff=10*70)
+	fwd_profiles, rev_profiles = fm.variant_frag_factor_profile(nifs, '75', frag_mean=280, 
+		                                                        frag_sd=70, bp_cutoff=10*70)
 	# There should be 4 FWD and 3 REV profiles
 	print 'Forward profiles = ', len(fwd_profiles) , '(Should equal 4)'
 	print 'Reverse profiles = ', len(rev_profiles) , '(Should equal 3)'

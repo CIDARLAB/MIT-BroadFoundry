@@ -48,10 +48,10 @@ FLOW_MODEL_RATES = { 'fwd_rate' : 0.2,
 
 def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx, 
 	                                 site_len=25, rates=FLOW_MODEL_RATES):
-	"""Generates a homogeneoug site based model for use with the flow simulator.
+	"""Generates a homogeneous site based model for use with the flow simulator.
 
 	All rates for promoters and terminators are assumed to be identical and fixed
-	to values provided by the FLOW_MODEL_PARAMS dictionary.
+	to values provided by the FLOW_MODEL_RATES dictionary.
 
     Parameters
     ----------
@@ -69,6 +69,9 @@ def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx,
 
     site_len : int (default=25)
     	Length of each site (in bp).
+
+    rates : dict (float, default=FLOW_MODEL_RATES)
+    	Dictionary of rates for different types of transition, see FLOW_MODEL_RATES.
 
     Returns
     -------
@@ -97,7 +100,7 @@ def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx,
 	# 	1 - promoter
 	# 	2 - coding DNA (CDS)
 	# 	3 - terminator
-	sites = [[0]*num_of_sites, [0]*num_of_sites]
+	sites = [[[0,'']]*num_of_sites, [[0,'']]*num_of_sites]
 	# Cycle through all parts 
 	for cur_idx in range(part_start_idx, part_end_idx+1):
 		# Extract the part and find site it belongs
@@ -115,25 +118,25 @@ def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx,
 		if cur_type == 'Promoter':
 			# It's a promoter - use end bp
 			if cur_el['dir'] == 'F':
-				sites[0][site_end] = 1
+				sites[0][site_end] = [1, cur_el['part_name']]
 			else:
-				sites[1][site_end] = 1
+				sites[1][site_end] = [1, cur_el['part_name']]
 		if cur_type == 'Terminator':
 			# It's a terminator - use start bp
 			if cur_el['dir'] == 'F':
-				sites[0][site_start] = 3
+				sites[0][site_start] = [3, cur_el['part_name']]
 			else:
-				sites[1][site_start] = 3
+				sites[1][site_start] = [3, cur_el['part_name']]
 		if cur_type == 'CDS':
 			# It's a coding region - extend across (make sure not to overwrite promoter)
 			if cur_el['dir'] == 'F':
 				for s in range(site_start, site_end+1):
 					if sites[0][s] == 0:
-						sites[0][s] = 2
+						sites[0][s] = [2, cur_el['part_name']]
 			else:
 				for s in range(site_end, site_start+1):
 					if sites[1][s] == 0:
-						sites[1][s] = 2
+						sites[1][s] = [2, cur_el['part_name']]
 	# Rates for transitions between sites (use defaults for fwd and rev rates)
 	rate_fwd = [[rates['fwd_rate']]*num_of_sites,
 	            [rates['fwd_rate']]*num_of_sites]
@@ -145,22 +148,148 @@ def generate_homogeneous_site_model (gcl, variant, part_start_idx, part_end_idx,
 	# Update the initation and termination rates based on site structure
 	for i in range(num_of_sites):
 		# Promoter so add initiation rate
-		if sites[0][i] == 1:
+		if sites[0][i][0] == 1:
 			rate_int[0][i] = rates['int_rate']
-		if sites[1][i] == 1:
+		if sites[1][i][0] == 1:
 			rate_int[1][i] = rates['int_rate']
 		# Terminator so add termination rate
-		if sites[0][i] == 3:
+		if sites[0][i][0] == 3:
 			rate_ext[0][i] += rates['ext_rate']
-		if sites[1][i] == 3:
+		if sites[1][i][0] == 3:
 			rate_ext[1][i] += rates['ext_rate']
 	rates = [rate_fwd, rate_rev, rate_int, rate_ext]
 	return (sites, rates)
 
 def generate_nonhomogeneous_site_model (gcl, variant, part_start_idx, part_end_idx, 
-	                                 site_len=25, p_rate_attrib='REU', 
-	                                 t_rate_attrib='Strength'):
-	return None
+	                                    site_len=25, rates=FLOW_MODEL_RATES, 
+	                                    p_rate_attrib='Strength', p_rate_factor=1.0,
+	                                    t_rate_attrib='Strength', t_rate_factor=1.0):
+	"""Generates a nonhomogeneous site based model for use with the flow simulator.
+
+	All rates for promoters and terminators are taken from a part attribute.
+
+    Parameters
+    ----------
+    gcl : GeneClusterLibrary
+        The gene cluster library to use.
+
+    variant : string
+    	Variant name to model.
+
+    part_start_idx : int
+    	Start part index to include in the model.
+
+    part_end_idx : int
+    	End part index to include in the model.
+
+    site_len : int (default=25)
+    	Length of each site (in bp).
+
+    rates : dict (float, default=FLOW_MODEL_RATES)
+    	Dictionary of rates for different types of transition, see FLOW_MODEL_RATES.
+    	This excludes the promoter initiation and termination rates that use
+    	attributes from the parts (see below).
+
+    p_rate_attrib : string
+    	Attribute key for the promoter strength rate.
+
+    p_rate_factor : float
+    	Factor to multiply rate attribute value by to give correctly scaled 
+    	promoter rates.
+
+    t_rate_attrib : string
+    	Attribute key for the terminator strength rate.
+
+    t_rate_factor : float
+    	Factor to multiply rate attribute value by to give correctly scaled 
+    	terminator rates.
+
+    Returns
+    -------
+    (sites, rates): (list, list)
+        The site model containing the site definitions and separated rates.
+	"""
+	# Abstract the DNA sequence from the library into a site model using types below
+	start_bp = 0
+	end_bp = 0
+	# Generate valid indexes
+	if part_start_idx < 0:
+		part_start_idx = len(gcl.variants[variant]['part_list']) - part_start_idx
+	if part_end_idx < 0:
+		part_end_idx = len(gcl.variants[variant]['part_list']) + part_end_idx
+	# Calculate positions in bp
+	start_bp = gcl.variants[variant]['part_list'][part_start_idx]['seq_idx']
+	end_bp = (gcl.variants[variant]['part_list'][part_end_idx]['seq_idx'] + 
+		      gcl.variants[variant]['part_list'][part_end_idx]['seq_len'])
+	# Generate the sites (initially classify as generic DNA)
+	num_of_sites = int((end_bp-start_bp)/site_len)
+	if (end_bp-start_bp) % site_len != 0:
+		num_of_sites += 1
+	# Sites along the DNA molecule (0 = +ve strand, 1 = -ve strand)
+	# Sites can have the following classifications:
+	# 	0 - generic DNA
+	# 	1 - promoter
+	# 	2 - coding DNA (CDS)
+	# 	3 - terminator
+	sites = [[[0,'']]*num_of_sites, [[0,'']]*num_of_sites]
+	# Cycle through all parts 
+	for cur_idx in range(part_start_idx, part_end_idx+1):
+		# Extract the part and find site it belongs
+		cur_el = gcl.variants[variant]['part_list'][cur_idx]
+		cur_type = gcl.parts[cur_el['part_name']]['type']
+		cur_start_bp = cur_el['seq_idx']
+		cur_end_bp = cur_el['seq_idx'] + cur_el['seq_len']
+		if cur_el['dir'] == 'R':
+			temp = cur_start_bp
+			cur_start_bp = cur_end_bp
+			cur_end_bp = temp
+		site_start = int((cur_start_bp-start_bp)/site_len)
+		site_end = int((cur_end_bp-start_bp)/site_len)
+		# Check part type and how to handle
+		if cur_type == 'Promoter':
+			# It's a promoter - use end bp
+			if cur_el['dir'] == 'F':
+				sites[0][site_end] = [1, cur_el['part_name']]
+			else:
+				sites[1][site_end] = [1, cur_el['part_name']]
+		if cur_type == 'Terminator':
+			# It's a terminator - use start bp
+			if cur_el['dir'] == 'F':
+				sites[0][site_start] = [3, cur_el['part_name']]
+			else:
+				sites[1][site_start] = [3, cur_el['part_name']]
+		if cur_type == 'CDS':
+			# It's a coding region - extend across (make sure not to overwrite promoter)
+			if cur_el['dir'] == 'F':
+				for s in range(site_start, site_end+1):
+					if sites[0][s] == 0:
+						sites[0][s] = [2, cur_el['part_name']]
+			else:
+				for s in range(site_end, site_start+1):
+					if sites[1][s] == 0:
+						sites[1][s] = [2, cur_el['part_name']]
+	# Rates for transitions between sites (use defaults for fwd and rev rates)
+	rate_fwd = [[rates['fwd_rate']]*num_of_sites,
+	            [rates['fwd_rate']]*num_of_sites]
+	rate_rev = [[rates['rev_rate']]*num_of_sites,
+	            [rates['rev_rate']]*num_of_sites]
+	rate_int = [[0.0]*num_of_sites,[0.0]*num_of_sites]
+	rate_ext = [[rates['drop_rate']]*num_of_sites,
+	            [rates['drop_rate']]*num_of_sites]
+	# Update the initation and termination rates based on site structure
+	for i in range(num_of_sites):
+		# Promoter so add initiation rate
+		if sites[0][i][0] == 1:
+			rate_int[0][i] =  gcl.parts[sites[0][i][1]][p_rate_attrib] * p_rate_factor
+		if sites[1][i][0] == 1:
+			rate_int[1][i] = gcl.parts[sites[1][i][1]][p_rate_attrib] * p_rate_factor
+		# Terminator so add termination rate
+		if sites[0][i][0] == 3:
+			rate_ext[0][i] += gcl.parts[sites[0][i][1]][t_rate_attrib] * t_rate_factor
+		if sites[1][i][0] == 3:
+			rate_ext[1][i] += gcl.parts[sites[1][i][1]][t_rate_attrib] * t_rate_factor
+	rates = [rate_fwd, rate_rev, rate_int, rate_ext]
+	return (sites, rates)
 
 def flow_derivative(y, time, rate_fwd, rate_rev, rate_int, rate_ext):
 	"""Calcuates the derivative for the site model ODE.

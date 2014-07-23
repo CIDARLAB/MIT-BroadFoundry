@@ -116,7 +116,7 @@ def filter_tu_insts_on_promoters (tu_insts, filter_insts):
 def filter_tu_insts_on_terminators (tu_insts, filter_insts):
 	return filter_tu_insts(tu_insts, filter_insts, idx=1)
 
-def load_strand_data (filename):
+def load_stata_strand_data (filename):
 	data = {}
 	reader = csv.reader(open(filename, 'rb'), delimiter=',')
 	# Use the header to get the names of the keys for the prediction data
@@ -139,6 +139,15 @@ def load_strand_data (filename):
 				data[el_name][0].append(float(row[el_idx]))
 			else:
 				data[el_name][1].append(float(row[el_idx]))
+	return data
+
+def load_strand_data (filename):
+	data = [[],[]]
+	reader = csv.reader(open(filename, 'rb'), delimiter=',')
+	header = reader.next()
+	for row in reader:
+		data[0].append(float(row[1]))
+		data[1].append(float(row[2]))
 	return data
 
 def abs_cds_rnap_decay_rate (gcl, variant, c_idx, tx_profile, start_skip=100, 

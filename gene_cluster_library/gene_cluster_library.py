@@ -51,7 +51,8 @@ class GeneClusterLibrary:
 	                  'RBS':'RBS',
 	                  'Terminator':'terminator',
 	                  'Scar':'misc_feature',
-	                  'Spacer':'misc_feature'}
+	                  'Spacer':'misc_feature',
+	                  'Ribozyme':'misc_feature'}
 
 	# Static class variable listing the standard parts generally used.
 	STD_PART_TYPES = ['Promoter',
@@ -59,7 +60,8 @@ class GeneClusterLibrary:
 	                  'CDS',
 	                  'Terminator',
 	                  'Scar',
-	                  'Spacer']
+	                  'Spacer',
+	                  'Ribozyme']
 
 	def __init__(self):
 		"""Constructor to generate an empty GeneClusterLibrary.
@@ -561,7 +563,7 @@ class GeneClusterLibrary:
 
 	    Returns
 	    -------
-	    seqs : dict(list(string))
+	    seqs : dict(list(int))
 	        The extracted sequence.
 		"""
 		part_seqs = {}

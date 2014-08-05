@@ -3,7 +3,7 @@ from random import random
 from re_eraser import re_erase
 
 def maine():
-    seqgen(35, 40, 15, 10, 0.01, 100, 100)
+    seqgen(30, 40, 16, 14, 2, 126, 100)
 
 def seqgen(pctA, pctT, pctC, pctG, var, seqlen, pronumber):
     

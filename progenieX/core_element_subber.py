@@ -7,7 +7,7 @@ def maine() :
     tatasub(seq, iB, cS)
     kozaksub(core, strength, iB, cS)
     tsssub(tss, strength, iB, cS)
-    polyAT_tbp_sub(tbp, strength, iB, uS)
+    polyAT_tbp_sub(tbp, strength, iB, cS)
     
 def tatasub(seq, iB, cS) :
 
@@ -132,7 +132,7 @@ def tsssub(tss, strength, iB, cS) :
 
     return tss
 
-def polyAT_tbp_sub(seq, strength, iB, uS):
+def polyAT_tbp_sub(seq, strength, iB, cS):
     
     count = 0
     sites = 1
@@ -147,17 +147,35 @@ def polyAT_tbp_sub(seq, strength, iB, uS):
         polynum = random()
         
         # How likely poly dA:dT addition occurs
-        polyatD = {1 : {'VH': float(cell(iB,uS,'B34')), 'H' : float(cell(iB,uS,'C34')),
-                        'M': float(cell(iB,uS,'D34')), 'L': float(cell(iB,uS,'E34'))}}
+        polyatD = {1 : {'VH': float(cell(iB,cS,'B46')), 'H' : float(cell(iB,cS,'C46')),
+                        'M': float(cell(iB,cS,'D46')), 'L': float(cell(iB,cS,'E46'))}}
         
         if polynum <= polyatD[1][strength] :
 
             # I want to insert the poly dA:dT 15 bp into the tbp of the core.  This should be after any TATA that has been
             # inserted into the sequences.
             psliceL = [slice_loc, slice_loc+13]
+
+            # This random generator decides which of the polydA:dT sequences to insert.  It will choose either
+            # (0): polyT, (1): polyA, (2): random mix.  As polyA will likely decrease strength of the promoter
+            # Or at least increase strength less than T or a mix), make polyA less likely as the strength increases.
+            seq_choose = random()
+            seq_choiceD = {'VH' : [float(cell(iB,cS,'H40')), float(cell(iB,cS,'H41'))],
+                           'H' : [float(cell(iB,cS,'J40')), float(cell(iB,cS,'J41'))],
+                           'M' : [float(cell(iB,cS,'L40')), float(cell(iB,cS,'L41'))],
+                           'L' : [float(cell(iB,cS,'N40')), float(cell(iB,cS,'N41'))]}
             
-            # For the core, only a T/A mix sequence will be inserted.
-            polyAT = cell(iB,cS,'R39')
+            # Define the potential sequences to substitute. Poly dA:dT - 1 T, 1 A, 1 random mix
+            polyAT = [cell(iB,cS,'R42'), cell(iB,cS,'R41'), cell(iB,cS,'R40')]
+
+            # This code originally defines the poly dA:dT sequence as all T, then based on the
+            # random number generated (seq_choose) decides to change the index in the list and
+            # therefor the poly dA:dT sequence.
+            index = 0
+            if seq_choose <= seq_choiceD[strength][0]:
+                index = 2
+            if seq_choiceD[strength][0] < seq_choose <= seq_choiceD[strength][1] :
+                index = 1
 
             # This is the actual code for replacement. I didn't use .replace() because that searches the whole
             # string for instances of the 12 bp sequence.  There is a low chance it repeats in the UAS, but it

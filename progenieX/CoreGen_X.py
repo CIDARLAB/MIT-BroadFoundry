@@ -32,20 +32,18 @@ def coregen(cornum) :
 
     # These are all of the scars I will be using for all generated sequences
     # For core promoters, the left scar will be even J and right will be B
-    B = cell(iB,gS,'B6')
+    A = cell(iB,gS,'B5')
+    B = cell(iB,gS, 'B6')
+    J1 = cell(iB,gS,'B7')
     J2 = cell(iB,gS,'B8')
+    J3 = cell(iB,gS,'B9')
     J4 = cell(iB,gS,'B10')
-    J6 = cell(iB,gS,'B12')
-    J8 = cell(iB,gS,'B14')
     
-    core_scar = {'VH': [J2, B],
-                 'H': [J4, B],
-                 'M': [J6, B],
-                 'L': [J8, B]}
+    core_scar = [J1, B]
 
     # These are the Type IIs sites to add to the end of the sequence for cloning
-    bbs1_F = cell(iB,gS,'B2')
-    bbs1_R = rev_comp(bbs1_F)
+    bbs1_F = cell(iB,gS,'G5')
+    bbs1_R = rev_comp(cell(iB,gS,'G6'))
     
     # Since the generator will create VH, H, L and M for each cornum, to output the
     # number of desired sequences, the input has to be divided by 4.
@@ -77,8 +75,14 @@ def coregen(cornum) :
                     'utr': {'A': cell(iB,cS,'C14'), 'T': cell(iB,cS,'D14'),
                             'C': cell(iB,cS,'E14'), 'G': cell(iB,cS,'F14')}}}
     
-    tol = cell(iB,cS,'G3')
-    le = int(cell(iB,cS,'H3'))
+    toleranceD = {'tbp': cell(iB,cS,'G3'),
+                  'tss': cell(iB,cS,'G4'),
+                  'utr': cell(iB,cS,'G5')}
+    
+    lengthD = {'tbp': int(cell(iB,cS,'H3')),
+               'tss': int(cell(iB,cS,'H4')),
+               'utr': int(cell(iB,cS,'H5'))}
+    
     clear('core_sub_record.txt')
     
     for x in strengths :
@@ -90,7 +94,8 @@ def coregen(cornum) :
 
             # Generate 50 bp sequences for each region
             seqgen(specD[x][y]['A'], specD[x][y]['T'],
-                   specD[x][y]['C'], specD[x][y]['G'], tol, le, cors)
+                   specD[x][y]['C'], specD[x][y]['G'],
+                   toleranceD[y], lengthD[y], cors)
 
             # Retrieves the generated sequences from the output file and
             # makes a list of the sequences without the names added in seqgen()
@@ -123,7 +128,7 @@ def coregen(cornum) :
                 for num, sy in enumerate(sylist) :
                     with open('core_sub_record.txt', 'a') as rec:
                         rec.write(' %(c)s\n' % {'c':count})
-                        sy = polyAT_tbp_sub(sy, x, iB, uS)
+                        sy = polyAT_tbp_sub(sy, x, iB, cS)
                         
             # Since the consensus Kozak is also unlikely to appear at the end of the UTR,
             # I also wrote a function that substitutes it in.
@@ -154,13 +159,19 @@ def coregen(cornum) :
             # This populates the different segments into one dictionary
             syxD[x][y] = sylist
 
-    # This stitches together the 50 bp segments into a full core promoter and adds TypeIIS sites.
+    # This stitches together the subsegments into a full core promoter and adds TypeIIS sites.
     for x in strengths :
         
         coreD[x] = syxD[x]['tbp']
         
         for num, seq in enumerate(syxD[x][y]):
-            core = re_eraser(core_scar[x][0]+syxD[x]['tbp'][num]+syxD[x]['tss'][num]+syxD[x]['utr'][num]+core_scar[x][1])
+            
+            core = re_eraser(core_scar[0]+
+                             syxD[x]['tbp'][num]+
+                             syxD[x]['tss'][num]+
+                             syxD[x]['utr'][num]+
+                             core_scar[1])
+            
             coreD[x][num] = bbs1_F+core+bbs1_R
 
     # Name output data files, format sequence dictionary into FASTA, and analyze for motifs.

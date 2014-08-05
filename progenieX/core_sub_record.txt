@@ -2,7 +2,35 @@
 VH
 tbp
  1
+     TATATAAA
  2
+     TATAAAAG
+ 3
+ 4
+ 5
+     TATATATA
+ 6
+     TATATATA
+ 7
+ 8
+ 9
+ 10
+     TTTTTTTTTTTTT
+ 1
+     TTTTTTTTTTTTT
+ 1
+     TTTTTTTTTTTTT
+ 1
+     TTTTTTTTTTTTT
+ 1
+     TTTTTTTTTTTTT
+ 1
+     TTAATTTAATTTT
+ 1
+     TTTTTTTTTTTTT
+ 1
+     TTTTTTTTTTTTT
+ 1
      TTTTTTTTTTTTT
  1
      TTTTTTTTTTTTT
@@ -11,66 +39,191 @@ tbp
 VH
 tss
  1
+     TTCTCAAA
+ 2
+     CTTACAAT
+ 3
+ 4
+     CTTACAAT
+ 5
+     CTTACAAT
+ 6
+     TTCTCAAA
+ 7
+ 8
+     TTCTCAAA
+ 9
+     CTTACAAT
+ 10
+
+VH
+utr
+ 1
+     AAAAACAAA
+ 2
+ 3
+ 4
+     AAAAACAAA
+ 5
+     AAAAACAAA
+ 6
+     AAAAGTAAA
+ 7
+     AAAAACAAA
+ 8
+     AAAAACAAA
+ 9
+     AAAAGTAAA
+ 10
+     AAAAACAAA
+
+H
+tbp
+     TTTTTTTTTTTTT
+ 1
+     TTTTTTTTTTTTT
+ 1
+     TTAATTTAATTTT
+ 1
+ 1
+ 1
+     TTAATTTAATTTT
+ 1
+ 1
+ 1
+     TTTTTTTTTTTTT
+ 1
+     TTTTTTTTTTTTT
+ 1
+
+H
+tss
+ 1
+ 2
+ 3
+     CTTACAAT
+ 4
+     TTCTCAAT
+ 5
+ 6
+ 7
+     TTTTCAAA
+ 8
+ 9
+ 10
+
+H
+utr
+ 1
+ 2
+     AAAAACAAA
+ 3
+     AAAAACAAA
+ 4
+ 5
+     AAAAACAAA
+ 6
+ 7
+ 8
+ 9
+ 10
+
+M
+tbp
+ 1
+ 1
+     TTAATTTAATTTT
+ 1
+ 1
+ 1
+ 1
+ 1
+ 1
+ 1
+ 1
+
+M
+tss
+ 1
+ 2
+ 3
      TTTTCAAT
- 2
-
-VH
-utr
- 1
-     AAAAGTAAA
- 2
-     AAAAGTAAA
-
-H
-tbp
-     TTAATTTAATTTT
- 1
- 1
-
-H
-tss
- 1
+ 4
+ 5
+ 6
      TTCTCACC
- 2
-
-H
-utr
- 1
-     AAAAGTAAA
- 2
-     AAAAGTAAA
-
-M
-tbp
-     TTAATTTAATTTT
- 1
- 1
-
-M
-tss
- 1
- 2
+ 7
+ 8
+     CTTAACAA
+ 9
+ 10
+     TTCTACAA
 
 M
 utr
  1
-     AAAAGTAAA
  2
-     AAAAGTAAA
+ 3
+ 4
+     AAAAACAAA
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
 
 L
 tbp
  1
  1
+ 1
+ 1
+ 1
+ 1
+ 1
+ 1
+ 1
+ 1
 
 L
 tss
  1
+     AGCGCACC
  2
+     AGCGCAAA
+ 3
+     AGCGCAAT
+ 4
+ 5
+     AGCGCACC
+ 6
      AGCGACAA
+ 7
+     AGCGCACC
+ 8
+     CTTACACC
+ 9
+     AGCGCACC
+ 10
+     AGCGCAAT
 
 L
 utr
  1
+     CCACCAGTG
  2
+     CCACCAGTG
+ 3
+ 4
+     CCACCAGTG
+ 5
      CCACCGGCG
+ 6
+     CCACCGGCG
+ 7
+     AAAAGTAAA
+ 8
+ 9
+ 10
+     AAAAGTAAA

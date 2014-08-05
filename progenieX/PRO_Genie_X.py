@@ -45,16 +45,16 @@ def pro_genie(num) :
     # to enable stitching as they would be in a TypeIIS reaction.
     corelist = lister('coregen.txt')
 
-    cores = [line[11:169] for line in corelist if '>' not in line]
+    cores = [line[11:145] for line in corelist if '>' not in line]
     x = [line[9:10] for line in corelist if '>' in line]
 
     uas1list = lister('uas1gen.txt')
 
-    uas1s = [line[11:165] for line in uas1list if '>' not in line]
+    uas1s = [line[11:141] for line in uas1list if '>' not in line]
     
     uas2list = lister('uas2gen.txt')
 
-    uas2s = [line[11:165] for line in uas2list if '>' not in line]
+    uas2s = [line[11:141] for line in uas2list if '>' not in line]
 
     # Stitch together the list of sequences into promoters. Note that this is not random stitching,
     # rather sequences are combined in the order they are generated.

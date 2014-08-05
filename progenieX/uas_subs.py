@@ -57,7 +57,7 @@ def tfsub(uas, seq, strength, sites, locilist, iB, uS) :
         # This ensures the first site is always inserted with a TF site.  For UAS2, the other
         # three are inserted with the probability in the ProGenie_Parameters.xlsx.  For UAS1,
         # there is only one other site that has the probability of insertion.
-        if count =< 1 :
+        if count <= 1 :
 
             # Generate another random number to choose which TF to substitute, likelihood
             #of choosing a particular transcription factor is determined in the tf_probs list.

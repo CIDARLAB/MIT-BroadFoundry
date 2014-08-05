@@ -6,39 +6,78 @@ PRO_Genie_X
 
         PRO_Genie_X is a greedy constraint-based algorithm for generating
         nucleotide sequences that have the same features as yeast promoters.
-        It is composed of a variety of functions, which are distributed among
-        various python scripts according to the task that function performs.
+        It is composed of several scripts which categorize functions.
 
-        Running this function, PRO_Genie_X.py, will execute all other scripts
+        Running the function PRO_Genie_X.py will execute all other scripts
         to create a specified number of promoters according to the parameters
         set in ProGenie_Parameters.xlsx.  Therefore, the user need only set
-        the desired parameters in Excel and then run this function to create
+        the desired parameters in Excel and then run the script to create
         promoters!!
 
+    Central Concepts
+    ----------------
 
-    Overview of Theory, Implementation, and Flow
-    --------------------------------------------
-
-        What follows is a brief description of how sequences are generated
-        and modified to create promoters. More information can be found
-        in the individual scripts for specific tasks.
+        What follows is a brief description of the key observations about
+        yeast promoters that inform the structure of the program and central
+        design concepts.  
         
         I. Strength
         -----------
         Throughout PRO_Genie scripts there is a concept of desired promoter
         strength. Four different sets of parameters (very high (VH or V),
         high (H), medium (M), or low (L) anticipated strength) are set for
-        most functions.  This allows diversity in composition without large
-        combinatorial explosion of potential designs.
+        most functions.  These settings determine nucleotide content, motifs,
+        and particular motif sequences.
+
+        II. Components
+        --------------
+        The second concept throughout PRO_Genie scripts is a concept of a
+        standard set of promoter components.  Drawing on insights in recent
+        publications, the yeast promoter is divided into three 150 bp
+        segments: the core promoter, upstream activating sequence (UAS) 1,
+        and UAS 2. Each of these segments has different constraints.
+
+                      UAS2    UAS1       CORE
+                    (------)(------)([--] [--] [--])
+                                     tbp  tss  utr
+                    - = 25 bp
+
+        Since the core promoter contains many varying sequence features, this
+        segment is further divided into three 50 bp sub-segments: the TATA
+        binding protein region (tbp), the anticipated transcription start site
+        (tss), and the anticipated 5'-UTR (utr).  These sub-segments each have
+        unique constraints.  Note that actual transcription start sites and
+        5'-UTR length must be determined experimentally; the program only
+        inserts motifs with a high likelihood of starting transcription within
+        the tss sub-segment.
+
+        III. Motifs and Nucleotide Content
+        ----------------------------------
+        Different nucleotide content and  motifs have been shown to influence
+        transcriptional levels in many studies of yeast promoter architecture.
+        Therefore, as the component and desired strength of the component
+        changes, the constraints on the sequence change in order to allow
+        such things as higher A/T content, additional transcription factor
+        binding sites, sites with greater binding affinity, consensus Kozak
+        sequences, and motifs more likely to initiate transcription.
+
+    Implementation
+    --------------
         
-        II. Generation
+        What follows is a brief description of how sequences are generated
+        and modified to create promoters. More information can be found
+        in the individual scripts for specific tasks.
+
+        I. Generation
         --------------
         The primary sequence generation function is SeqGen_5.  This is a
         greedy constraint-based algorithm that will generate a given number
         of sequences of a given length that meet a given nucleotide content
-        within a set tolerance.
+        within a set tolerance. Again: number of sequences, length, ATCG
+        content, and tolerance are the relevant inputs.  In this application,
+        length is 150 bp for either UAS, and 50 bp for each core sub-segment.
 
-        III. Substitution and Formatting
+        II. Substitution and Formatting
         --------------------------------
         The SeqGen_5 function is called by two scripts for creating the main
         components of a yeast promoter: the core, handled by CoreGen_X, and
@@ -60,13 +99,13 @@ PRO_Genie_X
         There is also a group of eraser functions that eliminate TypeIIS sites
         as well as motifs that are shown to induce mRNA decay (NAB1 and NRD3).
 
-        IV. Common Functions
+        III. Common Functions
         --------------------
         There are also a number of shared functions among all scripts that 
-	handle reading from ProGenie_Parameters.xlsx, and manipulating text 
+	handle reading from ProGenie_Parameters.xlsx and manipulating text 
 	files.
 
-	V. Analysis
+	IV. Analysis
 	-----------
 	In addition to outputting a log of all substitutions made to every 
 	sequence, there is an included analysis package of functions using 

@@ -4,7 +4,6 @@
 ###############################################################################
 
 
-# How the library is structured (at present!)
 import gene_cluster_library as gcl
 import gene_cluster_analysis as gca
 import gene_cluster_visualization as gcv
@@ -43,14 +42,11 @@ p3_seq_ranges_around = nifs.extract_seq_ranges(p3_insts, 100, 50) # (instances, 
 # Extract all the divergent promoters
 div_p = nifs.divergent_promoters()
 
-
 # Extract all the divergent promoters
 con_p = nifs.convergent_promoters()
 
-
 # Extract monocistronic transcriptional units
 monocis_tu = nifs.monocistronic_units()
-
 
 # Extract polycistronic transcriptional units (with specific number of CDSs if needed)
 polycis_tu = nifs.polycistronic_units(number_of_CDS=None)
@@ -141,7 +137,7 @@ if True:
 	ax_traces = plt.subplot(gs[0],sharex=ax_arch)
 
 	# Load the traces for predicted and measured
-	phys_reads = gca.load_strand_data('./data/phys_depths3.csv')
+	phys_reads = gca.load_stata_strand_data('./data/phys_depths3.csv')
 
 	# Plot trace and the architecture
 	gcv.plot_traces_with_arch(ax_arch, ax_traces, nifs, '79', phys_reads, start_idx=1, 

@@ -30,10 +30,10 @@ def main(args):
 	
 	actzymes = open(options.input, "U")
 
-	labels = actzymes.readline().strip().split(options.delimeter)
+	labels = actzymes.readline().strip("\n").split(options.delimeter)
 
 	for line in actzymes:
-    	line = line.strip().split(options.delimeter)
+    	line = line.strip("\n").split(options.delimeter)
    		db.parts.update({labels[0]: ObjectId(line[0])}, {"$set": dict(zip(labels[1:], line[1:]))})
 	
 if __name__ == "__main__":

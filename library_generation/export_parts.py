@@ -16,7 +16,8 @@ def parse_args(args):
 
 	parser.add_argument("--output", "-o", dest="output", type=argparse.FileType('w'),
 			help="Output file to write data to.")
-	parser.add_argument("--atts", "-a", dest="atts", help="Attributes to select documents. att:value, comma separated")
+	parser.add_argument("--atts", "-a", dest="atts", default="",
+		help="Attributes to select documents. att:value, comma separated")
 	parser.add_argument("--data", dest="data", default="sequence",
 		help="Attributes to return for selected documents (comma separated). Default is sequence (ObjectId is always returned as first column")
 	parser.add_argument("--delimeter", "-d", dest="delimeter", default = "\t", help="Text\
@@ -35,13 +36,15 @@ def write_tab(file, labels, data, delimeter):
 
 def main(args):
 	options = parse_args(args)
-	
-	atts = dict([att.split(":") for att in atts.split(",")])
-	
+	if options.atts:
+		atts = dict([att.split(":") for att in options.atts.split(",")])
+	else:
+		atts = {}
 	data = []
 	for doc in db.parts.find(atts):
-    	data.append(doc)
-    write_tab(options.output, options.data.split(","), data, options.delimeter)
+		data.append(doc)
+		
+	write_tab(options.output, options.data.split(","), data, options.delimeter)
     
 	
 if __name__ == "__main__":

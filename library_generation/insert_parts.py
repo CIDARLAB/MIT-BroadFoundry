@@ -26,13 +26,15 @@ def parse_args(args):
 def main(args):
 	options = parse_args(args)
 	
-	actzymes = open(options.input, "U")
+	actzymes = options.input
 
-	labels = actzymes.readline().strip().split(options.delimeter)
+	labels = actzymes.readline().strip("\n").split(options.delimeter)
 
 	for line in actzymes:
-    	line = line.strip().split(options.delimeter)
-   		db.parts.insert(dict(zip(labels, line)))	
+		if not line:
+			continue
+		line = line.strip("\n").split(options.delimeter)
+		db.parts.insert(dict(zip(labels, line)))	
 	
 if __name__ == "__main__":
 	try:

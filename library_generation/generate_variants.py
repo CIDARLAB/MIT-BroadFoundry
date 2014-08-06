@@ -62,9 +62,36 @@ def spec_parse(spec):
     if star == plus == -1:
         return part_lookup(spec)
         
-design = open("../act/test_construction.tab")
-labels = design.readline().strip().split("\t")
-for line in design:
-    line = line.strip().split("\t")
-    for path in spec_parse(line[4]):
-        db.variants.insert({'name': line[0], 'substrate':line[1], 'product':line[2], 'type':line[3], 'spec':line[4], 'parts': path})
+def parse_args(args):
+	
+	
+	parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+			description=__doc__)
+
+	parser.add_argument("--input", "-o", dest="input", type=argparse.FileType('r'),
+			help="Output file to write data to.")
+	parser.add_argument("--delimeter", "-d", dest="delimeter", default = "\t", help="Text\
+			delimeter in output file that separates columns.")
+	
+	args = parser.parse_args(args)
+	
+	return args
+        
+def main(args):
+	
+	options = parse_args(args)
+
+	labels = options.input.readline().strip("\n").split(options.delimeter)
+	for line in design:
+	    line = line.strip("\n").split("\t")
+	    doc = dict(zip(labels,line))
+	    for path in spec_parse(doc['spec']):
+	        db.variants.insert(dict(zip(labels, lines) + ['parts', path]))
+        
+        
+if __name__ == "__main__":
+	try:
+		sys.exit(main(sys.argv[1:]))
+	except EnvironmentError as (errno,strerr):
+		sys.stderr.write("ERROR: " + strerr + "\n")
+		sys.exit(errno)

@@ -1,0 +1,1 @@
+The query is running for CP008805.1. Please wait for a few minutes.<br>Please check the following files after the time.<br>http://phast.wishartlab.com/tmp/CP008805.1/summary.txt<br>http://phast.wishartlab.com/tmp/CP008805.1/detail.txt<br>http://phast.wishartlab.com/tmp/CP008805.1/image.png<br>

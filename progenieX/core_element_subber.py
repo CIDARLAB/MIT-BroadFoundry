@@ -1,145 +1,93 @@
 from random import random
 from xlrd import *
 from excel_functions import cell
-from tss_chooser import *
 
 def maine() :
-    tatasub(seq, iB, cS)
-    kozaksub(core, strength, iB, cS)
-    tsssub(tss, strength, iB, cS)
-    polyAT_tbp_sub(tbp, strength, iB, cS)
+    tata_sub(tbp, strength)
+    polyAT_tbp_sub(tbp, strength)
+    tss_sub(tss, strength)
+    kozak_sub(utr, strength)
     
-def tatasub(seq, iB, cS) :
-
+def tata_sub(seq, strength) :
+    
+    # Define location of data 
+    iB = 'ProGenie_Parameters.xlsx'
+    gS = 'General'
+    cS = 'Core'
+    uS = 'UAS'
+    
+    # Since consensus TATA arise less frequently than they
+    # appear in the Lubliner Very high Emax set, I need sub
+    # them in at about 30% of the time when strength is 'VH'.
+    
+    tata_sub_list = []
     number = random()
 
-    # Now write a chance of subsituting in the TATA at a defined location in the core
-    if number <= cell(iB, cS, 'B26') :
+    if strength is 'VH' :
         
-        # Consensus TATA is TATAWAWR, so need to write random generator to pick a
-        # form of the consensus TATA randomly
-        w = ['A','T']
-        r = ['A','G']
-    
-        in1,in2,in3 = 0,0,0
+        # Chance of subsituting in the TATA at a defined location in the core
+        if number <= cell(iB, cS, 'B26') :
         
-        number1,number2,number3 = random(),random(),random()
+            startslice = int(cell(iB, cS, 'C18'))
 
-        if number1 <= 0.5 :
-            in1 = 1
-        if number2 <= 0.5 :
-            in2 = 1
-        if number3 <= 0.5 :
-            in3 = 1
+            if number <= cell(iB, cS, 'D28') :
+                startslice = int(cell(iB, cS, 'C19'))
+            if cell(iB, cS, 'D28') < number <= cell(iB, cS, 'D29') :
+                startslice = int(cell(iB, cS, 'C20'))
             
-        w1,w2,r1 = w[in1],w[in2],r[in3]
+            endslice = startslice + 7
 
-        startslice = int(cell(iB, cS, 'C18'))
+            tata = tata_sequence_generator()
 
-        if number <= cell(iB, cS, 'D28') :
-            startslice = int(cell(iB, cS, 'C19'))
-        if cell(iB, cS, 'D28') < number <= cell(iB, cS, 'D29') :
-            startslice = int(cell(iB, cS, 'C20'))
+            seqL = seq[:startslice-1]
+            seqR = seq[endslice:]
+
+            seq = seqL+tata+seqR
+
+            tata_sub_list = [tata, startslice]
             
-        endslice = startslice + 7
-        
-        tata = 'TATA%(W1)-sA%(W2)-s%(R1)-s' % {'W1': w1, 'W2' : w2, 'R1': r1}
-        
-        seqL = seq[:startslice-1]
-        seqR = seq[endslice:]
+    return [seq, tata_sub_list]
 
-        seq = seqL+tata+seqR
+def tata_sequence_generator() :
+    
+    # Consensus TATA is TATAWAWR, so need to write random generator to pick a
+    # form of the consensus TATA randomly
+    w = ['A','T']
+    r = ['A','G']
+    
+    in1,in2,in3 = 0,0,0
         
-        with open('core_sub_record.txt', 'a') as rec:
-            rec.write('     %(t)s\n' % {'t': tata})
+    number1,number2,number3 = random(),random(),random()
+
+    if number1 <= 0.5 :
+        in1 = 1
+    if number2 <= 0.5 :
+        in2 = 1
+    if number3 <= 0.5 :
+        in3 = 1
             
-    return seq
+    w1,w2,r1 = w[in1],w[in2],r[in3]
 
-def kozaksub(core, strength, iB, cS) :
+    tata = 'TATA%(W1)-sA%(W2)-s%(R1)-s' % {'W1': w1, 'W2' : w2, 'R1': r1}
 
-    x = strength
+    return tata
 
-    # Change how likely it is that Kozak will be applied depending on strength of core
-    number = random()
-    prob_sub =  {'VH' : cell(iB, cS, 'C31'),
-                 'H' : cell(iB, cS, 'C32'),
-                 'M' : cell(iB, cS, 'C33'),
-                 'L' : cell(iB, cS, 'C34')}
+def polyAT_tbp_sub(seq, strength):
     
-    # Now write a chance of subsituting in the Kozak at the end of the core
-    if number <= prob_sub[x] :
-        
-        # Kozak mutants derived from consensus sequences in Dvir et al. In the design,
-        # the -1 nucleotide will always be A because Bscar is AATG.
-        # So the Kozaks are only 9 nucleotides long. The first two Kozaks
-        # are positively correlated, the second two are negatively correlated.
-        
-        kozak_list = [cell(iB, cS, 'R19'),
-                      cell(iB, cS, 'R20'),
-                      cell(iB, cS, 'R21'),
-                      cell(iB, cS, 'R22')]
-        
-        kozD = {'VH' : [cell(iB, cS, 'I20'), cell(iB, cS, 'I21'), cell(iB, cS, 'I22')],
-                'H' : [cell(iB, cS, 'K20'), cell(iB, cS, 'K21'), cell(iB, cS, 'K22')],
-                'M' : [cell(iB, cS, 'M20'), cell(iB, cS, 'M21'), cell(iB, cS, 'M22')],
-                'L' : [cell(iB, cS, 'O20'), cell(iB, cS, 'O21'), cell(iB, cS, 'O22')]}
-    
-        koz_choose = random()
-        index = 0
-        if koz_choose <= kozD[x][0] :
-            index = 1
-        if kozD[x][0] < koz_choose <= kozD[x][1] :
-            index = 2
-        if kozD[x][1] < koz_choose <= kozD[x][2] :
-            index = 3
-            
-        kozak = kozak_list[index]
-    
-        core = core[:int(cell(iB, cS, 'C22'))]+kozak
-
-        if x is 'VH' :
-           double_sub = random()
-           if double_sub <= cell(iB, cS, 'C35') :
-              core = core[:int(cell(iB, cS, 'C23'))]+kozak_list[index]+kozak
-              
-        with open('core_sub_record.txt', 'a') as rec:
-            rec.write('     %(k)s\n' % {'k': kozak})
-            
-    return core
-
-def tsssub(tss, strength, iB, cS) :
-
-    x = strength
-
-    # Change how likely it is that TSS will be applied depending on strength of core
-    number = random()
-    prob_sub =  {'VH' : cell(iB, cS, 'C36'),
-                 'H' : cell(iB, cS, 'C37'),
-                 'M' : cell(iB, cS, 'C38'),
-                 'L' : cell(iB, cS, 'C39')}
-    
-    # Now write a chance of subsituting in the TSS at the expected TSS
-    #(right at the core-utr junction)
-    if number <= prob_sub[x] :
-        
-        tssu = tss_upstream_chooser(x, iB, cS)
-        tss_el = tss_el_chooser(x, iB, cS)
-    
-        tss = tss[:int(cell(iB, cS, 'C21'))]+tssu+tss_el
-
-        with open('core_sub_record.txt', 'a') as rec:
-            rec.write('     %(t)s\n' % {'t':tssu+tss_el})
-
-    return tss
-
-def polyAT_tbp_sub(seq, strength, iB, cS):
+    # Define location of data 
+    iB = 'ProGenie_Parameters.xlsx'
+    gS = 'General'
+    cS = 'Core'
+    uS = 'UAS'
     
     count = 0
-    sites = 1
+    sites = int(cell(iB,cS,'B43'))
+    
+    polyAT_list = []
 
     while count < sites :
         
-        slice_loc = 15
+        slice_loc = int(cell(iB,cS,'C20'))
         count = count + 1
 
         # This random generator decides whether to insert a poly dA:dT sequence, based on the probability defined
@@ -186,10 +134,159 @@ def polyAT_tbp_sub(seq, strength, iB, cS):
             
             seq = L+polyAT[index]+R
 
-            with open('core_sub_record.txt', 'a') as rec:
-                rec.write('     %(a)s\n' % {'a':polyAT[index]})
+            polyAT_list = [polyAT[index], psliceL[0]]
 
-    return seq
+    return [seq, polyAT_list]
+
+def tss_sub(seq, strength) :
+    
+    # Define location of data 
+    iB = 'ProGenie_Parameters.xlsx'
+    gS = 'General'
+    cS = 'Core'
+    uS = 'UAS'
+    
+    x = strength
+    
+    tss_list = []
+    
+    # Change how likely it is that TSS will be applied depending on strength of core
+    number = random()
+    prob_sub =  {'VH' : cell(iB, cS, 'C36'),
+                 'H' : cell(iB, cS, 'C37'),
+                 'M' : cell(iB, cS, 'C38'),
+                 'L' : cell(iB, cS, 'C39')}
+    
+    # Now write a chance of subsituting in the TSS at the expected TSS
+    #(right at the core-utr junction)
+    if number <= prob_sub[x] :
+        
+        tssu = tss_upstream_chooser(x, iB, cS)
+        tss_el = tss_el_chooser(x, iB, cS)
+
+        tss = tssu+tss_el
+
+        sliceloc = int(cell(iB,cS,'C21'))
+    
+        seq = seq[:sliceloc]+tss
+
+        tss_list = [tss, sliceloc]
+
+    return [seq, tss_list]
+            
+def tss_upstream_chooser(strength, iB, cS) :
+
+    # TSS mutants derived from consensus sequences in Lubliner et al.
+    # TSS upstream has three positively correlated elements and 1 negative
+    tss_upstream_list = [cell(iB,cS,'R28'), cell(iB,cS,'R29'), cell(iB,cS,'R30'), cell(iB,cS,'R31')]
+        
+    tssuD = {'VH' : [cell(iB,cS,'I29'), cell(iB,cS,'I30'), cell(iB,cS,'I31')],
+             'H' : [cell(iB,cS,'K29'), cell(iB,cS,'K30'), cell(iB,cS,'K31')],
+             'M' : [cell(iB,cS,'M29'), cell(iB,cS,'M30'), cell(iB,cS,'M31')],
+             'L' : [cell(iB,cS,'O29'), cell(iB,cS,'O30'), cell(iB,cS,'O31')]}
+
+    x = strength
+    tss_up_choose = random()
+    index = 0
+    if tss_up_choose <= tssuD[x][0] :
+        index = 1
+    if tssuD[x][0] < tss_up_choose <= tssuD[x][1] :
+        index = 2
+    if tssuD[x][1] < tss_up_choose <= tssuD[x][2] :
+        index = 3
+
+    tss_upstream = tss_upstream_list[index]
+             
+    return tss_upstream
+
+def tss_el_chooser(strength, iB, cS) :
+             
+    # TSS mutants derived from consensus sequences in Lubliner et al.
+    # TSS elements are all positively correlated, but (0) and (1) are more strongly correlated.
+    # Therefore I decreased the likelihood of choosing those elements as strength decreased.
+    tss_el_list = [cell(iB,cS,'R33'), cell(iB,cS,'R34'), cell(iB,cS,'R35'), cell(iB,cS,'R36')]
+             
+    tss_elD = {'VH' : [cell(iB,cS,'I34'), cell(iB,cS,'I35'), cell(iB,cS,'I36')],
+             'H' : [cell(iB,cS,'K34'), cell(iB,cS,'K35'), cell(iB,cS,'K36')],
+             'M' : [cell(iB,cS,'M34'), cell(iB,cS,'M35'), cell(iB,cS,'M36')],
+             'L' : [cell(iB,cS,'O34'), cell(iB,cS,'O35'), cell(iB,cS,'O36')]}
+
+    x = strength
+    tss_el_choose = random()
+    index = 0
+    if tss_el_choose <= tss_elD[x][0] :
+        index = 1
+    if tss_elD[x][0] < tss_el_choose <= tss_elD[x][1] :
+        index = 2
+    if tss_elD[x][1] < tss_el_choose <= tss_elD[x][2] :
+        index = 3
+
+    tss_el = tss_el_list[index]
+
+    return tss_el
+            
+def kozak_sub(core, strength) :
+    
+    # Define location of data 
+    iB = 'ProGenie_Parameters.xlsx'
+    gS = 'General'
+    cS = 'Core'
+    uS = 'UAS'
+    
+    x = strength
+
+    kozak_list = []
+
+    # Change how likely it is that Kozak will be applied depending on strength of core
+    number = random()
+    prob_sub =  {'VH' : cell(iB, cS, 'C31'),
+                 'H' : cell(iB, cS, 'C32'),
+                 'M' : cell(iB, cS, 'C33'),
+                 'L' : cell(iB, cS, 'C34')}
+    
+    # Now write a chance of subsituting in the Kozak at the end of the core
+    if number <= prob_sub[x] :
+        
+        # Kozak mutants derived from consensus sequences in Dvir et al. In the design,
+        # the -1 nucleotide will always be A because Bscar is AATG.
+        # So the Kozaks are only 9 nucleotides long. The first two Kozaks
+        # are positively correlated, the second two are negatively correlated.
+        
+        kozak_list = [cell(iB, cS, 'R19'),
+                      cell(iB, cS, 'R20'),
+                      cell(iB, cS, 'R21'),
+                      cell(iB, cS, 'R22')]
+        
+        kozD = {'VH' : [cell(iB, cS, 'I20'), cell(iB, cS, 'I21'), cell(iB, cS, 'I22')],
+                'H' : [cell(iB, cS, 'K20'), cell(iB, cS, 'K21'), cell(iB, cS, 'K22')],
+                'M' : [cell(iB, cS, 'M20'), cell(iB, cS, 'M21'), cell(iB, cS, 'M22')],
+                'L' : [cell(iB, cS, 'O20'), cell(iB, cS, 'O21'), cell(iB, cS, 'O22')]}
+    
+        koz_choose = random()
+        index = 0
+        if koz_choose <= kozD[x][0] :
+            index = 1
+        if kozD[x][0] < koz_choose <= kozD[x][1] :
+            index = 2
+        if kozD[x][1] < koz_choose <= kozD[x][2] :
+            index = 3
+            
+        kozak = kozak_list[index]
+
+        sliceloc = int(cell(iB, cS, 'C22'))
+    
+        core = core[:sliceloc]+kozak
+
+        if x is 'VH' :
+           double_sub = random()
+           if double_sub <= cell(iB, cS, 'C35') :
+               sliceloc_2 = int(cell(iB, cS, 'C23'))
+               
+               core = core[:sliceloc_2]+kozak_list[index]+kozak
+              
+        kozak_list = [kozak, sliceloc] 
+            
+    return [core, kozak_list]
 
 if __name__ == "__maine__" :
     maine()

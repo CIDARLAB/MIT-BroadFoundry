@@ -1,184 +1,179 @@
-from xlrd import *
+"""
+CoreGen_X
+===========
+    CoreGen_X is the main function for creating segments of core promoters.
+    This program reads in settings in ProGenie_Parameters.xlsx and calls SeqGen_5 for
+    each subelement of the core promoter: tata-binding region (tbp), transcription start
+    site (tss), and anticipated 5'-UTR (utr).  It then passes these sequences to the
+    various substitution functions.  Finally, it wipes any TypeIIS sites from the sequence
+    and adds on flanking sequences for cloning.    
+"""
+
 from common_functions import *
-from excel_functions import cell
-from reverser import rev_comp
 from SeqGen_5 import seqgen
+from get_data import get_parameters
 from core_element_subber import *
 from site_eraser import *
-from pro_analysis import promoter_analysis
 
 def maine() :
-    coregen(int(raw_input("Number (must be a multiple of 4):")))
-
-def coregen(cornum) :
-    # Define location of data 
-    iB = 'ProGenie_Parameters.xlsx'
-    gS = 'General'
-    cS = 'Core'
-    uS = 'UAS'
     
-    # Define names of strength levels and iterable lists 
-    strengths = ['VH', 'H', 'M', 'L']
-    subpart = ['tbp', 'tss', 'utr']
+    # This function pulls the data from ProGenie_Parameters.xlsx
+    # I invoke above the following for loops so that the dictionary is only created once.
+    parameterD = get_parameters()
+    
+    coregen(int(raw_input("Number (must be a multiple of 4):")), parameterD)
+
+def coregen(core_number, parameterD) :
+
+    # Common iterating list for sequence scripts
     ATCG = ['A', 'T', 'C', 'G']
     
+    # Define iterating lists for strengths and each core subpart 
+    strengths = ['VH', 'H', 'M', 'L']
+    subpart = ['tbp', 'tss', 'utr']
 
-    syxD = {'VH': {'tbp': [], 'tss': [], 'utr': []},
-            'H': {'tbp': [], 'tss': [], 'utr': []},
-            'M': {'tbp': [], 'tss': [], 'utr': []},
-            'L': {'tbp': [], 'tss': [], 'utr': []}}
+    # This dictionary is an empty dictionary into which the generated sequences will
+    # be substituted
+    subelementD = {'VH': {'tbp': [], 'tss': [], 'utr': []},
+                   'H': {'tbp': [], 'tss': [], 'utr': []},
+                   'M': {'tbp': [], 'tss': [], 'utr': []},
+                   'L': {'tbp': [], 'tss': [], 'utr': []}}
 
-    coreD = {'VH': [], 'H': [], 'M': [], 'L': []}
-
-    # These are all of the scars I will be using for all generated sequences
-    # For core promoters, the left scar will be even J and right will be B
-    A = cell(iB,gS,'B5')
-    B = cell(iB,gS, 'B6')
-    J1 = cell(iB,gS,'B7')
-    J2 = cell(iB,gS,'B8')
-    J3 = cell(iB,gS,'B9')
-    J4 = cell(iB,gS,'B10')
-    
-    core_scar = [J1, B]
-
-    # These are the Type IIs sites to add to the end of the sequence for cloning
-    bbs1_F = cell(iB,gS,'G5')
-    bbs1_R = rev_comp(cell(iB,gS,'G6'))
-    
     # Since the generator will create VH, H, L and M for each cornum, to output the
     # number of desired sequences, the input has to be divided by 4.
-    cors = cornum/4
+    cores = core_number/4
 
-    # Associated fractions from Lubliner et al. 2013
-    specD = {'VH': {'tbp': {'A': cell(iB,cS,'C3'), 'T': cell(iB,cS,'D3'),
-                            'C': cell(iB,cS,'E3'), 'G': cell(iB,cS,'F3')},
-                    'tss': {'A': cell(iB,cS,'C4'), 'T': cell(iB,cS,'D4'),
-                            'C': cell(iB,cS,'E4'), 'G': cell(iB,cS,'F4')},
-                    'utr': {'A': cell(iB,cS,'C5'), 'T': cell(iB,cS,'D5'),
-                            'C': cell(iB,cS,'E5'), 'G': cell(iB,cS,'F5')}},
-             'H': {'tbp': {'A': cell(iB,cS,'C6'), 'T': cell(iB,cS,'D6'),
-                           'C': cell(iB,cS,'E6'), 'G': cell(iB,cS,'F6')},
-                    'tss': {'A': cell(iB,cS,'C7'), 'T': cell(iB,cS,'D7'),
-                            'C': cell(iB,cS,'E7'), 'G': cell(iB,cS,'F7')},
-                    'utr': {'A': cell(iB,cS,'C8'), 'T': cell(iB,cS,'D8'),
-                            'C': cell(iB,cS,'E8'), 'G': cell(iB,cS,'F8')}},
-             'M': {'tbp': {'A': cell(iB,cS,'C9'), 'T': cell(iB,cS,'D9'),
-                           'C': cell(iB,cS,'E9'), 'G': cell(iB,cS,'F9')},
-                    'tss': {'A': cell(iB,cS,'C10'), 'T': cell(iB,cS,'D10'),
-                            'C': cell(iB,cS,'E10'), 'G': cell(iB,cS,'F10')},
-                    'utr': {'A': cell(iB,cS,'C11'), 'T': cell(iB,cS,'D11'),
-                            'C': cell(iB,cS,'E11'), 'G': cell(iB,cS,'F11')}},
-             'L': {'tbp': {'A': cell(iB,cS,'C12'), 'T': cell(iB,cS,'D12'),
-                           'C': cell(iB,cS,'E12'), 'G': cell(iB,cS,'F12')},
-                    'tss': {'A': cell(iB,cS,'C13'), 'T': cell(iB,cS,'D13'),
-                            'C': cell(iB,cS,'E13'), 'G': cell(iB,cS,'F13')},
-                    'utr': {'A': cell(iB,cS,'C14'), 'T': cell(iB,cS,'D14'),
-                            'C': cell(iB,cS,'E14'), 'G': cell(iB,cS,'F14')}}}
-    
-    toleranceD = {'tbp': cell(iB,cS,'G3'),
-                  'tss': cell(iB,cS,'G4'),
-                  'utr': cell(iB,cS,'G5')}
-    
-    lengthD = {'tbp': int(cell(iB,cS,'H3')),
-               'tss': int(cell(iB,cS,'H4')),
-               'utr': int(cell(iB,cS,'H5'))}
-    
-    clear('core_sub_record.txt')
-    
+    # This dictionary will hold all final sequences and metadata concerning substitution
+    recordD = {}
+    for x in strengths :
+        recordD[x] = {}
+        for n in range(cores) :
+            recordD[x][n] = {}
+
+    # This for loop kicks of sequence generation
     for x in strengths :
         
         for y in subpart :
-            
-            with open('core_sub_record.txt', 'a') as rec:
-                rec.write('\n%(x)s\n%(y)s\n' % {'x':x, 'y':y})
 
-            # Generate 50 bp sequences for each region
-            seqgen(specD[x][y]['A'], specD[x][y]['T'],
-                   specD[x][y]['C'], specD[x][y]['G'],
-                   toleranceD[y], lengthD[y], cors)
-
-            # Retrieves the generated sequences from the output file and
-            # makes a list of the sequences without the names added in seqgen()
-            sygenlist = lister('seqsgen.txt')
-            
-            # Eliminate the generic FASTA names applied by seqgen
-            sylist = [line for line in sygenlist if '>' not in line]
-            
-            # Since consensus TATA arise less frequently than they appear in the Lubliner
-            # Very high Emax set, I needed to write a script that subs them in at about 30%
-            # of the time the tatagen() function is executed.
-            # Since the consensus Kozak is also unlikely to appear at the end of the UTR,
-            # I also wrote a function that substitutes it in.
-            if x is 'VH' :
-                count = 1
-                if y is 'tbp':
-                    for num, sy in enumerate(sylist) :
-                        with open('core_sub_record.txt', 'a') as rec:
-                            rec.write(' %(c)s\n' % {'c':count})
-                        sy = tatasub(sy, iB, cS)
-                        count = count + 1
-                        sylist[num] = sy
-
-            # This function writes the polyAT into the tbp region.
+            # Call the sequence generation function that handles calling SeqGen_5 using the
+            # parameters set in ProGenie_Parameters.xlsx
+            seq_list = generate_core_sequences(cores, x, y, parameterD)
+         
+            # This loop substitutes TATA and polyAT sites into the tbp region.
             # This arrangement allows for one more pdW, but without combinatorial
             # explosion in UAS1, and also allows nucleosome free region close to the
             # tss. 
             if y is 'tbp':
-                count = 1
-                for num, sy in enumerate(sylist) :
-                    with open('core_sub_record.txt', 'a') as rec:
-                        rec.write(' %(c)s\n' % {'c':count})
-                        sy = polyAT_tbp_sub(sy, x, iB, cS)
+                for n, seq in enumerate(seq_list):
                         
-            # Since the consensus Kozak is also unlikely to appear at the end of the UTR,
-            # I also wrote a function that substitutes it in.
-            if y is 'utr':
-                count = 1
-                for num, sy in enumerate(sylist) :
-                    with open('core_sub_record.txt', 'a') as rec:
-                        rec.write(' %(c)s\n' % {'c':count})
-                    sy = kozaksub(sy, x, iB, cS)
-                    sy = atg_eraser(sy, x)
-                    sy = nab_nrd_eraser(sy, x)
-                    count = count + 1
-                    sylist[num] = sy
+                    tata_sub_list = tata_sub(seq, x)
 
+                    recordD[x][n]['tata_sub'] = tata_sub_list[1]
+
+                    polyAT_sub_list = polyAT_tbp_sub(tata_sub_list[0],x)
+
+                    recordD[x][n]['polyAT_sub'] = polyAT_sub_list[1]
+                        
+                    seq_list[n] = polyAT_sub_list[0]
+                    
             # Since there is data available about elements around the TSS from Lubliner
             # I also wrote a function that puts in TSS elements right at the end of the
             # tss element
             if y is 'tss' :
-                count = 1
-                for num, sy in enumerate(sylist) :
-                    with open('core_sub_record.txt', 'a') as rec:
-                        rec.write(' %(c)s\n' % {'c':count})
-                    sy = tsssub(sy, x, iB, cS)
-                    sy = nab_nrd_eraser(sy, x)
-                    count = count + 1
-                    sylist[num] = sy
+                for n, seq in enumerate(seq_list) :
+                    
+                    tss_sub_list = tss_sub(seq, x)
+                    
+                    recordD[x][n]['tss_sub'] = tss_sub_list[1]
+                    
+                    tss_nn_erase_list = nab_nrd_eraser(tss_sub_list[0], x)
 
-            # This populates the different segments into one dictionary
-            syxD[x][y] = sylist
+                    recordD[x][n]['tss_nn_erase'] = tss_nn_erase_list[1]
+
+                    seq_list[n] = tss_nn_erase_list[0]
+                    
+            # Since the consensus Kozak is also unlikely to appear at the end of the UTR,
+            # I also wrote a function that substitutes it in.
+            if y is 'utr':
+                for n, seq in enumerate(seq_list) :
+                    
+                    kozak_sub_list = kozak_sub(seq, x)
+                    
+                    recordD[x][n]['kozak_sub'] = kozak_sub_list[1]
+                    
+                    atg_erase_list = atg_eraser(kozak_sub_list[0], x)
+
+                    recordD[x][n]['atg_erase'] = atg_erase_list[1]
+                    
+                    utr_nn_erase_list = nab_nrd_eraser(atg_erase_list[0], x)
+
+                    recordD[x][n]['utr_nn_erase'] = utr_nn_erase_list[1]
+                    
+                    seq_list[n] = utr_nn_erase_list[0]
+                    
+            # This populates the different segments into the empty dictionary to hold
+            # all sequences together.
+            subelementD[x][y] = seq_list
+
+    # Stitch subelements
+    coreD = stitch_subelements(parameterD, subelementD, strengths)
+    
+    # Format sequence dictionary into FASTA and save to text file. 
+    fastaD_out(coreD, 'core')
+
+    # Add final sequences to the record dictionary.
+    for x in strengths :
+        for n in range(cores) :
+            recordD[x][n]['sequence'] = coreD[x][n]
+    
+    return recordD
+
+def generate_core_sequences(cores, x, y, parameterD) :
+    
+    dataD = {'A' : parameterD['nuc_pct'][x][y]['A'],
+             'T' : parameterD['nuc_pct'][x][y]['T'],
+             'C' : parameterD['nuc_pct'][x][y]['C'],
+             'G' : parameterD['nuc_pct'][x][y]['G'],
+             'tol' : parameterD['tolerance'][y],
+             'len' : parameterD['length'][y],
+             'num' : cores}
+
+    # Generate sequences for each subelement.
+    # Seqgen saves theses sequences in a text file, which the next
+    # lines of code will read.
+    seqgen(dataD['A'], dataD['T'], dataD['C'], dataD['G'],
+           dataD['tol'], dataD['len'], dataD['num'])
+
+    # Retrieves the generated sequences from the output text file and
+    # makes a list of the sequences without the names added in seqgen()
+    annotated_seq_list = lister('seqsgen.txt')
+            
+    # Eliminate the generic FASTA names applied by seqgen
+    seq_list = [line for line in annotated_seq_list if '>' not in line]
+
+    return seq_list
+
+def stitch_subelements(parameterD, subelementD, strengths) :
+    
+    # Define empty dictionary to substitute stitched sequences
+    coreD = {'VH': [], 'H': [], 'M': [], 'L': []}
 
     # This stitches together the subsegments into a full core promoter and adds TypeIIS sites.
     for x in strengths :
         
-        coreD[x] = syxD[x]['tbp']
+        coreD[x] = subelementD[x]['tbp']
         
-        for num, seq in enumerate(syxD[x][y]):
+        for n, seq in enumerate(subelementD[x]['tbp']):
             
-            core = re_eraser(core_scar[0]+
-                             syxD[x]['tbp'][num]+
-                             syxD[x]['tss'][num]+
-                             syxD[x]['utr'][num]+
-                             core_scar[1])
-            
-            coreD[x][num] = bbs1_F+core+bbs1_R
+            core = re_eraser(parameterD['scars']['J1']+
+                             subelementD[x]['tbp'][n]+
+                             subelementD[x]['tss'][n]+
+                             subelementD[x]['utr'][n]+
+                             parameterD['scars']['B'])
 
-    # Name output data files, format sequence dictionary into FASTA, and analyze for motifs.
-    prefix = 'core'   
-    fastaD_out(coreD, prefix)    
-    promoter_analysis(prefix)
+            coreD[x][n] = parameterD['flanks']['Core_F']+core+parameterD['flanks']['Core_R']
 
+    return coreD
 
 if __name__ == "__maine__" :
     maine()

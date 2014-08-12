@@ -3,14 +3,21 @@ from xlrd import *
 from excel_functions import cell
 
 def maine() :
-    reb1_site_chooser(strength, iB, uS)
-    rap1_site_chooser(strength, iB, uS)
-    gcr1_site_chooser(strength, iB, uS)
-    abf1_site_chooser(strength, iB, uS)
-    mcm1_site_chooser(strength, iB, uS)
-    rsc3_site(strength, iB, uS)
+    reb1_site_chooser(strength, parameterD)
+    rap1_site_chooser(strength, parameterD)
+    gcr1_site_chooser(strength, parameterD)
+    abf1_site_chooser(strength, parameterD)
+    mcm1_site_chooser(strength, parameterD)
+    rsc3_site(strength, parameterD)
     
-def reb1_site_chooser(strength, iB, uS):
+def reb1_site_chooser(strength, parameterD):
+    # Define location of data 
+    iB = 'ProGenie_Parameters.xlsx'
+    gS = 'General'
+    cS = 'Core'
+    uS = 'UAS'
+    
+    tf_name = 'REB1'
     
     # BINDING SITES FROM YEASTRACT AND MOGNO ET AL.
     reb1 = [cell(iB,uS,'S5'), cell(iB,uS,'S6'), cell(iB,uS,'S7'), cell(iB,uS,'S8')]
@@ -35,9 +42,16 @@ def reb1_site_chooser(strength, iB, uS):
 
     reb1_choice = reb1[index]
 
-    return reb1_choice
+    return [tf_name, index+1, reb1_choice]
 
-def rap1_site_chooser(strength, iB, uS):
+def rap1_site_chooser(strength, parameterD):
+    # Define location of data 
+    iB = 'ProGenie_Parameters.xlsx'
+    gS = 'General'
+    cS = 'Core'
+    uS = 'UAS'
+    
+    tf_name = 'RAP1'
     
     # BINDING SITES FROM YEASTRACT AND MOGNO ET AL.
     rap1 = [cell(iB,uS,'S14'), cell(iB,uS,'S15'), cell(iB,uS,'S16')]
@@ -58,10 +72,17 @@ def rap1_site_chooser(strength, iB, uS):
 
     rap1_choice = rap1[index]
 
-    return rap1_choice
+    return [tf_name, index+1, rap1_choice]
 
-def gcr1_site_chooser(strength, iB, uS):
-
+def gcr1_site_chooser(strength, parameterD):
+    # Define location of data 
+    iB = 'ProGenie_Parameters.xlsx'
+    gS = 'General'
+    cS = 'Core'
+    uS = 'UAS'
+    
+    tf_name = 'GCR1'
+    
     # BINDING SITES FROM YEASTRACT, MOGNO ET AL., AND BAI ET AL.
     gcr1 = [cell(iB,uS,'S22'), cell(iB,uS,'S23'), cell(iB,uS,'S24'), cell(iB,uS,'S25')]
     
@@ -83,10 +104,17 @@ def gcr1_site_chooser(strength, iB, uS):
 
     gcr1_choice = gcr1[index]
 
-    return gcr1_choice
+    return [tf_name, index+1, gcr1_choice]
 
-def abf1_site_chooser(strength, iB, uS):
-
+def abf1_site_chooser(strength, parameterD):
+    # Define location of data 
+    iB = 'ProGenie_Parameters.xlsx'
+    gS = 'General'
+    cS = 'Core'
+    uS = 'UAS'
+    
+    tf_name = 'ABF1'
+    
     # BINDING SITES FROM YEASTRACT, LAST TWO BASED OFF "RTCRYYYNNNACG" 
     abf1 = [cell(iB,uS,'S30'), cell(iB,uS,'S31'), cell(iB,uS,'S32')]
 
@@ -99,10 +127,17 @@ def abf1_site_chooser(strength, iB, uS):
         
     abf1_choice = abf1[index]
     
-    return abf1_choice
+    return [tf_name, index+1, abf1_choice]
 
-def mcm1_site_chooser(strength, iB, uS):
-
+def mcm1_site_chooser(strength, parameterD):
+    # Define location of data 
+    iB = 'ProGenie_Parameters.xlsx'
+    gS = 'General'
+    cS = 'Core'
+    uS = 'UAS'
+    
+    tf_name = 'MCM1'
+    
     # BINDING SITES FROM BAI ET AL.
     mcm1 = [cell(iB,uS,'S37'), cell(iB,uS,'S38')]
     
@@ -113,14 +148,21 @@ def mcm1_site_chooser(strength, iB, uS):
         
     mcm1_choice = mcm1[index]
     
-    return mcm1_choice
+    return [tf_name, index+1, mcm1_choice]
 
-def rsc3_site(strength, iB, uS):
-
+def rsc3_site(strength, parameterD):
+    # Define location of data 
+    iB = 'ProGenie_Parameters.xlsx'
+    gS = 'General'
+    cS = 'Core'
+    uS = 'UAS'
+    
+    tf_name  = 'RSC3'
+    
     # BINDING SITE FROM BAI ET AL.
     rsc3 = cell(iB,uS,'S41')
     
-    return rsc3
+    return [tf_name, 1, rsc3]
 
 if __name__ == "__maine__" :
     maine()

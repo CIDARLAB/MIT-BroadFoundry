@@ -71,7 +71,7 @@ def atg_eraser(seq, strength) :
         if atg in seq :
             seq = seq.replace(atg, fix)
             
-    return seq
+    return [seq, 1]
 
 def nab_nrd_eraser(seq, strength) :
 
@@ -80,11 +80,11 @@ def nab_nrd_eraser(seq, strength) :
     nab3 = "TCTT"
     nrd1_1 = "GTAA"
     nrd1_2 = "GTAG"
-
+    
+    nab_fix = "ACTA"
+    nrd_fix = "GTAT"
+    
     if s is not "L":
-
-        nab_fix = "ACTA"
-        nrd_fix = "GTAT"
         
         if nab3 in seq :
             seq = seq.replace(nab3, nab_fix)
@@ -93,7 +93,7 @@ def nab_nrd_eraser(seq, strength) :
         if nrd1_2 in seq :
             seq = seq.replace(nrd1_2, nrd_fix)
             
-    return seq
+    return [seq, 1]
 
 if __name__ == "__maine__" :
     maine()

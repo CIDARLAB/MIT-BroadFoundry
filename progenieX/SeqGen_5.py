@@ -1,6 +1,4 @@
-# Functions to Import from Modules
 from random import random
-from site_eraser import re_eraser
 
 def maine():
     seqgen(30, 40, 16, 14, 2, 126, 100)
@@ -95,8 +93,6 @@ def seqgen(pctA, pctT, pctC, pctG, var, seqlen, pronumber):
         if seq_ok is 4 :
         
             seq = ''.join(templist)
-
-            seq = re_eraser(seq)
 
             pCount = pCount + 1
             pro_output.write(">EMY%(name)-spro\n%(promoter)-s\n" % {"name": pCount, "promoter": seq})

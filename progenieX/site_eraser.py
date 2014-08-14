@@ -6,92 +6,58 @@ def maine() :
     atg_eraser(seq, strength)
     nab_nrd_eraser(seq, strength)
 
-def re_eraser(seq) :
-    
-    # Define unwanted restriction enzyme sites
-    bpiI_f = "GAAGAC"
-    bpiI_r = rev_comp(bpiI_f)
-    bsaI_f = "GGTCTC"
-    bsaI_r = rev_comp(bsaI_f)
-    sapI_f = "GCTCTTC"
-    sapI_r = rev_comp(sapI_f)
-    mlyI_f = "GAGTC"
-    mlyI_r = rev_comp(mlyI_f)
+def re_eraser(seq, parameterD) :
 
-    fix_bpiI_f = "GATGAC"
-    fix_bpiI_r = "GTCATC"
-    fix_bsaI_f = "GGTCAC"
-    fix_bsaI_r = "GTGACC"
-    fix_sapI_f = "GCTCATC"
-    fix_sapI_r = "GATGAGC"
-    fix_mlyI_f = "GTGTC"
-    fix_mlyI_r = "GACAC"
-
-    relist = ["bpiI_f", "bpiI_r", "bsaI_f", "bsaI_r",
-              "sapI_f", "sapI_r", "mlyI_f", "mlyI_r"]
-    
-    reD = {"bpiI_f": bpiI_f, "bpiI_r": bpiI_r,
-           "bsaI_f": bsaI_f, "bsaI_r":bsaI_r,
-           "sapI_f":sapI_f, "sapI_r":sapI_r,
-           "mlyI_f":mlyI_f, "mlyI_r":mlyI_r}
-    
-    fixD = {"bpiI_f": fix_bpiI_f, "bpiI_r": fix_bpiI_r,
-            "bsaI_f": fix_bsaI_f, "bsaI_r":fix_bsaI_r,
-            "sapI_f":fix_sapI_f, "sapI_r":fix_sapI_r,
-            "mlyI_f":fix_mlyI_f, "mlyI_r":fix_mlyI_r}
+    reD = parameterD['re']
     
     re_count = 0
-    resD = {}
-    re_seq = {}
     
-    for x in relist:
-        if reD[x] in seq :
-            seq = seq.replace(reD[x], fixD[x])
+    for k in reD:
+        
+        if reD[k]['seq'] in seq :
+            
+            seq = seq.replace(reD[k]['seq'],
+                              reD[k]['fix'])
             re_count = re_count + 1
             
     return seq
 
-def atg_eraser(seq, strength) :
+def atg_eraser(seq, strength, parameterD) :
 
-    s = strength
+    if strength is not "L":
     
-    atg = "ATG"
-
-    if s is not "L":
-
-        fix = "AAG"
-    
-        x = random()
-
-        if 0 <= x <= 0.25:
-            fix = "TTG"
-        if 0.25 <= x <= 0.5:
-            fix = "ATC"
+        choose_fix = random()
+        choice_list = parameterD['atg_erase']['fix_choice']
+        
+        index = 0
+        if 0 <= choose_fix <= choice_list[0]:
+            index = 1
+        if choice_list[0] <= choose_fix <= choice_list[0]:
+            index = 2
+            
+        atg = parameterD['atg_erase']['atg']
+        fix = parameterD['atg_erase']['fix'][index]
         
         if atg in seq :
             seq = seq.replace(atg, fix)
             
     return [seq, 1]
 
-def nab_nrd_eraser(seq, strength) :
-
-    s = strength
+def nab_nrd_eraser(seq, strength, parameterD) :
     
-    nab3 = "TCTT"
-    nrd1_1 = "GTAA"
-    nrd1_2 = "GTAG"
-    
-    nab_fix = "ACTA"
-    nrd_fix = "GTAT"
-    
-    if s is not "L":
+    if strength is not "L":
         
-        if nab3 in seq :
-            seq = seq.replace(nab3, nab_fix)
-        if nrd1_1 in seq :
-            seq = seq.replace(nrd1_1, nrd_fix)
-        if nrd1_2 in seq :
-            seq = seq.replace(nrd1_2, nrd_fix)
+        if parameterD['nn_erase']['nab3'] in seq :
+            seq = seq.replace(parameterD['nn_erase']['nab3'],
+                              parameterD['nn_erase']['fix'][0])
+            
+        if parameterD['nn_erase']['nrd1_1'] in seq :
+            seq = seq.replace(parameterD['nn_erase']['nrd1_1'],
+                              parameterD['nn_erase']['fix'][1])
+            
+        if parameterD['nn_erase']['nrd1_2'] in seq :
+            seq = seq.replace(parameterD['nn_erase']['nrd1_2'],
+                              parameterD['nn_erase']['fix'][1])
             
     return [seq, 1]
 

@@ -39,6 +39,8 @@ def fasta_out(seqlist, prefix) :
 def fastaD_out(seqD, prefix) :
 
     strengths = ['VH', 'H', 'M', 'L']
+    multiplierD = {'VH': 0, 'H': 1, 'M': 2, 'L': 3}
+    n_in_strength = len(seqD['VH'])
 
     output_filename = '%(prefix)sgen.txt' % {'prefix': prefix}
 
@@ -47,7 +49,10 @@ def fastaD_out(seqD, prefix) :
     for x in strengths :
         
         for num, seq in enumerate(seqD[x]) :
-            output_file.write(">EMY%(prefix)s_%(str)-s%(name)-s\n%(seq)-s\n" % {"prefix": prefix,"str": x, "name": num+1, "seq": seqD[x][num]})
+            output_file.write(">EMY%(prefix)s_%(name)-s\n%(seq)-s\n" % {"prefix": prefix,
+                                                                        "str": x,
+                                                                        "name": num+1+multiplierD[x]*n_in_strength,
+                                                                        "seq": seqD[x][num]})
 
     output_file.close()
 

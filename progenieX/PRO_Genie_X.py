@@ -21,7 +21,7 @@ PRO_Genie_X
 #   All rights reserved.
 
 __author__ = 'Eric M. Young <ericyoung7@gmail.com>, Voigt Lab, MIT'
-__version__ = '2.0'
+__version__ = '2.2'
 
 ###########################################################################
 # MAIN SCRIPT FOR CREATING YEAST PROMOTERS
@@ -34,50 +34,57 @@ from UASGen_X import uasgen
 from get_data import get_parameters
 
 def maine() :
-    pro_genie(int(raw_input("Number of sequences (must be multiple of 4):")))
-
-def pro_genie(n) :
+    pro_genie()
+    
+def pro_genie() :
 
     # Get data from ProGenie_parameters.xlsx
     parameterD = get_parameters()
-    
+
     # Generate empty record dictionary
     recordD = {}
     
     # Generate sequences using the coregen and uasgen functions
-    recordD['core'] = coregen(n, parameterD)
-    recordD['uas'] = uasgen(n, parameterD)
+    recordD['core'] = coregen(parameterD)
+    recordD['uas'] = uasgen(parameterD)
 
     # This is a stitching function for combining the core, uas1, and uas2
     # lists into full length promoters for analysis.  
     if False :
-        promoter_stitcher(n)
+        promoter_stitcher(parameterD)
 
     # This kicks off the regex based analysis of generated sequences
     if False :
         promoter_analysis()
     
-    with open('promoter_pickle.txt', 'w') as p :
-        pickle.dump(recordD, p)
+        with open('promoter_pickle.txt', 'w') as p :
+            pickle.dump(recordD, p)
 
-    
     # This is the output function into a human-readable text file
-    dictionary_output(recordD, n)
+    dictionary_output(recordD, parameterD)
 
-def dictionary_output(recordD, n) :
-
+def dictionary_output(recordD, parameterD) :
+    
     # Define number of strengths
-    n_in_strength = n/4
+    n = parameterD['input']['total']
+    n_in_strength = parameterD['loop']['seq_number']
 
-    strength = ['VH', 'H', 'M', 'L']
+    strengths = parameterD['strengths']
     multiplierD = {'VH': 0, 'H': 1, 'M': 2, 'L': 3}
     number = []
     
     for i in range(n_in_strength) :
         number.append(i)
     
-    core_subL = ['tss_sub', 'kozak_sub', 'polyAT_sub', 'tata_sub']
-    core_subD = {'tss_sub': 'TSS', 'kozak_sub': 'KOZ', 'polyAT_sub': 'pAT', 'tata_sub': 'TATAWAWR'}
+    core_subL = ['tss_sub',
+                 'kozak_sub',
+                 'polyAT_sub',
+                 'tata_sub']
+    
+    core_subD = {'tss_sub': 'TSS',
+                 'kozak_sub': 'KOZ',
+                 'polyAT_sub': 'pAT',
+                 'tata_sub': 'TATAWAWR'}
 
     uas_subL = ['tf_sub', 'pAT_sub']    
     uasL = [1,2]
@@ -86,22 +93,23 @@ def dictionary_output(recordD, n) :
     clear(record_filename)
     record = open(record_filename, 'a')
     
-    for x in strength :
+    for x in strengths :
         for i in number :
-            record.write('>EMYcore_%(number)s\n' % {'number' : i+1+multiplierD[x]*4})
+            record.write('>EMYcore_%(number)s\n' % {'number' : i+1+multiplierD[x]*n_in_strength})
             record.write('>>%(x)s\n' % {'x' : x})
             
             for y in core_subL :
-                if len(recordD['core'][x][i][y]) > 1: 
+                if len(recordD['core'][x][i][y]) > 1:
+
                     record.write('>>%(name)s %(loc)s %(seq)s\n' % {'name' : core_subD[y],
                                                           'loc' : recordD['core'][x][i][y][1],
                                                           'seq' : recordD['core'][x][i][y][0]})
             record.write('%(seq)s\n' % {'seq' : recordD['core'][x][i]['sequence']})
 
     for u in uasL :
-        for x in strength :
+        for x in strengths :
             for i in number :
-                record.write('>EMYuas%(u)s_%(number)s\n' % {'u': u, 'number' : i+1+multiplierD[x]*4})
+                record.write('>EMYuas%(u)s_%(number)s\n' % {'u': u, 'number' : i+1+multiplierD[x]*n_in_strength})
                 record.write('>>%(x)s\n' % {'x' : x})
                 
                 for y in uas_subL :
@@ -162,8 +170,10 @@ def dictionary_output(recordD, n) :
                                 [start, stop]                         
     '''
 
-def promoter_stitcher(n) :
+def promoter_stitcher() :
 
+    n = parameterD['input']['total']
+    
     # Retrieve generated sequences from the output txt files.  Omit TypeIIS sites on ends
     # to enable stitching as they would be in a TypeIIS reaction.
     corelist = lister('coregen.txt')

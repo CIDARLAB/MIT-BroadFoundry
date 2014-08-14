@@ -12,8 +12,8 @@ CoreGen_X
 from common_functions import *
 from SeqGen_5 import seqgen
 from get_data import get_parameters
-from core_element_subber import *
 from site_eraser import *
+from core_element_subber import *
 
 def maine() :
     
@@ -21,122 +21,92 @@ def maine() :
     # I invoke above the following for loops so that the dictionary is only created once.
     parameterD = get_parameters()
     
-    coregen(int(raw_input("Number (must be a multiple of 4):")), parameterD)
+    coregen(parameterD)
 
-def coregen(core_number, parameterD) :
-
-    # Common iterating list for sequence scripts
-    ATCG = ['A', 'T', 'C', 'G']
+def coregen(parameterD) :
     
-    # Define iterating lists for strengths and each core subpart 
-    strengths = ['VH', 'H', 'M', 'L']
-    subpart = ['tbp', 'tss', 'utr']
-
     # This dictionary is an empty dictionary into which the generated sequences will
     # be substituted
     subelementD = {'VH': {'tbp': [], 'tss': [], 'utr': []},
                    'H': {'tbp': [], 'tss': [], 'utr': []},
                    'M': {'tbp': [], 'tss': [], 'utr': []},
                    'L': {'tbp': [], 'tss': [], 'utr': []}}
-
-    # Since the generator will create VH, H, L and M for each cornum, to output the
-    # number of desired sequences, the input has to be divided by 4.
-    cores = core_number/4
-
+    
     # This dictionary will hold all final sequences and metadata concerning substitution
     recordD = {}
-    for x in strengths :
-        recordD[x] = {}
-        for n in range(cores) :
-            recordD[x][n] = {}
 
     # This for loop kicks of sequence generation
-    for x in strengths :
+    for strength in parameterD['strengths'] :
         
-        for y in subpart :
+        for subpart in parameterD['subpart'] :
 
-            # Call the sequence generation function that handles calling SeqGen_5 using the
-            # parameters set in ProGenie_Parameters.xlsx
-            seq_list = generate_core_sequences(cores, x, y, parameterD)
-         
-            # This loop substitutes TATA and polyAT sites into the tbp region.
-            # This arrangement allows for one more pdW, but without combinatorial
-            # explosion in UAS1, and also allows nucleosome free region close to the
-            # tss. 
-            if y is 'tbp':
-                for n, seq in enumerate(seq_list):
-                        
-                    tata_sub_list = tata_sub(seq, x)
+            # Call the sequence generation function that handles calling SeqGen_5
+            seq_list = generate_core_sequences(strength, subpart, parameterD)
 
-                    recordD[x][n]['tata_sub'] = tata_sub_list[1]
+            # Begin substitution logic.  Calls function for each subelement
+            if subpart is 'tbp':
 
-                    polyAT_sub_list = polyAT_tbp_sub(tata_sub_list[0],x)
+                tbp_subs = tbp_subber(seq_list, strength, parameterD)
 
-                    recordD[x][n]['polyAT_sub'] = polyAT_sub_list[1]
-                        
-                    seq_list[n] = polyAT_sub_list[0]
-                    
-            # Since there is data available about elements around the TSS from Lubliner
-            # I also wrote a function that puts in TSS elements right at the end of the
-            # tss element
-            if y is 'tss' :
-                for n, seq in enumerate(seq_list) :
-                    
-                    tss_sub_list = tss_sub(seq, x)
-                    
-                    recordD[x][n]['tss_sub'] = tss_sub_list[1]
-                    
-                    tss_nn_erase_list = nab_nrd_eraser(tss_sub_list[0], x)
+                seq_list, tbp_sub_recordD = tbp_subs[0], tbp_subs[1]
 
-                    recordD[x][n]['tss_nn_erase'] = tss_nn_erase_list[1]
+            if subpart is 'tss' :
 
-                    seq_list[n] = tss_nn_erase_list[0]
-                    
-            # Since the consensus Kozak is also unlikely to appear at the end of the UTR,
-            # I also wrote a function that substitutes it in.
-            if y is 'utr':
-                for n, seq in enumerate(seq_list) :
-                    
-                    kozak_sub_list = kozak_sub(seq, x)
-                    
-                    recordD[x][n]['kozak_sub'] = kozak_sub_list[1]
-                    
-                    atg_erase_list = atg_eraser(kozak_sub_list[0], x)
+                tss_subs = tss_subber(seq_list, strength, parameterD)
 
-                    recordD[x][n]['atg_erase'] = atg_erase_list[1]
-                    
-                    utr_nn_erase_list = nab_nrd_eraser(atg_erase_list[0], x)
+                seq_list, tss_sub_recordD = tss_subs[0], tss_subs[1]
+                
+            if subpart is 'utr':
 
-                    recordD[x][n]['utr_nn_erase'] = utr_nn_erase_list[1]
-                    
-                    seq_list[n] = utr_nn_erase_list[0]
+                utr_subs = utr_subber(seq_list, strength, parameterD)
+
+                seq_list, utr_sub_recordD = utr_subs[0], utr_subs[1]
                     
             # This populates the different segments into the empty dictionary to hold
             # all sequences together.
-            subelementD[x][y] = seq_list
+            subelementD[strength][subpart] = seq_list
+
+        # Combine all record dictionaries into one record dictionary
+        recordD[strength] = {}
+        
+        for n, seq in enumerate(seq_list) :
+                
+            recordD[strength][n] = {}
+                
+            for k in tbp_sub_recordD[n] :
+
+                recordD[strength][n][k] = tbp_sub_recordD[n][k]
+
+            for k in tss_sub_recordD[n] :
+
+                recordD[strength][n][k] = tss_sub_recordD[n][k]
+
+            for k in utr_sub_recordD[n] :
+
+                recordD[strength][n][k] = utr_sub_recordD[n][k]
 
     # Stitch subelements
-    coreD = stitch_subelements(parameterD, subelementD, strengths)
+    coreD = stitch_subelements(parameterD, subelementD)
     
     # Format sequence dictionary into FASTA and save to text file. 
     fastaD_out(coreD, 'core')
 
     # Add final sequences to the record dictionary.
-    for x in strengths :
-        for n in range(cores) :
-            recordD[x][n]['sequence'] = coreD[x][n]
+    for strength in parameterD['strengths'] :
+        for n in range(parameterD['loop']['seq_number']) :
+            recordD[strength][n]['sequence'] = coreD[strength][n]
     
     return recordD
 
-def generate_core_sequences(cores, x, y, parameterD) :
+def generate_core_sequences(strength, subpart, parameterD) :
     
-    dataD = {'A' : parameterD['nuc_pct'][x][y]['A'],
-             'T' : parameterD['nuc_pct'][x][y]['T'],
-             'C' : parameterD['nuc_pct'][x][y]['C'],
-             'G' : parameterD['nuc_pct'][x][y]['G'],
-             'tol' : parameterD['tolerance'][y],
-             'len' : parameterD['length'][y],
-             'num' : cores}
+    dataD = {'A' : parameterD['nuc_pct'][strength][subpart]['A'],
+             'T' : parameterD['nuc_pct'][strength][subpart]['T'],
+             'C' : parameterD['nuc_pct'][strength][subpart]['C'],
+             'G' : parameterD['nuc_pct'][strength][subpart]['G'],
+             'tol' : parameterD['tolerance'][subpart],
+             'len' : parameterD['length'][subpart],
+             'num' : parameterD['loop']['seq_number']}
 
     # Generate sequences for each subelement.
     # Seqgen saves theses sequences in a text file, which the next
@@ -153,25 +123,141 @@ def generate_core_sequences(cores, x, y, parameterD) :
 
     return seq_list
 
-def stitch_subelements(parameterD, subelementD, strengths) :
+def tbp_subber(seq_list, strength, parameterD):
+
+    tbp_sub_recordD = {}
+    
+    # This loop substitutes TATA and polyAT sites into the tbp subelement.
+    # This arrangement allows nucleosome free region close to the tss.
+    
+    for n, seq in enumerate(seq_list):
+
+        tbp_sub_recordD[n] = {}
+
+        # Following logic allows some sequences to escape substitution
+        if n < parameterD['loop']['no_sub_cutoff'] :
+                        
+            tata_sub_list = tata_sub(seq,
+                                     strength,
+                                     parameterD)
+
+            tbp_sub_recordD[n]['tata_sub'] = tata_sub_list[1]
+
+            polyAT_sub_list = polyAT_tbp_sub(tata_sub_list[0],
+                                             strength,
+                                             parameterD)
+
+            tbp_sub_recordD[n]['polyAT_sub'] = polyAT_sub_list[1]
+                        
+            seq_list[n] = polyAT_sub_list[0]
+                        
+        else :
+            tbp_sub_recordD[n]['tata_sub'] = []
+            tbp_sub_recordD[n]['polyAT_sub'] = []
+
+
+    return [seq_list, tbp_sub_recordD]
+
+def tss_subber(seq_list, strength, parameterD) :
+    
+    # Following block substitutes transcription start sites from Lubliner
+    # et al. as well as erases NAB3 and NRD1 mRNA degradation signals in
+    # the forward direction.  This is to reduce likelihood of creating
+    # an easily degraded 5'-UTR.
+
+    tss_sub_recordD = {}
+    
+    for n, seq in enumerate(seq_list) :
+
+        tss_sub_recordD[n] = {}
+        
+        # Following logic allows some sequences to escape substitution
+        if n < parameterD['loop']['no_sub_cutoff'] :
+                        
+            tss_sub_list = tss_sub(seq,
+                                   strength,
+                                   parameterD)
+                    
+            tss_sub_recordD[n]['tss_sub'] = tss_sub_list[1]
+                    
+            tss_nn_erase_list = nab_nrd_eraser(tss_sub_list[0],
+                                               strength,
+                                               parameterD)
+
+            tss_sub_recordD[n]['tss_nn_erase'] = tss_nn_erase_list[1]
+
+            seq_list[n] = tss_nn_erase_list[0]
+                        
+        else : 
+            tss_sub_recordD[n]['tss_sub'] = []
+            tss_sub_recordD[n]['tss_nn_erase'] = []
+
+    return [seq_list, tss_sub_recordD]
+                        
+def utr_subber(seq_list, strength, parameterD) :
+
+    # Following block substitutes consensus kozak sequences from Dvir et al.
+    # as well as erases NAB3 and NRD1 mRNA degradation signals in the forward
+    # direction.  This is to reduce likelihood of creating an easily degraded
+    # 5'-UTR. Furthermore, since upstream ATG can reduce expression, also
+    # erase any ATG that may have arisen.
+
+    utr_sub_recordD = {}
+    
+    for n, seq in enumerate(seq_list) :
+
+        utr_sub_recordD[n] = {}
+        
+        # Following logic allows some sequences to escape substitution
+        if n < parameterD['loop']['no_sub_cutoff'] :
+                        
+            kozak_sub_list = kozak_sub(seq,
+                                       strength,
+                                       parameterD)
+                    
+            utr_sub_recordD[n]['kozak_sub'] = kozak_sub_list[1]
+                    
+            utr_nn_erase_list = nab_nrd_eraser(kozak_sub_list[0],
+                                               strength,
+                                               parameterD)
+
+            utr_sub_recordD[n]['utr_nn_erase'] = utr_nn_erase_list[1]
+
+            atg_erase_list = atg_eraser(utr_nn_erase_list[0],
+                                        strength,
+                                        parameterD)
+
+            utr_sub_recordD[n]['atg_erase'] = atg_erase_list[1]
+                    
+            seq_list[n] = atg_erase_list[0]
+
+        else :
+            utr_sub_recordD[n]['kozak_sub'] = []
+            utr_sub_recordD[n]['utr_nn_erase'] = []
+            utr_sub_recordD[n]['atg_erase'] =  []
+
+    return [seq_list, utr_sub_recordD]
+
+def stitch_subelements(parameterD, subelementD) :
     
     # Define empty dictionary to substitute stitched sequences
     coreD = {'VH': [], 'H': [], 'M': [], 'L': []}
 
     # This stitches together the subsegments into a full core promoter and adds TypeIIS sites.
-    for x in strengths :
+    for strength in parameterD['strengths'] :
         
-        coreD[x] = subelementD[x]['tbp']
+        coreD[strength] = subelementD[strength]['tbp']
         
-        for n, seq in enumerate(subelementD[x]['tbp']):
+        for n, seq in enumerate(subelementD[strength]['tbp']):
             
             core = re_eraser(parameterD['scars']['J1']+
-                             subelementD[x]['tbp'][n]+
-                             subelementD[x]['tss'][n]+
-                             subelementD[x]['utr'][n]+
-                             parameterD['scars']['B'])
+                             subelementD[strength]['tbp'][n]+
+                             subelementD[strength]['tss'][n]+
+                             subelementD[strength]['utr'][n]+
+                             parameterD['scars']['B'],
+                             parameterD)
 
-            coreD[x][n] = parameterD['flanks']['Core_F']+core+parameterD['flanks']['Core_R']
+            coreD[strength][n] = parameterD['flanks']['Core_F']+core+parameterD['flanks']['Core_R']
 
     return coreD
 

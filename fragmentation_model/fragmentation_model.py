@@ -21,7 +21,7 @@ Fragmentation Model
 
     2. Fragments are drawn from a Normal distribution defined by
           a mean length (bp) and standard deviation (bp). This is
-          essential as it enables and exact solution to be found
+          essential as it enables an exact solution to be found
           for the predicted factor at a given base in the sequence.
 """
 #    Fragmentation Model
@@ -35,7 +35,10 @@ __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
 
 import math
+import csv
+import random
 import numpy as np
+from scipy.stats import norm
 
 def frag_factor_profile (mrna_len, frag_mean, frag_sd, bp_cutoff=None, no_end=False):
 	"""Generate the expected fragmentation correction factor profile
@@ -53,6 +56,12 @@ def frag_factor_profile (mrna_len, frag_mean, frag_sd, bp_cutoff=None, no_end=Fa
 	frag_sd : float
 		Standard deviation in the fragment lengths.
 
+	bp_cutoff : int (default=None)
+		Limit of size of potential fragment. None assumes up to length of TU.
+
+	no_end : bool (default=False)
+		Flag whether the mRNA has an end.
+
 	Returns
 	-------
 	profile: array
@@ -63,7 +72,7 @@ def frag_factor_profile (mrna_len, frag_mean, frag_sd, bp_cutoff=None, no_end=Fa
 		# Correct the potential mRNA lengths if no terminator
 		corrected_mrna_len = mrna_len
 		if no_end == True:
-			corrected_mrna_len = mrna_len + frag_mean + bp_cutoff
+			corrected_mrna_len = mrna_len + frag_mean #+ bp_cutoff
 		d[bp] = frag_at_base(bp, corrected_mrna_len, frag_mean, frag_sd, 
 			                 bp_cutoff=bp_cutoff, no_end=no_end)
 	return d
@@ -84,6 +93,12 @@ def frag_at_base (bp, mrna_len, frag_mean, frag_sd, bp_cutoff=None, no_end=False
 
 	frag_sd : float
 		Standard deviation in the fragment lengths.
+
+	bp_cutoff : int (default=None)
+		Limit of size of potential fragment. None assumes up to length of TU.
+
+	no_end : bool (default=False)
+		Flag whether the mRNA has an end.
 
 	Returns
 	-------
@@ -219,3 +234,143 @@ def variant_frag_factor_profile (gcl, variant, frag_mean=280, frag_sd=70, bp_cut
 			# Forward strand
 			rev_profiles.append([tu[0], tu[1], p_bp, t_bp, profile])
 	return fwd_profiles, rev_profiles
+
+def frag_profile_library (min_len, max_len, frag_mean=280, frag_sd=70, bp_cutoff=None):
+	"""Generate library of fragmentation profiles over a specified range.
+
+	Parameters
+	----------
+	min_len : int
+	    Minimum length of an mRNA (bp).
+
+	max_len : int
+	    Maximum length of an mRNA (bp).
+
+	frag_mean : float (default=280)
+		Mean fragment length used during sequencing
+
+	frag_sd : float (default=70)
+		Standard deviation in the fragment lengths.
+
+	bp_cutoff : int (default=None)
+		Limit of size of potential fragment. None assumes up to length of TU.\
+
+	Returns
+	-------
+	profiles_fixed: dict(list(float))
+	    A dictionary of lists (the profiles) with the key corresponding to the length
+	    of the mRNA. This dictionary considers mRNAs where the end it fixed.
+
+	profiles_open: dict(list(float))
+	    A dictionary of lists (the profiles) with the key corresponding to the length
+	    of the mRNA. This dictionary considers mRNAs where the end it not fixed i.e.,
+	    translation can continue outside of the constructs design. 
+	"""
+	profiles_fixed = {}
+	profiles_open = {}
+	for mrna_len in range(min_len, max_len+1):
+		profiles_fixed[mrna_len] = frag_factor_profile(mrna_len, frag_mean, frag_sd, bp_cutoff=bp_cutoff, no_end=False)
+		profiles_open[mrna_len] = frag_factor_profile(mrna_len, frag_mean, frag_sd, bp_cutoff=bp_cutoff, no_end=True)
+	return profiles_fixed, profiles_open
+
+def save_frag_profile_library (out_filename, min_len, max_len, frag_mean=280, frag_sd=70, bp_cutoff=None):
+	"""Save a library of fragmentation profiles to a text file.
+
+	Parameters
+	----------
+	out_filename : string
+		Output filename
+
+	min_len : int
+	    Minimum length of an mRNA (bp).
+
+	max_len : int
+	    Maximum length of an mRNA (bp).
+
+	frag_mean : float (default=280)
+		Mean fragment length used during sequencing
+
+	frag_sd : float (default=70)
+		Standard deviation in the fragment lengths.
+
+	bp_cutoff : int (default=None)
+		Limit of size of potential fragment. None assumes up to length of TU.
+	"""
+	# Generate the profile library
+	profiles_fixed, profiles_open = frag_profile_library(min_len, max_len, frag_mean=frag_mean, frag_sd=frag_sd, bp_cutoff=bp_cutoff)
+	# Save the profiles to file
+	f_out = open(out_filename, 'w')
+	f_out.write('type,length,profile\n')
+	for mrna_len in sorted(profiles_fixed.keys()):
+		f_out.write('F,' + str(mrna_len) + ',' + ';'.join([str(x) for x in profiles_fixed[mrna_len]]) + '\n')
+		f_out.write('O,' + str(mrna_len) + ',' + ';'.join([str(x) for x in profiles_open[mrna_len]]) + '\n')
+	f_out.close()
+
+def load_frag_profile_library (in_filename):
+	"""Load a library of fragmentation profiles from a text file.
+
+	Parameters
+	----------
+	in_filename : string
+		Input filename
+
+	Returns
+	-------
+	profiles_fixed: dict(list(float))
+	    A dictionary of lists (the profiles) with the key corresponding to the length
+	    of the mRNA. This dictionary considers mRNAs where the end it fixed.
+
+	profiles_open: dict(list(float))
+	    A dictionary of lists (the profiles) with the key corresponding to the length
+	    of the mRNA. This dictionary considers mRNAs where the end it not fixed i.e.,
+	    translation can continue outside of the constructs design. 
+	"""
+	profiles_fixed = {}
+	profiles_open = {}
+	# Load the file data
+	file_reader = csv.reader(open(in_filename, 'rU'), delimiter=',')
+	# Ignore the header
+	header = next(file_reader)
+	# Load the rest of the file
+	for row in file_reader:
+		if row[0] == 'F':
+			profiles_fixed[int(row[1])] = [float(x) for x in row[2].split(';')]
+		else:
+			profiles_open[int(row[1])] = [float(x) for x in row[2].split(';')]
+	return profiles_fixed, profiles_open
+
+def frag_factor_profile_random_model (mrna_len, frag_mean, frag_sd, mrna_count=10000, bp_frag_prob=0.01, verbose=False):
+	# The list of fragments we generate (tuples of start and end bp)
+	frags = []
+	# Randomly fragment the mRNAs with uniform probability and probabistically select those of the right size
+	for mrna in range(mrna_count):
+		if verbose==True:
+			print 'Processing mRNA:', mrna
+		start_bp = 0
+		end_bp = 0
+		for bp in range(mrna_len):
+			if random.random() <= bp_frag_prob:
+				# Fragment is made
+				end_bp = bp+1
+				frag_len = end_bp-start_bp
+				frag_prob = norm.pdf(frag_len, loc=frag_mean, scale=frag_sd)
+				if random.random() <= frag_prob:
+					# The fragment is selected
+					frags.append([start_bp, end_bp])
+				start_bp=end_bp
+		if end_bp < mrna_len:
+			# Add the last fragment
+			frag_len = mrna_len-start_bp
+			frag_prob = norm.pdf(frag_len, loc=frag_mean, scale=frag_sd)
+			if random.random() <= frag_prob:
+				# The fragment is selected
+				frags.append([start_bp, mrna_len])
+	if verbose==True:
+		print 'Found', len(frags), 'fragments.'
+	# Count up fragments that fall at each point along mRNA
+	frag_profile = np.zeros(mrna_len)
+	for frag in frags:
+		c = np.zeros(mrna_len)
+		c[frag[0]:frag[1]] = np.ones(frag[1]-frag[0])
+		frag_profile = frag_profile + c
+	return frag_profile

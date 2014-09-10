@@ -339,7 +339,7 @@ def load_frag_profile_library (in_filename):
 			profiles_open[int(row[1])] = [float(x) for x in row[2].split(';')]
 	return profiles_fixed, profiles_open
 
-def frag_factor_profile_random_model (mrna_len, frag_mean, frag_sd, mrna_count=10000, bp_frag_prob=0.01, verbose=False):
+def frag_factor_profile_random_prob_model (mrna_len, frag_mean, frag_sd, mrna_count=10000, bp_frag_prob=0.01, verbose=False):
 	# The list of fragments we generate (tuples of start and end bp)
 	frags = []
 	# Randomly fragment the mRNAs with uniform probability and probabistically select those of the right size
@@ -374,3 +374,48 @@ def frag_factor_profile_random_model (mrna_len, frag_mean, frag_sd, mrna_count=1
 		c[frag[0]:frag[1]] = np.ones(frag[1]-frag[0])
 		frag_profile = frag_profile + c
 	return frag_profile
+
+def frag_factor_profile_random_break_model (mrna_len, frag_mean, frag_sd, mrna_count=10000, max_frags=10, verbose=False):
+	# The list of fragments we generate (tuples of start and end bp)
+	frags = []
+	# Randomly fragment the mRNAs with uniform probability and probabistically select those of the right size
+	for mrna in range(mrna_count):
+		if verbose==True:
+			print 'Processing mRNA:', mrna
+		# Break the mRNA into pieces
+		breaks = []
+		num_of_breaks = random.randint(1,max_frags+1)
+		for b in range(num_of_breaks):
+			b_bp = random.randint(0,mrna_len)
+			while b_bp in breaks:
+				b_bp = random.randint(0,mrna_len)
+			breaks.append(b_bp)
+
+		# Probabilistically choose fragments based on distirbution
+		start_bp = 0
+		for b in breaks:
+			end_bp = b+1
+			frag_len = end_bp-start_bp
+			frag_prob = norm.pdf(frag_len, loc=frag_mean, scale=frag_sd)
+			if random.random() <= frag_prob:
+				# The fragment is selected
+				frags.append([start_bp, end_bp])
+			start_bp=end_bp
+			if end_bp < mrna_len:
+				# Add the last fragment
+				frag_len = mrna_len-start_bp
+				frag_prob = norm.pdf(frag_len, loc=frag_mean, scale=frag_sd)
+				if random.random() <= frag_prob:
+					# The fragment is selected
+					frags.append([start_bp, mrna_len])
+	if verbose==True:
+		print 'Found', len(frags), 'fragments.'
+	# Count up fragments that fall at each point along mRNA
+	frag_profile = np.zeros(mrna_len)
+	for frag in frags:
+		c = np.zeros(mrna_len)
+		c[frag[0]:frag[1]] = np.ones(frag[1]-frag[0])
+		frag_profile = frag_profile + c
+	return frag_profile
+
+

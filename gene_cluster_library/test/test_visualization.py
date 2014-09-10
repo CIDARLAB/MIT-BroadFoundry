@@ -107,5 +107,19 @@ gcv.plot_traces_with_arch(ax_arch, ax_traces, nifs, '75', phys_reads, start_idx=
 plt.tight_layout()
 fig.savefig('./visualizations/ArchAndTrace.pdf')
 
+# Plot traces for every variant
+for v in nifs.variants.keys():
+	# Example plot of architecture with Tx traces
+	gs = gridspec.GridSpec(2, 1, height_ratios=[2,1])
+	fig = plt.figure(figsize=(14,4))
+	ax_arch = plt.subplot(gs[1])
+	ax_traces = plt.subplot(gs[0],sharex=ax_arch)
+	# Load the traces for predicted and measured
+	phys_reads = gca.load_stata_strand_data('./data/phys_depths3.csv')
+	gcv.plot_traces_with_arch(ax_arch, ax_traces, nifs, v, phys_reads, start_idx=1, 
+		                      end_idx=-2, linewidth=1.2, colormap=cmap, hatchmap=hmap)
+	plt.tight_layout()
+	fig.savefig('./visualizations/all_nif_traces/arch_and_trace_' + v + '.pdf')
+
 # Clear the plotting cache
 plt.close('all')

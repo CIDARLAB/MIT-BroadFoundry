@@ -33,7 +33,7 @@ def run_fragmentation_test ():
 	ax.plot(range(mrna2_len), p2, 'g')
 	ax.plot(range(mrna3_len), p3, 'b')
 	ax.set_xlim([0,mrna3_len])
-	ax.set_ylim([0,max(p3)*1.1])
+	ax.set_ylim([0,1.1])
 	plt.tight_layout()
 	plt.savefig('fragmentation_profile.pdf')
 

@@ -23,10 +23,6 @@ Fragmentation Model
           a mean length (bp) and standard deviation (bp). This is
           essential as it enables an exact solution to be found
           for the predicted factor at a given base in the sequence.
-
-    Note: In the process of adding a normalisation step such that the
-          profile gives a factor to divide the RNAseq value by to give
-          the actual level.
 """
 #    Fragmentation Model
 #    Copyright (C) 2014 by
@@ -72,21 +68,16 @@ def frag_factor_profile (mrna_len, frag_mean, frag_sd, bp_cutoff=None, no_end=Fa
 	    Profile of fragmentation factor along the mRNA.
 	"""
 	d = np.zeros(mrna_len)
-	frag_dist = np.zeros(2000)
-	for i in range(len(frag_dist)):
-		frag_dist[i] = norm.pdf(float(i+1), loc=frag_mean, scale=frag_sd)
 	for bp in range(mrna_len):
 		# Correct the potential mRNA lengths if no terminator
 		corrected_mrna_len = mrna_len
 		if no_end == True:
 			corrected_mrna_len = mrna_len + frag_mean #+ bp_cutoff
-		d[bp] = frag_at_base(bp, corrected_mrna_len, frag_dist, frag_mean, 
+		d[bp] = frag_at_base(bp, corrected_mrna_len, frag_mean, frag_sd, 
 			                 bp_cutoff=bp_cutoff, no_end=no_end)
-		#d[bp] = frag_at_base(bp, corrected_mrna_len, frag_mean, frag_sd, 
-		#	                 bp_cutoff=bp_cutoff, no_end=no_end)
 	return d
 
-def frag_at_base (bp, mrna_len, frag_dist, frag_mean, bp_cutoff=None, no_end=False):
+def frag_at_base (bp, mrna_len, frag_mean, frag_sd, bp_cutoff=None, no_end=False):
 	"""Calculate the fragmentation factor at a given base in an mRNA.
 
 	Parameters
@@ -115,31 +106,44 @@ def frag_at_base (bp, mrna_len, frag_dist, frag_mean, bp_cutoff=None, no_end=Fal
 	    Fragmentation factor at that base.
 	"""
 	result = 0.0
-	norm_res = 0.0
 	min_bp = 1
 	if bp_cutoff != None and bp_cutoff < frag_mean:
 		min_bp = frag_mean - bp_cutoff
 	max_bp = mrna_len+1
 	if bp_cutoff != None and frag_mean+bp_cutoff <= mrna_len+1:
 		max_bp = frag_mean + bp_cutoff
-	frag_cs = 0.0
 	for i in range(min_bp, max_bp):
+		frag_cs = 0.0
 		if no_end == False:
 			frag_cs = frag_combinations(bp,i,mrna_len)
 		else:
 			frag_cs = frag_combinations(bp,i,mrna_len+max_bp)
-		# Select the probability from the discrete probabilty distribution
-		len_prob = 0.0
-		if i-1 < len(frag_dist):
-			len_prob = frag_dist[i-1]
-		#len_prob = norm.pdf(float(i), loc=frag_mean, scale=frag_sd)
-		#len_prob = (1.0/(frag_sd*math.sqrt(2.0*math.pi))) * math.exp(
-		#	       -(math.pow(float(i)-2.0*frag_mean,2.0)
-		#	       / (2.0*math.pow(frag_sd,2.0))))
-		if frag_cs > 0:
-			result += len_prob * (float(frag_cs)/float(i))
-		#norm_res += len_prob * float(i)
-	return result #/norm_res
+		result += ( (1.0/(frag_sd*math.sqrt(2.0*math.pi))) * math.exp(
+			       -(math.pow(i-2.0*frag_mean,2.0)
+			       / (2.0*math.pow(frag_sd,2.0)))) 
+		           * frag_cs )
+	return result
+
+def frag_c (i, x):
+	"""Helper function to handle edge cases.
+
+	Parameters
+	----------
+	i : int
+	    Index of base in mRNA.
+
+	x : int
+		Fragment length being considered
+
+	Returns
+	-------
+	combinations: int
+	    Number of ways base can be positioned on one side.
+	"""
+	if i <= x:
+		return 0.0
+	else:
+		return i-x
 
 def frag_combinations (i, x, x_max):
 	"""Number of ways a fragment of a given length can be uniquely positioned
@@ -162,25 +166,7 @@ def frag_combinations (i, x, x_max):
 	    Number of unique ways a fragment of that length can take across
 	    that base.
 	"""
-	if x > x_max:
-		return 0
-	elif i>=x and i+x<=x_max:
-		return x
-	else:
-		w = x
-		if i < x:
-			# remove left difficulties
-			w -= x-i
-		if x_max-i < x:
-			# remove right difficulties
-			w -= x-(x_max-i)
-		return w
-		# OLD IMPLEMENTATION: very slow
-		#for p in range(x):
-		#	l_x = p
-		#	r_x = x-p-1
-		#	if i>p and i+r_x<=x_max:
-		#		c += 1
+	return i - frag_c(i,x) - frag_c(i,x_max-x)
 
 def variant_frag_factor_profile (gcl, variant, frag_mean=280, frag_sd=70, bp_cutoff=None):
 	"""Generate the expected fragmentation correction factor profile for all TUs in variant.

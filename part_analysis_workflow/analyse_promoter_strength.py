@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Functions to aid in analysis of promoter strengths
+"""Functions to aid in analysis of promoter strengths.
 """
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'

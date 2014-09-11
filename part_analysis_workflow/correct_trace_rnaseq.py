@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Functions to correct RNA-seq based traces
+"""Functions to correct RNA-seq based traces using known fragmentation patterns.
 """
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'

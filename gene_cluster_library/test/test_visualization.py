@@ -19,7 +19,7 @@ __version__ = '1.0'
 
 # Load the Stata nif library data
 nifs = gcl.GeneClusterLibrary()
-nifs.load('./data/nif_stata_library.txt')
+nifs.load('./data/clean_nif_stata_library.txt')
 
 # Example plot testing promoter/CDS/terminator renderings
 fig = plt.figure(figsize=(6,5))

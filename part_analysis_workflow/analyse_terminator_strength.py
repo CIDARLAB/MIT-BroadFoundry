@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Functions to aid in analysis of terminator strengths
+"""Functions to aid in analysis of terminator strengths.
 
    1. Consider the termination efficiency (fractional termination) based
       on the pre- and post-trace read depths.

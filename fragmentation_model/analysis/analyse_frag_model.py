@@ -63,7 +63,7 @@ tick_labels = ['1','1200']
 cbar1.locator = matplotlib.ticker.FixedLocator(tick_locs)
 cbar1.formatter = matplotlib.ticker.FixedFormatter(tick_labels)
 cbar1.update_ticks()
-cbar1.ax.set_ylabel('mRNA length (bp)', fontsize=10, rotation=270, labelpad=-22)
+cbar1.ax.set_ylabel('mRNA length (bp)', fontsize=10, rotation=270, labelpad=-21)
 
 plt.savefig('mrna_length_rnaseq_signal_2.pdf')
 

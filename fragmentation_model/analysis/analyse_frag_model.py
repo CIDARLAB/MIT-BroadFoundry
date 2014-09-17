@@ -27,7 +27,7 @@ areas = []
 norm_areas = []
 for l in mrna_lens:
 	print 'Generating profile for mRNA of length:', l
-	profiles.append(fm.frag_factor_profile(l, frag_mean, frag_sd, bp_cutoff=10*frag_sd, no_end=False))
+	profiles.append(fm.frag_factor_profile(l, frag_mean=frag_mean, frag_sd=frag_sd, no_end=False))
 	# Calculate the peaks and areas
 	peaks.append(profiles[-1].max())
 	areas.append(profiles[-1].sum())
@@ -105,7 +105,7 @@ peaks = []
 areas = []
 for l in nif_lens:
 	print 'Generating nif profile for mRNA of length:', l
-	profiles.append(fm.frag_factor_profile(l, frag_mean, frag_sd, bp_cutoff=None, no_end=False))
+	profiles.append(fm.frag_factor_profile(l, frag_mean=frag_mean, frag_sd=frag_sd, no_end=False))
 	# Calculate the peaks and areas
 	peaks.append(profiles[-1].max())
 	areas.append(profiles[-1].sum())

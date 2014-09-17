@@ -44,7 +44,13 @@ import random
 import numpy as np
 from scipy.stats import norm
 
-def frag_factor_profile (mrna_len, frag_mean, frag_sd, bp_cutoff=None, no_end=False):
+def norm_frag_dist (frag_mean, frag_sd, frag_dist_len):
+	frag_dist = np.zeros(frag_dist_len)
+	for i in range(len(frag_dist)+1):
+		frag_dist[i] = norm.pdf(float(i), loc=frag_mean, scale=frag_sd)
+	return frag_dist
+
+def frag_factor_profile (mrna_len, frag_dist=None, frag_mean=None, frag_sd=None, bp_cutoff=None, no_end=False):
 	"""Generate the expected fragmentation correction factor profile
 	for a given length mRNA and fragments of given mean length and
 	standard deviation.
@@ -72,21 +78,24 @@ def frag_factor_profile (mrna_len, frag_mean, frag_sd, bp_cutoff=None, no_end=Fa
 	    Profile of fragmentation factor along the mRNA.
 	"""
 	d = np.zeros(mrna_len)
-	frag_dist = np.zeros(2000)
-	for i in range(len(frag_dist)):
-		frag_dist[i] = norm.pdf(float(i+1), loc=frag_mean, scale=frag_sd)
+	# Generate the distribution (if necessary)
+	if frag_dist == None:
+		if frag_mean != None and frag_sd != None:
+			frag_dist = norm_frag_dist(frag_mean, frag_sd, mrna_len)
+		else:
+			return None
 	for bp in range(mrna_len):
 		# Correct the potential mRNA lengths if no terminator
 		corrected_mrna_len = mrna_len
 		if no_end == True:
-			corrected_mrna_len = mrna_len + frag_mean #+ bp_cutoff
-		d[bp] = frag_at_base(bp, corrected_mrna_len, frag_dist, frag_mean, 
-			                 bp_cutoff=bp_cutoff, no_end=no_end)
-		#d[bp] = frag_at_base(bp, corrected_mrna_len, frag_mean, frag_sd, 
-		#	                 bp_cutoff=bp_cutoff, no_end=no_end)
+			if frag_mean == None:
+				corrected_mrna_len = mrna_len + len(frag_dist)
+			else:
+				corrected_mrna_len = mrna_len + frag_mean
+		d[bp] = frag_at_base(bp, corrected_mrna_len, frag_dist, no_end=no_end)
 	return d
 
-def frag_at_base (bp, mrna_len, frag_dist, frag_mean, bp_cutoff=None, no_end=False):
+def frag_at_base (bp, mrna_len, frag_dist, no_end=False):
 	"""Calculate the fragmentation factor at a given base in an mRNA.
 
 	Parameters
@@ -117,29 +126,19 @@ def frag_at_base (bp, mrna_len, frag_dist, frag_mean, bp_cutoff=None, no_end=Fal
 	result = 0.0
 	norm_res = 0.0
 	min_bp = 1
-	if bp_cutoff != None and bp_cutoff < frag_mean:
-		min_bp = frag_mean - bp_cutoff
-	max_bp = mrna_len+1
-	if bp_cutoff != None and frag_mean+bp_cutoff <= mrna_len+1:
-		max_bp = frag_mean + bp_cutoff
+	max_bp = len(frag_dist)
 	frag_cs = 0.0
 	for i in range(min_bp, max_bp):
 		if no_end == False:
 			frag_cs = frag_combinations(bp,i,mrna_len)
 		else:
 			frag_cs = frag_combinations(bp,i,mrna_len+max_bp)
-		# Select the probability from the discrete probabilty distribution
-		len_prob = 0.0
-		if i-1 < len(frag_dist):
-			len_prob = frag_dist[i-1]
-		#len_prob = norm.pdf(float(i), loc=frag_mean, scale=frag_sd)
-		#len_prob = (1.0/(frag_sd*math.sqrt(2.0*math.pi))) * math.exp(
-		#	       -(math.pow(float(i)-2.0*frag_mean,2.0)
-		#	       / (2.0*math.pow(frag_sd,2.0))))
+		# Select the probability from the discrete distribution
+		len_prob = frag_dist[i]
+		# Check that the fragment can fit, if so add to result
 		if frag_cs > 0:
 			result += len_prob * (float(frag_cs)/float(i))
-		#norm_res += len_prob * float(i)
-	return result #/norm_res
+	return result
 
 def frag_combinations (i, x, x_max):
 	"""Number of ways a fragment of a given length can be uniquely positioned
@@ -169,20 +168,14 @@ def frag_combinations (i, x, x_max):
 	else:
 		w = x
 		if i < x:
-			# remove left difficulties
+			# remove left constrained
 			w -= x-i
 		if x_max-i < x:
-			# remove right difficulties
+			# remove right constrained
 			w -= x-(x_max-i)
 		return w
-		# OLD IMPLEMENTATION: very slow
-		#for p in range(x):
-		#	l_x = p
-		#	r_x = x-p-1
-		#	if i>p and i+r_x<=x_max:
-		#		c += 1
 
-def variant_frag_factor_profile (gcl, variant, frag_mean=280, frag_sd=70, bp_cutoff=None):
+def variant_frag_factor_profile (gcl, variant, frag_dist=None, frag_mean=None, frag_sd=None, bp_cutoff=None):
 	"""Generate the expected fragmentation correction factor profile for all TUs in variant.
 
 	Parameters
@@ -236,15 +229,19 @@ def variant_frag_factor_profile (gcl, variant, frag_mean=280, frag_sd=70, bp_cut
 				t_bp = gcl.variant_part_idx_start_bp(variant, tu[1])
 		else:
 			t_bp = gcl.variant_part_idx_start_bp(variant, tu[1])
+		# Make the fragmentation distribution (if needed)
+		if frag_mean != None and frag_sd != None:
+			if p_bp < t_bp:
+				frag_dist = norm_frag_dist(frag_mean, frag_sd, t_bp-p_bp)
+			else:
+				frag_dist = norm_frag_dist(frag_mean, frag_sd, p_bp-t_bp)
 		# Check direction and generate profile
 		if p_bp < t_bp:
-			profile = frag_factor_profile(t_bp-p_bp, frag_mean, frag_sd, 
-				                          bp_cutoff=bp_cutoff, no_end=tu_has_no_end)
+			profile = frag_factor_profile(t_bp-p_bp, frag_dist=frag_dist, no_end=tu_has_no_end)
 			# Forward strand
 			fwd_profiles.append([tu[0], tu[1], p_bp, t_bp, profile])
 		else:
-			profile = frag_factor_profile(p_bp-t_bp, frag_mean, frag_sd,
-				                          bp_cutoff=bp_cutoff, no_end=tu_has_no_end)
+			profile = frag_factor_profile(p_bp-t_bp, frag_dist=frag_dist, no_end=tu_has_no_end)
 			# Forward strand
 			rev_profiles.append([tu[0], tu[1], p_bp, t_bp, profile])
 	return fwd_profiles, rev_profiles

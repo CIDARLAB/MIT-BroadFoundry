@@ -23,9 +23,9 @@ def run_fragmentation_test ():
 	mrna2_len = 1000
 	mrna3_len = 2000
 	# Generate the profiles
-	p1 = fm.frag_factor_profile(mrna1_len, frag_mean, frag_sd, bp_cutoff=10*frag_sd, no_end=False)
-	p2 = fm.frag_factor_profile(mrna2_len, frag_mean, frag_sd, bp_cutoff=10*frag_sd, no_end=False)
-	p3 = fm.frag_factor_profile(mrna3_len, frag_mean, frag_sd, bp_cutoff=10*frag_sd, no_end=True)
+	p1 = fm.frag_factor_profile(mrna1_len, frag_mean=frag_mean, frag_sd=frag_sd, no_end=False)
+	p2 = fm.frag_factor_profile(mrna2_len, frag_mean=frag_mean, frag_sd=frag_sd, no_end=False)
+	p3 = fm.frag_factor_profile(mrna3_len, frag_mean=frag_mean, frag_sd=frag_sd, no_end=True)
 	# Plot the profiles
 	fig = plt.figure(figsize=(8,3))
 	ax = fig.add_subplot(1,1,1)

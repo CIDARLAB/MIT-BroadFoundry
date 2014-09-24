@@ -23,18 +23,26 @@ def parse_args(args):
 	args = parser.parse_args(args)
 	
 	return args
+	
+def update(table):
+	"""Function takes a list of lists. This is a matrix of data (a table). The first row
+	must be column labels. The first column must be ObjectID for the documents to be
+	edited/updated.
+	"""
+	
+	labels = table[0]
+	
+	for row in table[1:]:
+   		db.parts.update({labels[0]: ObjectId(row[0])}, {"$set": dict(zip(labels[1:], row[1:]))})
+	
 
 
 def main(args):
 	options = parse_args(args)
-	
-	actzymes = open(options.input, "U")
+		
+	table = [[ele for ele in row.split(options.delimeter)] for row in options.input.read()]
+	update(table)
 
-	labels = actzymes.readline().strip("\n").split(options.delimeter)
-
-	for line in actzymes:
-    	line = line.strip("\n").split(options.delimeter)
-   		db.parts.update({labels[0]: ObjectId(line[0])}, {"$set": dict(zip(labels[1:], line[1:]))})
 	
 if __name__ == "__main__":
 	try:

@@ -23,6 +23,17 @@ def part_lookup(spec):
     return [[ObjectId(part['_id'])] for part in db.parts.find(atts)]
     
 def spec_parse(spec):
+	"""function accepts a string representing a 'spec'. This included (), *, +, and data
+	specifying documents in the database. Example:
+		A+B = AB
+		A*B = AB, BA
+		A+B*C = (A+B)*C = ABC, CAB
+		(A*B)+(C*D) = ABCD, BACD, ABDC, BADC
+	Each variable (A, B, C, D) can be a part:
+		substrate:L-TRYPTOPHAN;product:5-HYDROXY-L-TRYPTOPHAN+substrate:5-HYDROXY-L-TRYPTOPHAN;product:SEROTONIN
+	this concatenates all combinations of parts that satisfy that spec.
+	"""
+		
     if not spec.count("(") == spec.count(")"):
         print "Missing Parentheses"
         return
@@ -70,8 +81,8 @@ def parse_args(args):
 	parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
 			description=__doc__)
 
-	parser.add_argument("--input", "-o", dest="input", type=argparse.FileType('r'),
-			help="Output file to write data to.")
+	parser.add_argument("--input", "-i", dest="input", type=argparse.FileType('r'),
+			help="Input file to write data to.")
 	parser.add_argument("--delimeter", "-d", dest="delimeter", default = "\t", help="Text\
 			delimeter in output file that separates columns.")
 	
@@ -79,17 +90,20 @@ def parse_args(args):
 	
 	return args
         
+def insert_variants(table):
+	
+	labels = table[0]
+	for row in table[1:]:
+	    doc = dict(zip(labels,row))
+	    for path in spec_parse(doc['spec']):
+	        db.variants.insert(dict(zip(labels, row) + ['parts', path]))
+	        
 def main(args):
 	
 	options = parse_args(args)
-
-	labels = options.input.readline().strip("\n").split(options.delimeter)
-	for line in design:
-	    line = line.strip("\n").split("\t")
-	    doc = dict(zip(labels,line))
-	    for path in spec_parse(doc['spec']):
-	        db.variants.insert(dict(zip(labels, lines) + ['parts', path]))
-        
+    table = [[ele for ele in row.split(options.delimeter)] for row in options.input.read()]
+	insert_variants(table)
+	
         
 if __name__ == "__main__":
 	try:

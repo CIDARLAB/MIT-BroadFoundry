@@ -22,6 +22,8 @@ def parse_args(args):
 	
 	return args
 
+#def insert(
+
 
 def main(args):
 	options = parse_args(args)

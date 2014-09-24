@@ -33,21 +33,25 @@ MongoClient = pymongo.MongoClient
 Base = declarative_base()
 
 
-pv = Table('parts-variants', Base.metadata,
-	Column('part_id', Integer, ForeignKey('parts.pid')),
-	Column('variant_id', Integer, ForeignKey('variants.vid')))
+pv = Table('parts_variants', Base.metadata,
+	Column('part_id', Integer, ForeignKey('parts.pid'), primary_key=True),
+	Column('variant_id', Integer, ForeignKey('variants.vid'), primary_key=True)
+	)
 
-pr = Table('parts-rxns', Base.metadata,
-	Column('part_id', Integer, ForeignKey('parts.pid')),
-	Column('rxn_id', Integer, ForeignKey('rxns.rid')))
+pr = Table('parts_rxns', Base.metadata,
+	Column('part_id', Integer, ForeignKey('parts.pid'), primary_key=True),
+	Column('rxn_id', Integer, ForeignKey('rxns.rid'), primary_key=True)
+	)
 	
-vr = Table('variants-rxns', Base.metadata,
-	Column('variant_id', Integer, ForeignKey('variants.vid')),
-	Column('rxn_id', Integer, ForeignKey('rxns.rid')))
+vr = Table('variants_rxns', Base.metadata,
+	Column('variant_id', Integer, ForeignKey('variants.vid'), primary_key=True),
+	Column('rxn_id', Integer, ForeignKey('rxns.rid'), primary_key=True)
+	)
 	
-ct = Table('constructs-tubes', Base.metadata,
-	Column('construct_id', Integer, ForeignKey('constructs.cid')),
-	Column('tube_id', Integer, ForeignKey('tubes.tid')))
+ct = Table('constructs_tubes', Base.metadata,
+	Column('construct_id', Integer, ForeignKey('constructs.cid'), primary_key=True),
+	Column('tube_id', Integer, ForeignKey('tubes.tid'), primary_key=True)
+	)
 	
 def connect(sqldb, mongodb, verb=False):
 	engine = create_engine('sqlite:///'+sqldb, echo=verb)
@@ -60,6 +64,63 @@ def connect(sqldb, mongodb, verb=False):
 	
 def syn_mongo(collection, atts):
 	return list(mdb[collection].find(atts))
+
+class Part(Base):
+
+	__tablename__ = 'parts'
+	
+	pid = Column(Integer, primary_key=True)
+	ec = Column(String)
+	host = Column(String)
+	protein = Column(String, unique=True, nullable=True)
+	dna = Column(String, unique=True, nullable=True)
+	type = Column(String)
+	accession = Column(String)
+	enzyme = Column(String)
+	name = Column(String, unique=True, nullable=True)
+	
+	#list of variants that contain this part
+	variants = relationship('Variant', secondary=pv, backref=backref('parts'))
+	
+	#list of reactions that this part performs
+	rxns = relationship('Rxn', secondary=pr, backref=backref('parts'))
+	
+	#tubes variable created by one-to-many relationship specified in Tube()
+	#tubes = relationship(Tube, backref=backref('part'))
+	
+	def __init__(self, name, type):
+		self.type = type
+		self.name = name
+		
+	@sqlalchemy.orm.reconstructor
+	def get_mongo(self):
+		self.mongo = sync_mongo('parts', {'pid': self.pid})
+
+class Variant(Base):
+	
+	__tablename__ = 'variants'
+	
+	vid = Column(Integer, primary_key=True)
+	type = Column(String)
+	spec = Column(String)
+	name = Column(String, unique=True, nullable=True)
+	
+	#parts variable created by many-to-many relationship specified in Part()
+	#parts = list of parts in the variant
+	
+	#list of reactions that this variant performs
+	rxns = relationship('Rxn', secondary=vr, backref=backref('variants'))
+	
+	#constructs variable created by one-to-many relationship specified in Construct()
+	#constructs = list of constructs that are specified by this variant
+	
+	def __init__(self, name, type):
+		self.name = name
+		self.type = type
+	
+	@sqlalchemy.orm.reconstructor
+	def get_mongo(self):
+		self.mongo = sync_mongo('variants', {'vid': self.vid})
 
 class Rxn(Base):
 
@@ -82,63 +143,6 @@ class Rxn(Base):
 		self.substrate = substrate
 		self.product = product
 
-class Variant(Base):
-	
-	__tablename__ = 'variants'
-	
-	vid = Column(Integer, primary_key=True)
-	type = Column(String)
-	spec = Column(String)
-	name = Column(String, unique=True, nullable=True)
-	
-	#parts variable created by many-to-many relationship specified in Part()
-	#parts = list of parts in the variant
-	
-	#list of reactions that this variant performs
-	rxns = relationship(Rxn, secondary=lambda: vr, backref=backref('variants'))
-	
-	#constructs variable created by one-to-many relationship specified in Construct()
-	#constructs = list of constructs that are specified by this variant
-	
-	def __init__(self, name, type):
-		self.name = name
-		self.type = type
-	
-	@sqlalchemy.orm.reconstructor
-	def get_mongo(self):
-		self.mongo = sync_mongo('variants', {'vid': self.vid})
-		
-class Part(Base):
-
-	__tablename__ = 'parts'
-	
-	pid = Column(Integer, primary_key=True)
-	ec = Column(String)
-	host = Column(String)
-	protein = Column(String, unique=True, nullable=True)
-	dna = Column(String, unique=True, nullable=True)
-	type = Column(String)
-	accession = Column(String)
-	enzyme = Column(String)
-	name = Column(String, unique=True, nullable=True)
-	
-	#list of variants that contain this part
-	variants = relationship(Variant, secondary=lambda: pv, backref=backref('parts'))
-	
-	#list of reactions that this part performs
-	rxns = relationship(Rxn, secondary=lambda: pr, backref=backref('parts'))
-	
-	#tubes variable created by one-to-many relationship specified in Tube()
-	tubes = relationship('Tube', backref=backref('part'))
-	
-	def __init__(self, name, type):
-		self.type = type
-		self.name = name
-		
-	@sqlalchemy.orm.reconstructor
-	def get_mongo(self):
-		self.mongo = sync_mongo('parts', {'pid': self.pid})
-
 class Tube(Base):
 
 	__tablename__ = 'tubes'
@@ -157,6 +161,7 @@ class Tube(Base):
 	#constructs = list of constructs that contain this tube
 	
 	#part variable created by one-to-many relationship specified in Tube()
+	part = relationship('Part', backref=backref('tubes'))
 	
 	def __init__(self, dna):
 		self.dna = dna
@@ -170,6 +175,7 @@ class Construct(Base):
 	__tablename__ = 'constructs'
 	
 	cid = Column(Integer, primary_key=True)
+	vid = Column(Integer, ForeignKey('variants.vid'))
 	dna = Column(String)
 	author = Column(String)
 	date = Column(String)
@@ -179,10 +185,10 @@ class Construct(Base):
 	name = Column(String, unique=True, nullable=True)
 	
 	#variant template for construct
-	template = relationship(Variant, backref=backref('constructs'))
+	template = relationship('Variant', backref=backref('constructs'))
 	
 	#tubes (physical version of parts) included in this construct
-	tubes = relationship(Tube, secondary=lambda: ct, backref=backref('constructs'))
+	tubes = relationship('Tube', secondary=ct, backref=backref('constructs'))
 	
 	def __init__(self, dna):
 		self.dna = dna

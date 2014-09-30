@@ -32,19 +32,13 @@ MongoClient = pymongo.MongoClient
 #Open declarative base builder to build object-db mappers
 Base = declarative_base()
 
-
-pv = Table('parts_variants', Base.metadata,
-	Column('part_id', Integer, ForeignKey('parts.pid'), primary_key=True),
-	Column('variant_id', Integer, ForeignKey('variants.vid'), primary_key=True)
-	)
-
 pr = Table('parts_rxns', Base.metadata,
 	Column('part_id', Integer, ForeignKey('parts.pid'), primary_key=True),
 	Column('rxn_id', Integer, ForeignKey('rxns.rid'), primary_key=True)
 	)
 	
-vr = Table('variants_rxns', Base.metadata,
-	Column('variant_id', Integer, ForeignKey('variants.vid'), primary_key=True),
+vr = Table('designs_rxns', Base.metadata,
+	Column('design_id', Integer, ForeignKey('designs.did'), primary_key=True),
 	Column('rxn_id', Integer, ForeignKey('rxns.rid'), primary_key=True)
 	)
 	
@@ -72,15 +66,15 @@ class Part(Base):
 	pid = Column(Integer, primary_key=True)
 	ec = Column(String)
 	host = Column(String)
-	protein = Column(String, unique=True, nullable=True)
+	protein = Column(String)
 	dna = Column(String, unique=True, nullable=True)
 	type = Column(String)
 	accession = Column(String)
 	enzyme = Column(String)
 	name = Column(String, unique=True, nullable=True)
+	version = Column(String)
 	
-	#list of variants that contain this part
-	variants = relationship('Variant', secondary=pv, backref=backref('parts'))
+	#list of designs that contain this part
 	
 	#list of reactions that this part performs
 	rxns = relationship('Rxn', secondary=pr, backref=backref('parts'))
@@ -88,47 +82,75 @@ class Part(Base):
 	#tubes variable created by one-to-many relationship specified in Tube()
 	#tubes = relationship(Tube, backref=backref('part'))
 	
-	def __init__(self, name, type):
-		self.type = type
-		self.name = name
+	def __init__(self, dict):
+		self.reset(dict)
+	
+	def reset(self, dict):
+		for k, v in dict.items():
+			setattr(self, k, v)
 		
 	@sqlalchemy.orm.reconstructor
 	def get_mongo(self):
 		self.mongo = sync_mongo('parts', {'pid': self.pid})
 
-class Variant(Base):
+class Design(Base):
 	
-	__tablename__ = 'variants'
+	__tablename__ = 'designs'
 	
-	vid = Column(Integer, primary_key=True)
+	did = Column(Integer, primary_key=True)
 	type = Column(String)
 	spec = Column(String)
 	name = Column(String, unique=True, nullable=True)
 	
 	#parts variable created by many-to-many relationship specified in Part()
-	#parts = list of parts in the variant
+	#parts = list of parts in the design
 	
-	#list of reactions that this variant performs
-	rxns = relationship('Rxn', secondary=vr, backref=backref('variants'))
+	#list of reactions that this design performs
+	rxns = relationship('Rxn', secondary=vr, backref=backref('designs'))
 	
 	#constructs variable created by one-to-many relationship specified in Construct()
-	#constructs = list of constructs that are specified by this variant
+	#constructs = list of constructs that are specified by this design
 	
-	def __init__(self, name, type):
-		self.name = name
-		self.type = type
+	def __init__(self, dict):
+		self.reset(dict)
+	
+	def reset(self, dict):
+		for k, v in dict.items():
+			setattr(self, k, v)
 	
 	@sqlalchemy.orm.reconstructor
 	def get_mongo(self):
-		self.mongo = sync_mongo('variants', {'vid': self.vid})
+		self.mongo = sync_mongo('designs', {'did': self.vid})
+		
+class DesignPart(Base):
+	
+	__tablename__ = 'designparts'
+	
+	pid = Column(Integer, ForeignKey('parts.pid'), primary_key = True)
+	did = Column(Integer, ForeignKey('designs.did'), primary_key = True)
+	
+	start = Column(Integer)
+	end = Column(Integer)
+	direction = Column(Integer)
+	
+	parts = relationship('Part', backref=backref('designs'))
+	
+	designs = relationship('Design', backref=backref('parts'))
+	
+	def __init__(self, dict):
+		self.reset(dict)
+	
+	def reset(self, dict):
+		for k, v in dict.items():
+			setattr(self, k, v)
 
 class Rxn(Base):
 
 	__tablename__ = 'rxns'
 	
 	rid = Column(Integer, primary_key=True)
-	substrate = Column(String)
-	product = Column(String)
+	substrate = Column(String, nullable=False)
+	product = Column(String, nullable=False)
 	cosubstrate = Column(String)
 	coproduct = Column(String)
 	name = Column(String, unique=True, nullable=True)
@@ -136,12 +158,15 @@ class Rxn(Base):
 	#parts variable created by many-to-many relationship specified in Part()
 	#parts = list of parts that perform this reaction
 	
-	#variants variable created by many-to-many relationship specified in Variant()
-	#variants = list of variants that perform this reaction
+	#designs variable created by many-to-many relationship specified in Design()
+	#designs = list of designs that perform this reaction
 	
-	def __init__(self, substrate, product):
-		self.substrate = substrate
-		self.product = product
+	def __init__(self, dict):
+		self.reset(dict)
+	
+	def reset(self, dict):
+		for k, v in dict.items():
+			setattr(self, k, v)
 
 class Tube(Base):
 
@@ -149,7 +174,7 @@ class Tube(Base):
 	
 	tid = Column(Integer, primary_key=True)
 	pid = Column(Integer, ForeignKey('parts.pid'))
-	dna = Column(String)
+	dna = Column(String, unique=True)
 	author = Column(String)
 	date = Column(String)
 	plate = Column(String)
@@ -163,8 +188,14 @@ class Tube(Base):
 	#part variable created by one-to-many relationship specified in Tube()
 	part = relationship('Part', backref=backref('tubes'))
 	
-	def __init__(self, dna):
+	def __init__(self, dna, dict = {}):
 		self.dna = dna
+		
+		self.reset(dict)
+	
+	def reset(self, dict):
+		for k, v in dict.items():
+			setattr(self, k, v)
 	
 	@sqlalchemy.orm.reconstructor
 	def get_mongo(self):
@@ -175,7 +206,7 @@ class Construct(Base):
 	__tablename__ = 'constructs'
 	
 	cid = Column(Integer, primary_key=True)
-	vid = Column(Integer, ForeignKey('variants.vid'))
+	did = Column(Integer, ForeignKey('designs.did'))
 	dna = Column(String)
 	author = Column(String)
 	date = Column(String)
@@ -184,14 +215,20 @@ class Construct(Base):
 	location = Column(String)
 	name = Column(String, unique=True, nullable=True)
 	
-	#variant template for construct
-	template = relationship('Variant', backref=backref('constructs'))
+	#design template for construct
+	template = relationship('Design', backref=backref('constructs'))
 	
 	#tubes (physical version of parts) included in this construct
 	tubes = relationship('Tube', secondary=ct, backref=backref('constructs'))
 	
-	def __init__(self, dna):
+	def __init__(self, dna, dict = {}):
 		self.dna = dna
+		
+		self.reset(dict)
+	
+	def reset(self, dict):
+		for k, v in dict.items():
+			setattr(self, k, v)
 
 	@sqlalchemy.orm.reconstructor
 	def get_mongo(self):

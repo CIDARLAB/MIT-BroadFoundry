@@ -332,56 +332,55 @@ def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 # BASIC TESTING WILL BE REMOVED EVENTUALLY
 #############################################################################################
 
-def test():
-	# Create the renderer and DNA description
-	dr = DNARenderer(y_scale=1.0, linewidth=1.2)
+# Create the renderer and DNA description
+dr = DNARenderer(y_scale=1.0, linewidth=1.2)
 
-	parts = [{'type':'Promoter', 'start':0, 'end':30, 'opts':{'end_pad':-5}},
-	         {'type':'RBS', 'start':20, 'end':40},
-	         {'type':'CDS', 'start':250, 'end':300},
-	         {'type':'CDS', 'start':300, 'end':350, 'opts':{'hatch':'/////'}},
-	         {'type':'Terminator', 'start':351, 'end':352},
-	         {'type':'Promoter', 'start':360, 'end':380}]
+parts = [{'type':'Promoter', 'start':0, 'end':30, 'opts':{'end_pad':-5}},
+         {'type':'RBS', 'start':20, 'end':40},
+         {'type':'CDS', 'start':250, 'end':300},
+         {'type':'CDS', 'start':300, 'end':350, 'opts':{'hatch':'/////'}},
+         {'type':'Terminator', 'start':351, 'end':352},
+         {'type':'Promoter', 'start':360, 'end':380}]
 
-	parts_rev = [{'type':'Terminator', 'start':150, 'end':100},
-			{'type':'CDS', 'start':200, 'end':150, 'opts':{'hatch':'/////'}},
-	         {'type':'RBS', 'start':250, 'end':200},
-	         {'type':'Promoter', 'start':300, 'end':250, 'opts':{'end_pad':-5}}]
+parts_rev = [{'type':'Terminator', 'start':150, 'end':100},
+		{'type':'CDS', 'start':200, 'end':150, 'opts':{'hatch':'/////'}},
+         {'type':'RBS', 'start':250, 'end':200},
+         {'type':'Promoter', 'start':300, 'end':250, 'opts':{'end_pad':-5}}]
 
-	part_renderers = {'Promoter':sbol_promoter, 'CDS':sbol_cds, 
-	                  'Terminator':sbol_terminator, 'RBS':sbol_rbs}
+part_renderers = {'Promoter':sbol_promoter, 'CDS':sbol_cds, 
+                  'Terminator':sbol_terminator, 'RBS':sbol_rbs}
 
-	# Set up the figure
-	import matplotlib.pyplot as plt
+# Set up the figure
+import matplotlib.pyplot as plt
 
-	fig = plt.figure(figsize=(3,2))
-	ax = fig.add_subplot(1,1,1)
-	# Render the DNA
-	start, end = dr.renderDNA(ax, parts, part_renderers)
-	dna_len = end-start
-	# Set bounds
-	ax.set_xlim([start-(0.01*dna_len),end+(0.01*dna_len)])
-	ax.set_ylim([-15,15])
-	ax.set_aspect('equal')
-	ax.set_axis_off()
-	# Save the figure
-	plt.tight_layout()
-	fig.savefig('./plots/test_fwd.pdf')
+fig = plt.figure(figsize=(3,2))
+ax = fig.add_subplot(1,1,1)
+# Render the DNA
+start, end = dr.renderDNA(ax, parts, part_renderers)
+dna_len = end-start
+# Set bounds
+ax.set_xlim([start-(0.01*dna_len),end+(0.01*dna_len)])
+ax.set_ylim([-15,15])
+ax.set_aspect('equal')
+ax.set_axis_off()
+# Save the figure
+plt.tight_layout()
+fig.savefig('test_fwd.pdf')
 
-	fig = plt.figure(figsize=(3,2))
-	ax = fig.add_subplot(1,1,1)
-	# Render the DNA
-	start, end = dr.renderDNA(ax, parts_rev, part_renderers)
-	dna_len = end-start
-	# Set bounds
-	ax.set_xlim([start-(0.01*dna_len),end+(0.01*dna_len)])
-	ax.set_ylim([-15,15])
-	ax.set_aspect('equal')
-	ax.set_axis_off()
-	# Save the figure
-	plt.tight_layout()
-	fig.savefig('./plots/test_rev.pdf')
+fig = plt.figure(figsize=(3,2))
+ax = fig.add_subplot(1,1,1)
+# Render the DNA
+start, end = dr.renderDNA(ax, parts_rev, part_renderers)
+dna_len = end-start
+# Set bounds
+ax.set_xlim([start-(0.01*dna_len),end+(0.01*dna_len)])
+ax.set_ylim([-15,15])
+ax.set_aspect('equal')
+ax.set_axis_off()
+# Save the figure
+plt.tight_layout()
+fig.savefig('test_rev.pdf')
 
-	# Clear the plotting cache
-	plt.close('all')
+# Clear the plotting cache
+plt.close('all')
 

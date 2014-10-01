@@ -107,14 +107,16 @@ def plot_dna (dna_designs, out_filename, plot_params):
     # Create the figure
 	fig = plt.figure(figsize=(plot_params['fig_y'],plot_params['fig_x']))
 	# Cycle through the designs an plot on individual axes
-	design_list = dna_designs.keys()
+	design_list = sorted(dna_designs.keys())
 	num_of_designs = len(design_list)
 	ax_list = []
 	max_dna_len = 0.0
 	for i in range(num_of_designs):
 		# Create axis for the design and plot
 		design =  dna_designs[design_list[i]]
-		ax = fig.add_subplot(num_of_designs,1,i)
+		ax = fig.add_subplot(num_of_designs,1,i+1)
+		if 'show_title' in plot_params.keys() and plot_params['show_title'] == 'Y':
+			ax.set_title(design_list[i], fontsize=8)
 		start, end = dr.renderDNA(ax, design, part_renderers)
 		dna_len = end-start
 		if max_dna_len < dna_len:

@@ -103,7 +103,9 @@ def plot_dna (dna_designs, out_filename, plot_params):
 	part_renderers = {'Promoter'  :dpl.sbol_promoter, 
 	                  'CDS'       :dpl.sbol_cds, 
                       'Terminator':dpl.sbol_terminator,
-                      'RBS'       :dpl.sbol_rbs}
+                      'RBS'       :dpl.sbol_rbs,
+                      'Ribozyme'  :dpl.sbol_ribozyme}
+
     # Create the figure
 	fig = plt.figure(figsize=(plot_params['fig_y'],plot_params['fig_x']))
 	# Cycle through the designs an plot on individual axes

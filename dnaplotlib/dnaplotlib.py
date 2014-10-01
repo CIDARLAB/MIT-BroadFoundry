@@ -16,7 +16,7 @@ dnaplotlib
 #    All rights reserved.
 #    OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
 
-from matplotlib.patches import Polygon, Ellipse, Wedge
+from matplotlib.patches import Polygon, Ellipse, Wedge, Circle
 from matplotlib.lines import Line2D
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
@@ -185,7 +185,7 @@ def sbol_cds (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	start_pad = 1.0
 	end_pad = 1.0
 	y_extent = 5
-	x_extent = 50
+	x_extent = 30
 	arrowhead_height = 4
 	arrowhead_length = 8
 	# Reset defaults if provided
@@ -315,14 +315,14 @@ def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 		final_end = start+start_pad
 		rbs_center = (end+((start-end)/2.0),0)
 		w1 = Wedge(rbs_center, x_extent/2.0, 180, 360, linewidth=linewidth, facecolor=color, zorder=8)
+		ax.add_patch(w1)
 	else:
 		start = prev_end+start_pad
 		end = start+x_extent
 		final_end = end+end_pad
 		rbs_center = (start+((end-start)/2.0),0)
 		w1 = Wedge(rbs_center, x_extent/2.0, 0, 180, linewidth=linewidth, facecolor=color, zorder=8)
-	# Draw the RBS symbol
-	ax.add_patch(w1)
+		ax.add_patch(w1)
 	if final_start > final_end:
 		return prev_end, final_start
 	else:
@@ -333,7 +333,9 @@ def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 	color = (0,0,0)
 	start_pad = 2.0
 	end_pad = 2.0
-	x_extent = 10.0
+	x_extent = 5.0
+	y_extent = 10.0
+	linestyle = '-'
 	# Reset defaults if provided
 	if opts != None:
 		if 'color' in opts.keys():
@@ -344,29 +346,35 @@ def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 			end_pad = opts['end_pad']
 		if 'x_extent' in opts.keys():
 			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
 		if 'y_scale' in opts.keys():
 			y_scale = opts['y_scale']
 	# Check direction add start padding
-	dir_fac = 1.0
 	final_end = end
 	final_start = prev_end
-	rbs_center = (0,0)
 	if start > end:
 		start = prev_end+end_pad+x_extent
 		end = prev_end+end_pad
 		final_end = start+start_pad
-		rbs_center = (end+((start-end)/2.0),0)
-		w1 = Wedge(rbs_center, x_extent/2.0, 180, 360, linewidth=linewidth, facecolor=color, zorder=8)
+		rbs_center = (end+((start-end)/2.0),-y_extent)
+		c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, facecolor=(1,1,1), zorder=8)
+		ax.add_patch(c1)
+		l1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent+(x_extent/2.0)], linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
+		ax.add_line(l1)
 	else:
 		start = prev_end+start_pad
 		end = start+x_extent
 		final_end = end+end_pad
-		rbs_center = (start+((end-start)/2.0),0)
-		w1 = Wedge(rbs_center, x_extent/2.0, 0, 180, linewidth=linewidth, facecolor=color, zorder=8)
-	# Draw the RBS symbol
-	ax.add_patch(w1)
+		rbs_center = (start+((end-start)/2.0),y_extent)
+		c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, facecolor=(1,1,1), zorder=8)
+		ax.add_patch(c1)
+		l1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent-(x_extent/2.0)], linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
+		ax.add_line(l1)
 	if final_start > final_end:
 		return prev_end, final_start
 	else:

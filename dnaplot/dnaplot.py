@@ -113,7 +113,7 @@ class DNARenderer:
 								           self.linewidth, opts=reg_opts)
 				reg_num += 1
 		# Plot the backbone (z=1)
-		l1 = Line2D([first_start,prev_end],[0,0], linewidth=self.linewidth, color=(0,0,0), zorder=1)
+		l1 = Line2D([first_start,prev_end],[0,0], linewidth=self.linewidth, color=(0,0,0), zorder=10)
 		ax.add_line(l1)
 		return first_start, prev_end
 

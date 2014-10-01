@@ -17,7 +17,7 @@
 import sys
 import getopt
 import csv
-import dnaplot as dp
+import dnaplotlib as dpl
 import matplotlib.pyplot as plt
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
@@ -98,12 +98,12 @@ def load_dna_designs (filename, part_info):
 
 def plot_dna (dna_designs, out_filename, plot_params):
 	# Create the renderer
-	dr = dp.DNARenderer(y_scale=plot_params['y_scale'], linewidth=plot_params['linewidth'])
+	dr = dpl.DNARenderer(y_scale=plot_params['y_scale'], linewidth=plot_params['linewidth'])
 	# We default to the SBOL part renderers
-	part_renderers = {'Promoter'  :dp.sbol_promoter, 
-	                  'CDS'       :dp.sbol_cds, 
-                      'Terminator':dp.sbol_terminator,
-                      'RBS'       :dp.sbol_rbs}
+	part_renderers = {'Promoter'  :dpl.sbol_promoter, 
+	                  'CDS'       :dpl.sbol_cds, 
+                      'Terminator':dpl.sbol_terminator,
+                      'RBS'       :dpl.sbol_rbs}
     # Create the figure
 	fig = plt.figure(figsize=(plot_params['fig_y'],plot_params['fig_x']))
 	# Cycle through the designs an plot on individual axes

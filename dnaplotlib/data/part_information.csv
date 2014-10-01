@@ -1,0 +1,1 @@
+part_name,type,x_extent,y_extent,start_pad,end_pad,color,hatch,arrowhead_height,arrowhead_lengthP1,Promoter,,,,,,,,P2,Promoter,,,,,0;1;0,,,R1,RBS,,,-5,,0;0;0,,,R2,RBS,,,-5,,0;0;1,,,C1,CDS,50,4,2,2,1;1;0,/////////////,4,8C2,CDS,80,5,-2,2,0;1;1,,4,8T1,Terminator,,,4,4,1;0;0,,,T2,Terminator,,,-2,4,,,,Z1,Ribozyme,,,,,,,,

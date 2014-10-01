@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-dnaplot
-=======
+dnaplotlib
+==========
     This module is designed to allow for highly customisable visualisation of DNA
     fragments. Diagrams can be in the form of conceptual SBOL compliant icons or
     make use of scaling icons to allow for easier comparison of part locations to
@@ -174,9 +174,9 @@ def sbol_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 		          facecolor=color, edgecolor=color, linewidth=linewidth)
 	ax.add_patch(p1)
 	if final_start > final_end:
-		return final_end, final_start
+		return prev_end, final_start
 	else:
-		return final_start, final_end
+		return prev_end, final_end
 
 def sbol_cds (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	# Default options
@@ -186,8 +186,8 @@ def sbol_cds (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	end_pad = 1.0
 	y_extent = 5
 	x_extent = 50
-	arrow_height = 4
-	arrow_length = 8
+	arrowhead_height = 4
+	arrowhead_length = 8
 	# Reset defaults if provided
 	if opts != None:
 		if 'color' in opts.keys():
@@ -202,10 +202,10 @@ def sbol_cds (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 			y_extent = opts['y_extent']
 		if 'x_extent' in opts.keys():
 			x_extent = opts['x_extent']
-		if 'arrow_height' in opts.keys():
-			arrow_height = opts['arrow_height']
-		if 'arrow_length' in opts.keys():
-			arrow_length = opts['arrow_length']
+		if 'arrowhead_height' in opts.keys():
+			arrowhead_height = opts['arrowhead_height']
+		if 'arrowhead_length' in opts.keys():
+			arrowhead_length = opts['arrowhead_length']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
 		if 'y_scale' in opts.keys():
@@ -226,17 +226,17 @@ def sbol_cds (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	# Draw the CDS symbol
 	p1 = Polygon([(start, y_extent), 
 		          (start, -y_extent),
-		          (end-dir_fac*arrow_length, -y_extent),
-		          (end-dir_fac*arrow_length, -y_extent-arrow_height),
+		          (end-dir_fac*arrowhead_length, -y_extent),
+		          (end-dir_fac*arrowhead_length, -y_extent-arrowhead_height),
 		          (end, 0),
-		          (end-dir_fac*arrow_length, y_extent+arrow_height),
-		          (end-dir_fac*arrow_length, y_extent)],
+		          (end-dir_fac*arrowhead_length, y_extent+arrowhead_height),
+		          (end-dir_fac*arrowhead_length, y_extent)],
 		          edgecolor=(0.0,0.0,0.0), facecolor=color, linewidth=linewidth, hatch=hatch, zorder=11)
 	ax.add_patch(p1)
 	if final_start > final_end:
-		return final_end, final_start
+		return prev_end, final_start
 	else:
-		return final_start, final_end
+		return prev_end, final_end
 
 def sbol_terminator (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	# Default options
@@ -267,8 +267,8 @@ def sbol_terminator (ax, type, num, start, end, prev_end, y_scale, linewidth, op
 	final_start = prev_end
 	if start > end:
 		dir_fac = -1.0
-		start = prev_end+start_pad+x_extent
-		end = start-x_extent
+		start = prev_end+end_pad+x_extent
+		end = prev_end+end_pad
 		final_end = start+start_pad
 	else:
 		start = prev_end+start_pad
@@ -280,9 +280,9 @@ def sbol_terminator (ax, type, num, start, end, prev_end, y_scale, linewidth, op
 	ax.add_line(l1)
 	ax.add_line(l2)
 	if final_start > final_end:
-		return final_end, final_start
+		return prev_end, final_start
 	else:
-		return final_start, final_end
+		return prev_end, final_end
 
 def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	# Default options
@@ -310,9 +310,9 @@ def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	final_start = prev_end
 	rbs_center = (0,0)
 	if start > end:
-		start = prev_end+start_pad
-		end = prev_end+start_pad+x_extent
-		final_end = end+end_pad
+		start = prev_end+end_pad+x_extent
+		end = prev_end+end_pad
+		final_end = start+start_pad
 		rbs_center = (end+((start-end)/2.0),0)
 		w1 = Wedge(rbs_center, x_extent/2.0, 180, 360, linewidth=linewidth, facecolor=color, zorder=8)
 	else:
@@ -324,9 +324,53 @@ def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	# Draw the RBS symbol
 	ax.add_patch(w1)
 	if final_start > final_end:
-		return final_end, final_start
+		return prev_end, final_start
 	else:
-		return final_start, final_end
+		return prev_end, final_end
+
+def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	x_extent = 10.0
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'y_scale' in opts.keys():
+			y_scale = opts['y_scale']
+	# Check direction add start padding
+	dir_fac = 1.0
+	final_end = end
+	final_start = prev_end
+	rbs_center = (0,0)
+	if start > end:
+		start = prev_end+end_pad+x_extent
+		end = prev_end+end_pad
+		final_end = start+start_pad
+		rbs_center = (end+((start-end)/2.0),0)
+		w1 = Wedge(rbs_center, x_extent/2.0, 180, 360, linewidth=linewidth, facecolor=color, zorder=8)
+	else:
+		start = prev_end+start_pad
+		end = start+x_extent
+		final_end = end+end_pad
+		rbs_center = (start+((end-start)/2.0),0)
+		w1 = Wedge(rbs_center, x_extent/2.0, 0, 180, linewidth=linewidth, facecolor=color, zorder=8)
+	# Draw the RBS symbol
+	ax.add_patch(w1)
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
 
 #############################################################################################
 # BASIC TESTING WILL BE REMOVED EVENTUALLY

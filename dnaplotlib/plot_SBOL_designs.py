@@ -6,9 +6,9 @@
 
  	Usage:
     ------
-    python plotdesigns.py PARAM_FILENAME PART_FILENAME DESIGN_FILENAME OUT_FILENAME
+    python plot_SBOL_designs.py PARAM_FILENAME PART_FILENAME DESIGN_FILENAME OUT_FILENAME
 """
-#    Plot Designs
+#    Plot SBOL Designs
 #    Copyright (C) 2014 by
 #    Thomas E. Gorochowski <tom@chofski.co.uk>
 #    All rights reserved.

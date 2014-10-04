@@ -4,20 +4,21 @@ dnaplotlib
 ==========
     This module is designed to allow for highly customisable visualisation of DNA
     fragments. Diagrams can be in the form of conceptual SBOL compliant icons or
-    make use of scaling icons to allow for easier comparison of part locations to
-    trace information, such as RNA-seq read depths. All plotting is performed using
-    matplotlib to enable export of publication quality, vector-based figures. 
-    Furthermore, all standard renderers can be replaced with user defined versions
-    to allow for full customisation of the plot.
+    make use of icons whose wide is scaled to allow for easier comparison of part 
+    locations to trace information, such as for corresponding RNA-seq read depth
+    data. All plotting is performed using matplotlib and to an axis object. This 
+    enables the export of publication quality, vector-based figures. Furthermore,
+    all standard renderers can be replaced with user defined versions to allow 
+    for full customisation of the plot.
 """
-#    DNA Plot
+#    dnaplotlib
 #    Copyright (C) 2014 by
 #    Thomas E. Gorochowski <tom@chofski.co.uk>
 #    All rights reserved.
 #    OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
 
 from matplotlib.patches import Polygon, Ellipse, Wedge, Circle
-from matplotlib.lines import Line2D
+from matplotlib.lines   import Line2D
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
@@ -118,7 +119,7 @@ class DNARenderer:
 		return first_start, prev_end
 
 ###############################################################################
-# SBOL Compliant Icons
+# SBOL Compliant Icon Renderers
 ###############################################################################
 
 def sbol_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
@@ -379,3 +380,11 @@ def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 		return prev_end, final_start
 	else:
 		return prev_end, final_end
+
+###############################################################################
+# Trace Icon Renderers (icon width corrisponds to trace data)
+###############################################################################
+
+# TODO - Convert from GeneClusterLibrary visualisation package, and integrate dnaplotlib
+
+

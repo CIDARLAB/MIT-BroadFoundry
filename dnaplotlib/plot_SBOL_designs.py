@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-	plotdeaigns.py
+	plot_SBOL_designs.py
 
 	Will plot the design of DNA constructs using SBOL notation.
 

@@ -211,6 +211,21 @@ class GeneClusterLibrary:
 		"""
 		return self.variants[variant]
 
+	def variant_part_list (self, variant):
+		"""Get method for variant part list from a name
+
+	    Parameters
+	    ----------
+	    variant : string
+	        Variant name.
+
+	    Returns
+	    -------
+	    part_list: list
+	        Part list for the variant.
+		"""
+		return self.variants[variant]['part_list']
+
 	def variant_part_idx_name (self, variant, part_idx):
 		"""Get method for part name from variant and part index
 

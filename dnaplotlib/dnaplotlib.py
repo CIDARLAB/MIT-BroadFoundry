@@ -114,7 +114,8 @@ class DNARenderer:
 								           self.linewidth, opts=reg_opts)
 				reg_num += 1
 		# Plot the backbone (z=1)
-		l1 = Line2D([first_start,prev_end],[0,0], linewidth=self.linewidth, color=(0,0,0), zorder=10)
+		l1 = Line2D([first_start,prev_end],[0,0], linewidth=self.linewidth, 
+			        color=(0,0,0), zorder=10)
 		ax.add_line(l1)
 		return first_start, prev_end
 
@@ -143,10 +144,10 @@ def sbol_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 			y_extent = opts['y_extent']
 		if 'x_extent' in opts.keys():
 			x_extent = opts['x_extent']
-		if 'arrow_height' in opts.keys():
-			arrow_height = opts['arrow_height']
-		if 'arrow_length' in opts.keys():
-			arrow_length = opts['arrow_length']
+		if 'arrowhead_height' in opts.keys():
+			arrowhead_height = opts['arrowhead_height']
+		if 'arrowhead_length' in opts.keys():
+			arrowhead_length = opts['arrowhead_length']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
 		if 'y_scale' in opts.keys():
@@ -165,13 +166,18 @@ def sbol_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 		end = start+x_extent
 		final_end = end+end_pad
 	# Draw the promoter symbol
-	l1 = Line2D([start,start],[0,dir_fac*y_extent], linewidth=linewidth, color=color, zorder=9)
-	l2 = Line2D([start,start+dir_fac*x_extent-dir_fac*(arrow_length*0.5)],[dir_fac*y_extent,dir_fac*x_extent], linewidth=linewidth, color=color, zorder=10)
+	l1 = Line2D([start,start],[0,dir_fac*y_extent], linewidth=linewidth, 
+		        color=color, zorder=9)
+	l2 = Line2D([start,start+dir_fac*x_extent-dir_fac*(arrowhead_length*0.5)],
+                [dir_fac*y_extent,dir_fac*x_extent], linewidth=linewidth, 
+                color=color, zorder=10)
 	ax.add_line(l1)
 	ax.add_line(l2)
-	p1 = Polygon([(start+dir_fac*x_extent-dir_fac*arrow_length, dir_fac*y_extent+(arrow_height)), 
+	p1 = Polygon([(start+dir_fac*x_extent-dir_fac*arrowhead_length, 
+		           dir_fac*y_extent+(arrowhead_height)), 
 		          (start+dir_fac*x_extent, dir_fac*y_extent),
-		          (start+dir_fac*x_extent-dir_fac*arrow_length, dir_fac*y_extent-(arrow_height))],
+		          (start+dir_fac*x_extent-dir_fac*arrowhead_length, 
+		           dir_fac*y_extent-(arrowhead_height))],
 		          facecolor=color, edgecolor=color, linewidth=linewidth)
 	ax.add_patch(p1)
 	if final_start > final_end:
@@ -232,7 +238,8 @@ def sbol_cds (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 		          (end, 0),
 		          (end-dir_fac*arrowhead_length, y_extent+arrowhead_height),
 		          (end-dir_fac*arrowhead_length, y_extent)],
-		          edgecolor=(0.0,0.0,0.0), facecolor=color, linewidth=linewidth, hatch=hatch, zorder=11)
+		          edgecolor=(0.0,0.0,0.0), facecolor=color, linewidth=linewidth, 
+		          hatch=hatch, zorder=11)
 	ax.add_patch(p1)
 	if final_start > final_end:
 		return prev_end, final_start
@@ -276,8 +283,10 @@ def sbol_terminator (ax, type, num, start, end, prev_end, y_scale, linewidth, op
 		end = start+x_extent
 		final_end = end+end_pad
 	# Draw the terminator symbol
-	l1 = Line2D([start,start],[0,dir_fac*y_extent], linewidth=linewidth, color=color, zorder=8)
-	l2 = Line2D([start-x_extent,start+x_extent],[dir_fac*y_extent,dir_fac*y_extent], linewidth=linewidth, color=color, zorder=9)
+	l1 = Line2D([start,start],[0,dir_fac*y_extent], linewidth=linewidth, 
+		        color=color, zorder=8)
+	l2 = Line2D([start-x_extent,start+x_extent],[dir_fac*y_extent,dir_fac*y_extent], 
+		        linewidth=linewidth, color=color, zorder=9)
 	ax.add_line(l1)
 	ax.add_line(l2)
 	if final_start > final_end:
@@ -315,14 +324,16 @@ def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 		end = prev_end+end_pad
 		final_end = start+start_pad
 		rbs_center = (end+((start-end)/2.0),0)
-		w1 = Wedge(rbs_center, x_extent/2.0, 180, 360, linewidth=linewidth, facecolor=color, zorder=8)
+		w1 = Wedge(rbs_center, x_extent/2.0, 180, 360, linewidth=linewidth, 
+			       facecolor=color, zorder=8)
 		ax.add_patch(w1)
 	else:
 		start = prev_end+start_pad
 		end = start+x_extent
 		final_end = end+end_pad
 		rbs_center = (start+((end-start)/2.0),0)
-		w1 = Wedge(rbs_center, x_extent/2.0, 0, 180, linewidth=linewidth, facecolor=color, zorder=8)
+		w1 = Wedge(rbs_center, x_extent/2.0, 0, 180, linewidth=linewidth, 
+			       facecolor=color, zorder=8)
 		ax.add_patch(w1)
 	if final_start > final_end:
 		return prev_end, final_start
@@ -363,18 +374,22 @@ def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 		end = prev_end+end_pad
 		final_end = start+start_pad
 		rbs_center = (end+((start-end)/2.0),-y_extent)
-		c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, facecolor=(1,1,1), zorder=8)
+		c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
+			        facecolor=(1,1,1), zorder=8)
 		ax.add_patch(c1)
-		l1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent+(x_extent/2.0)], linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
+		l1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent+(x_extent/2.0)], 
+			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
 		ax.add_line(l1)
 	else:
 		start = prev_end+start_pad
 		end = start+x_extent
 		final_end = end+end_pad
 		rbs_center = (start+((end-start)/2.0),y_extent)
-		c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, facecolor=(1,1,1), zorder=8)
+		c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
+			        facecolor=(1,1,1), zorder=8)
 		ax.add_patch(c1)
-		l1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent-(x_extent/2.0)], linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
+		l1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent-(x_extent/2.0)], 
+			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
 		ax.add_line(l1)
 	if final_start > final_end:
 		return prev_end, final_start

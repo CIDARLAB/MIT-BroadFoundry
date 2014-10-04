@@ -52,9 +52,9 @@ fig.savefig('./visualizations/VariantRendering.pdf')
 # Color mapping to use in library rendering
 cmap = {}
 # Promoters
-cmap['P1'] = (1.0,0.0,0.0)
+cmap['P1'] = (1.0,0.8,0.8)
 cmap['P2'] = (1.0,0.5,0.5)
-cmap['P3'] = (1.0,0.8,0.8)
+cmap['P3'] = (1.0,0.0,0.0)
 # Terminator
 cmap['T1'] = (0.0,0.0,1.0)
 # nif Genes

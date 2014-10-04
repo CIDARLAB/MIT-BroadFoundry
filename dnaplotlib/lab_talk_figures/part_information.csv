@@ -1,0 +1,1 @@
+part_name,type,x_extent,y_extent,start_pad,end_pad,color,hatch,arrowhead_height,arrowhead_length,linestyle,linewidthP1,Promoter,,,,,0.4;0.4;1.0,,,,,P2,Promoter,,,,,1.0;0.4;0.4,,,,,P3,Promoter,,,,,0.4;1.0;0.4,,,,,R1,RBS,,,-6,,0;0;0,,,,,C1,CDS,,4,2,2,1;1;0,/////////////,4,8,,T1,Terminator,,,2,2,0;0;0,,,,,

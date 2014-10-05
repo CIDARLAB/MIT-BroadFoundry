@@ -130,8 +130,8 @@ def sbol_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 	end_pad = 2.0
 	y_extent = 10
 	x_extent = 10
-	arrow_height = 2
-	arrow_length = 4
+	arrowhead_height = 2
+	arrowhead_length = 4
 	# Reset defaults if provided
 	if opts != None:
 		if 'color' in opts.keys():

@@ -107,7 +107,7 @@ def plot_dna (dna_designs, out_filename, plot_params):
                       'Ribozyme'  :dpl.sbol_ribozyme}
 
     # Create the figure
-	fig = plt.figure(figsize=(plot_params['fig_y'],plot_params['fig_x']))
+	fig = plt.figure(figsize=(plot_params['fig_x'],plot_params['fig_y']))
 	# Cycle through the designs an plot on individual axes
 	design_list = sorted(dna_designs.keys())
 	num_of_designs = len(design_list)

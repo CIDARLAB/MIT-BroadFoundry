@@ -260,7 +260,7 @@ class GeneClusterLibrary:
 	    part_type: string
 	        Type of the part.
 		"""
-		return self.parts[self.get_variant_part_idx_name(variant, part_idx)]['type']
+		return self.parts[self.variant_part_idx_name(variant, part_idx)]['type']
 
 	def variant_part_idx_dir (self, variant, part_idx):
 		"""Get method for part direction from variant and part index

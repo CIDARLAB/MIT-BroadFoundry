@@ -1,1 +1,1 @@
-design_name,parts,,,Design 1,P1,R1,C1,T1Design 2,P2,R1,C1,T1Design 3,P3,R1,C1,T1
+design_name,parts,,,P-CDS,P1,R1,C1,T-P-CDS,T1,P1,R1,C1CDS-P-CDS,C2,P1,R1,C1P-P,P1,P2,,P-P-P,P3,P1,P2,CDS-P-P,C2,P1,P2,T-P-P,T1,P1,P2,P-P-CDS,P2,P1,R1,C1rP-P-CDS,rP2,P1,R1,C1

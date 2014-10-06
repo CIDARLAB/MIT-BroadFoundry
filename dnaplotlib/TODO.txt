@@ -13,7 +13,7 @@ OUTSTANDING
 
 - [BD] Automatic generation of all state diagrams of circuit regulation?
 
-- [EG] Test SBOL figure elements (create some basic diagrams with all parts).
+- [EG] Test SBOL figure elements (create some basic diagrams with all parts, see "gallery").
 
 - [EG] ORM for integration with other tools in lab (less important at moment).
 
@@ -25,7 +25,7 @@ OUTSTANDING
 
 - [TG,EG,BD] Gallery of examples covering constructs, circuits, other functionality.
 
-- [TG,EG,BD] Bioinformatics paper (speak with Chris about publication). Wait until working.
+- [TG,EG,BD] Bioinformatics paper (speak with Chris about publication). Wait until working, draft in online.
 
 - [TG] Final home for the code. Maybe create Voigt lab GitHub Repo? Speak to Chris.
 

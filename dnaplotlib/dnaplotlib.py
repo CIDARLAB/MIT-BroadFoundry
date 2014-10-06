@@ -4,7 +4,7 @@ dnaplotlib
 ==========
     This module is designed to allow for highly customisable visualisation of DNA
     fragments. Diagrams can be in the form of conceptual SBOL compliant icons or
-    make use of icons whose wide is scaled to allow for easier comparison of part 
+    make use of icons whose width is scaled to allow for easier comparison of part 
     locations to trace information, such as for corresponding RNA-seq read depth
     data. All plotting is performed using matplotlib and to an axis object. This 
     enables the export of publication quality, vector-based figures. Furthermore,

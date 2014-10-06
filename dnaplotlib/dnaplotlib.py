@@ -14,13 +14,17 @@ dnaplotlib
 #    dnaplotlib
 #    Copyright (C) 2014 by
 #    Thomas E. Gorochowski <tom@chofski.co.uk>
+#    Emerson Glassey <eglassey@mit.edu>
+#    Bryan Der <bder@mit.edu>
 #    All rights reserved.
 #    OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
 
 from matplotlib.patches import Polygon, Ellipse, Wedge, Circle
 from matplotlib.lines   import Line2D
 
-__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
+__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
+               Emerson Glassey <eglassey@mit.edu>, Voigt Lab, MIT\n\
+               Bryan Der <bder@mit.edu>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
 
@@ -51,7 +55,7 @@ class DNARenderer:
 	def renderDNA(self, ax, parts, part_renderers, regs=None, reg_renderers=None):
 		"""Render the parts on the DNA and regulation.
 			- parts_list: list of dicts defining the parts
-			- renderers: standard renderer functions dict to use
+			- part_renderers: standard renderer functions dict to use
 			- regs: list of regulations on the DNA
 			- reg_renderers: dict of standard regulation renderers
 		"""

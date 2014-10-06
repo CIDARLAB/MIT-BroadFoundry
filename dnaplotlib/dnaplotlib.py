@@ -39,11 +39,14 @@ class DNARenderer:
 	STD_REG_TYPES = ['Repression',
 	                 'Activation']
 
-	def __init__(self, y_scale=1.0, linewidth=1.0):
+	def __init__(self, y_scale=1.0, linewidth=1.0, 
+		         backbone_pad_left=0.0, backbone_pad_right=0.0):
 		"""Constructor to generate an empty DNARenderer.
 		"""
 		self.y_scale = y_scale
 		self.linewidth = linewidth
+		self.backbone_pad_left = backbone_pad_left
+		self.backbone_pad_right = backbone_pad_right
 
 	def renderDNA(self, ax, parts, part_renderers, regs=None, reg_renderers=None):
 		"""Render the parts on the DNA and regulation.
@@ -114,8 +117,8 @@ class DNARenderer:
 								           self.linewidth, opts=reg_opts)
 				reg_num += 1
 		# Plot the backbone (z=1)
-		l1 = Line2D([first_start,prev_end],[0,0], linewidth=self.linewidth, 
-			        color=(0,0,0), zorder=10)
+		l1 = Line2D([first_start-self.backbone_pad_left,prev_end+self.backbone_pad_right],[0,0], 
+			        linewidth=self.linewidth, color=(0,0,0), zorder=10)
 		ax.add_line(l1)
 		return first_start, prev_end
 

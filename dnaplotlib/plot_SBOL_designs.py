@@ -98,9 +98,15 @@ def load_dna_designs (filename, part_info):
 
 def plot_dna (dna_designs, out_filename, plot_params):
 	# Create the renderer
+	left_pad = 0.0
+	right_pad = 0.0
+	if 'backbone_pad_left' in plot_params.keys():
+		left_pad = plot_params['backbone_pad_left']
+	if 'backbone_pad_right' in plot_params.keys():
+		right_pad = plot_params['backbone_pad_right']
 	dr = dpl.DNARenderer(y_scale=plot_params['y_scale'], linewidth=plot_params['linewidth'],
-		                 backbone_pad_left=plot_params['backbone_pad_left'], 
-		                 backbone_pad_right=plot_params['backbone_pad_right'])
+		                 backbone_pad_left=left_pad, 
+		                 backbone_pad_right=right_pad)
 	# We default to the SBOL part renderers
 	part_renderers = {'Promoter'  :dpl.sbol_promoter, 
 	                  'CDS'       :dpl.sbol_cds, 
@@ -130,8 +136,8 @@ def plot_dna (dna_designs, out_filename, plot_params):
 		ax.set_xticks([])
 		ax.set_yticks([])
 		# Set bounds
-		ax.set_xlim([(-0.01*max_dna_len)-plot_params['backbone_pad_left'],
-			        max_dna_len+(0.01*max_dna_len)+plot_params['backbone_pad_right']])
+		ax.set_xlim([(-0.01*max_dna_len)-left_pad,
+			        max_dna_len+(0.01*max_dna_len)+right_pad])
 		ax.set_ylim([-15,15])
 		ax.set_aspect('equal')
 		ax.set_axis_off()

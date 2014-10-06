@@ -1,0 +1,35 @@
+
+TODO list for dnaplotlib
+========================
+
+OUTSTANDING
+-----------
+
+- [TG] Final SBOL icons (ensure full compliance).
+
+- [TG] PyDocs everywhere to generate documentation for API.
+
+- [TG,BD] Add regulation features.
+
+- [BD] Automatic generation of all state diagrams of circuit regulation?
+
+- [EG] Test SBOL figure elements (create some basic diagrams with all parts).
+
+- [EG] ORM for integration with other tools in lab (less important at moment).
+
+- [EG] Web-based interface for file input and PDF/PNG output.
+
+- [EG] Short tutorial/user guide for web-interface.
+
+- [TG,EG,BD] Basic user guide to help people getting started. Some tutorials.
+
+- [TG,EG,BD] Gallery of examples covering constructs, circuits, other functionality.
+
+- [TG,EG,BD] Bioinformatics paper (speak with Chris about publication). Wait until working.
+
+- [TG] Final home for the code. Maybe create Voigt lab GitHub Repo? Speak to Chris.
+
+
+COMPLETED
+---------
+

@@ -7,9 +7,13 @@ OUTSTANDING
 
 - [TG] Final SBOL icons (ensure full compliance).
 
+- [BD] Read SBOL file format to generate image, write SBOL file specifying the 'DnaComponents'.  Low priority.
+
 - [TG] PyDocs everywhere to generate documentation for API.
 
 - [TG,BD] Add regulation features.
+
+- [BD] Option to label a part with the part name.
 
 - [BD] Automatic generation of all state diagrams of circuit regulation?
 
@@ -17,7 +21,7 @@ OUTSTANDING
 
 - [EG] ORM for integration with other tools in lab (less important at moment).
 
-- [EG] Web-based interface for file input and PDF/PNG output.
+- [EG,BD would like to help] Web-based interface for file input and PDF/PNG output.
 
 - [EG] Short tutorial/user guide for web-interface.
 

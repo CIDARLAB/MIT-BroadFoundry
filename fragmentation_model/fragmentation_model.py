@@ -46,7 +46,7 @@ from scipy.stats import norm
 
 def norm_frag_dist (frag_mean, frag_sd, frag_dist_len):
 	frag_dist = np.zeros(frag_dist_len)
-	for i in range(len(frag_dist)+1):
+	for i in range(frag_dist_len):
 		frag_dist[i] = norm.pdf(float(i), loc=frag_mean, scale=frag_sd)
 	return frag_dist
 
@@ -86,12 +86,12 @@ def frag_factor_profile (mrna_len, frag_dist=None, frag_mean=None, frag_sd=None,
 			return None
 	for bp in range(mrna_len):
 		# Correct the potential mRNA lengths if no terminator
-		corrected_mrna_len = mrna_len
+		corrected_mrna_len = mrna_len-1
 		if no_end == True:
 			if frag_mean == None:
-				corrected_mrna_len = mrna_len + len(frag_dist)
+				corrected_mrna_len = mrna_len + len(frag_dist)-1
 			else:
-				corrected_mrna_len = mrna_len + frag_mean
+				corrected_mrna_len = mrna_len + frag_mean-1
 		d[bp] = frag_at_base(bp, corrected_mrna_len, frag_dist, no_end=no_end)
 	return d
 

@@ -167,8 +167,11 @@ class GeneClusterLibrary:
 				part_list_el['dir'] = el['dir']
 				part_list_el['seq_idx'] = len(the_seq)
 				part_list_el['seq_len'] = len(self.parts[el['part_name']]['seq'])
-				# Update the sequence
-				the_seq = the_seq + self.parts[el['part_name']]['seq']
+				# Update the sequence (check direction and insert reverse comp if necessary)
+				if part_list_el['dir'] == 'F':
+					the_seq = the_seq + self.parts[el['part_name']]['seq']
+				else:
+					the_seq = the_seq + self.__reverse_complement(self.parts[el['part_name']]['seq'])
 				# Add additional variant-part-level attributes
 				for k in list(set(el.keys()) - set(['part_name', 'dir', 'seq_idx'])):
 					part_list_el[k] = el[k]
@@ -555,12 +558,12 @@ class GeneClusterLibrary:
 		the_seq_len = the_part['seq_len']
 		if the_part['dir'] == 'F':
 			start_idx = the_seq_idx-start_offset
-			end_idx = the_seq_idx+end_offset
+			end_idx = the_seq_idx+the_seq_len+end_offset
 			return the_seq[start_idx:end_idx]
 		else:
 			start_idx = the_seq_idx+the_seq_len+start_offset
-			end_idx = the_seq_idx+the_seq_len-end_offset
-			return the_seq[end_idx:start_idx]
+			end_idx = the_seq_idx-end_offset
+			return self.__reverse_complement(the_seq[end_idx:start_idx])
 
 	def extract_seq_ranges (self, variant_insts, start_offset, end_offset):
 		"""Extract sequence ranges from the start of a set of part instances.
@@ -1763,6 +1766,28 @@ class GeneClusterLibrary:
 		for v in variant_data.keys():
 			collated.append(variant_data[v])
 		return collated
+
+	def __reverse_complement(self, seq):
+		"""http://crazyhottommy.blogspot.com/2013/10/python-code-for-getting-reverse.html
+		"""
+		for base in seq:
+			if base not in 'ATCGatcg':
+				print "Error: NOT a DNA sequence"
+				return None
+		seq1 = 'ATCGTAGCatcgtagc'
+		seq_dict = { seq1[i]:seq1[i+4] for i in range(16) if i < 4 or 8<=i<12 }
+		return "".join([seq_dict[base] for base in reversed(seq)])
+
+	def __complement(self, seq):
+		"""http://crazyhottommy.blogspot.com/2013/10/python-code-for-getting-reverse.html
+		"""
+		for base in seq:
+			if base not in 'ATCGatcg':
+				print "Error: NOT a DNA sequence"
+				return None
+		seq1 = 'ATCGTAGCatcgtagc'
+		seq_dict = { seq1[i]:seq1[i+4] for i in range(16) if i < 4 or 8<=i<12 }
+		return "".join([seq_dict[base] for base in seq])
 
 ###############################################################################
 # GLOBAL FUNCTIONS

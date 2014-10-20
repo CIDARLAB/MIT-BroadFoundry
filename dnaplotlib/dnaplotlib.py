@@ -21,6 +21,7 @@ dnaplotlib
 
 from matplotlib.patches import Polygon, Ellipse, Wedge, Circle
 from matplotlib.lines   import Line2D
+from math import sqrt
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
                Emerson Glassey <eglassey@mit.edu>, Voigt Lab, MIT\n\
@@ -451,6 +452,61 @@ def sbol_scar (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	ax.add_patch(p1)
 	ax.add_line(l_top)
 	ax.add_line(l_bottom)
+
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
+
+def sbol_spacer (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	x_extent = 6.0
+	y_extent = 6.0
+	linestyle = '-'
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'y_scale' in opts.keys():
+			y_scale = opts['y_scale']
+	# Check direction add start padding
+	final_end = end
+	final_start = prev_end
+	
+	start = prev_end+start_pad
+	end = start+x_extent
+	final_end = end+end_pad
+	rbs_center = (start+((end-start)/2.0),0)
+	center_x = start+(end-start)/2.0
+	radius = x_extent/2
+
+	delta = radius - 0.5 * radius * sqrt(2)
+
+	l1 = Line2D([start+delta,end-delta],[radius-delta,-1*radius+delta], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	l2 = Line2D([start+delta,end-delta],[-1*radius+delta,radius-delta], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
+		        facecolor=(1,1,1), zorder=12)
+	
+	ax.add_patch(c1)
+	ax.add_line(l1)
+	ax.add_line(l2)
 
 	if final_start > final_end:
 		return prev_end, final_start

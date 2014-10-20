@@ -113,7 +113,8 @@ def plot_dna (dna_designs, out_filename, plot_params):
                       'Terminator':dpl.sbol_terminator,
                       'RBS'       :dpl.sbol_rbs,
                       'Ribozyme'  :dpl.sbol_ribozyme,
-                      'Scar'	  :dpl.sbol_scar}
+                      'Scar'	  :dpl.sbol_scar,
+                      'Spacer'	  :dpl.sbol_spacer}
 
     # Create the figure
 	fig = plt.figure(figsize=(plot_params['fig_x'],plot_params['fig_y']))

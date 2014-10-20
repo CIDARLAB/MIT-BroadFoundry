@@ -349,13 +349,38 @@ def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 		return prev_end, final_end
 
 def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
+def sbol_protein_stability (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)	
+def sbol_protease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
+def sbol_ribonuclease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
+
+#function for similar parts: ribozyme, protein_stability, protease, and ribonuclease parts
+def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
 	end_pad = 2.0
 	x_extent = 5.0
 	y_extent = 10.0
-	linestyle = '--'
+
+	linestyle = "";
+	headgroup = "";
+	if(type == "Ribozyme"):
+		linestyle = '--'
+		headgroup = 'circle'
+	elif(type == "Protease"):
+		linestyle = '--'
+		headgroup = 'crosshair'
+	elif(type == "ProteinStability"):
+		linestyle = '-'
+		headgroup = 'circle'
+	elif(type == "Ribonuclease"):
+		linestyle = '-'
+		headgroup = 'crosshair'		
+
 	# Reset defaults if provided
 	if opts != None:
 		if 'color' in opts.keys():
@@ -384,10 +409,23 @@ def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 		rbs_center = (end+((start-end)/2.0),-y_extent)
 		c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
 			        facecolor=(1,1,1), zorder=8)
-		ax.add_patch(c1)
 		l1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent+(x_extent/2.0)], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
-		ax.add_line(l1)
+		x1 = Line2D([start,end],[-1*y_extent*1.25,-1*y_extent/1.5], 
+		        	linewidth=linewidth, color=color, zorder=12, linestyle='-')
+		x2 = Line2D([start,end],[-1*y_extent/1.5,-1*y_extent*1.25], 
+		        	linewidth=linewidth, color=color, zorder=12, linestyle='-')		
+		lx = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent], 
+			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
+		
+		if(headgroup == "circle"):
+			ax.add_line(l1)
+			ax.add_patch(c1)
+		elif(headgroup == "crosshair"):
+			ax.add_line(lx)
+			ax.add_line(x1)
+			ax.add_line(x2)
+		
 	else:
 		start = prev_end+start_pad
 		end = start+x_extent
@@ -395,10 +433,23 @@ def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 		rbs_center = (start+((end-start)/2.0),y_extent)
 		c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
 			        facecolor=(1,1,1), zorder=8)
-		ax.add_patch(c1)
 		l1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent-(x_extent/2.0)], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
-		ax.add_line(l1)
+		x1 = Line2D([start,end],[y_extent*1.25,y_extent/1.5], 
+		        	linewidth=linewidth, color=color, zorder=12, linestyle='-')
+		x2 = Line2D([start,end],[y_extent/1.5,y_extent*1.25], 
+		        	linewidth=linewidth, color=color, zorder=12, linestyle='-')
+		lx = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent], 
+			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
+
+		if(headgroup == "circle"):
+			ax.add_line(l1)
+			ax.add_patch(c1)
+		elif(headgroup == "crosshair"):
+			ax.add_line(lx)
+			ax.add_line(x1)
+			ax.add_line(x2)
+		
 	if final_start > final_end:
 		return prev_end, final_start
 	else:
@@ -508,6 +559,155 @@ def sbol_spacer (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	ax.add_line(l1)
 	ax.add_line(l2)
 
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
+
+
+def sbol_origin (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	x_extent = 10.0
+	y_extent = 10.0
+	linestyle = '-'
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'y_scale' in opts.keys():
+			y_scale = opts['y_scale']
+	# Check direction add start padding
+	final_end = end
+	final_start = prev_end
+	
+	start = prev_end+start_pad
+	end = start+x_extent
+	final_end = end+end_pad
+	rbs_center = (start+((end-start)/2.0),0)
+	
+	c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
+		        facecolor=(1,1,1), zorder=12)
+	
+	ax.add_patch(c1)
+	
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
+
+def sbol_operator (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	x_extent = 3.0
+	y_extent = 3.0
+	linestyle = '-'
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'y_scale' in opts.keys():
+			y_scale = opts['y_scale']
+	# Check direction add start padding
+	final_end = end
+	final_start = prev_end
+
+	start = prev_end+start_pad
+	end = start+x_extent
+	final_end = end+end_pad
+	
+	#white rectangle overlays backbone line
+	p1 = Polygon([(start-x_extent, y_extent), 
+		          (start-x_extent, -y_extent),
+		          (start+x_extent, -y_extent),
+		          (start+x_extent, y_extent)],
+		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+
+	ax.add_patch(p1)
+	
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
+
+def sbol_insulator (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	x_extent = 3.0
+	y_extent = 3.0
+	linestyle = '-'
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'y_scale' in opts.keys():
+			y_scale = opts['y_scale']
+	# Check direction add start padding
+	final_end = end
+	final_start = prev_end
+
+	start = prev_end+start_pad
+	end = start+x_extent
+	final_end = end+end_pad
+	
+	#white rectangle overlays backbone line
+	p1 = Polygon([(start-x_extent, y_extent), 
+		          (start-x_extent, -y_extent),
+		          (start+x_extent, -y_extent),
+		          (start+x_extent, y_extent)],
+		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=12)		
+
+	p2 = Polygon([((start-x_extent)-x_extent/2,  y_extent+x_extent/2), 
+		          ((start-x_extent)-x_extent/2, -y_extent-x_extent/2),
+		          ((start+x_extent)+x_extent/2, -y_extent-x_extent/2),
+		          ((start+x_extent)+x_extent/2,  y_extent+x_extent/2)],
+		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+
+	ax.add_patch(p1)
+	ax.add_patch(p2)
+	
 	if final_start > final_end:
 		return prev_end, final_start
 	else:

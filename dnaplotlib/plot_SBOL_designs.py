@@ -112,9 +112,15 @@ def plot_dna (dna_designs, out_filename, plot_params):
 	                  'CDS'       :dpl.sbol_cds, 
                       'Terminator':dpl.sbol_terminator,
                       'RBS'       :dpl.sbol_rbs,
-                      'Ribozyme'  :dpl.sbol_ribozyme,
                       'Scar'	  :dpl.sbol_scar,
-                      'Spacer'	  :dpl.sbol_spacer}
+                      'Spacer'	  :dpl.sbol_spacer,
+                      'Ribozyme'          :dpl.sbol_ribozyme,
+                      'Ribonuclease'      :dpl.sbol_ribonuclease,
+                      'ProteinStability'  :dpl.sbol_protein_stability,
+                      'Protease'          :dpl.sbol_protease,
+                      'Operator'  :dpl.sbol_operator,
+                      'Origin'    :dpl.sbol_origin,
+                      'Insulator' :dpl.sbol_insulator}
 
     # Create the figure
 	fig = plt.figure(figsize=(plot_params['fig_x'],plot_params['fig_y']))

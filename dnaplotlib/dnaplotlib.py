@@ -355,7 +355,7 @@ def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 	end_pad = 2.0
 	x_extent = 5.0
 	y_extent = 10.0
-	linestyle = '-'
+	linestyle = '--'
 	# Reset defaults if provided
 	if opts != None:
 		if 'color' in opts.keys():

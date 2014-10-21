@@ -348,16 +348,6 @@ def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	else:
 		return prev_end, final_end
 
-def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
-	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
-def sbol_protein_stability (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
-	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)	
-def sbol_protease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
-	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
-def sbol_ribonuclease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
-	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
-
-#function for similar parts: ribozyme, protein_stability, protease, and ribonuclease parts
 def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
@@ -365,21 +355,22 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 	end_pad = 2.0
 	x_extent = 5.0
 	y_extent = 10.0
-
-	linestyle = "";
-	headgroup = "";
+	linestyle = '-'
+	
+	linetype  = "";
+	shapetype = "";
 	if(type == "Ribozyme"):
-		linestyle = '--'
-		headgroup = 'circle'
+		linetype = 'dash'
+		headgroup = 'O'
 	elif(type == "Protease"):
-		linestyle = '--'
-		headgroup = 'crosshair'
+		linetype = 'dash'
+		headgroup = 'X'
 	elif(type == "ProteinStability"):
-		linestyle = '-'
-		headgroup = 'circle'
+		linetype = 'full'
+		headgroup = 'O'
 	elif(type == "Ribonuclease"):
-		linestyle = '-'
-		headgroup = 'crosshair'		
+		linetype = 'full'
+		headgroup = 'X'
 
 	# Reset defaults if provided
 	if opts != None:
@@ -402,6 +393,7 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 	# Check direction add start padding
 	final_end = end
 	final_start = prev_end
+
 	if start > end:
 		start = prev_end+end_pad+x_extent
 		end = prev_end+end_pad
@@ -409,22 +401,36 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 		rbs_center = (end+((start-end)/2.0),-y_extent)
 		c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
 			        facecolor=(1,1,1), zorder=8)
-		l1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent+(x_extent/2.0)], 
-			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
 		x1 = Line2D([start,end],[-1*y_extent*1.25,-1*y_extent/1.5], 
 		        	linewidth=linewidth, color=color, zorder=12, linestyle='-')
 		x2 = Line2D([start,end],[-1*y_extent/1.5,-1*y_extent*1.25], 
-		        	linewidth=linewidth, color=color, zorder=12, linestyle='-')		
-		lx = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent], 
+		        	linewidth=linewidth, color=color, zorder=12, linestyle='-')
+
+		dash1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent/4], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
-		
-		if(headgroup == "circle"):
-			ax.add_line(l1)
+		dash2 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[-y_extent/2,-y_extent+(x_extent/2.0)], 
+			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
+		fullO = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent+(x_extent/2.0)], 
+			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
+		fullX = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent], 
+			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
+
+		if(headgroup == "O" and linetype == "dash"):
 			ax.add_patch(c1)
-		elif(headgroup == "crosshair"):
-			ax.add_line(lx)
+			ax.add_line(dash1)
+			ax.add_line(dash2)
+		elif(headgroup == "X" and linetype == "dash"):
 			ax.add_line(x1)
 			ax.add_line(x2)
+			ax.add_line(dash1)
+			ax.add_line(dash2)
+		elif(headgroup == "O" and linetype == "full"):
+			ax.add_patch(c1)
+			ax.add_line(fullO)
+		elif(headgroup == "X" and linetype == "full"):
+			ax.add_line(x1)
+			ax.add_line(x2)
+			ax.add_line(fullX)
 		
 	else:
 		start = prev_end+start_pad
@@ -433,27 +439,51 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 		rbs_center = (start+((end-start)/2.0),y_extent)
 		c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
 			        facecolor=(1,1,1), zorder=8)
-		l1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent-(x_extent/2.0)], 
-			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
 		x1 = Line2D([start,end],[y_extent*1.25,y_extent/1.5], 
 		        	linewidth=linewidth, color=color, zorder=12, linestyle='-')
 		x2 = Line2D([start,end],[y_extent/1.5,y_extent*1.25], 
 		        	linewidth=linewidth, color=color, zorder=12, linestyle='-')
-		lx = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent], 
+
+		dash1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent/4], 
+			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
+		dash2 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[y_extent/2,y_extent-(x_extent/2.0)], 
+			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
+		fullO = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent-(x_extent/2.0)], 
+			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
+		fullX = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
 
-		if(headgroup == "circle"):
-			ax.add_line(l1)
+		if(headgroup == 'O' and linetype == 'dash'):
 			ax.add_patch(c1)
-		elif(headgroup == "crosshair"):
-			ax.add_line(lx)
+			ax.add_line(dash1)
+			ax.add_line(dash2)
+		elif(headgroup == "X" and linetype == "dash"):
 			ax.add_line(x1)
 			ax.add_line(x2)
+			ax.add_line(dash1)
+			ax.add_line(dash2)
+		elif(headgroup == "O" and linetype == "full"):
+			ax.add_patch(c1)
+			ax.add_line(fullO)
+		elif(headgroup == "X" and linetype == "full"):
+			ax.add_line(x1)
+			ax.add_line(x2)
+			ax.add_line(fullX)
 		
 	if final_start > final_end:
 		return prev_end, final_start
 	else:
 		return prev_end, final_end
+
+def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)	
+def sbol_protein_stability (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)	
+def sbol_protease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
+def sbol_ribonuclease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
+
 
 def sbol_scar (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	# Default options
@@ -712,6 +742,67 @@ def sbol_insulator (ax, type, num, start, end, prev_end, y_scale, linewidth, opt
 		return prev_end, final_start
 	else:
 		return prev_end, final_end
+
+
+def temporary_repressor (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	# Default options
+	color = (1.0,0.0,0.0)
+	start_pad = 2.0
+	end_pad = 2.0
+	y_extent = 10
+	x_extent = 10
+	arrowhead_height = 2
+	arrowhead_length = 4
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'arrowhead_height' in opts.keys():
+			arrowhead_height = opts['arrowhead_height']
+		if 'arrowhead_length' in opts.keys():
+			arrowhead_length = opts['arrowhead_length']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'y_scale' in opts.keys():
+			y_scale = opts['y_scale']
+	# Check direction add start padding
+	dir_fac = 1.0
+	final_end = end
+	final_start = prev_end
+	if start > end:
+		dir_fac = -1.0
+		start = prev_end+end_pad+x_extent
+		end = prev_end+end_pad
+		final_end = start+start_pad
+	else:
+		start = prev_end+start_pad
+		end = start+x_extent
+		final_end = end+end_pad
+	
+	e1center = (start+((end-start)/2.0),0)
+	e2center = (start+((end-start)/2.0)+x_extent/3.75,0)
+
+	e1 = Ellipse(e1center, y_extent/2, y_extent, edgecolor=(0,0,0), facecolor=color, 
+				linewidth=linewidth, fill=True, zorder=12)
+	e2 = Ellipse(e2center, y_extent/2, y_extent, edgecolor=(0,0,0), facecolor=color, 
+				linewidth=linewidth, fill=True, zorder=11)
+
+	ax.add_patch(e1)
+	ax.add_patch(e2)
+
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
+
 
 ###############################################################################
 # Trace Icon Renderers (icon width corrisponds to trace data)

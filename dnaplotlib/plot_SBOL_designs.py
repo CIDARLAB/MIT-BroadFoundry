@@ -120,7 +120,8 @@ def plot_dna (dna_designs, out_filename, plot_params):
                       'Protease'          :dpl.sbol_protease,
                       'Operator'  :dpl.sbol_operator,
                       'Origin'    :dpl.sbol_origin,
-                      'Insulator' :dpl.sbol_insulator}
+                      'Insulator' :dpl.sbol_insulator,
+                      'Repressor' :dpl.temporary_repressor}
 
     # Create the figure
 	fig = plt.figure(figsize=(plot_params['fig_x'],plot_params['fig_y']))
@@ -146,7 +147,7 @@ def plot_dna (dna_designs, out_filename, plot_params):
 		# Set bounds
 		ax.set_xlim([(-0.01*max_dna_len)-left_pad,
 			        max_dna_len+(0.01*max_dna_len)+right_pad])
-		ax.set_ylim([-15,15])
+		ax.set_ylim([-55,55])
 		ax.set_aspect('equal')
 		ax.set_axis_off()
 	# Save the figure

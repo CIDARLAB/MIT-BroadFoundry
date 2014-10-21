@@ -18,7 +18,7 @@
 \begin{abstract}
 
 \section{Summary:}
-dnaplotlib is a computational toolkit that enables highly customizable visualization of individual genetic constructs and libraries of design variants. Publication quality vector-based output is produced and all aspects of the rendering process can be easily customized or replaced by the user. dnaplotlib is capable of SBOL Visual compliant diagrams in addition to a format able to better illustrate the precise location and length of each genetic part. This alternative visualization method enables direct comparison with nucleotide-level information such as RNA-seq read depths. While it is envisaged that access will be predominantly via the programming interface, a web-based front-end is also provided to facilitate broader usage.
+dnaplotlib is a computational toolkit that enables highly customizable visualization of individual genetic constructs and libraries of design variants. Publication quality vector-based output is produced and all aspects of the rendering process can be easily customized or replaced by the user. dnaplotlib is capable of SBOL Visual compliant diagrams in addition to a format able to better illustrate the precise location and length of each genetic part. This alternative visualization method enables direct comparison with nucleotide-level information such as RNA-seq read depth. While it is envisaged that access will be predominantly via the programming interface, a web-based front-end is also provided to facilitate broader usage.
 
 \section{Availability:}
 dnaplotlib is cross-platform and open-source software developed using Python and released under the OSI recognised NPOSL-3.0 licence. Source code, documentation and a web front-end are available at the project website: \href{http://www.dnaplotlib.org}{http://www.dnaplotlib.org}.
@@ -28,13 +28,24 @@ dnaplotlib is cross-platform and open-source software developed using Python and
 
 1 (1 para). Introduction to the need for standardized visualization of genetic designs. Sell the approach.
 
+To date limited attempts have been made to aid in the visualisation of conceptual genetic designs \citep{Bhatia13a} and although many DNA design tools offer the ability to . Firstly, output is generally 
+The biggest limitation of these approaches so far though is an inability to integrate with existing scientific computing visualisation and analysis tools. This is essential as 
+
+
+
 2 (1 para). Existing tools that are available and the current difficulties in using them, e.g., PigeonCAD \citep{Bhatia13a}. Why is it needed... difficulty with library designs \citep{Smanski14a}.
 
 3 (3 para). What dnaplotlib is: Python-based, uses matplotlib \citep{Hunter07a}, generates publication quality vector-based output. Highly customizable at all stages of the rendering process. Enables both single and libraries to be easily visualized. Describe the rendering pipeline (should tie into figure), and multiple types of output available.
 
-4 (1 para). Web-based interface. What does this include, what it doesn't. Why did we make it.
+% 4 (1 para). Web-based interface. What does this include, what it doesn't. Why did we make it.
 
-5 (1 para). Broader view. How is this toolkit going to help the community. Broader use of SBOL-compliant figures? Easier communication of ideas. Still able to have a lab ``style'' to differentiate your work and emphasize aspects in unique ways.
+To ensure broadest application of the library, including those not , access to 
+
+% 5 (1 para). Broader view. How is this toolkit going to help the community. Broader use of SBOL-compliant figures? Easier communication of ideas. Still able to have a lab ``style'' to differentiate your work and emphasize aspects in unique ways.
+
+As synthetic biology moves towards automated design workflows and harnesses the potential to construct huge libraries of design variants \citep{Smanski14a}, supporting visualisation tools will become important for clear communication of aspects of these designs.
+
+
 
 \begin{figure*}[t]
 \centering

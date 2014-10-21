@@ -5,7 +5,7 @@
 \begin{document}
 \firstpage{1}
 
-\title[dnaplotlib]{dnaplotlib: a computational toolkit for the visualization of genetic constructs, libraries and associated data}
+\title[dnaplotlib]{dnaplotlib: visualization of genetic constructs, libraries and associated data}
 \author[Thomas E. Gorochowski \textit{et~al.}]{Thomas~E.~Gorochowski$^{1}$, Emerson~Glassey$^{1}$, Bryan~Der$^{1}$, D. Benjamin Gordon$^{1}$ and Christopher~A.~Voigt$^{1,}$\footnote{to whom correspondence should be addressed}}
 \address{$^{1}$Department of Biological Engineering, Synthetic Biology Center, Massachusetts Institute of Technology, USA.}
 
@@ -26,32 +26,44 @@ dnaplotlib is cross-platform and open-source software developed using Python and
 \section{Contact:} \href{cavoigt@gmail.com}{cavoigt@gmail.com}
 \end{abstract}
 
-1 (1 para). Introduction to the need for standardized visualization of genetic designs. Sell the approach.
+% 1. (1 para). Introduction to the need for standardized visualization of genetic designs. Sell the approach.
 
-To date limited attempts have been made to aid in the visualisation of conceptual genetic designs \citep{Bhatia13a} and although many DNA design tools offer the ability to . Firstly, output is generally 
-The biggest limitation of these approaches so far though is an inability to integrate with existing scientific computing visualisation and analysis tools. This is essential as 
-
-
-
-2 (1 para). Existing tools that are available and the current difficulties in using them, e.g., PigeonCAD \citep{Bhatia13a}. Why is it needed... difficulty with library designs \citep{Smanski14a}.
-
-3 (3 para). What dnaplotlib is: Python-based, uses matplotlib \citep{Hunter07a}, generates publication quality vector-based output. Highly customizable at all stages of the rendering process. Enables both single and libraries to be easily visualized. Describe the rendering pipeline (should tie into figure), and multiple types of output available.
-
-% 4 (1 para). Web-based interface. What does this include, what it doesn't. Why did we make it.
-
-To ensure broadest application of the library, including those not , access to 
-
-% 5 (1 para). Broader view. How is this toolkit going to help the community. Broader use of SBOL-compliant figures? Easier communication of ideas. Still able to have a lab ``style'' to differentiate your work and emphasize aspects in unique ways.
-
-As synthetic biology moves towards automated design workflows and harnesses the potential to construct huge libraries of design variants \citep{Smanski14a}, supporting visualisation tools will become important for clear communication of aspects of these designs.
+Attempts have been made to visualize conceptual genetic designs 
+To date limited attempts have been made to aid in the visualization of conceptual genetic designs \citep{Bhatia13a} and although many DNA design tools offer the ability to . Firstly, output is generally 
+The biggest limitation of these approaches so far though is an inability to integrate with existing scientific computing visualization and analysis tools. This is essential as 
 
 
+
+% 2. (1 para). Existing tools that are available and the current difficulties in using them, e.g., PigeonCAD \citep{Bhatia13a}. Why is it needed... difficulty with library designs \citep{Smanski14a,Bilitchenko11a}.
+
+
+
+
+% 3. (3 para). What dnaplotlib is: Python-based, uses matplotlib \citep{Hunter07a}, generates publication quality vector-based output. Highly customizable at all stages of the rendering process. Enables both single and libraries to be easily visualized. Describe the rendering pipeline (should tie into figure), and multiple types of output available.
+
+To address these needs, dnaplotlib has been built using the Python-based 2D graphics library matplotlib \citep{Hunter07a}. This enables portable output in the form of vector based PDFs or rasterised PNG or JPEG images. Python was chosen due to its increasing use for the analysis of biological systems with increasing use of toolkits such as BioPython \citep{Cock09a}, and it being a highly flexible language in which to .
+
+A key consideration in the design of dnaplotlib was ensuring all aspects of the rendering process could be customized to users requirements. As fields such as synthetic biology are still evolving, the the precise way in which such tools will be used and the discovery of new types of genetic part that need to be included, but may not yet have a standardized representation. Enabling custom elements to be easily added and refined over time will ensure such elements are captured and also contribute to the standardization process. 
+
+To generate a 
+
+In addition to direct library access through Python analysis scripts, we also provide two scripts to enable input in the form of text files
+
+% 4. (1 para). Web-based interface. What does this include, what it doesn't. Why did we make it.
+
+To ensure broadest application of these tools that included use by non-programmers, we also developed a web-based interface that allows text files describing part styles and DNA designs to be uploaded and processed. These files uploaded to the server, processed by the scripts described previously, and generated images are returned to the user. This ensures broadest use of the library and ensures that members across a lab can share the same styling of diagrams to ensure clear communication of their designs.
+
+% 5. (1 para). Broader view. How is this toolkit going to help the community. Broader use of SBOL-compliant figures? Easier communication of ideas. Still able to have a lab ``style'' to differentiate your work and emphasize aspects in unique ways.
+
+As synthetic biology moves closer to automated design workflows and harnesses the potential to construct huge libraries of design variants \citep{Smanski14a,Bilitchenko11a}, supporting visualization tools will become important to ensure clear communication of these designs. The SBOL Visual initiative was started to aid in the definition of agreed pictorial representation of genetic elements across the field \citep{Quinn13a}, but so far there has been limited uptake due to a lack a tools available that can be easily integrated into existing analysis processes. dnaplotlib fills this gap by providing a computational toolkit that both adheres to this standard while also enabling highly customizable visualizations that are most appropriate for the specific needs of the laboratory. It is hoped that by providing researchers this flexibility they will be more willing to apply such standards to their work, improving general uptake of SBOL Visual across the field.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{Figure1.pdf}
 \caption{\label{fig:overview}Overview of dnaplotlib library and tools. (a) What can it produce, types of figure. (b) Potential usage of dnaplotlib (inputs, outputs). How it actually works.}
 \end{figure*}
+
+% 6. (1 para). Future directions (general point on where it is available and contributions)
 
 dnaplotlib is under continual development with a current focus on broadening the types of genetic element covered to include new areas of synthetic biology research, e.g., siRNAs. The project welcomes contributions from others within the community through the project website and public development repository at: \href{http://www.dnaplotlib.org}{http://www.dnaplotlib.org}.
 
@@ -66,7 +78,15 @@ T.E.G. was supported by TO DO. E.G. was supported by TO DO. B.D. was supported b
 
 \bibitem[Hunter, 2007]{Hunter07a} Hunter, J.D. (2007). Matplotlib: A 2D graphics environment, {\it Computing in Science \& Engineering}, {\bf 9}, 90-95.
 
+\bibitem[Cock {\it et~al}., 2009]{Cock09a} 
+Cock PJ, Antao T, Chang JT, Chapman BA, Cox CJ, Dalke A, Friedberg I, Hamelryck T, Kauff F, Wilczynski B, and de Hoon MJ. (2009) Biopython: freely available Python tools for computational molecular biology and bioinformatics. {\it Bioinformatics}, {\bf 25}, 1422-1422.
 
+
+\bibitem[Bilitchenko {\it et~al}., 2011]{Bilitchenko11a} 
+Bilitchenko, L., Liu, A., Cheung, S., Weeding, E., Xia, B., Leguia, M., Anderson, J.C., Densmore, D. (2011) Eugene – A Domain Specific Language for Specifying and Constraining Synthetic Biological Parts, Devices, and Systems. {\it PLoS ONE}, {\bf 6}, e18882.
+
+\bibitem[Quinn {\it et~al}., 2013]{Quinn13a} 
+Quinn, J., Beal, J., Bhatia, S., Cai, P., Chen, J., Clancy, K., Hillson, N., Galdzicki, M., Maheshwari, A.P., Umesh; P., Matthew; R.C.; Stan, G.-B., Endy, D. (2013) ``Synthetic Biology Open Language Visual (SBOL Visual), version 1.0.0.''
 
 
 \end{thebibliography}

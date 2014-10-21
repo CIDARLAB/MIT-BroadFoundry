@@ -66,6 +66,7 @@ class DNARenderer:
 			- regs: list of regulations on the DNA
 			- reg_renderers: dict of standard regulation renderers
 		"""
+
 		# Plot the parts to the axis
 		part_num = 0
 		prev_end = 0
@@ -86,6 +87,11 @@ class DNARenderer:
 						             part['start'], part['end'], prev_end,
 						             self.y_scale, self.linewidth, 
 						             opts=part_opts)
+
+					#update start,end for regulation
+					part['start'] = prev_start
+					part['end'] = prev_end
+
 					if first_part == True:
 						first_start = prev_start
 						first_part = False
@@ -97,35 +103,36 @@ class DNARenderer:
 							           part['start'], part['end'], 
 							           prev_end, self.y_scale, 
 							           self.linewidth, opts=part_opts)
+						
+						#update start,end for regulation
+						part['start'] = prev_start
+						part['end'] = prev_end
+						
 						if first_part == True:
 							first_start = prev_start
 							first_part = False
 			part_num += 1
 		# Plot the regulatory links on the axis
-		if regs != None and False:
+		if regs != None:
+			#return first_start, prev_end
+
 			reg_num = 0
 			for reg in regs:
 				keys = reg.keys()
+
 				# Check the part has minimal details required
-				if 'type' in keys and 'start' in keys and 'end' in keys:
+				if 'type' in keys and 'start_part' in keys and 'end_part' in keys:
 					# Extract custom part options (if available)
+
 					reg_opts = None
 					if 'opts' in reg.keys():
 						reg_opts = reg['opts']
-					# Use the correct renderer
-					if 'renderer' in part.keys():
-						# Use custom renderer
-						reg['renderer'](ax, reg['type'], reg_num, 
-							            reg['start'], reg['end'], 
-							            self.y_scale, self.linewidth,
-							            opts=reg_opts)
-					else:
-						# Use standard renderer, if one exists
-						if reg['type'] in reg_renderers.keys():
-							reg_renderers[reg['type']](ax, reg['type'], 
-								           reg_num, reg['start'], 
-								           reg['end'], self.y_scale, 
-								           self.linewidth, opts=reg_opts)
+					
+					if reg['type'] in reg_renderers.keys():
+						reg_renderers[reg['type']](ax, reg['type'], 
+							           reg_num, reg['start_part'], 
+							           reg['end_part'], self.y_scale, 
+							           self.linewidth, opts=reg_opts)
 				reg_num += 1
 		# Plot the backbone (z=1)
 		l1 = Line2D([first_start-self.backbone_pad_left,prev_end+self.backbone_pad_right],[0,0], 
@@ -809,6 +816,36 @@ def temporary_repressor (ax, type, num, start, end, prev_end, y_scale, linewidth
 		return prev_end, final_start
 	else:
 		return prev_end, final_end
+
+###############################################################################
+# Regulation renderers
+###############################################################################
+
+def repress (ax, type, num, start_part, end_part, y_scale, linewidth, opts):
+
+	print start_part['start'],start_part['end']
+	print end_part['start'],end_part['end']
+
+	start = (start_part['start'] + start_part['end']) / 2
+	end   = (end_part['start']   + end_part['end']) / 2
+
+	line_away   = Line2D([start,start],[0,2], 
+		        linewidth=linewidth, color=(0,0,0), zorder=12, linestyle='-')
+	line_across = Line2D([start,end],[2,2], 
+		        linewidth=linewidth, color=(0,0,0), zorder=12, linestyle='-')
+	line_toward = Line2D([end,end],[2,0], 
+		        linewidth=linewidth, color=(0,0,0), zorder=12, linestyle='-')
+	ax.add_line(line_away)
+	ax.add_line(line_across)
+	ax.add_line(line_toward)
+
+def induce (ax, type, num, start, end, y_scale, linewidth, opts):
+	print 'call induce renderer'
+
+#reg_renderers[reg['type']](ax, reg['type'], 
+#								           reg_num, reg['start'], 
+#								           reg['end'], self.y_scale, 
+#								           self.linewidth, opts=reg_opts)
 
 
 ###############################################################################

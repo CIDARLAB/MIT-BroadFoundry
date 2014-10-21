@@ -106,7 +106,7 @@ def load_dna_designs (filename, part_info):
 
 
 def load_regulatory_information (filename, part_info, dna_designs):
-	reg_info = {}
+	regs_info = {}
 	reg_reader = csv.reader(open(filename, 'rU'), delimiter=',')
 	# Ignore header
 	header = next(reg_reader)
@@ -119,7 +119,6 @@ def load_regulatory_information (filename, part_info, dna_designs):
 	for row in reg_reader:
 		row_index += 1
 		reg_map = {}
-
 		type = row[header_map['type']]
 		from_partname = row[header_map['from_partname']]
 		to_partname   = row[header_map['to_partname']]
@@ -128,27 +127,37 @@ def load_regulatory_information (filename, part_info, dna_designs):
 		num_of_designs = len(design_list)
 		for i in range(num_of_designs):
 			design =  dna_designs[design_list[i]]
-			regstart = None;
-			regend = None;
+			reg_info = {}
+			#regstart = None;
+			#regend = None;
+			start_part = None;
+			end_part = None;
 			for part1 in design: #loop through once to find the cds
 				if(part1['name'] == from_partname):
-					regstart = part1['start']
+					#regstart = part1['start']
+					start_part = part1
 					for part2 in design: #loop through again to find the promoter
 						if(part2['name'] == to_partname):
-							regend = part2['end']
-							print 'found regulation', part1['name'], regstart, part2['name'], regend, row[header_map['type']]
-							reg_map['type'] = row[header_map['type']]
-							reg_map['start'] = regstart
-							reg_map['end'] = regend
-							reg_info[row_index] = reg_map
+							#regend = part2['end']
+							end_part = part2
 
-	for reg_index in reg_info:
-		print reg_info[reg_index]
+							#print 'found regulation', part1['name'], regstart, part2['name'], regend, row[header_map['type']]
+							#reg_map['type'] = row[header_map['type']]
+							#reg_map['start'] = regstart
+							#reg_map['end'] = regend
+							#reg_info[row_index] = reg_map
+							reg_info['type'] = row[header_map['type']]
+							reg_info['start_part'] = start_part
+							reg_info['end_part'] = end_part
+			regs_info[i] = [reg_info];
 
-	return reg_info
+	#for reg_index in regs_info:
+		#print regs_info[reg_index]
+
+	return regs_info
 
 
-def plot_dna (dna_designs, out_filename, plot_params, regulations):
+def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	# Create the renderer
 	left_pad = 0.0
 	right_pad = 0.0
@@ -159,6 +168,10 @@ def plot_dna (dna_designs, out_filename, plot_params, regulations):
 	dr = dpl.DNARenderer(y_scale=plot_params['y_scale'], linewidth=plot_params['linewidth'],
 		                 backbone_pad_left=left_pad, 
 		                 backbone_pad_right=right_pad)
+
+	reg_renderers = {'rep'  :dpl.repress, 
+	                 'ind'  :dpl.induce}
+
 	# We default to the SBOL part renderers
 	part_renderers = {'Promoter'  :dpl.sbol_promoter, 
 	                  'CDS'       :dpl.sbol_cds, 
@@ -174,21 +187,33 @@ def plot_dna (dna_designs, out_filename, plot_params, regulations):
                       'Origin'    :dpl.sbol_origin,
                       'Insulator' :dpl.sbol_insulator,
                       'Repressor' :dpl.temporary_repressor}
-
+    
+    
+    
+    
     # Create the figure
 	fig = plt.figure(figsize=(plot_params['fig_x'],plot_params['fig_y']))
 	# Cycle through the designs an plot on individual axes
+
 	design_list = sorted(dna_designs.keys())
+	regs_list   = sorted(regs_info.keys())
 	num_of_designs = len(design_list)
+	#print len(design_list),len(regs_list)
 	ax_list = []
 	max_dna_len = 0.0
 	for i in range(num_of_designs):
 		# Create axis for the design and plot
+		regs   =  regs_info[regs_list[i]]
+		#print 'printing regs',regs
+
 		design =  dna_designs[design_list[i]]
+		#print 'printing parts',design
+
 		ax = fig.add_subplot(num_of_designs,1,i+1)
 		if 'show_title' in plot_params.keys() and plot_params['show_title'] == 'Y':
 			ax.set_title(design_list[i], fontsize=8)
-		start, end = dr.renderDNA(ax, design, part_renderers, regulations)
+		start, end = dr.renderDNA(ax, design, part_renderers, regs, reg_renderers)
+
 		dna_len = end-start
 		if max_dna_len < dna_len:
 			max_dna_len = dna_len
@@ -263,12 +288,11 @@ def main():
 
 	dna_designs = load_dna_designs (args.designs.name, part_info)
 	
-	reg_info = None
+	regs_info = None
 	if(args.regulation):
-		reg_info = load_regulatory_information(args.regulation.name, part_info, dna_designs)
-		print reg_info
+		regs_info = load_regulatory_information(args.regulation.name, part_info, dna_designs)
 
-	plot_dna(dna_designs, args.output_pdf, plot_params, reg_info)
+	plot_dna(dna_designs, args.output_pdf, plot_params, regs_info)
 
 
 

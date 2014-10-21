@@ -354,6 +354,16 @@ def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	else:
 		return prev_end, final_end
 
+
+def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)	
+def sbol_protein_stability (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)	
+def sbol_protease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
+def sbol_ribonuclease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
+	
 def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
@@ -480,15 +490,6 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 		return prev_end, final_start
 	else:
 		return prev_end, final_end
-
-def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
-	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)	
-def sbol_protein_stability (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
-	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)	
-def sbol_protease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
-	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
-def sbol_ribonuclease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
-	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
 
 
 def sbol_scar (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):

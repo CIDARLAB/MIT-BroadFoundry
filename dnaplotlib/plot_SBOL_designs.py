@@ -20,6 +20,8 @@ import getopt
 import csv
 import dnaplotlib as dpl
 import matplotlib.pyplot as plt
+from argparse import ArgumentParser
+import os.path
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
                Bryan Der <bder@mit.edu>, Voigt Lab, MIT'
@@ -158,24 +160,59 @@ def plot_dna (dna_designs, out_filename, plot_params):
 	# Clear the plotting cache
 	plt.close('all')
 
+
+
+def is_valid_file(parser, arg):
+    if not os.path.exists(arg):
+        parser.error("The file %s does not exist!" % arg)
+    else:
+        return open(arg, 'r')  # return an open file handle
+
+
 def main():
-	# parse command line options
-	try:
-		opts, args = getopt.getopt(sys.argv[1:], "h", ["help"])
-	except getopt.error, msg:
-		print msg
-		print "for help use --help"
-		sys.exit(2)
-	# process options
-	for o, a in opts:
-		if o in ("-h", "--help"):
-			print __doc__
-			sys.exit(0)
+	## parse command line options
+	#try:
+	#	opts, args = getopt.getopt(sys.argv[1:], "h", ["help"])
+	#except getopt.error, msg:
+	#	print msg
+	#	print "for help use --help"
+	#	sys.exit(2)
+	## process options
+	#for o, a in opts:
+	#	if o in ("-h", "--help"):
+	#		print __doc__
+	#		sys.exit(0)
+	
+	parser = ArgumentParser(description="file paths as arguments")
+	parser.add_argument("-params", dest="params", required=True,
+					help="plot_params.csv", metavar="FILE",
+                    type=lambda x: is_valid_file(parser, x))
+	parser.add_argument("-parts", dest="parts", required=True,
+					help="parts_information.csv", metavar="FILE",
+                    type=lambda x: is_valid_file(parser, x))
+	parser.add_argument("-regulation", dest="regulation", required=False,
+					help="reg_information.csv", metavar="FILE",
+                    type=lambda x: is_valid_file(parser, x))
+	parser.add_argument("-designs", dest="designs", required=True,
+					help="dna_designs.csv", metavar="FILE",
+                    type=lambda x: is_valid_file(parser, x))
+	parser.add_argument("-output", dest="output_pdf", required=True,
+					help="output pdf filename")
+
+	args = parser.parse_args()
+
+	#print args.params.name
+	#print args.parts.name
+	#if(args.regulation):
+	#	print args.regulation.name
+	#print args.designs.name
+	#print args.output_pdf
+
 	# process arguments
-	plot_params = load_plot_parameters(args[0])
-	part_info = load_part_information(args[1])
-	dna_designs = load_dna_designs (args[2], part_info)
-	plot_dna(dna_designs, args[3], plot_params)
+	plot_params = load_plot_parameters(args.params.name)
+	part_info = load_part_information(args.parts.name)
+	dna_designs = load_dna_designs (args.designs.name, part_info)
+	plot_dna(dna_designs, args.output_pdf, plot_params)
 
 if __name__ == "__main__":
  	main()

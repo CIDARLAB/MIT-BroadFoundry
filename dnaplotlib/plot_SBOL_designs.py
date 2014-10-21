@@ -35,6 +35,19 @@ def make_float_if_needed (s):
 	except ValueError:
 		return s
 
+
+def load_plot_parameters (filename):
+	plot_params = {}
+	param_reader = csv.reader(open(filename, 'rU'), delimiter=',')
+	# Ignore header
+	header = next(param_reader)
+	# Process all parameters
+	for row in param_reader:
+		if len(row) >= 2:
+			plot_params[row[0]] = make_float_if_needed(row[1])
+	return plot_params
+
+
 def load_part_information (filename):
 	part_info = {}
 	parts_reader = csv.reader(open(filename, 'rU'), delimiter=',')
@@ -54,43 +67,9 @@ def load_part_information (filename):
 					part_attribs_map[k] = make_float_if_needed(row[header_map[k]])
 		part_name = row[header_map['part_name']]
 		part_type = row[header_map['type']]
-		part_info[part_name] = [part_type, part_attribs_map]
+		part_info[part_name] = [part_name, part_type, part_attribs_map]
 	return part_info
 
-def load_regulatory_information (filename):
-	reg_info = {}
-	reg_reader = csv.reader(open(filename, 'rU'), delimiter=',')
-	# Ignore header
-	header = next(reg_reader)
-	header_map = {}
-	for i in range(len(header)):
-		header_map[header[i]] = i
-	attrib_keys = [k for k in header_map.keys()]
-	row_index = 0;
-	for row in reg_reader:
-		row_index += 1
-		# Make the attributes map
-		reg_map = {}
-		for k in attrib_keys:
-			if row[header_map[k]] != '':
-				reg_map[k] = row[header_map[k]]
-
-		if(reg_map['type'] == 'rep' or reg_map['type'] == 'ind'):
-			reg_info[row_index] = [reg_map]
-
-	return reg_info
-
-
-def load_plot_parameters (filename):
-	plot_params = {}
-	param_reader = csv.reader(open(filename, 'rU'), delimiter=',')
-	# Ignore header
-	header = next(param_reader)
-	# Process all parameters
-	for row in param_reader:
-		if len(row) >= 2:
-			plot_params[row[0]] = make_float_if_needed(row[1])
-	return plot_params
 
 def load_dna_designs (filename, part_info):
 	dna_designs = {}
@@ -112,19 +91,64 @@ def load_dna_designs (filename, part_info):
 					# Store the design
 					part_design = {}
 					cur_part_info = part_info[part_name]
-					part_design['type'] = cur_part_info[0]
+					part_design['name'] = part_name #needed to add part name for regulation
+					part_design['type'] = cur_part_info[1]
 					if fwd == True:
 						part_design['start'] = i
 						part_design['end'] = i+1
 					else:
 						part_design['end'] = i
 						part_design['start'] = i+1
-					part_design['opts'] = cur_part_info[1]
+					part_design['opts'] = cur_part_info[2]
 					part_list.append(part_design)
 			dna_designs[row[0]] = part_list
 	return dna_designs
 
-def plot_dna (dna_designs, out_filename, plot_params):
+
+def load_regulatory_information (filename, part_info, dna_designs):
+	reg_info = {}
+	reg_reader = csv.reader(open(filename, 'rU'), delimiter=',')
+	# Ignore header
+	header = next(reg_reader)
+	header_map = {}
+	for i in range(len(header)):
+		header_map[header[i]] = i
+	attrib_keys = [k for k in header_map.keys()]
+	
+	row_index = 0
+	for row in reg_reader:
+		row_index += 1
+		reg_map = {}
+
+		type = row[header_map['type']]
+		from_partname = row[header_map['from_partname']]
+		to_partname   = row[header_map['to_partname']]
+
+		design_list = sorted(dna_designs.keys())
+		num_of_designs = len(design_list)
+		for i in range(num_of_designs):
+			design =  dna_designs[design_list[i]]
+			regstart = None;
+			regend = None;
+			for part1 in design: #loop through once to find the cds
+				if(part1['name'] == from_partname):
+					regstart = part1['start']
+					for part2 in design: #loop through again to find the promoter
+						if(part2['name'] == to_partname):
+							regend = part2['end']
+							print 'found regulation', part1['name'], regstart, part2['name'], regend, row[header_map['type']]
+							reg_map['type'] = row[header_map['type']]
+							reg_map['start'] = regstart
+							reg_map['end'] = regend
+							reg_info[row_index] = reg_map
+
+	for reg_index in reg_info:
+		print reg_info[reg_index]
+
+	return reg_info
+
+
+def plot_dna (dna_designs, out_filename, plot_params, regulations):
 	# Create the renderer
 	left_pad = 0.0
 	right_pad = 0.0
@@ -164,7 +188,7 @@ def plot_dna (dna_designs, out_filename, plot_params):
 		ax = fig.add_subplot(num_of_designs,1,i+1)
 		if 'show_title' in plot_params.keys() and plot_params['show_title'] == 'Y':
 			ax.set_title(design_list[i], fontsize=8)
-		start, end = dr.renderDNA(ax, design, part_renderers)
+		start, end = dr.renderDNA(ax, design, part_renderers, regulations)
 		dna_len = end-start
 		if max_dna_len < dna_len:
 			max_dna_len = dna_len
@@ -237,13 +261,14 @@ def main():
 	
 	part_info = load_part_information(args.parts.name)
 
-	if(args.regulation):
-		reg_info = load_regulatory_information(args.regulation.name)
-		print reg_info
-
 	dna_designs = load_dna_designs (args.designs.name, part_info)
 	
-	plot_dna(dna_designs, args.output_pdf, plot_params)
+	reg_info = None
+	if(args.regulation):
+		reg_info = load_regulatory_information(args.regulation.name, part_info, dna_designs)
+		print reg_info
+
+	plot_dna(dna_designs, args.output_pdf, plot_params, reg_info)
 
 
 

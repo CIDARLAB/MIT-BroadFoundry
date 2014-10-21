@@ -102,7 +102,7 @@ class DNARenderer:
 							first_part = False
 			part_num += 1
 		# Plot the regulatory links on the axis
-		if regs != None:
+		if regs != None and False:
 			reg_num = 0
 			for reg in regs:
 				keys = reg.keys()
@@ -363,7 +363,7 @@ def sbol_protease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
 def sbol_ribonuclease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
-	
+
 def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)

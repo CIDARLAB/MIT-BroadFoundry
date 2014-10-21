@@ -11,6 +11,7 @@
 #    Plot SBOL Designs
 #    Copyright (C) 2014 by
 #    Thomas E. Gorochowski <tom@chofski.co.uk>
+#    Bryan Der <bder@mit.edu>
 #    All rights reserved.
 #    OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
 
@@ -20,7 +21,8 @@ import csv
 import dnaplotlib as dpl
 import matplotlib.pyplot as plt
 
-__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
+__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
+               Bryan Der <bder@mit.edu>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
 

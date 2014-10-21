@@ -33,12 +33,18 @@ class DNARenderer:
 
 	# Standard part types
 	STD_PART_TYPES = ['Promoter',
-	                  'RBS',
 	                  'CDS',
-	                  'Terminator',
-	                  'Scar',
-	                  'Spacer',
-	                  'Ribozyme']
+                      'Terminator',
+                      'RBS',
+                      'Scar',
+                      'Spacer',
+                      'Ribozyme',
+                      'Ribonuclease',
+                      'ProteinStability',
+                      'Protease',
+                      'Operator',
+                      'Origin',
+                      'Insulator']
 
 	# Standard regulatory types
 	STD_REG_TYPES = ['Repression',

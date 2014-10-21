@@ -57,6 +57,30 @@ def load_part_information (filename):
 		part_info[part_name] = [part_type, part_attribs_map]
 	return part_info
 
+def load_regulatory_information (filename):
+	reg_info = {}
+	reg_reader = csv.reader(open(filename, 'rU'), delimiter=',')
+	# Ignore header
+	header = next(reg_reader)
+	header_map = {}
+	for i in range(len(header)):
+		header_map[header[i]] = i
+	attrib_keys = [k for k in header_map.keys()]
+	row_index = 0;
+	for row in reg_reader:
+		row_index += 1
+		# Make the attributes map
+		reg_map = {}
+		for k in attrib_keys:
+			if row[header_map[k]] != '':
+				reg_map[k] = row[header_map[k]]
+
+		if(reg_map['type'] == 'rep' or reg_map['type'] == 'ind'):
+			reg_info[row_index] = [reg_map]
+
+	return reg_info
+
+
 def load_plot_parameters (filename):
 	plot_params = {}
 	param_reader = csv.reader(open(filename, 'rU'), delimiter=',')
@@ -210,9 +234,18 @@ def main():
 
 	# process arguments
 	plot_params = load_plot_parameters(args.params.name)
+	
 	part_info = load_part_information(args.parts.name)
+
+	if(args.regulation):
+		reg_info = load_regulatory_information(args.regulation.name)
+		print reg_info
+
 	dna_designs = load_dna_designs (args.designs.name, part_info)
+	
 	plot_dna(dna_designs, args.output_pdf, plot_params)
+
+
 
 if __name__ == "__main__":
  	main()

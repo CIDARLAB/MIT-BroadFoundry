@@ -93,6 +93,7 @@ def load_dna_designs (filename, part_info):
 					cur_part_info = part_info[part_name]
 					part_design['name'] = part_name #needed to add part name for regulation
 					part_design['type'] = cur_part_info[1]
+					part_design['fwd'] = fwd
 					if fwd == True:
 						part_design['start'] = i
 						part_design['end'] = i+1
@@ -116,6 +117,7 @@ def load_regulatory_information (filename, part_info, dna_designs):
 		header_map[header[i]] = i
 	attrib_keys = [k for k in header_map.keys() if k not in ['from_partname', 'type', 'to_partname']]
 	
+	#reg_reader can only be read once?
 	rows = []
 	for row in reg_reader:
 		rows.append(row)
@@ -130,7 +132,7 @@ def load_regulatory_information (filename, part_info, dna_designs):
 
 		#middle loop: for each regulation
 		for row in rows:
-			print i,row
+			#print i,row
 			
 			#opts
 			reg_attribs_map = {}

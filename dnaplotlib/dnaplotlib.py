@@ -22,6 +22,7 @@ dnaplotlib
 from matplotlib.patches import Polygon, Ellipse, Wedge, Circle
 from matplotlib.lines   import Line2D
 from math import sqrt
+from math import fabs
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
                Emerson Glassey <eglassey@mit.edu>, Voigt Lab, MIT\n\
@@ -829,6 +830,12 @@ def temporary_repressor (ax, type, num, start, end, prev_end, y_scale, linewidth
 arcHeight = 20
 
 def repress (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
+	regulation(ax, type, num, from_part, to_part, y_scale, linewidth, opts)
+
+def induce (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
+	regulation(ax, type, num, from_part, to_part, y_scale, linewidth, opts)
+
+def regulation (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
 
 	color = (0.0,0.0,0.0)
 	arrowhead_length = 4
@@ -837,7 +844,7 @@ def repress (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
 	global arcHeight
 	arcHeight += 5
 	startHeight = 10
-
+	
 	# Reset defaults if provided
 	if opts != None:
 		if 'arrowhead_length' in opts.keys():
@@ -852,22 +859,41 @@ def repress (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
 	start = (from_part['start'] + from_part['end']) / 2
 	end   = (to_part['start']   + to_part['end']) / 2
 
-	line_away   = Line2D([start,start],[startHeight/1.2,arcHeight], 
+	print to_part['name'],to_part['start'],to_part['end'], to_part['fwd']
+
+	top = arcHeight;
+	base = startHeight;
+	indHeight = arrowhead_length
+	
+	if(to_part['fwd'] == False):
+		base = -1*startHeight
+		top  = -1*arcHeight
+		indHeight = -1*arrowhead_length
+
+	line_away   = Line2D([start,start],[base/1.2,top], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	line_across = Line2D([start,end],[arcHeight,arcHeight], 
+	line_across = Line2D([start,end],[top,top], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	line_toward = Line2D([end,end],[arcHeight,startHeight*1.5], 
+	line_toward = Line2D([end,end],[top,base*1.5], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	line_rep = Line2D([end-2,end+2],[startHeight*1.5,startHeight*1.5], 
-		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	line_rep    = Line2D([end-arrowhead_length,end+arrowhead_length],[base*1.5,base*1.5], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle='-')
+	line_ind1   = Line2D([end-arrowhead_length,end],[base*1.5+indHeight,base*1.5], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle='-')
+	line_ind2    = Line2D([end+arrowhead_length,end],[base*1.5+indHeight,base*1.5], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle='-')
 
 	ax.add_line(line_away)
 	ax.add_line(line_across)
 	ax.add_line(line_toward)
-	ax.add_line(line_rep)
 
-def induce (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
-	print 'call induce renderer'
+	if(type == 'rep')
+		ax.add_line(line_rep)
+
+	if(type == 'ind')
+		ax.add_line(line_ind1)
+		ax.add_line(line_ind2)
+
 
 #reg_renderers[reg['type']](ax, reg['type'], 
 #								           reg_num, reg['start'], 

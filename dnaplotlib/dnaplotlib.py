@@ -68,6 +68,10 @@ class DNARenderer:
 			- reg_renderers: dict of standard regulation renderers
 		"""
 
+		#re-initialize the 
+		global arcHeight
+		arcHeight = 20
+
 		# Plot the parts to the axis
 		part_num = 0
 		prev_end = 0
@@ -822,7 +826,7 @@ def temporary_repressor (ax, type, num, start, end, prev_end, y_scale, linewidth
 # Regulation renderers
 ###############################################################################
 
-stopHeight = 20
+arcHeight = 20
 
 def repress (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
 
@@ -830,8 +834,8 @@ def repress (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
 	arrowhead_length = 4
 	linestyle = '-'
 	
-	global stopHeight
-	stopHeight += 5
+	global arcHeight
+	arcHeight += 5
 	startHeight = 10
 
 	# Reset defaults if provided
@@ -848,11 +852,11 @@ def repress (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
 	start = (from_part['start'] + from_part['end']) / 2
 	end   = (to_part['start']   + to_part['end']) / 2
 
-	line_away   = Line2D([start,start],[startHeight/1.2,stopHeight], 
+	line_away   = Line2D([start,start],[startHeight/1.2,arcHeight], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	line_across = Line2D([start,end],[stopHeight,stopHeight], 
+	line_across = Line2D([start,end],[arcHeight,arcHeight], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	line_toward = Line2D([end,end],[stopHeight,startHeight*1.5], 
+	line_toward = Line2D([end,end],[arcHeight,startHeight*1.5], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
 	line_rep = Line2D([end-2,end+2],[startHeight*1.5,startHeight*1.5], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)

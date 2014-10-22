@@ -107,6 +107,7 @@ def load_dna_designs (filename, part_info):
 
 def load_regulatory_information (filename, part_info, dna_designs):
 	regs_info = {}
+	
 	reg_reader = csv.reader(open(filename, 'rU'), delimiter=',')
 	# Ignore header
 	header = next(reg_reader)
@@ -115,18 +116,24 @@ def load_regulatory_information (filename, part_info, dna_designs):
 		header_map[header[i]] = i
 	attrib_keys = [k for k in header_map.keys() if k not in ['from_partname', 'type', 'to_partname']]
 	
+	rows = []
+	for row in reg_reader:
+		rows.append(row)
+
 	design_list = sorted(dna_designs.keys())
 	num_of_designs = len(design_list)
+
 	#outer loop: for each design
 	for i in range(num_of_designs):
 		regs_info[i]=[]
 		design =  dna_designs[design_list[i]]
 
 		#middle loop: for each regulation
-		for row in reg_reader:
-			reg_info = {} #from, type, to, opts
-			reg_attribs_map = {} #opts
+		for row in rows:
+			print i,row
 			
+			#opts
+			reg_attribs_map = {}
 			for k in attrib_keys:
 				if row[header_map[k]] != '':
 					if k == 'color':
@@ -134,6 +141,7 @@ def load_regulatory_information (filename, part_info, dna_designs):
 					else:
 						reg_attribs_map[k] = make_float_if_needed(row[header_map[k]])
 
+			#from, type, to
 			type = row[header_map['type']]
 			from_partname = row[header_map['from_partname']]
 			to_partname   = row[header_map['to_partname']]
@@ -148,6 +156,7 @@ def load_regulatory_information (filename, part_info, dna_designs):
 						if(part2['name'] == to_partname):
 							end_part = part2
 							#found from-to, save regulation arc
+							reg_info = {}
 							reg_info['from_part'] = start_part
 							reg_info['type'] = row[header_map['type']]
 							reg_info['to_part'] = end_part

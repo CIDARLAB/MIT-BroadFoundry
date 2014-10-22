@@ -114,17 +114,46 @@ class DNARenderer:
 							first_start = prev_start
 							first_part = False
 			part_num += 1
-		# Plot the regulatory links on the axis
+		
+
+		# first pass to get all of the arcranges
 		if regs != None:
-			#return first_start, prev_end
 
-			pos_arc_ranges = [] # arc above DNA backbone if to_part is fwd
-			neg_arc_ranges = [] # arc below DNA backbone if to_part is reverse			
-
-			reg_num = 0
 			for reg in regs:
 				keys = reg.keys()
-				#arc_height_index += 1
+
+				# Check the part has minimal details required
+				if 'type' in keys and 'from_part' in keys and 'to_part' in keys:
+					# Extract custom part options (if available)
+
+					reg_opts = None
+					if 'opts' in reg.keys():
+						reg_opts = reg['opts']
+					
+					if reg['type'] in reg_renderers.keys():
+						
+						##############################################################################
+						arcstart = (reg['from_part']['start'] + reg['from_part']['end']) / 2
+						arcend   = (reg['to_part']['start']   + reg['to_part']['end']) / 2
+						arcrange = [arcstart,arcend]
+						reg['arclength'] = fabs(arcstart-arcend)
+						reg['arc_height_index'] = 1
+						##############################################################################
+
+			#sort regs by arc ranges from shortest to longest
+			regs.sort(key=lambda x: x['arclength'], reverse=False)
+
+			reg_num = 0
+			
+
+			pos_arc_ranges = [] # arc above DNA backbone if to_part is fwd
+			neg_arc_ranges = [] # arc below DNA backbone if to_part is reverse
+			
+			current_max = 1
+
+			# second pass to render all the arcs
+			for reg in regs:
+				keys = reg.keys()
 
 				# Check the part has minimal details required
 				if 'type' in keys and 'from_part' in keys and 'to_part' in keys:
@@ -138,44 +167,68 @@ class DNARenderer:
 						
 						##############################################################################
 						# arc height algorithm: greedy from left-to-right on DNA design
-
-						arc_height_index = 1
 						
 						arcstart = (reg['from_part']['start'] + reg['from_part']['end']) / 2
 						arcend   = (reg['to_part']['start']   + reg['to_part']['end']) / 2
-						arcrange = [arcstart,arcend]
+						
+						arcmin = min(arcstart,arcend)
+						arcmax = max(arcstart,arcend)
+						arcrange = [arcmin,arcmax,reg['arc_height_index']]
+						arc_height_index = 1
 						
 						# arc above if to_part is fwd
-						if(reg['to_part']['fwd'] == True): 
-							pos_arc_ranges.append(arcrange)
+						if(reg['to_part']['fwd'] == True):
+							# find max arc height index
+							current_max = 1
+							for r in pos_arc_ranges:
+								if(arcrange[2] > current_max):
+									current_max = arcrange[2]
+							
+							# if arcs cross over, increment the arc height index
 							for r in pos_arc_ranges:
 								if  (arcrange[0] > r[0] and arcrange[0] < r[1]):
-									arc_height_index += 1
+									reg['arc_height_index'] = current_max + 1
+									arcrange[2] = reg['arc_height_index']
 								elif(arcrange[0] > r[1] and arcrange[0] < r[0]):
-									arc_height_index += 1
+									reg['arc_height_index'] = current_max + 1
+									arcrange[2] = reg['arc_height_index']
 								elif(arcrange[1] > r[0] and arcrange[0] < r[1]):
-									arc_height_index += 1
+									reg['arc_height_index'] = current_max + 1
+									arcrange[2] = reg['arc_height_index']
 								elif(arcrange[1] > r[1] and arcrange[0] < r[0]):
-									arc_height_index += 1
+									reg['arc_height_index'] = current_max + 1
+									arcrange[2] = reg['arc_height_index']
+							pos_arc_ranges.append(arcrange)
 						
 						# arc below if to_part is reverse
 						else:
-							neg_arc_ranges.append(arcrange)
+							# find max arc height index
+							current_max = 1
+							for r in neg_arc_ranges:
+								if(arcrange[2] > current_max):
+									current_max = arcrange[2]
+							
+							# if arcs cross over, increment the arc height index
 							for r in neg_arc_ranges:
 								if  (arcrange[0] > r[0] and arcrange[0] < r[1]):
-									arc_height_index += 1
+									reg['arc_height_index'] = current_max + 1
+									arcrange[2] = reg['arc_height_index']
 								elif(arcrange[0] > r[1] and arcrange[0] < r[0]):
-									arc_height_index += 1
+									reg['arc_height_index'] = current_max + 1
+									arcrange[2] = reg['arc_height_index']
 								elif(arcrange[1] > r[0] and arcrange[0] < r[1]):
-									arc_height_index += 1
+									reg['arc_height_index'] = current_max + 1
+									arcrange[2] = reg['arc_height_index']
 								elif(arcrange[1] > r[1] and arcrange[0] < r[0]):
-									arc_height_index += 1
+									reg['arc_height_index'] = current_max + 1
+									arcrange[2] = reg['arc_height_index']
+							neg_arc_ranges.append(arcrange)
 						##############################################################################
 						
 						reg_renderers[reg['type']](ax, reg['type'], 
 							           reg_num, reg['from_part'], 
 							           reg['to_part'], self.y_scale, 
-							           self.linewidth, arc_height_index, opts=reg_opts)
+							           self.linewidth, reg['arc_height_index'], opts=reg_opts)
 				reg_num += 1
 		# Plot the backbone (z=1)
 		l1 = Line2D([first_start-self.backbone_pad_left,prev_end+self.backbone_pad_right],[0,0], 

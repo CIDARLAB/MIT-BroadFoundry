@@ -91,9 +91,9 @@ def load_dna_designs (filename, part_info):
 					# Store the design
 					part_design = {}
 					cur_part_info = part_info[part_name]
-					part_design['name'] = part_name #needed to add part name for regulation
 					part_design['type'] = cur_part_info[1]
-					part_design['fwd'] = fwd
+					part_design['name'] = part_name #needed to add part name for regulation
+					part_design['fwd']  = fwd       #needed to add fwd for regulation
 					if fwd == True:
 						part_design['start'] = i
 						part_design['end'] = i+1

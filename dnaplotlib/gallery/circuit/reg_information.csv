@@ -1,4 +1,4 @@
 from_partname,type,to_partname,arrowhead_length,linestyle,linewidth,color
 SrpR,rep,pSrpR,2,--,2,1;0.5;0
 PhlF,rep,pPhlF,2,-,2,1;0;0
-AmtR,rep,pAmtR,2,-,2,0;0;1
+AmtR,ind,pAmtR,2,-,2,0;0;1

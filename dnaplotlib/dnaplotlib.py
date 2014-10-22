@@ -887,10 +887,10 @@ def regulation (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
 	ax.add_line(line_across)
 	ax.add_line(line_toward)
 
-	if(type == 'rep')
+	if(type == 'rep'):
 		ax.add_line(line_rep)
 
-	if(type == 'ind')
+	if(type == 'ind'):
 		ax.add_line(line_ind1)
 		ax.add_line(line_ind2)
 

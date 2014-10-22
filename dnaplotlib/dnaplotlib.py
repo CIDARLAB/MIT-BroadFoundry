@@ -122,7 +122,7 @@ class DNARenderer:
 				keys = reg.keys()
 
 				# Check the part has minimal details required
-				if 'type' in keys and 'start_part' in keys and 'end_part' in keys:
+				if 'type' in keys and 'from_part' in keys and 'to_part' in keys:
 					# Extract custom part options (if available)
 
 					reg_opts = None
@@ -131,8 +131,8 @@ class DNARenderer:
 					
 					if reg['type'] in reg_renderers.keys():
 						reg_renderers[reg['type']](ax, reg['type'], 
-							           reg_num, reg['start_part'], 
-							           reg['end_part'], self.y_scale, 
+							           reg_num, reg['from_part'], 
+							           reg['to_part'], self.y_scale, 
 							           self.linewidth, opts=reg_opts)
 				reg_num += 1
 		# Plot the backbone (z=1)
@@ -824,7 +824,7 @@ def temporary_repressor (ax, type, num, start, end, prev_end, y_scale, linewidth
 
 stopHeight = 20
 
-def repress (ax, type, num, start_part, end_part, y_scale, linewidth, opts):
+def repress (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
 
 	color = (0.0,0.0,0.0)
 	arrowhead_length = 4
@@ -845,10 +845,8 @@ def repress (ax, type, num, start_part, end_part, y_scale, linewidth, opts):
 		if 'color' in opts.keys():
 			color = opts['color']
 	
-	print start_part['start'],start_part['end']
-	print end_part['start'],end_part['end']
-	start = (start_part['start'] + start_part['end']) / 2
-	end   = (end_part['start']   + end_part['end']) / 2
+	start = (from_part['start'] + from_part['end']) / 2
+	end   = (to_part['start']   + to_part['end']) / 2
 
 	line_away   = Line2D([start,start],[startHeight/1.2,stopHeight], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
@@ -864,7 +862,7 @@ def repress (ax, type, num, start_part, end_part, y_scale, linewidth, opts):
 	ax.add_line(line_toward)
 	ax.add_line(line_rep)
 
-def induce (ax, type, num, start_part, end_part, y_scale, linewidth, opts):
+def induce (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
 	print 'call induce renderer'
 
 #reg_renderers[reg['type']](ax, reg['type'], 

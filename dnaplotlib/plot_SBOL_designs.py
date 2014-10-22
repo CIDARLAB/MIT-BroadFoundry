@@ -115,42 +115,51 @@ def load_regulatory_information (filename, part_info, dna_designs):
 		header_map[header[i]] = i
 	attrib_keys = [k for k in header_map.keys() if k not in ['from_partname', 'type', 'to_partname']]
 	
-	row_index = 0
-	for row in reg_reader:
-		row_index += 1
-		reg_attribs_map = {}
-		for k in attrib_keys:
-			if row[header_map[k]] != '':
-				if k == 'color':
-					reg_attribs_map[k] = [float(x) for x in row[header_map[k]].split(';')]
-				else:
-					reg_attribs_map[k] = make_float_if_needed(row[header_map[k]])
+	design_list = sorted(dna_designs.keys())
+	num_of_designs = len(design_list)
+	#outer loop: for each design
+	for i in range(num_of_designs):
+		regs_info[i]=[]
+		design =  dna_designs[design_list[i]]
 
-		type = row[header_map['type']]
-		from_partname = row[header_map['from_partname']]
-		to_partname   = row[header_map['to_partname']]
+		#middle loop: for each regulation
+		for row in reg_reader:
+			reg_info = {} #from, type, to, opts
+			reg_attribs_map = {} #opts
+			
+			for k in attrib_keys:
+				if row[header_map[k]] != '':
+					if k == 'color':
+						reg_attribs_map[k] = [float(x) for x in row[header_map[k]].split(';')]
+					else:
+						reg_attribs_map[k] = make_float_if_needed(row[header_map[k]])
 
-		design_list = sorted(dna_designs.keys())
-		num_of_designs = len(design_list)
-		for i in range(num_of_designs):
-			design =  dna_designs[design_list[i]]
-			reg_info = {}
-			start_part = None;
-			end_part = None;
+			type = row[header_map['type']]
+			from_partname = row[header_map['from_partname']]
+			to_partname   = row[header_map['to_partname']]
+			from_part = None;
+			to_part = None;
+			
+			#inner loop: loop through parts to find 'from' and 'to' parts
 			for part1 in design: #loop through once to find the cds
 				if(part1['name'] == from_partname):
 					start_part = part1
 					for part2 in design: #loop through again to find the promoter
 						if(part2['name'] == to_partname):
 							end_part = part2
-							reg_info['start_part'] = start_part
+							#found from-to, save regulation arc
+							reg_info['from_part'] = start_part
 							reg_info['type'] = row[header_map['type']]
-							reg_info['end_part'] = end_part
+							reg_info['to_part'] = end_part
 							reg_info['opts'] = reg_attribs_map
-			regs_info[i] = [reg_info];
+							regs_info[i].append( reg_info );
 
-	#for reg_index in regs_info:
-		#print regs_info[reg_index]
+		#print i,regs_info[i]
+
+	#for reg in regs_info:
+	#	print regs_info[reg]
+
+	#print regs_info
 	return regs_info
 
 
@@ -200,11 +209,8 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	max_dna_len = 0.0
 	for i in range(num_of_designs):
 		# Create axis for the design and plot
-		regs   =  regs_info[regs_list[i]]
-		#print 'printing regs',regs
-
+		regs   =  regs_info[i]
 		design =  dna_designs[design_list[i]]
-		#print 'printing parts',design
 
 		ax = fig.add_subplot(num_of_designs,1,i+1)
 		if 'show_title' in plot_params.keys() and plot_params['show_title'] == 'Y':

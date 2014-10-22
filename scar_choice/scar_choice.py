@@ -188,14 +188,14 @@ def main():
 	seed_set_filename = args[4]
 	seed_set = []
 	if seed_set_filename != 'None':
-		handle = open(seed_set_filename, 'r')
+		handle = open(seed_set_filename, 'rU')
 		seed_set = handle.readlines()
 		seed_set = [x.strip() for x in seed_set if x.strip() != '']
 		handle.close()
 	allowed_set_filename = args[5]
 	allowed_set = []
 	if allowed_set_filename != 'None':
-		handle = open(allowed_set_filename, 'r')
+		handle = open(allowed_set_filename, 'rU')
 		allowed_set = handle.readlines()
 		allowed_set = [x.strip() for x in allowed_set if x.strip() != '']
 		handle.close()

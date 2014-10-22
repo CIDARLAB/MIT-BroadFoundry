@@ -148,9 +148,7 @@ class DNARenderer:
 						# arc above if to_part is fwd
 						if(reg['to_part']['fwd'] == True): 
 							pos_arc_ranges.append(arcrange)
-							print 'posrange',arcrange
 							for r in pos_arc_ranges:
-								print r
 								if  (arcrange[0] > r[0] and arcrange[0] < r[1]):
 									arc_height_index += 1
 								elif(arcrange[0] > r[1] and arcrange[0] < r[0]):
@@ -163,9 +161,7 @@ class DNARenderer:
 						# arc below if to_part is reverse
 						else:
 							neg_arc_ranges.append(arcrange)
-							print 'negrange',arcrange
 							for r in neg_arc_ranges:
-								print r
 								if  (arcrange[0] > r[0] and arcrange[0] < r[1]):
 									arc_height_index += 1
 								elif(arcrange[0] > r[1] and arcrange[0] < r[0]):

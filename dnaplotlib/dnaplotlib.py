@@ -69,10 +69,6 @@ class DNARenderer:
 			- reg_renderers: dict of standard regulation renderers
 		"""
 
-		#re-initialize the 
-		global arcHeight
-		arcHeight = 20
-
 		# Plot the parts to the axis
 		part_num = 0
 		prev_end = 0
@@ -122,9 +118,13 @@ class DNARenderer:
 		if regs != None:
 			#return first_start, prev_end
 
+			pos_arc_ranges = [] # arc above DNA backbone if to_part is fwd
+			neg_arc_ranges = [] # arc below DNA backbone if to_part is reverse			
+
 			reg_num = 0
 			for reg in regs:
 				keys = reg.keys()
+				#arc_height_index += 1
 
 				# Check the part has minimal details required
 				if 'type' in keys and 'from_part' in keys and 'to_part' in keys:
@@ -135,10 +135,51 @@ class DNARenderer:
 						reg_opts = reg['opts']
 					
 					if reg['type'] in reg_renderers.keys():
+						
+						##############################################################################
+						# arc height algorithm: greedy from left-to-right on DNA design
+
+						arc_height_index = 1
+						
+						arcstart = (reg['from_part']['start'] + reg['from_part']['end']) / 2
+						arcend   = (reg['to_part']['start']   + reg['to_part']['end']) / 2
+						arcrange = [arcstart,arcend]
+						
+						# arc above if to_part is fwd
+						if(reg['to_part']['fwd'] == True): 
+							pos_arc_ranges.append(arcrange)
+							print 'posrange',arcrange
+							for r in pos_arc_ranges:
+								print r
+								if  (arcrange[0] > r[0] and arcrange[0] < r[1]):
+									arc_height_index += 1
+								elif(arcrange[0] > r[1] and arcrange[0] < r[0]):
+									arc_height_index += 1
+								elif(arcrange[1] > r[0] and arcrange[0] < r[1]):
+									arc_height_index += 1
+								elif(arcrange[1] > r[1] and arcrange[0] < r[0]):
+									arc_height_index += 1
+						
+						# arc below if to_part is reverse
+						else:
+							neg_arc_ranges.append(arcrange)
+							print 'negrange',arcrange
+							for r in neg_arc_ranges:
+								print r
+								if  (arcrange[0] > r[0] and arcrange[0] < r[1]):
+									arc_height_index += 1
+								elif(arcrange[0] > r[1] and arcrange[0] < r[0]):
+									arc_height_index += 1
+								elif(arcrange[1] > r[0] and arcrange[0] < r[1]):
+									arc_height_index += 1
+								elif(arcrange[1] > r[1] and arcrange[0] < r[0]):
+									arc_height_index += 1
+						##############################################################################
+						
 						reg_renderers[reg['type']](ax, reg['type'], 
 							           reg_num, reg['from_part'], 
 							           reg['to_part'], self.y_scale, 
-							           self.linewidth, opts=reg_opts)
+							           self.linewidth, arc_height_index, opts=reg_opts)
 				reg_num += 1
 		# Plot the backbone (z=1)
 		l1 = Line2D([first_start-self.backbone_pad_left,prev_end+self.backbone_pad_right],[0,0], 
@@ -395,10 +436,10 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 		linetype = 'dash'
 		headgroup = 'X'
 	elif(type == "ProteinStability"):
-		linetype = 'full'
+		linetype = 'solid'
 		headgroup = 'O'
 	elif(type == "Ribonuclease"):
-		linetype = 'full'
+		linetype = 'solid'
 		headgroup = 'X'
 
 	# Reset defaults if provided
@@ -435,13 +476,13 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 		x2 = Line2D([start,end],[-1*y_extent/1.5,-1*y_extent*1.25], 
 		        	linewidth=linewidth, color=color, zorder=12, linestyle='-')
 
-		dash1 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent/4], 
+		dash1  = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent/4], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
-		dash2 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[-y_extent/2,-y_extent+(x_extent/2.0)], 
+		dash2  = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[-y_extent/2,-y_extent+(x_extent/2.0)], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
-		fullO = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent+(x_extent/2.0)], 
+		solidO = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent+(x_extent/2.0)], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
-		fullX = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent], 
+		solidX = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
 
 		if(headgroup == "O" and linetype == "dash"):
@@ -453,13 +494,13 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 			ax.add_line(x2)
 			ax.add_line(dash1)
 			ax.add_line(dash2)
-		elif(headgroup == "O" and linetype == "full"):
+		elif(headgroup == "O" and linetype == "solid"):
 			ax.add_patch(c1)
-			ax.add_line(fullO)
-		elif(headgroup == "X" and linetype == "full"):
+			ax.add_line(solidO)
+		elif(headgroup == "X" and linetype == "solid"):
 			ax.add_line(x1)
 			ax.add_line(x2)
-			ax.add_line(fullX)
+			ax.add_line(solidX)
 		
 	else:
 		start = prev_end+start_pad
@@ -477,9 +518,9 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
 		dash2 = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[y_extent/2,y_extent-(x_extent/2.0)], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
-		fullO = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent-(x_extent/2.0)], 
+		solidO = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent-(x_extent/2.0)], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
-		fullX = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent], 
+		solidX = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
 
 		if(headgroup == 'O' and linetype == 'dash'):
@@ -491,13 +532,13 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 			ax.add_line(x2)
 			ax.add_line(dash1)
 			ax.add_line(dash2)
-		elif(headgroup == "O" and linetype == "full"):
+		elif(headgroup == "O" and linetype == "solid"):
 			ax.add_patch(c1)
-			ax.add_line(fullO)
-		elif(headgroup == "X" and linetype == "full"):
+			ax.add_line(solidO)
+		elif(headgroup == "X" and linetype == "solid"):
 			ax.add_line(x1)
 			ax.add_line(x2)
-			ax.add_line(fullX)
+			ax.add_line(solidX)
 		
 	if final_start > final_end:
 		return prev_end, final_start
@@ -829,20 +870,20 @@ def temporary_repressor (ax, type, num, start, end, prev_end, y_scale, linewidth
 
 arcHeight = 20
 
-def repress (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
-	regulation(ax, type, num, from_part, to_part, y_scale, linewidth, opts)
+def repress (ax, type, num, from_part, to_part, y_scale, linewidth, arc_height_index, opts):
+	regulation(ax, type, num, from_part, to_part, y_scale, linewidth, arc_height_index, opts)
 
-def induce (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
-	regulation(ax, type, num, from_part, to_part, y_scale, linewidth, opts)
+def induce (ax, type, num, from_part, to_part, y_scale, linewidth, arc_height_index, opts):
+	regulation(ax, type, num, from_part, to_part, y_scale, linewidth, arc_height_index, opts)
 
-def regulation (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
+def regulation (ax, type, num, from_part, to_part, y_scale, linewidth, arc_height_index, opts):
 
 	color = (0.0,0.0,0.0)
 	arrowhead_length = 4
 	linestyle = '-'
 	
-	global arcHeight
-	arcHeight += 5
+	#Warning: change these to params instead of hard-coded numbers
+	arcHeight = 15 + arc_height_index*5
 	startHeight = 10
 	
 	# Reset defaults if provided
@@ -859,7 +900,7 @@ def regulation (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
 	start = (from_part['start'] + from_part['end']) / 2
 	end   = (to_part['start']   + to_part['end']) / 2
 
-	print to_part['name'],to_part['start'],to_part['end'], to_part['fwd']
+	#print to_part['name'],to_part['start'],to_part['end'], to_part['fwd']
 
 	top = arcHeight;
 	base = startHeight;
@@ -887,18 +928,13 @@ def regulation (ax, type, num, from_part, to_part, y_scale, linewidth, opts):
 	ax.add_line(line_across)
 	ax.add_line(line_toward)
 
-	if(type == 'rep'):
+	if(type == 'Repression'):
 		ax.add_line(line_rep)
 
-	if(type == 'ind'):
+	if(type == 'Activation'):
 		ax.add_line(line_ind1)
 		ax.add_line(line_ind2)
 
-
-#reg_renderers[reg['type']](ax, reg['type'], 
-#								           reg_num, reg['start'], 
-#								           reg['end'], self.y_scale, 
-#								           self.linewidth, opts=reg_opts)
 
 
 ###############################################################################

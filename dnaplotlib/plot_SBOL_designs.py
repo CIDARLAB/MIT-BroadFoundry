@@ -186,8 +186,8 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 		                 backbone_pad_left=left_pad, 
 		                 backbone_pad_right=right_pad)
 
-	reg_renderers = {'rep'  :dpl.repress, 
-	                 'ind'  :dpl.induce}
+	reg_renderers = {'Repression'  :dpl.repress, 
+	                 'Activation'  :dpl.induce}
 
 	# We default to the SBOL part renderers
 	part_renderers = {'Promoter'  :dpl.sbol_promoter, 

@@ -113,12 +113,19 @@ def load_regulatory_information (filename, part_info, dna_designs):
 	header_map = {}
 	for i in range(len(header)):
 		header_map[header[i]] = i
-	attrib_keys = [k for k in header_map.keys()]
+	attrib_keys = [k for k in header_map.keys() if k not in ['from_partname', 'type', 'to_partname']]
 	
 	row_index = 0
 	for row in reg_reader:
 		row_index += 1
-		reg_map = {}
+		reg_attribs_map = {}
+		for k in attrib_keys:
+			if row[header_map[k]] != '':
+				if k == 'color':
+					reg_attribs_map[k] = [float(x) for x in row[header_map[k]].split(';')]
+				else:
+					reg_attribs_map[k] = make_float_if_needed(row[header_map[k]])
+
 		type = row[header_map['type']]
 		from_partname = row[header_map['from_partname']]
 		to_partname   = row[header_map['to_partname']]
@@ -128,32 +135,22 @@ def load_regulatory_information (filename, part_info, dna_designs):
 		for i in range(num_of_designs):
 			design =  dna_designs[design_list[i]]
 			reg_info = {}
-			#regstart = None;
-			#regend = None;
 			start_part = None;
 			end_part = None;
 			for part1 in design: #loop through once to find the cds
 				if(part1['name'] == from_partname):
-					#regstart = part1['start']
 					start_part = part1
 					for part2 in design: #loop through again to find the promoter
 						if(part2['name'] == to_partname):
-							#regend = part2['end']
 							end_part = part2
-
-							#print 'found regulation', part1['name'], regstart, part2['name'], regend, row[header_map['type']]
-							#reg_map['type'] = row[header_map['type']]
-							#reg_map['start'] = regstart
-							#reg_map['end'] = regend
-							#reg_info[row_index] = reg_map
-							reg_info['type'] = row[header_map['type']]
 							reg_info['start_part'] = start_part
+							reg_info['type'] = row[header_map['type']]
 							reg_info['end_part'] = end_part
+							reg_info['opts'] = reg_attribs_map
 			regs_info[i] = [reg_info];
 
 	#for reg_index in regs_info:
 		#print regs_info[reg_index]
-
 	return regs_info
 
 
@@ -271,15 +268,7 @@ def main():
                     type=lambda x: is_valid_file(parser, x))
 	parser.add_argument("-output", dest="output_pdf", required=True,
 					help="output pdf filename")
-
 	args = parser.parse_args()
-
-	#print args.params.name
-	#print args.parts.name
-	#if(args.regulation):
-	#	print args.regulation.name
-	#print args.designs.name
-	#print args.output_pdf
 
 	# process arguments
 	plot_params = load_plot_parameters(args.params.name)

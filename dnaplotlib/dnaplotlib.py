@@ -58,6 +58,7 @@ class DNARenderer:
 		self.linewidth = linewidth
 		self.backbone_pad_left = backbone_pad_left
 		self.backbone_pad_right = backbone_pad_right
+		self.reg_height = 15
 
 	def renderDNA(self, ax, parts, part_renderers, regs=None, reg_renderers=None):
 		"""Render the parts on the DNA and regulation.
@@ -821,25 +822,49 @@ def temporary_repressor (ax, type, num, start, end, prev_end, y_scale, linewidth
 # Regulation renderers
 ###############################################################################
 
+stopHeight = 20
+
 def repress (ax, type, num, start_part, end_part, y_scale, linewidth, opts):
 
+	color = (0.0,0.0,0.0)
+	arrowhead_length = 4
+	linestyle = '-'
+	
+	global stopHeight
+	stopHeight += 5
+	startHeight = 10
+
+	# Reset defaults if provided
+	if opts != None:
+		if 'arrowhead_length' in opts.keys():
+			arrowhead_length = opts['arrowhead_length']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'color' in opts.keys():
+			color = opts['color']
+	
 	print start_part['start'],start_part['end']
 	print end_part['start'],end_part['end']
-
 	start = (start_part['start'] + start_part['end']) / 2
 	end   = (end_part['start']   + end_part['end']) / 2
 
-	line_away   = Line2D([start,start],[0,2], 
-		        linewidth=linewidth, color=(0,0,0), zorder=12, linestyle='-')
-	line_across = Line2D([start,end],[2,2], 
-		        linewidth=linewidth, color=(0,0,0), zorder=12, linestyle='-')
-	line_toward = Line2D([end,end],[2,0], 
-		        linewidth=linewidth, color=(0,0,0), zorder=12, linestyle='-')
+	line_away   = Line2D([start,start],[startHeight/1.2,stopHeight], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	line_across = Line2D([start,end],[stopHeight,stopHeight], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	line_toward = Line2D([end,end],[stopHeight,startHeight*1.5], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	line_rep = Line2D([end-2,end+2],[startHeight*1.5,startHeight*1.5], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+
 	ax.add_line(line_away)
 	ax.add_line(line_across)
 	ax.add_line(line_toward)
+	ax.add_line(line_rep)
 
-def induce (ax, type, num, start, end, y_scale, linewidth, opts):
+def induce (ax, type, num, start_part, end_part, y_scale, linewidth, opts):
 	print 'call induce renderer'
 
 #reg_renderers[reg['type']](ax, reg['type'], 

@@ -178,12 +178,22 @@ class DNARenderer:
 						
 						# arc above if to_part is fwd
 						if(reg['to_part']['fwd'] == True):
-							# find max arc height index
+							# find max arc height index of ONLY the prior arcs that clash with the current arc
 							current_max = 1
 							for r in pos_arc_ranges:
-								if(r[2] > current_max):
-									current_max = r[2]
-							
+								if  (arcrange[0] > r[0] and arcrange[0] < r[1]):
+									if(r[2] > current_max):
+										current_max = r[2]
+								elif(arcrange[0] > r[1] and arcrange[0] < r[0]):
+									if(r[2] > current_max):
+										current_max = r[2]
+								elif(arcrange[1] > r[0] and arcrange[0] < r[1]):
+									if(r[2] > current_max):
+										current_max = r[2]
+								elif(arcrange[1] > r[1] and arcrange[0] < r[0]):
+									if(r[2] > current_max):
+										current_max = r[2]
+									
 							# if arcs cross over, increment the arc height index
 							for r in pos_arc_ranges:
 								if  (arcrange[0] > r[0] and arcrange[0] < r[1]):
@@ -205,8 +215,18 @@ class DNARenderer:
 							# find max arc height index
 							current_max = 1
 							for r in neg_arc_ranges:
-								if(r[2] > current_max):
-									current_max = r[2]
+								if  (arcrange[0] > r[0] and arcrange[0] < r[1]):
+									if(r[2] > current_max):
+										current_max = r[2]
+								elif(arcrange[0] > r[1] and arcrange[0] < r[0]):
+									if(r[2] > current_max):
+										current_max = r[2]
+								elif(arcrange[1] > r[0] and arcrange[0] < r[1]):
+									if(r[2] > current_max):
+										current_max = r[2]
+								elif(arcrange[1] > r[1] and arcrange[0] < r[0]):
+									if(r[2] > current_max):
+										current_max = r[2]
 							
 							# if arcs cross over, increment the arc height index
 							for r in neg_arc_ranges:

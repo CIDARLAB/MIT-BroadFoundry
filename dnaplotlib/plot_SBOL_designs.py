@@ -176,6 +176,8 @@ def load_regulatory_information (filename, part_info, dna_designs):
 
 def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	# Create the renderer
+	if 'axis_y' not in plot_params.keys():
+		plot_params['axis_y'] = 55
 	left_pad = 0.0
 	right_pad = 0.0
 	if 'backbone_pad_left' in plot_params.keys():
@@ -243,12 +245,14 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 		# Set bounds
 		ax.set_xlim([(-0.01*max_dna_len)-left_pad,
 			        max_dna_len+(0.01*max_dna_len)+right_pad])
-		ax.set_ylim([-45,45])
+
+		ax.set_ylim([-plot_params['axis_y'],plot_params['axis_y']])
+
 		ax.set_aspect('equal')
 		ax.set_axis_off()
 	# Save the figure
 	plt.tight_layout()
-	fig.savefig(out_filename)
+	fig.savefig(out_filename, transparent=True)
 	# Clear the plotting cache
 	plt.close('all')
 

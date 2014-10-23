@@ -243,7 +243,7 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 		ax.set_axis_off()
 	# Save the figure
 	plt.tight_layout()
-	fig.savefig(out_filename)
+	fig.savefig(out_filename, transparent=True)
 	# Clear the plotting cache
 	plt.close('all')
 

@@ -77,7 +77,19 @@ class DNARenderer:
 		for part in parts:
 			keys = part.keys()
 			# Check the part has minimal details required
-			if 'type' in keys and 'start' in keys and 'end' in keys:
+			if 'type' in keys:
+				if 'fwd' not in keys:
+					part['fwd'] = 'True'
+				if 'start' not in keys:
+					if part['fwd'] == True:
+						part['start'] = part_num
+					else:
+						part['start'] = part_num+1
+				if 'end' not in keys:
+					if part['fwd'] == True:
+						part['end'] = part_num+1
+					else:
+						part['end'] = part_num
 				# Extract custom part options (if available)
 				part_opts = None
 				if 'opts' in part.keys():

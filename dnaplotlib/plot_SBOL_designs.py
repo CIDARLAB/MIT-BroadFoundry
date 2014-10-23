@@ -213,14 +213,19 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	# Cycle through the designs an plot on individual axes
 
 	design_list = sorted(dna_designs.keys())
-	regs_list   = sorted(regs_info.keys())
+	if(regs_info != None):
+		regs_list   = sorted(regs_info.keys())
+	
 	num_of_designs = len(design_list)
 	#print len(design_list),len(regs_list)
 	ax_list = []
 	max_dna_len = 0.0
 	for i in range(num_of_designs):
 		# Create axis for the design and plot
-		regs   =  regs_info[i]
+
+		regs = None
+		if(regs_info != None):
+			regs   =  regs_info[i]
 		design =  dna_designs[design_list[i]]
 
 		ax = fig.add_subplot(num_of_designs,1,i+1)
@@ -238,7 +243,7 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 		# Set bounds
 		ax.set_xlim([(-0.01*max_dna_len)-left_pad,
 			        max_dna_len+(0.01*max_dna_len)+right_pad])
-		ax.set_ylim([-55,55])
+		ax.set_ylim([-45,45])
 		ax.set_aspect('equal')
 		ax.set_axis_off()
 	# Save the figure

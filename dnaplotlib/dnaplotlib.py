@@ -181,8 +181,8 @@ class DNARenderer:
 							# find max arc height index
 							current_max = 1
 							for r in pos_arc_ranges:
-								if(arcrange[2] > current_max):
-									current_max = arcrange[2]
+								if(r[2] > current_max):
+									current_max = r[2]
 							
 							# if arcs cross over, increment the arc height index
 							for r in pos_arc_ranges:
@@ -205,8 +205,8 @@ class DNARenderer:
 							# find max arc height index
 							current_max = 1
 							for r in neg_arc_ranges:
-								if(arcrange[2] > current_max):
-									current_max = arcrange[2]
+								if(r[2] > current_max):
+									current_max = r[2]
 							
 							# if arcs cross over, increment the arc height index
 							for r in neg_arc_ranges:

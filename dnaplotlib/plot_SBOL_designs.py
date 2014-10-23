@@ -206,10 +206,7 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
                       'Origin'    :dpl.sbol_origin,
                       'Insulator' :dpl.sbol_insulator,
                       'Repressor' :dpl.temporary_repressor}
-    
-    
-    
-    
+
     # Create the figure
 	fig = plt.figure(figsize=(plot_params['fig_x'],plot_params['fig_y']))
 	# Cycle through the designs an plot on individual axes
@@ -256,14 +253,11 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	# Clear the plotting cache
 	plt.close('all')
 
-
-
 def is_valid_file(parser, arg):
     if not os.path.exists(arg):
         parser.error("The file %s does not exist!" % arg)
     else:
         return open(arg, 'r')  # return an open file handle
-
 
 def main():
 	## parse command line options

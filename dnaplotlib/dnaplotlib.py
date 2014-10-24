@@ -272,6 +272,20 @@ class DNARenderer:
 # SBOL Compliant Icon Renderers
 ###############################################################################
 
+def write_label (ax, label_text, x_pos, opts=None):
+	label_style = 'normal'
+	label_size = 6.5
+	label_y_offset = 0
+	if opts != None:
+		if 'label_style' in opts.keys():
+			label_style = opts['label_style']
+		if 'label_size' in opts.keys():
+			label_size = opts['label_size']
+		if 'label_y_offset' in opts.keys():
+			label_y_offset = opts['label_y_offset']
+	ax.text(x_pos, label_y_offset, label_text, horizontalalignment='center',
+		    verticalalignment='center', fontsize=label_size, fontstyle=label_style, zorder=30) #, transform=ax.transAxes)
+
 def sbol_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	# Default options
 	color = (0.0,0.0,0.0)
@@ -329,6 +343,11 @@ def sbol_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 		           dir_fac*y_extent-(arrowhead_height))],
 		          facecolor=color, edgecolor=color, linewidth=linewidth)
 	ax.add_patch(p1)
+	if 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
 	if final_start > final_end:
 		return prev_end, final_start
 	else:
@@ -390,6 +409,11 @@ def sbol_cds (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 		          edgecolor=(0.0,0.0,0.0), facecolor=color, linewidth=linewidth, 
 		          hatch=hatch, zorder=11)
 	ax.add_patch(p1)
+	if 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
 	if final_start > final_end:
 		return prev_end, final_start
 	else:
@@ -438,6 +462,11 @@ def sbol_terminator (ax, type, num, start, end, prev_end, y_scale, linewidth, op
 		        linewidth=linewidth, color=color, zorder=9)
 	ax.add_line(l1)
 	ax.add_line(l2)
+	if 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
 	if final_start > final_end:
 		return prev_end, final_start
 	else:
@@ -484,6 +513,11 @@ def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 		w1 = Wedge(rbs_center, x_extent/2.0, 0, 180, linewidth=linewidth, 
 			       facecolor=color, zorder=8)
 		ax.add_patch(w1)
+	if 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
 	if final_start > final_end:
 		return prev_end, final_start
 	else:
@@ -620,7 +654,13 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 			ax.add_line(x1)
 			ax.add_line(x2)
 			ax.add_line(solidX)
-		
+	
+	if 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
 	if final_start > final_end:
 		return prev_end, final_start
 	else:
@@ -675,6 +715,12 @@ def sbol_scar (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	ax.add_patch(p1)
 	ax.add_line(l_top)
 	ax.add_line(l_bottom)
+
+	if 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
 
 	if final_start > final_end:
 		return prev_end, final_start
@@ -731,6 +777,12 @@ def sbol_spacer (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	ax.add_line(l1)
 	ax.add_line(l2)
 
+	if 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
 	if final_start > final_end:
 		return prev_end, final_start
 	else:
@@ -777,6 +829,12 @@ def sbol_origin (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	
 	ax.add_patch(c1)
 	
+	if 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
 	if final_start > final_end:
 		return prev_end, final_start
 	else:
@@ -825,6 +883,12 @@ def sbol_operator (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 
 	ax.add_patch(p1)
 	
+	if 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
 	if final_start > final_end:
 		return prev_end, final_start
 	else:
@@ -880,6 +944,12 @@ def sbol_insulator (ax, type, num, start, end, prev_end, y_scale, linewidth, opt
 	ax.add_patch(p1)
 	ax.add_patch(p2)
 	
+	if 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
 	if final_start > final_end:
 		return prev_end, final_start
 	else:

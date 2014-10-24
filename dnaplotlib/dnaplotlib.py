@@ -351,9 +351,9 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 		rbs_center = (end+((start-end)/2.0),-y_extent)
 		c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
 			        facecolor=(1,1,1), zorder=8)
-		x1 = Line2D([start,end],[-1*y_extent*1.25,-1*y_extent/1.5], 
+		x1 = Line2D([start,end],[-y_extent*1.25,-y_extent/1.5], 
 		        	linewidth=linewidth, color=color, zorder=12, linestyle='-')
-		x2 = Line2D([start,end],[-1*y_extent/1.5,-1*y_extent*1.25], 
+		x2 = Line2D([start,end],[-y_extent/1.5,-y_extent*1.25], 
 		        	linewidth=linewidth, color=color, zorder=12, linestyle='-')
 
 		dash1  = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent/4], 
@@ -400,7 +400,7 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
 		solidO = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent-(x_extent/2.0)], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
-		solidX = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,-y_extent], 
+		solidX = Line2D([end+((start-end)/2.0),end+((start-end)/2.0)],[0,y_extent], 
 			        linewidth=linewidth, color=color, zorder=8, linestyle=linestyle)
 
 		if(headgroup == 'O' and linetype == 'dash'):

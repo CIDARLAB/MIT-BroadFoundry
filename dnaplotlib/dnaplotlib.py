@@ -274,8 +274,9 @@ class DNARenderer:
 
 def write_label (ax, label_text, x_pos, opts=None):
 	label_style = 'normal'
-	label_size = 6.5
+	label_size = 7
 	label_y_offset = 0
+	label_x_offset = 0
 	if opts != None:
 		if 'label_style' in opts.keys():
 			label_style = opts['label_style']
@@ -283,7 +284,9 @@ def write_label (ax, label_text, x_pos, opts=None):
 			label_size = opts['label_size']
 		if 'label_y_offset' in opts.keys():
 			label_y_offset = opts['label_y_offset']
-	ax.text(x_pos, label_y_offset, label_text, horizontalalignment='center',
+		if 'label_x_offset' in opts.keys():
+			label_x_offset = opts['label_x_offset']
+	ax.text(x_pos+label_x_offset, label_y_offset, label_text, horizontalalignment='center',
 		    verticalalignment='center', fontsize=label_size, fontstyle=label_style, zorder=30) #, transform=ax.transAxes)
 
 def sbol_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):

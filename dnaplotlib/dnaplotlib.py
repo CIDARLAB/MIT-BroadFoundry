@@ -858,7 +858,72 @@ def regulation (ax, type, num, from_part, to_part, y_scale, linewidth, arc_heigh
 ###############################################################################
 
 # TODO - Convert from GeneClusterLibrary visualisation package, and integrate dnaplotlib
-
+def trace_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+	# Default options
+	color = (0.0,0.0,0.0)
+	start_pad = 2.0
+	end_pad = 2.0
+	y_extent = 10
+	x_extent = 10
+	arrowhead_height = 2
+	arrowhead_length = 4
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'arrowhead_height' in opts.keys():
+			arrowhead_height = opts['arrowhead_height']
+		if 'arrowhead_length' in opts.keys():
+			arrowhead_length = opts['arrowhead_length']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'y_scale' in opts.keys():
+			y_scale = opts['y_scale']
+	# Check direction add start padding
+	dir_fac = 1.0
+	final_end = end
+	final_start = prev_end
+	if start > end:
+		dir_fac = -1.0
+		start = prev_end+end_pad+x_extent
+		end = prev_end+end_pad
+		final_end = start+start_pad
+	else:
+		start = prev_end+start_pad
+		end = start+x_extent
+		final_end = end+end_pad
+	# Draw the promoter symbol
+	l1 = Line2D([start,start],[0,dir_fac*y_extent], linewidth=linewidth, 
+		        color=color, zorder=9)
+	l2 = Line2D([start,start+dir_fac*x_extent-dir_fac*(arrowhead_length*0.5)],
+                [dir_fac*y_extent,dir_fac*x_extent], linewidth=linewidth, 
+                color=color, zorder=10)
+	ax.add_line(l1)
+	ax.add_line(l2)
+	p1 = Polygon([(start+dir_fac*x_extent-dir_fac*arrowhead_length, 
+		           dir_fac*y_extent+(arrowhead_height)), 
+		          (start+dir_fac*x_extent, dir_fac*y_extent),
+		          (start+dir_fac*x_extent-dir_fac*arrowhead_length, 
+		           dir_fac*y_extent-(arrowhead_height))],
+		          facecolor=color, edgecolor=color, linewidth=linewidth)
+	ax.add_patch(p1)
+	if 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
 
 
 ###############################################################################

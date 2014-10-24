@@ -35,8 +35,7 @@ start, end = dr.renderDNA(ax, design, part_renderers)
 # Set bounds and display options for the axis
 dna_len = end-start
 ax.set_xlim([-10, 2020])
-ax.set_ylim([-20,20])
-#ax.set_aspect('equal')
+ax.set_ylim([-25,25])
 ax.set_xticks([])
 ax.set_yticks([])
 ax.set_title('Example construct')

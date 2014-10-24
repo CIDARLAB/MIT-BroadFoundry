@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-	Example of trace plotting.
+	Example of trace plotting. Requires gene_cluster_library.
 """
 
 import dnaplotlib as dpl

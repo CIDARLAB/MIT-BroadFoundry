@@ -49,7 +49,7 @@ def write_label (ax, label_text, x_pos, opts=None):
 		if 'label_x_offset' in opts.keys():
 			label_x_offset = opts['label_x_offset']
 	ax.text(x_pos+label_x_offset, label_y_offset, label_text, horizontalalignment='center',
-		    verticalalignment='center', fontsize=label_size, fontstyle=label_style, zorder=30) #, transform=ax.transAxes)
+		    verticalalignment='center', fontsize=label_size, fontstyle=label_style, zorder=30)
 
 def sbol_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	# Default options

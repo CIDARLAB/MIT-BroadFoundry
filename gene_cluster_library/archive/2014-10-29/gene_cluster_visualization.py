@@ -21,13 +21,96 @@ if sys.version_info[:2] < (2, 6):
     raise ImportError(m % sys.version_info[:2])
 del sys
 
+import csv
 import numpy as np
 import gene_cluster_library as gcl
-import dnaplotlib as dpl
+
+from matplotlib.patches import Polygon, Ellipse
+from matplotlib.lines import Line2D
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
+
+def draw_promoter (ax, start_bp, end_bp, color=None, extent=50, offset=10, linewidth=2, 
+	               p_width=1, arrow_len=6, arrow_width=1, label=None):
+	if color == None:
+		color = (1.0,0.0,0.0)
+	# Draw the promoter symbol
+	dir_fac = 1.0
+	if start_bp > end_bp:
+		dir_fac = -1.0
+	l1 = Line2D([start_bp,start_bp],[0,dir_fac*offset], linewidth=linewidth, color=color, zorder=9)
+	l2 = Line2D([start_bp,start_bp+dir_fac*extent-dir_fac*(arrow_len*0.5)],[dir_fac*offset,dir_fac*offset], linewidth=linewidth, color=color, zorder=10)
+	ax.add_line(l1)
+	ax.add_line(l2)
+	p1 = Polygon([(start_bp+dir_fac*extent-dir_fac*arrow_len, dir_fac*offset+(arrow_width)), 
+		          (start_bp+dir_fac*extent, dir_fac*offset),
+		          (start_bp+dir_fac*extent-dir_fac*arrow_len, dir_fac*offset-(arrow_width))],
+		          facecolor=color, edgecolor=color, linewidth=linewidth)
+	ax.add_patch(p1)
+ 	# Shade the promoter area (normally smaller than symbol extent)
+ 	p2 = Polygon([(start_bp, -p_width), 
+ 		          (start_bp, p_width),
+ 		          (end_bp, p_width),
+ 		          (end_bp, -p_width)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=9)
+	ax.add_patch(p2)
+
+def draw_terminator (ax, start_bp, end_bp, color=None, extent=5, offset=6, linewidth=2, t_width=1, label=None):
+	if color == None:
+		color = (0.0,0.0,1.0)
+	# Draw the terminator symbol
+	dir_fac = 1.0
+	if start_bp > end_bp:
+		dir_fac = -1.0
+	l1 = Line2D([start_bp,start_bp],[0,dir_fac*offset], linewidth=linewidth, color=color, zorder=8)
+	l2 = Line2D([start_bp-extent,start_bp+extent],[dir_fac*offset,dir_fac*offset], linewidth=linewidth, color=color, zorder=9)
+	ax.add_line(l1)
+	ax.add_line(l2)
+	# Shade the terminator area (normally smaller than symbol extent)
+ 	p2 = Polygon([(start_bp, -t_width), 
+ 		          (start_bp, t_width),
+ 		          (end_bp, t_width),
+ 		          (end_bp, -t_width)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=8)
+	ax.add_patch(p2)
+
+def draw_rbs (ax, start_bp, end_bp, color=None, extent=4, offset=5, linewidth=2, t_width=1, label=None):
+	if color == None:
+		color = (0.16,0.68,0.15)
+	# Draw the terminator symbol
+	dir_fac = 1.0
+	if start_bp > end_bp:
+		dir_fac = -1.0
+	l1 = Line2D([start_bp,start_bp],[0,dir_fac*offset], linewidth=linewidth, color=color, zorder=10)
+	ax.add_line(l1)
+	c1 = Ellipse((start_bp,dir_fac*offset),width=extent,height=offset*0.4,color=color, zorder=10)
+	ax.add_artist(c1)
+	# Shade the terminator area (normally smaller than symbol extent)
+ 	p2 = Polygon([(start_bp, -t_width), 
+ 		          (start_bp, t_width),
+ 		          (end_bp, t_width),
+ 		          (end_bp, -t_width)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=10)
+	ax.add_patch(p2)
+
+def draw_cds (ax, start_bp, end_bp, color=None, linewidth=2, arrow_extent=16, body_offset=3, arrow_offset=3, 
+	          hatch=None, label=None):
+	if color == None:
+		color = (0.0,1.0,0.0)
+	if hatch == None:
+		hatch = ''
+	# Draw the CDS symbol
+	dir_fac = 1.0
+	if start_bp > end_bp:
+		dir_fac = -1.0
+	p1 = Polygon([(start_bp, body_offset), 
+		          (start_bp, -body_offset),
+		          (end_bp-dir_fac*arrow_extent, -body_offset),
+		          (end_bp-dir_fac*arrow_extent, -body_offset-arrow_offset),
+		          (end_bp, 0),
+		          (end_bp-dir_fac*arrow_extent, body_offset+arrow_offset),
+		          (end_bp-dir_fac*arrow_extent, body_offset)],
+		          facecolor=color, edgecolor=(0.0,0.0,0.0), linewidth=linewidth, hatch=hatch, zorder=11)
+	ax.add_patch(p1)
 
 def plot_library_arch (fig, gcl, start_idx=0, end_idx=None, linewidth=1.0, colormap=None, hatchmap=None):
 	for v_idx in range(len(gcl.variants.keys())):
@@ -58,13 +141,6 @@ def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.
 		part_hatch = None
 		if hatchmap != None and part_name in hatchmap.keys():
 			part_hatch = hatchmap[part_name]
-		
-		# Build the object for rendering
-
-
-
-
-
 		if part_type == 'Promoter':
 			draw_promoter(ax, part_start_bp, part_end_bp, color=part_color, linewidth=linewidth, extent=60, arrow_len=30, arrow_width=1)
 		if part_type == 'CDS':
@@ -73,14 +149,6 @@ def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.
 			draw_terminator(ax, part_start_bp, part_end_bp, color=part_color, linewidth=linewidth, extent=20)
 		if part_type == 'RBS':
 			draw_rbs(ax, part_start_bp, part_end_bp, color=part_color, linewidth=linewidth, extent=30)
-	
-
-
-
-	# Draw the elements
-	
-
-
 	# Resize the axis and set bounds to ensure fully visible
 	start_bp = part_list[start_idx]['seq_idx']
 	if part_list[0]['dir'] == 'R':
@@ -89,7 +157,7 @@ def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.
 	if part_list[0]['dir'] == 'R':
 		end_bp -= part_list[end_idx]['seq_len']
 	end_padding = 20
-	#ax.plot([start_bp-end_padding,end_bp+end_padding], [0,0], color=(0,0,0), linewidth=linewidth, zorder=1)
+	ax.plot([start_bp-end_padding,end_bp+end_padding], [0,0], color=(0,0,0), linewidth=linewidth, zorder=1)
 	ax.set_xlim([start_bp-end_padding,end_bp+end_padding])
 	ax.set_ylim([-15,15])
 	ax.set_axis_off()

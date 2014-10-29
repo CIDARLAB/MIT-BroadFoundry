@@ -66,7 +66,7 @@ def get_plot_param_defaults():
 	params = ""
 	params += "parameter,value\n"
 	params += "linewidth,2\n"
-	params += "y_scale,1\n"
+	params += "scale,1\n"
 	params += "fig_x,8.5\n"
 	params += "fig_y,1\n"
 	params += "show_title,N\n"

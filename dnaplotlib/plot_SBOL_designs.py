@@ -180,11 +180,17 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 		plot_params['axis_y'] = 55
 	left_pad = 0.0
 	right_pad = 0.0
+	scale = 1.0
+	linewidth = 1.0
 	if 'backbone_pad_left' in plot_params.keys():
 		left_pad = plot_params['backbone_pad_left']
 	if 'backbone_pad_right' in plot_params.keys():
 		right_pad = plot_params['backbone_pad_right']
-	dr = dpl.DNARenderer(y_scale=plot_params['y_scale'], linewidth=plot_params['linewidth'],
+	if 'scale' in plot_params.keys():
+		scale = plot_params['scale']
+	if 'linewidth' in plot_params.keys():
+		linewidth = plot_params['linewidth']
+	dr = dpl.DNARenderer(scale=scale, linewidth=linewidth,
 		                 backbone_pad_left=left_pad, 
 		                 backbone_pad_right=right_pad)
 

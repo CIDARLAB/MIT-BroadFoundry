@@ -200,3 +200,14 @@ def cds_insts_from_tu_insts (gcl, tu_insts):
 		for tu in tu_insts[v_key]:
 			results[v_key].append(cds_from_tu(gcl, v_key, tu))
 	return results
+
+def generate_all_variant_tus_fasta (gcl, fasta_filename_prefix):
+	all_tus = gcl.transcriptional_units(read_through=True)
+	for v_key in all_tus.keys():
+
+		gcl.transcriptional_unit_seqs(variant, tus)
+
+
+
+
+

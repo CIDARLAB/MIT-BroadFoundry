@@ -3,7 +3,7 @@ import sys
 sys.path.append('../')
 import gene_cluster_library as gct
 
-a = gct.GeneCluster()
+a = gct.GeneClusterLibrary()
 a.load('test_find_functions.txt')
 
 print 'V1 extract_seq_range:', a.extract_seq_range('V1', 3, 2, 3)
@@ -31,7 +31,7 @@ print '-------------------'
 print 'V2: extract_seq_range_around_part', a.extract_seq_range_around_part('V2', 3, 0, 0)
 print '-------------------'
 
-nifs = gct.GeneCluster()
+nifs = gct.GeneClusterLibrary()
 nifs.load('../nif_cluster_data/nif_stata_library.txt')
 
 my_col_mapping = {'P1':2, 'P2':4, 'P3':6,

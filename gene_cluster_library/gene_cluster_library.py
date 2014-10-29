@@ -530,7 +530,37 @@ class GeneClusterLibrary:
 				found[v] = idxs
 		return found
 
-	def extract_seq_range (self, variant_name, part_idx, start_offset, end_offset):
+	def extract_seq_range (self, variant_name, start_bp, end_bp, direction='F'):
+		"""Extract sequence range from the start of a part in a specific variant.
+
+	    Parameters
+	    ----------
+	    variant_name : string
+	        Variant to use.
+
+	    start_bp : int
+	        Start position to extract.
+
+	    end_bp : int
+	        End position to extract.
+
+	    direction : string (default='F')
+	    	Direction to extract sequence for.
+
+	    Returns
+	    -------
+	    seq : string
+	        The extracted sequence.
+		"""
+		the_seq = self.variants[variant_name]['seq']
+		if end_bp != None and start_bp > end_bp:
+			direction = 'R'
+		if direction == 'F':
+			return the_seq[start_idx:end_idx]
+		else:
+			return self.__reverse_complement(the_seq[end_idx:start_idx])
+
+	def extract_part_idx_seq_range (self, variant_name, part_idx, start_offset, end_offset):
 		"""Extract sequence range from the start of a part in a specific variant.
 
 	    Parameters
@@ -565,7 +595,7 @@ class GeneClusterLibrary:
 			end_idx = the_seq_idx-end_offset
 			return self.__reverse_complement(the_seq[end_idx:start_idx])
 
-	def extract_seq_ranges (self, variant_insts, start_offset, end_offset):
+	def extract_part_idx_seq_ranges (self, variant_insts, start_offset, end_offset):
 		"""Extract sequence ranges from the start of a set of part instances.
 		
 	    Parameters
@@ -588,65 +618,7 @@ class GeneClusterLibrary:
 		for v in variant_insts.keys():
 			v_seqs = []
 			for i in variant_insts[v]:
-				v_seqs.append(self.extract_seq_range(v, i, start_offset, end_offset))
-			part_seqs[v] = v_seqs
-		return part_seqs
-
-	def extract_seq_range_around_part (self, variant_name, part_idx, fwd_len, rev_len):
-		"""Extract sequences that extend forward and backwards from the 
-		edges of a part.
-
-	    Parameters
-	    ----------
-	    variant_name : string
-	        Variant to use.
-
-	    part_idx : string
-	        Index of the part in the variant part list to use.
-
-	    fwd_len : int
-	        Number of base pairs in the forward direction from the part 
-	        end to include.
-
-	    rev_len : int
-	        Number of base pairs in the reverse direction from the part
-	        start to include.
-
-	    Returns
-	    -------
-	    seqs : dict(list(string))
-	        The extracted sequence.
-		"""
-		part_len = len(self.parts[self.variants[variant_name]['part_list'][part_idx]['part_name']]['seq'])
-		return self.extract_seq_range(variant_name, part_idx, part_len+fwd_len, rev_len)
-
-	def extract_seq_ranges_around_part (self, variant_insts, fwd_len, rev_len):
-		"""Extract sequences that extend forward and backwards from the 
-		edges of a set of part instances.
-
-	    Parameters
-	    ----------
-	    variant_insts : dict(list(int))
-	        Variant to use.
-
-	    fwd_len : int
-	        Number of base pairs in the forward direction from the part 
-	        end to include.
-
-	    rev_len : int
-	        Number of base pairs in the reverse direction from the part
-	        start to include.
-
-	    Returns
-	    -------
-	    seqs : dict(list(string))
-	        The extracted sequence.
-		"""
-		part_seqs = {}
-		for v in variant_insts.keys():
-			v_seqs = []
-			for i in variant_insts[v]:
-				v_seqs.append(self.extract_seq_range_around_part(v, i, fwd_len, rev_len))
+				v_seqs.append(self.extract_part_idx_seq_range(v, i, start_offset, end_offset))
 			part_seqs[v] = v_seqs
 		return part_seqs
 
@@ -1292,15 +1264,18 @@ class GeneClusterLibrary:
 		f_out.write('# Arcs\n')
 		f_out.close()
 
-	def transcriptional_units (self, non_terminated=False):
+	def transcriptional_units (self, non_terminated=False, read_through=False):
 		"""Extract all valid transcriptional units from a GeneClusterLibrary.
 
 		Note: double promoters will generate two transcriptional units.
 
 	    Parameters
 	    ----------
-	    gcl : GeneClusterLibrary
-	        Gene cluster library to consider.
+	    non_terminated : bool (default=False)
+	        Should TUs that are not terminated be included e.g., reach end of construct.
+
+	    read_through : bool (default=False)
+	    	Should TUs be generated that would occur if read through is present.
 
 	    Returns
 	    -------
@@ -1309,6 +1284,9 @@ class GeneClusterLibrary:
 	        indexed by variant name with elements stored as a list of promoter, 
 	        terminator pairs (also stored as a list).
 		"""
+		# If we consider read through then we must also include non-terminated TUs
+		if read_through == True:
+			non_terminated = True
 		# Find all promoters in the library
 		p_insts = self.find_part_type_instances('Promoter')
 		# Find all the downstream terminators from the promoters
@@ -1324,7 +1302,79 @@ class GeneClusterLibrary:
 						if v_key not in units.keys():
 							units[v_key] = []
 						units[v_key].append([cur_p_data[idx], cur_t_data[idx]])
+		# If we allow for read-through then concatenate all potential lengths
+		if read_through == True:
+			all_units = {}
+			for v_key in units.keys():
+				# Separate and sort all forward and reverse TUs
+				fwd_tus = [] # +ve strand
+				rev_tus = [] # -ve strand
+				all_tus = units[v_key]
+				for tu in all_tus: # tu[0] is promoter idx, tu[1] is terminator idx
+					if self.variant_part_idx_dir(v_key, tu[0]) == 'F':
+						fwd_tus.append(tu)
+					else:
+						rev_tus.append(tu)
+				# Sort them to make finding concatentated transcripts easier
+				fwd_tus.sort(key=lambda x: x[0], reverse=False)
+				rev_tus.sort(key=lambda x: x[0], reverse=True)
+				all_fwd_tus = []
+				all_rev_tus = []
+				# Process fwd TUs
+				for tu_idx in range(len(fwd_tus)):
+					all_fwd_tus.append(fwd_tus[tu_idx])
+					for next_tu_idx in range(tu_idx+1,len(fwd_tus)):
+						if fwd_tus[next_tu_idx][1] != None:
+							new_tu = [fwd_tus[tu_idx][0], fwd_tus[next_tu_idx][1]]
+							if new_tu not in all_fwd_tus:
+								all_fwd_tus.append(new_tu)
+					if fwd_tus[tu_idx][1] != None:
+						all_fwd_tus.append([fwd_tus[tu_idx][0], None])
+				# Process rev TUs
+				for tu_idx in range(len(rev_tus)):
+					all_rev_tus.append(rev_tus[tu_idx])
+					for next_tu_idx in range(tu_idx+1,len(rev_tus)):
+						if rev_tus[next_tu_idx][1] != None:
+							new_tu = [rev_tus[tu_idx][0], rev_tus[next_tu_idx][1]]
+							if new_tu not in all_rev_tus:
+								all_rev_tus.append(new_tu)
+					if rev_tus[tu_idx][1] != None:
+						all_rev_tus.append([rev_tus[tu_idx][0], None])
+				# Add the full set of TUs
+				all_units[v_key] = all_fwd_tus + all_rev_tus
+			# We wantto return all TUs (overwrite existing ones)
+			units = all_units
 		return units
+
+	def transcriptional_unit_seqs (self, variant, tus):
+		"""Extract the sequences of tus for a specific variant.
+
+	    Parameters
+	    ----------
+	    variant : string
+	        Name of the variant to extract sequences for.
+
+	    tus : list([promoter_idx, terminator_idx], ...)
+	    	TUs to find sequence for.
+
+	    Returns
+	    -------
+	    tu_seqs: list([transcript_id, transcript_seq]...)
+	        Sequences of the transcripts with a unique ID. Takes the form:
+	        	VARIANT_DIR_STARTIDX-ENDIDX_STARTBP-ENDBP
+		"""
+		tu_seqs = {}
+		for tu in tus:
+			tu_dir = self.variant_part_idx_dir(tu[0])
+			tu_start_bp = self.variant_part_idx_end_bp(variant, tu[0])
+			tu_end_bp = self.variant_part_idx_start_bp(variant, tu[1])
+			tu_id = ''
+			if self.variant_part_idx_dir(variant, tu[0]) == 'F'
+				tu_id = str(variant) + '_F_' + str(tu[0]) + '-'  + str(tu[1]) + '_'  + str(tu_start_bp) + '-'  + str(tu_end_bp)
+			else:
+				tu_id = str(variant) + '_R_' + str(tu[0]) + '-'  + str(tu[1]) + '_'  + str(tu_start_bp) + '-'  + str(tu_end_bp)
+			tu_seqs.append([tu_id, self.extract_seq_range(svariant, tu_start_bp, tu_end_bp, direction=tu_dir)])
+		return tu_seqs
 
 	def monocistronic_units (self):
 		"""Extract all monocistronic transcriptional units from a GeneClusterLibrary.
@@ -1968,7 +2018,8 @@ def make_library_from_csv (part_attribs_fn, variant_designs_fn, variant_attribs_
 	gene_cluster_lib = GeneClusterLibrary()
 	# Add the part data
 	for p_key in part_attribs.keys():
-		gene_cluster_lib.new_part(p_key, part_attribs[p_key][0], part_attribs[p_key][1], attribs=part_attribs[p_key][2])
+		gene_cluster_lib.new_part(p_key, part_attribs[p_key][0], part_attribs[p_key][1], 
+			                      attribs=part_attribs[p_key][2])
 	# Add the variants
 	for v_key in variant_designs.keys():
 		part_list = []

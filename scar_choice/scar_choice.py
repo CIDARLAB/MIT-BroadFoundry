@@ -4,7 +4,8 @@ Scar Choice
 ===========
 
     Script to help with the selection of orthogonal scars used for 
-    Golden-Gate like assembly of constructs.
+    Golden-Gate like assembly of constructs. Developed as part of the
+    MIT-Broad Foundry.
 
     Usage:
     ------

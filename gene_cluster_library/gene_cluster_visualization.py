@@ -29,20 +29,21 @@ __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
 
-def plot_library_arch (fig, gcl, start_idx=0, end_idx=None, linewidth=1.0, colormap=None, hatchmap=None):
+def plot_library_arch (fig, gcl, start_idx=0, end_idx=None, linewidth=1.0, scaleadjust=1.0):
 	for v_idx in range(len(gcl.variants.keys())):
 		v = gcl.variants.keys()[v_idx]
 		ax = fig.add_subplot(len(gcl.variants.keys()),1,v_idx)
-		plot_variant_arch(ax, gcl, v, start_idx=start_idx, end_idx=end_idx, linewidth=linewidth, colormap=colormap, hatchmap=hatchmap)
+		plot_variant_arch(ax, gcl, v, start_idx=start_idx, end_idx=end_idx, linewidth=linewidth, scaleadjust=scaleadjust)
 
-def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.0, colormap=None, hatchmap=None):
+def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.0, end_padding=20, scaleadjust=1.0):
 	# Calculate start and end bp
 	part_list = gcl.variants[variant]['part_list']
 	if end_idx == None:
 		end_idx = len(part_list)-1
 	if end_idx < 0:
 		end_idx = len(part_list)+end_idx
-	# Draw the parts
+	# Build the object for rendering
+	design = []
 	for el_idx in range(start_idx, end_idx+1):
 		part_name = part_list[el_idx]['part_name']
 		part_type =  gcl.parts[part_name]['type']
@@ -52,42 +53,31 @@ def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.
 			part_end_bp += part_list[el_idx]['seq_len']
 		else:
 			part_start_bp += part_list[el_idx]['seq_len']
-		part_color = None
-		if colormap != None and part_name in colormap.keys():
-			part_color = colormap[part_name]
-		part_hatch = None
-		if hatchmap != None and part_name in hatchmap.keys():
-			part_hatch = hatchmap[part_name]
-		
-		# Build the object for rendering
-
-		
-
-
-
-
-		if part_type == 'Promoter':
-			draw_promoter(ax, part_start_bp, part_end_bp, color=part_color, linewidth=linewidth, extent=60, arrow_len=30, arrow_width=1)
-		if part_type == 'CDS':
-			draw_cds(ax, part_start_bp, part_end_bp, color=part_color, hatch=part_hatch, linewidth=linewidth, arrow_extent=80)
-		if part_type == 'Terminator':
-			draw_terminator(ax, part_start_bp, part_end_bp, color=part_color, linewidth=linewidth, extent=20)
-		if part_type == 'RBS':
-			draw_rbs(ax, part_start_bp, part_end_bp, color=part_color, linewidth=linewidth, extent=30)
-	
-
-
-
+		opts = {}
+		for k in part_list[el_idx].keys():
+			if k not in ['part_name', 'type', 'seq_idx', 'dir']:
+				opts[k] = part_list[el_idx][k]
+		design.append({'type':part_type, 'name':part_name, 'fwd':part_list[el_idx]['dir'], 'start':part_start_bp, 'end':part_end_bp, 'opts':opts})
+	# Find the min and max bp to scale things properly
+	min_bp = design[0]['start']
+	max_bp = design[0]['start']
+	for el in design:
+		if el['start'] < min_bp:
+			min_bp = el['start']
+		if el['end'] < min_bp:
+			min_bp = el['end']
+		if el['start'] > max_bp:
+			max_bp = el['start']
+		if el['end'] > max_bp:
+			max_bp = el['end']
 	# Draw the elements
-	scale = 
-
+	design_len = float(max_bp-min_bp)
 	# Create the DNA renderer
-	dr = dpl.DNARenderer(scale=2000.0/1500.0) # Recomend scaling bp by 1500.0 to get similar glyph sizes
-
-	# Set the renders to draw elements
+	dr = dpl.DNARenderer(scale=(design_len/2000.0)*scaleadjust, linewidth=linewidth)
+	# Set the renders to draw elements (we don't draw regulation)
 	part_renderers = dr.trace_part_renderers()
-
-
+	# Redender the DNA to axis
+	start, end = dr.renderDNA(ax, design, part_renderers)
 	# Resize the axis and set bounds to ensure fully visible
 	start_bp = part_list[start_idx]['seq_idx']
 	if part_list[0]['dir'] == 'R':
@@ -95,15 +85,32 @@ def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.
 	end_bp = part_list[end_idx]['seq_idx'] + part_list[end_idx]['seq_len']
 	if part_list[0]['dir'] == 'R':
 		end_bp -= part_list[end_idx]['seq_len']
-	end_padding = 20
-	#ax.plot([start_bp-end_padding,end_bp+end_padding], [0,0], color=(0,0,0), linewidth=linewidth, zorder=1)
+	# Plot the backbone
+	bb_min_bp = design[0]['start']
+	bb_max_bp = design[0]['start']
+	for el in part_list:
+		temp_start_bp = el['seq_idx']
+		temp_end_bp = temp_start_bp
+		if el['dir'] == 'F':	
+			temp_end_bp += el['seq_len']
+		else:
+			temp_start_bp += el['seq_len']
+		if temp_start_bp < bb_min_bp:
+			bb_min_bp = temp_start_bp
+		if temp_end_bp < bb_min_bp:
+			bb_min_bp = temp_end_bp
+		if temp_start_bp > bb_max_bp:
+			bb_max_bp = temp_start_bp
+		if temp_end_bp > bb_max_bp:
+			bb_max_bp = temp_end_bp
+	ax.plot([bb_min_bp,bb_max_bp], [0,0], color=(0,0,0), linewidth=linewidth, zorder=1)
 	ax.set_xlim([start_bp-end_padding,end_bp+end_padding])
-	ax.set_ylim([-15,15])
+	ax.set_ylim([-8,8])
 	ax.set_axis_off()
 
-def plot_traces_with_arch (ax_arch, ax_traces, gcl, variant, traces, start_idx=None, end_idx=None, linewidth=1.2, colormap=None, hatchmap=None):
+def plot_traces_with_arch (ax_arch, ax_traces, gcl, variant, traces, start_idx=None, end_idx=None, linewidth=1.2, scaleadjust=1.0):
 	# Plot the architecture of the cluster
-	plot_variant_arch(ax_arch, gcl, variant, start_idx=start_idx, end_idx=end_idx, linewidth=linewidth, colormap=colormap, hatchmap=hatchmap)
+	plot_variant_arch(ax_arch, gcl, variant, start_idx=start_idx, end_idx=end_idx, linewidth=linewidth, scaleadjust=scaleadjust)
 	# Plot the traces (shared axis ensures only valid region plotted)
 	ts = np.array(traces[variant])
 	trace_len = len(ts[0])
@@ -123,14 +130,14 @@ def plot_traces_with_arch (ax_arch, ax_traces, gcl, variant, traces, start_idx=N
 	ax_traces.spines["top"].set_visible(False)
 	ax_traces.spines["bottom"].set_visible(False)
 	ax_traces.tick_params(axis='both', direction='out')
-	ax_traces.get_xaxis().tick_bottom()   # remove unneeded ticks 
+	ax_traces.get_xaxis().tick_bottom()
 	ax_traces.set_xticks([])
 	ax_traces.get_yaxis().tick_left()
 	ax_traces.tick_params(axis='x', labelsize=8)
 
-def plot_dual_traces_with_arch (ax_arch, ax_traces_1, ax_traces_2, gcl, variant, traces_1, traces_2, start_idx=None, end_idx=None, linewidth=1.2, colormap=None, hatchmap=None):
+def plot_dual_traces_with_arch (ax_arch, ax_traces_1, ax_traces_2, gcl, variant, traces_1, traces_2, start_idx=None, end_idx=None, linewidth=1.2, scaleadjust=1.0):
 	# Plot the architecture of the cluster
-	plot_variant_arch(ax_arch, gcl, variant, start_idx=start_idx, end_idx=end_idx, linewidth=linewidth, colormap=colormap, hatchmap=hatchmap)
+	plot_variant_arch(ax_arch, gcl, variant, start_idx=start_idx, end_idx=end_idx, linewidth=linewidth, scaleadjust=scaleadjust)
 	# Plot the traces (shared axis ensures only valid region plotted)
 	ts = np.array(traces_1[variant])
 	trace_len = len(ts[0])
@@ -173,7 +180,7 @@ def plot_dual_traces_with_arch (ax_arch, ax_traces_1, ax_traces_2, gcl, variant,
 	ax_traces_2.spines["top"].set_visible(False)
 	ax_traces_2.spines["bottom"].set_visible(False)
 	ax_traces_2.tick_params(axis='both', direction='out')
-	ax_traces_2.get_xaxis().tick_bottom()   # remove unneeded ticks 
+	ax_traces_2.get_xaxis().tick_bottom()
 	ax_traces_2.set_xticks([])
 	ax_traces_2.get_yaxis().tick_left()
 	ax_traces_2.tick_params(axis='x', labelsize=8)

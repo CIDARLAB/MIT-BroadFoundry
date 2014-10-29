@@ -855,7 +855,7 @@ def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth,
 	# Default options
 	color = (0.0,0.0,1.0)
 	y_extent = 6
-	x_extent = 50
+	x_extent = 30
 	arrowhead_height = 0.5
 	arrowhead_length = 15
 	highlight_y_extent = 0.8
@@ -883,7 +883,7 @@ def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth,
 		dir_fac = -1.0
 	# Draw the promoter symbol
 	l1 = Line2D([start_bp,start_bp],[0,dir_fac*y_extent], linewidth=linewidth, 
-		        color=color, zorder=13)
+		        color=color, zorder=14)
 	l2 = Line2D([start_bp,start_bp+dir_fac*x_extent*scale-dir_fac*arrowhead_length*0.5*scale],
                 [dir_fac*y_extent,dir_fac*y_extent], linewidth=linewidth, 
                 color=color, zorder=14)
@@ -900,7 +900,7 @@ def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth,
  	p2 = Polygon([(start_bp, -highlight_y_extent), 
  		          (start_bp, highlight_y_extent),
  		          (end_bp, highlight_y_extent),
- 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=13)
+ 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=14)
 	ax.add_patch(p2)
 	if opts != None and 'label' in opts.keys():
 		if start_bp > end_bp:

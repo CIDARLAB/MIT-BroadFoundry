@@ -61,6 +61,7 @@ def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.
 		
 		# Build the object for rendering
 
+		
 
 
 
@@ -78,7 +79,13 @@ def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.
 
 
 	# Draw the elements
-	
+	scale = 
+
+	# Create the DNA renderer
+	dr = dpl.DNARenderer(scale=2000.0/1500.0) # Recomend scaling bp by 1500.0 to get similar glyph sizes
+
+	# Set the renders to draw elements
+	part_renderers = dr.trace_part_renderers()
 
 
 	# Resize the axis and set bounds to ensure fully visible

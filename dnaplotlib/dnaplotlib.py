@@ -784,8 +784,6 @@ def temporary_repressor (ax, type, num, start, end, prev_end, scale, linewidth, 
 # Regulation renderers
 ###############################################################################
 
-arcHeight = 20
-
 def repress (ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts):
 	regulation(ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts)
 
@@ -815,8 +813,6 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 	
 	start = (from_part['start'] + from_part['end']) / 2
 	end   = (to_part['start']   + to_part['end']) / 2
-
-	#print to_part['name'],to_part['start'],to_part['end'], to_part['fwd']
 
 	top = arcHeight;
 	base = startHeight;

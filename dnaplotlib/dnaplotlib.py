@@ -51,7 +51,7 @@ def write_label (ax, label_text, x_pos, opts=None):
 	ax.text(x_pos+label_x_offset, label_y_offset, label_text, horizontalalignment='center',
 		    verticalalignment='center', fontsize=label_size, fontstyle=label_style, zorder=30)
 
-def sbol_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+def sbol_promoter (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0.0,0.0,0.0)
 	start_pad = 2.0
@@ -78,8 +78,8 @@ def sbol_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 			arrowhead_length = opts['arrowhead_length']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	dir_fac = 1.0
 	final_end = end
@@ -118,7 +118,7 @@ def sbol_promoter (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 	else:
 		return prev_end, final_end
 
-def sbol_cds (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+def sbol_cds (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0.7,0.7,0.7)
 	hatch = ''
@@ -148,8 +148,8 @@ def sbol_cds (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 			arrowhead_length = opts['arrowhead_length']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	dir_fac = 1.0
 	final_end = end
@@ -184,7 +184,7 @@ def sbol_cds (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	else:
 		return prev_end, final_end
 
-def sbol_terminator (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+def sbol_terminator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -205,8 +205,8 @@ def sbol_terminator (ax, type, num, start, end, prev_end, y_scale, linewidth, op
 			x_extent = opts['x_extent']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	dir_fac = 1.0
 	final_end = end
@@ -237,7 +237,7 @@ def sbol_terminator (ax, type, num, start, end, prev_end, y_scale, linewidth, op
 	else:
 		return prev_end, final_end
 
-def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+def sbol_rbs (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -255,8 +255,8 @@ def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 			x_extent = opts['x_extent']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	dir_fac = 1.0
 	final_end = end
@@ -289,16 +289,16 @@ def sbol_rbs (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 		return prev_end, final_end
 
 
-def sbol_ribozyme (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
-	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)	
-def sbol_protein_stability (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
-	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)	
-def sbol_protease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
-	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
-def sbol_ribonuclease (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
-	return stick_figure(ax,type,num,start,end,prev_end,y_scale,linewidth,opts)
+def sbol_ribozyme (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,scale,linewidth,opts)	
+def sbol_protein_stability (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,scale,linewidth,opts)	
+def sbol_protease (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,scale,linewidth,opts)
+def sbol_ribonuclease (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	return stick_figure(ax,type,num,start,end,prev_end,scale,linewidth,opts)
 
-def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+def stick_figure (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -338,8 +338,8 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 			linestyle = opts['linestyle']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	final_end = end
 	final_start = prev_end
@@ -432,7 +432,7 @@ def stick_figure (ax, type, num, start, end, prev_end, y_scale, linewidth, opts)
 		return prev_end, final_end
 
 
-def sbol_scar (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+def sbol_scar (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -456,8 +456,8 @@ def sbol_scar (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 			linestyle = opts['linestyle']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	final_end = end
 	final_start = prev_end
@@ -492,7 +492,7 @@ def sbol_scar (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	else:
 		return prev_end, final_end
 
-def sbol_spacer (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+def sbol_spacer (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -516,8 +516,8 @@ def sbol_spacer (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 			linestyle = opts['linestyle']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	final_end = end
 	final_start = prev_end
@@ -554,7 +554,7 @@ def sbol_spacer (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 		return prev_end, final_end
 
 
-def sbol_origin (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+def sbol_origin (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -578,8 +578,8 @@ def sbol_origin (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 			linestyle = opts['linestyle']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	final_end = end
 	final_start = prev_end
@@ -605,7 +605,7 @@ def sbol_origin (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
 	else:
 		return prev_end, final_end
 
-def sbol_operator (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+def sbol_operator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -629,8 +629,8 @@ def sbol_operator (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 			linestyle = opts['linestyle']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	final_end = end
 	final_start = prev_end
@@ -659,7 +659,7 @@ def sbol_operator (ax, type, num, start, end, prev_end, y_scale, linewidth, opts
 	else:
 		return prev_end, final_end
 
-def sbol_insulator (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+def sbol_insulator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -683,8 +683,8 @@ def sbol_insulator (ax, type, num, start, end, prev_end, y_scale, linewidth, opt
 			linestyle = opts['linestyle']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	final_end = end
 	final_start = prev_end
@@ -721,7 +721,7 @@ def sbol_insulator (ax, type, num, start, end, prev_end, y_scale, linewidth, opt
 		return prev_end, final_end
 
 
-def temporary_repressor (ax, type, num, start, end, prev_end, y_scale, linewidth, opts):
+def temporary_repressor (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (1.0,0.0,0.0)
 	start_pad = 2.0
@@ -748,8 +748,8 @@ def temporary_repressor (ax, type, num, start, end, prev_end, y_scale, linewidth
 			arrowhead_length = opts['arrowhead_length']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	dir_fac = 1.0
 	final_end = end
@@ -786,13 +786,13 @@ def temporary_repressor (ax, type, num, start, end, prev_end, y_scale, linewidth
 
 arcHeight = 20
 
-def repress (ax, type, num, from_part, to_part, y_scale, linewidth, arc_height_index, opts):
-	regulation(ax, type, num, from_part, to_part, y_scale, linewidth, arc_height_index, opts)
+def repress (ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts):
+	regulation(ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts)
 
-def induce (ax, type, num, from_part, to_part, y_scale, linewidth, arc_height_index, opts):
-	regulation(ax, type, num, from_part, to_part, y_scale, linewidth, arc_height_index, opts)
+def induce (ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts):
+	regulation(ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts)
 
-def regulation (ax, type, num, from_part, to_part, y_scale, linewidth, arc_height_index, opts):
+def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts):
 
 	color = (0.0,0.0,0.0)
 	arrowhead_length = 4
@@ -857,7 +857,7 @@ def regulation (ax, type, num, from_part, to_part, y_scale, linewidth, arc_heigh
 # Trace Icon Renderers (icon width corrisponds to trace data)
 ###############################################################################
 
-def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidth, opts):
+def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0.0,0.0,1.0)
 	y_extent = 6
@@ -881,8 +881,8 @@ def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidt
 			highlight_y_extent = opts['highlight_y_extent']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	dir_fac = 1.0
 	if start_bp > end_bp:
@@ -890,15 +890,15 @@ def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidt
 	# Draw the promoter symbol
 	l1 = Line2D([start_bp,start_bp],[0,dir_fac*y_extent], linewidth=linewidth, 
 		        color=color, zorder=13)
-	l2 = Line2D([start_bp,start_bp+dir_fac*x_extent-dir_fac*(arrowhead_length*0.5)],
+	l2 = Line2D([start_bp,start_bp+dir_fac*x_extent*scale-dir_fac*arrowhead_length*0.5*scale],
                 [dir_fac*y_extent,dir_fac*y_extent], linewidth=linewidth, 
                 color=color, zorder=14)
 	ax.add_line(l1)
 	ax.add_line(l2)
-	p1 = Polygon([(start_bp+dir_fac*x_extent-dir_fac*arrowhead_length, 
+	p1 = Polygon([(start_bp+dir_fac*x_extent*scale-dir_fac*arrowhead_length*scale, 
 		           dir_fac*y_extent+(arrowhead_height)), 
-		          (start_bp+dir_fac*x_extent, dir_fac*y_extent),
-		          (start_bp+dir_fac*x_extent-dir_fac*arrowhead_length, 
+		          (start_bp+dir_fac*(x_extent*scale), dir_fac*y_extent),
+		          (start_bp+dir_fac*x_extent*scale-dir_fac*arrowhead_length*scale, 
 		           dir_fac*y_extent-(arrowhead_height))],
 		          facecolor=color, edgecolor=color, linewidth=linewidth, zorder=14)
 	ax.add_patch(p1)
@@ -918,7 +918,7 @@ def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidt
 	else:
 		return start_bp, end_bp
 
-def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidth, opts):
+def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0.16,0.68,0.15)
 	y_extent = 3.5
@@ -936,8 +936,8 @@ def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidth, op
 			highlight_y_extent = opts['highlight_y_extent']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	dir_fac = 1.0
 	if start_bp > end_bp:
@@ -945,7 +945,7 @@ def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidth, op
 	# Draw the RBS symbol
 	l1 = Line2D([start_bp,start_bp],[0,dir_fac*y_extent], linewidth=linewidth, color=color, zorder=14)
 	ax.add_line(l1)
-	c1 = Ellipse((start_bp,dir_fac*y_extent),width=x_extent,height=y_extent*0.4,color=color, zorder=14)
+	c1 = Ellipse((start_bp,dir_fac*y_extent),width=(x_extent*scale),height=y_extent*0.4,color=color, zorder=14)
 	ax.add_artist(c1)
  	# Shade the promoter area (normally smaller than symbol extent)
  	p2 = Polygon([(start_bp, -highlight_y_extent), 
@@ -963,7 +963,7 @@ def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidth, op
 	else:
 		return start_bp, end_bp
 
-def trace_cds (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidth, opts):
+def trace_cds (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0.7,0.7,0.7)
 	hatch = ''
@@ -984,8 +984,8 @@ def trace_cds (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidth, op
 			arrowhead_length = opts['arrowhead_length']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	dir_fac = 1.0
 	if start_bp > end_bp:
@@ -993,11 +993,11 @@ def trace_cds (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidth, op
 	# Draw the CDS symbol
 	p1 = Polygon([(start_bp, y_extent), 
 		          (start_bp, -y_extent),
-		          (end_bp-dir_fac*arrowhead_length, -y_extent),
-		          (end_bp-dir_fac*arrowhead_length, -y_extent-arrowhead_height),
+		          (end_bp-dir_fac*arrowhead_length*scale, -y_extent),
+		          (end_bp-dir_fac*arrowhead_length*scale, -y_extent-arrowhead_height),
 		          (end_bp, 0),
-		          (end_bp-dir_fac*arrowhead_length, y_extent+arrowhead_height),
-		          (end_bp-dir_fac*arrowhead_length, y_extent)],
+		          (end_bp-dir_fac*arrowhead_length*scale, y_extent+arrowhead_height),
+		          (end_bp-dir_fac*arrowhead_length*scale, y_extent)],
 		          edgecolor=(0.0,0.0,0.0), facecolor=color, linewidth=linewidth, 
 		          hatch=hatch, zorder=15)
 	ax.add_patch(p1)
@@ -1011,7 +1011,7 @@ def trace_cds (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidth, op
 	else:
 		return start_bp, end_bp
 
-def trace_terminator (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewidth, opts):
+def trace_terminator (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (1.0,0.0,0.0)
 	y_extent = 3.5
@@ -1029,15 +1029,15 @@ def trace_terminator (ax, type, num, start_bp, end_bp, prev_end, y_scale, linewi
 			highlight_y_extent = opts['highlight_y_extent']
 		if 'linewidth' in opts.keys():
 			linewidth = opts['linewidth']
-		if 'y_scale' in opts.keys():
-			y_scale = opts['y_scale']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
 	# Check direction add start padding
 	dir_fac = 1.0
 	if start_bp > end_bp:
 		dir_fac = -1.0
 	# Draw the terminator symbol
 	l1 = Line2D([start_bp,start_bp],[0,dir_fac*y_extent], linewidth=linewidth, color=color, zorder=8)
-	l2 = Line2D([start_bp-x_extent,start_bp+x_extent],[dir_fac*y_extent,dir_fac*y_extent], linewidth=linewidth, color=color, zorder=14)
+	l2 = Line2D([start_bp-(x_extent*scale),start_bp+(x_extent*scale)],[dir_fac*y_extent,dir_fac*y_extent], linewidth=linewidth, color=color, zorder=14)
 	ax.add_line(l1)
 	ax.add_line(l2)
 	# Shade the terminator area (normally smaller than symbol extent)
@@ -1081,11 +1081,11 @@ class DNARenderer:
 	STD_REG_TYPES = ['Repression',
 	                 'Activation']
 
-	def __init__(self, y_scale=1.0, linewidth=1.0, 
+	def __init__(self, scale=1.0, linewidth=1.0, 
 		         backbone_pad_left=0.0, backbone_pad_right=0.0):
 		"""Constructor to generate an empty DNARenderer.
 		"""
-		self.y_scale = y_scale
+		self.scale = scale
 		self.linewidth = linewidth
 		self.backbone_pad_left = backbone_pad_left
 		self.backbone_pad_right = backbone_pad_right
@@ -1158,7 +1158,7 @@ class DNARenderer:
 					# Use custom renderer
 					prev_start, prev_end = part['renderer'](ax, part['type'], part_num, 
 						             part['start'], part['end'], prev_end,
-						             self.y_scale, self.linewidth, 
+						             self.scale, self.linewidth, 
 						             opts=part_opts)
 
 					#update start,end for regulation
@@ -1174,7 +1174,7 @@ class DNARenderer:
 						prev_start, prev_end = part_renderers[part['type']](ax, 
 							           part['type'], part_num, 
 							           part['start'], part['end'], 
-							           prev_end, self.y_scale, 
+							           prev_end, self.scale, 
 							           self.linewidth, opts=part_opts)
 						
 						#update start,end for regulation
@@ -1318,7 +1318,7 @@ class DNARenderer:
 						
 						reg_renderers[reg['type']](ax, reg['type'], 
 							           reg_num, reg['from_part'], 
-							           reg['to_part'], self.y_scale, 
+							           reg['to_part'], self.scale, 
 							           self.linewidth, reg['arc_height_index'], opts=reg_opts)
 				reg_num += 1
 		# Plot the backbone (z=1)

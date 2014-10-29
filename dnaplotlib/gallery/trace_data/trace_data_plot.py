@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Create the DNA renderer
-dr = dpl.DNARenderer()
+dr = dpl.DNARenderer(scale=2.0)
 
 # Set the renders to draw elements
 part_renderers = dr.trace_part_renderers()

@@ -556,9 +556,9 @@ class GeneClusterLibrary:
 		if end_bp != None and start_bp > end_bp:
 			direction = 'R'
 		if direction == 'F':
-			return the_seq[start_idx:end_idx]
+			return the_seq[start_bp:end_bp]
 		else:
-			return self.__reverse_complement(the_seq[end_idx:start_idx])
+			return self.__reverse_complement(the_seq[end_bp:start_bp])
 
 	def extract_part_idx_seq_range (self, variant_name, part_idx, start_offset, end_offset):
 		"""Extract sequence range from the start of a part in a specific variant.
@@ -1363,17 +1363,17 @@ class GeneClusterLibrary:
 	        Sequences of the transcripts with a unique ID. Takes the form:
 	        	VARIANT_DIR_STARTIDX-ENDIDX_STARTBP-ENDBP
 		"""
-		tu_seqs = {}
+		tu_seqs = []
 		for tu in tus:
-			tu_dir = self.variant_part_idx_dir(tu[0])
+			tu_dir = self.variant_part_idx_dir(variant, tu[0])
 			tu_start_bp = self.variant_part_idx_end_bp(variant, tu[0])
 			tu_end_bp = self.variant_part_idx_start_bp(variant, tu[1])
 			tu_id = ''
-			if self.variant_part_idx_dir(variant, tu[0]) == 'F'
+			if tu_dir == 'F':
 				tu_id = str(variant) + '_F_' + str(tu[0]) + '-'  + str(tu[1]) + '_'  + str(tu_start_bp) + '-'  + str(tu_end_bp)
 			else:
 				tu_id = str(variant) + '_R_' + str(tu[0]) + '-'  + str(tu[1]) + '_'  + str(tu_start_bp) + '-'  + str(tu_end_bp)
-			tu_seqs.append([tu_id, self.extract_seq_range(svariant, tu_start_bp, tu_end_bp, direction=tu_dir)])
+			tu_seqs.append([tu_id, self.extract_seq_range(variant, tu_start_bp, tu_end_bp, direction=tu_dir)])
 		return tu_seqs
 
 	def monocistronic_units (self):

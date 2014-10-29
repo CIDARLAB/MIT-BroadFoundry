@@ -21,17 +21,11 @@ OUTSTANDING
 
 - ***[TG] Final SBOL icons (ensure full compliance).
 
-- ***[TG] Add ability to show transcriptional traces and plot space correct symbols
-
 - [BD] Read SBOL file format to generate image, write SBOL file specifying the 'DnaComponents' (not for initial release).
 
 - ***[TG] PyDocs everywhere to generate documentation for API.
 
-- ***[TG] Option to label a part with the part name.
-
 - [BD] Automatic generation of all state diagrams of circuit regulation?
-
-- [EG] Test SBOL figure elements (create some basic diagrams with all parts, see "gallery").
 
 - [EG] ORM for integration with other tools in lab (less important at moment).
 
@@ -40,8 +34,6 @@ OUTSTANDING
 - [EG] Short tutorial/user guide for web-interface.
 
 - ***[TG,EG,BD] Basic user guide to help people getting started. Some tutorials.
-
-- ***[TG,EG,BD] Gallery of examples covering constructs, circuits, other functionality.
 
 - ***[TG,EG,BD] Bioinformatics paper (speak with Chris about publication). Wait until working, draft in online.
 
@@ -52,3 +44,15 @@ COMPLETED
 ---------
 
 - [TG,BD] Add regulation features.
+
+- ***[TG] Add ability to show transcriptional traces and plot space correct symbols
+
+- ***[TG] Option to label a part with the part name.
+
+- [EG] Test SBOL figure elements (create some basic diagrams with all parts, see "gallery").
+
+- ***[TG,EG,BD] Gallery of examples covering constructs, circuits, other functionality.
+
+
+
+

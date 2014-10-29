@@ -32,7 +32,7 @@ __version__ = '1.0'
 def plot_library_arch (fig, gcl, start_idx=0, end_idx=None, linewidth=1.0, scaleadjust=1.0):
 	for v_idx in range(len(gcl.variants.keys())):
 		v = gcl.variants.keys()[v_idx]
-		ax = fig.add_subplot(len(gcl.variants.keys()),1,v_idx)
+		ax = fig.add_subplot(len(gcl.variants.keys()),1,v_idx+1)
 		plot_variant_arch(ax, gcl, v, start_idx=start_idx, end_idx=end_idx, linewidth=linewidth, scaleadjust=scaleadjust)
 
 def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.0, end_padding=20, scaleadjust=1.0):
@@ -109,79 +109,32 @@ def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.
 	ax.set_axis_off()
 
 def plot_traces_with_arch (ax_arch, ax_traces, gcl, variant, traces, start_idx=None, end_idx=None, linewidth=1.2, scaleadjust=1.0):
+	""" ax_traces and traces are lists to plot to
+	"""
 	# Plot the architecture of the cluster
 	plot_variant_arch(ax_arch, gcl, variant, start_idx=start_idx, end_idx=end_idx, linewidth=linewidth, scaleadjust=scaleadjust)
-	# Plot the traces (shared axis ensures only valid region plotted)
-	ts = np.array(traces[variant])
-	trace_len = len(ts[0])
-	ax_traces.fill_between(range(trace_len),ts[0],np.zeros(trace_len), color='pink', edgecolor='red', linewidth=linewidth, zorder=1)
-	ax_traces.fill_between(range(trace_len),-ts[1],np.zeros(trace_len), color='lightblue', edgecolor='blue', linewidth=linewidth, zorder=1)
-	ax_traces.plot(range(trace_len), np.zeros(trace_len), color=(0,0,0), linewidth=linewidth, zorder=2)
-	# Scale the y-axis of the traces appropriately
-	max_read_depth = max(ts[0])
-	max_read_depth_1 = max(ts[1])
-	if max_read_depth_1 > max_read_depth:
-		max_read_depth = max_read_depth_1
-	max_read_depth *= 1.05
-	# Update axis visibility
-	ax_traces.set_ylim([-max_read_depth,max_read_depth])
-	#ax_traces.set_xlim([0,trace_len])
-	ax_traces.spines["right"].set_visible(False)
-	ax_traces.spines["top"].set_visible(False)
-	ax_traces.spines["bottom"].set_visible(False)
-	ax_traces.tick_params(axis='both', direction='out')
-	ax_traces.get_xaxis().tick_bottom()
-	ax_traces.set_xticks([])
-	ax_traces.get_yaxis().tick_left()
-	ax_traces.tick_params(axis='x', labelsize=8)
-
-def plot_dual_traces_with_arch (ax_arch, ax_traces_1, ax_traces_2, gcl, variant, traces_1, traces_2, start_idx=None, end_idx=None, linewidth=1.2, scaleadjust=1.0):
-	# Plot the architecture of the cluster
-	plot_variant_arch(ax_arch, gcl, variant, start_idx=start_idx, end_idx=end_idx, linewidth=linewidth, scaleadjust=scaleadjust)
-	# Plot the traces (shared axis ensures only valid region plotted)
-	ts = np.array(traces_1[variant])
-	trace_len = len(ts[0])
-	ax_traces_1.fill_between(range(trace_len),ts[0],np.zeros(trace_len), color='pink', edgecolor='red', linewidth=linewidth, zorder=1)
-	ax_traces_1.fill_between(range(trace_len),-ts[1],np.zeros(trace_len), color='lightblue', edgecolor='blue', linewidth=linewidth, zorder=1)
-	ax_traces_1.plot(range(trace_len), np.zeros(trace_len), color=(0,0,0), linewidth=linewidth, zorder=2)
-	# Scale the y-axis of the traces appropriately
-	max_read_depth = max(ts[0])
-	max_read_depth_1 = max(ts[1])
-	if max_read_depth_1 > max_read_depth:
-		max_read_depth = max_read_depth_1
-	max_read_depth *= 1.05
-	# Update axis visibility
-	ax_traces_1.set_ylim([-max_read_depth,max_read_depth])
-	#ax_traces.set_xlim([0,trace_len])
-	ax_traces_1.spines["right"].set_visible(False)
-	ax_traces_1.spines["top"].set_visible(False)
-	ax_traces_1.spines["bottom"].set_visible(False)
-	ax_traces_1.tick_params(axis='both', direction='out')
-	ax_traces_1.get_xaxis().tick_bottom()   # remove unneeded ticks 
-	ax_traces_1.set_xticks([])
-	ax_traces_1.get_yaxis().tick_left()
-	ax_traces_1.tick_params(axis='x', labelsize=8)
-	# Plot the second traces (shared axis ensures only valid region plotted)
-	ts = np.array(traces_2[variant])
-	trace_len = len(ts[0])
-	ax_traces_2.fill_between(range(trace_len),ts[0],np.zeros(trace_len), color='pink', edgecolor='red', linewidth=linewidth, zorder=1)
-	ax_traces_2.fill_between(range(trace_len),-ts[1],np.zeros(trace_len), color='lightblue', edgecolor='blue', linewidth=linewidth, zorder=1)
-	ax_traces_2.plot(range(trace_len), np.zeros(trace_len), color=(0,0,0), linewidth=linewidth, zorder=2)
-	# Scale the y-axis of the traces appropriately
-	max_read_depth = max(ts[0])
-	max_read_depth_1 = max(ts[1])
-	if max_read_depth_1 > max_read_depth:
-		max_read_depth = max_read_depth_1
-	max_read_depth *= 1.05
-	# Update axis visibility
-	ax_traces_2.set_ylim([-max_read_depth,max_read_depth])
-	#ax_traces.set_xlim([0,trace_len])
-	ax_traces_2.spines["right"].set_visible(False)
-	ax_traces_2.spines["top"].set_visible(False)
-	ax_traces_2.spines["bottom"].set_visible(False)
-	ax_traces_2.tick_params(axis='both', direction='out')
-	ax_traces_2.get_xaxis().tick_bottom()
-	ax_traces_2.set_xticks([])
-	ax_traces_2.get_yaxis().tick_left()
-	ax_traces_2.tick_params(axis='x', labelsize=8)
-
+	# Cycle trough axes and plot
+	for ax_idx in range(len(ax_traces)):
+		ax_trace = ax_traces[ax_idx]
+		# Plot the traces (shared axis ensures only valid region plotted)
+		ts = np.array(traces[ax_idx])
+		trace_len = len(ts[0])
+		ax_trace.fill_between(range(trace_len),ts[0],np.zeros(trace_len), color='pink', edgecolor='red', linewidth=linewidth, zorder=1)
+		ax_trace.fill_between(range(trace_len),-ts[1],np.zeros(trace_len), color='lightblue', edgecolor='blue', linewidth=linewidth, zorder=1)
+		ax_trace.plot(range(trace_len), np.zeros(trace_len), color=(0,0,0), linewidth=linewidth, zorder=2)
+		# Scale the y-axis of the traces appropriately
+		max_read_depth = max(ts[0])
+		max_read_depth_1 = max(ts[1])
+		if max_read_depth_1 > max_read_depth:
+			max_read_depth = max_read_depth_1
+		max_read_depth *= 1.05
+		# Update axis visibility
+		ax_trace.set_ylim([-max_read_depth,max_read_depth])
+		ax_trace.spines["right"].set_visible(False)
+		ax_trace.spines["top"].set_visible(False)
+		ax_trace.spines["bottom"].set_visible(False)
+		ax_trace.tick_params(axis='both', direction='out')
+		ax_trace.get_xaxis().tick_bottom()
+		ax_trace.set_xticks([])
+		ax_trace.get_yaxis().tick_left()
+		ax_trace.tick_params(axis='x', labelsize=8)

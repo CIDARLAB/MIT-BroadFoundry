@@ -40,7 +40,7 @@ ax_arch = plt.subplot(gs[1])
 ax_traces = plt.subplot(gs[0],sharex=ax_arch)
 # Load the traces for predicted and measured
 phys_reads = gca.load_stata_strand_data('./data/phys_depths3.csv')
-gcv.plot_traces_with_arch(ax_arch, ax_traces, nifs, '75', phys_reads, start_idx=1, 
+gcv.plot_traces_with_arch(ax_arch, [ax_traces], nifs, '75', [phys_reads['75']], start_idx=1, 
 	                      end_idx=-2, linewidth=1.2, scaleadjust=0.7)
 plt.tight_layout()
 fig.savefig('arch_and_trace.pdf')

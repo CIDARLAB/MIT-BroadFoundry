@@ -851,8 +851,6 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 		ax.add_line(line_ind1)
 		ax.add_line(line_ind2)
 
-
-
 ###############################################################################
 # Trace Icon Renderers (icon width corrisponds to trace data)
 ###############################################################################

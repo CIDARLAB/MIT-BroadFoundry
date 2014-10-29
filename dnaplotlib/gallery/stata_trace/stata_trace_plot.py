@@ -33,17 +33,28 @@ gcv.plot_library_arch(fig, nifs, linewidth=1.2, scaleadjust=0.6)
 plt.tight_layout()
 fig.savefig('library_rendering.pdf')
 
+# Load the traces for predicted and measured
+phys_reads = gca.load_stata_strand_data('./data/phys_depths3.csv')
+
 # Example plot of architecture with Tx traces
 gs = gridspec.GridSpec(2, 1, height_ratios=[2,1])
 fig = plt.figure(figsize=(14,4))
 ax_arch = plt.subplot(gs[1])
 ax_traces = plt.subplot(gs[0],sharex=ax_arch)
-# Load the traces for predicted and measured
-phys_reads = gca.load_stata_strand_data('./data/phys_depths3.csv')
 gcv.plot_traces_with_arch(ax_arch, [ax_traces], nifs, '75', [phys_reads['75']], start_idx=1, 
 	                      end_idx=-2, linewidth=1.2, scaleadjust=0.7)
 plt.tight_layout()
 fig.savefig('arch_and_trace.pdf')
+
+# Example plot of architecture with multiple Tx traces
+gs = gridspec.GridSpec(3, 1, height_ratios=[2,2,1])
+fig = plt.figure(figsize=(14,6))
+ax_arch = plt.subplot(gs[2])
+ax_traces = [plt.subplot(gs[0],sharex=ax_arch), plt.subplot(gs[1],sharex=ax_arch)]
+gcv.plot_traces_with_arch(ax_arch, ax_traces, nifs, '75', [phys_reads['75'], phys_reads['80']], start_idx=1, 
+	                      end_idx=-2, linewidth=1.2, scaleadjust=0.7)
+plt.tight_layout()
+fig.savefig('arch_and_multiple_traces.pdf')
 
 # Clear the plotting cache
 plt.close('all')

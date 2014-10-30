@@ -737,7 +737,6 @@ def sbol_primer_binding_site  (ax, type, num, start, end, prev_end, scale, linew
 		if 'scale' in opts.keys():
 			scale = opts['scale']
 	
-	# Direction is meaningless for this part => start is always < end
 	direction = 'F'
 	if start > end:
 		direction = 'R'
@@ -1003,23 +1002,80 @@ def sbol_signature  (ax, type, num, start, end, prev_end, scale, linewidth, opts
 			linewidth = opts['linewidth']
 		if 'scale' in opts.keys():
 			scale = opts['scale']
-	# Check direction add start padding
-	final_end = end
+	
+	direction = 'F'
+	if start > end:
+		direction = 'R'
+		temp_end = end
+		end = start
+		start = temp_end
+
+	final_end = prev_end
 	final_start = prev_end
 
-	start = prev_end+start_pad
-	end = start+x_extent
-	final_end = end+end_pad
-	
-	#white rectangle overlays backbone line
-	p1 = Polygon([(start, y_extent), 
-		          (start, -y_extent),
-		          (start+x_extent, -y_extent),
-		          (start+x_extent, y_extent)],
-		          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11)		
+	if direction == 'F':
+		final_start = prev_end
+		start = prev_end+start_pad
+		end = start+x_extent
+		final_end = end+end_pad
+	else:
+		final_start = prev_end
+		end = prev_end+end_pad
+		start = end+x_extent
+		final_start = start+start_pad
 
-	ax.add_patch(p1)
-	
+	indent_fac = (y_extent*2.0)*0.3
+	cross_width = (y_extent*2.0)*0.7
+
+	if direction == 'F':
+		p1 = Polygon([(start, y_extent), 
+			          (start, -y_extent),
+			          (start+x_extent, -y_extent),
+			          (start+x_extent, y_extent)],
+			          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11)		
+		ax.add_patch(p1)
+		top1x = start + indent_fac
+		top1y = y_extent - indent_fac
+		top2x = start + cross_width
+		top2y = y_extent - indent_fac
+		bot1x = start + indent_fac
+		bot1y = -y_extent + indent_fac
+		bot2x = start + cross_width
+		bot2y = -y_extent + indent_fac
+		lcross1 = Line2D([top1x,bot2x],[top1y,bot2y], 
+		                  linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+		lcross2 = Line2D([top2x,bot1x],[top2y,bot1y], 
+		                  linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+		ax.add_line(lcross1)
+		ax.add_line(lcross2)
+		lsign = Line2D([bot2x+indent_fac,end-indent_fac],[-y_extent+indent_fac,-y_extent+indent_fac], 
+		               linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+		ax.add_line(lsign)
+	else:
+		p1 = Polygon([(start, y_extent), 
+			          (start, -y_extent),
+			          (start-x_extent, -y_extent),
+			          (start-x_extent, y_extent)],
+			          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11)
+		ax.add_patch(p1)
+		top1x = start - indent_fac
+		top1y = y_extent - indent_fac
+		top2x = start - cross_width
+		top2y = y_extent - indent_fac
+		bot1x = start - indent_fac
+		bot1y = -y_extent + indent_fac
+		bot2x = start - cross_width
+		bot2y = -y_extent + indent_fac
+		lcross1 = Line2D([top1x,bot2x],[top1y,bot2y], 
+		                  linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+		lcross2 = Line2D([top2x,bot1x],[top2y,bot1y], 
+		                  linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+		ax.add_line(lcross1)
+		ax.add_line(lcross2)
+		lsign = Line2D([bot2x-indent_fac,end+indent_fac],[y_extent-indent_fac,y_extent-indent_fac], 
+		               linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+		ax.add_line(lsign)
+
 	if opts != None and 'label' in opts.keys():
 		if final_start > final_end:
 			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)

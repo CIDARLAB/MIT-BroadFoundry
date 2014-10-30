@@ -492,6 +492,207 @@ def sbol_scar (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	else:
 		return prev_end, final_end
 
+
+def sbol_5_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	x_extent = 3.0
+	y_extent = 1.0
+	linestyle = '-'
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
+	# Check direction add start padding
+	final_end = end
+	final_start = prev_end
+
+	start = prev_end+start_pad
+	end = start+x_extent
+	final_end = end+end_pad
+	
+	l_top    = Line2D([start-x_extent,start+x_extent],[y_extent,y_extent], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	l_bottom = Line2D([start,start+x_extent],[-1*y_extent,-1*y_extent], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	#white rectangle overlays backbone line
+	p1 = Polygon([(start-x_extent, y_extent), 
+		          (start-x_extent, -y_extent),
+		          (start+x_extent, -y_extent),
+		          (start+x_extent, y_extent)],
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+
+	ax.add_patch(p1)
+	ax.add_line(l_top)
+	ax.add_line(l_bottom)
+
+	if opts != None and 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
+
+def sbol_3_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	x_extent = 3.0
+	y_extent = 1.0
+	linestyle = '-'
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
+	# Check direction add start padding
+	final_end = end
+	final_start = prev_end
+
+	start = prev_end+start_pad
+	end = start+x_extent
+	final_end = end+end_pad
+	
+	l_top    = Line2D([start-x_extent,start+x_extent],[y_extent,y_extent], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	l_bottom = Line2D([start-x_extent,start],[-1*y_extent,-1*y_extent], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	#white rectangle overlays backbone line
+	p1 = Polygon([(start-x_extent, y_extent), 
+		          (start-x_extent, -y_extent),
+		          (start+x_extent, -y_extent),
+		          (start+x_extent, y_extent)],
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+
+	ax.add_patch(p1)
+	ax.add_line(l_top)
+	ax.add_line(l_bottom)
+
+	if opts != None and 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
+
+def sbol_blunt_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	return prev_end, prev_end
+
+def sbol_primer_binding_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	return prev_end, prev_end
+
+def sbol_5_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	return prev_end, prev_end
+
+def sbol_3_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	return prev_end, prev_end
+
+def sbol_user_defined  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	return prev_end, prev_end
+
+def sbol_signature  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	return prev_end, prev_end
+
+def sbol_restriction_site (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	x_extent = 3.0
+	y_extent = 1.0
+	linestyle = '-'
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
+	# Check direction add start padding
+	final_end = end
+	final_start = prev_end
+
+	start = prev_end+start_pad
+	end = start+x_extent
+	final_end = end+end_pad
+	
+	l_top    = Line2D([start-x_extent,start+x_extent],[y_extent,y_extent], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	l_bottom = Line2D([start-x_extent,start],[-1*y_extent,-1*y_extent], 
+		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	#white rectangle overlays backbone line
+	p1 = Polygon([(start-x_extent, y_extent), 
+		          (start-x_extent, -y_extent),
+		          (start+x_extent, -y_extent),
+		          (start+x_extent, y_extent)],
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+
+	ax.add_patch(p1)
+	ax.add_line(l_top)
+	ax.add_line(l_bottom)
+
+	if opts != None and 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
+
+
+
 def sbol_spacer (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
@@ -1100,6 +1301,15 @@ class DNARenderer:
 			'Operator'         :sbol_operator,
 			'Origin'           :sbol_origin,
 			'Insulator'        :sbol_insulator,
+			'5Overhang'        :sbol_5_overhang,
+			'3Overhang'        :sbol_3_overhang,
+			'RestrictionSite'  :sbol_restriction_site,
+			'BluntRestrictionSite'   :sbol_blunt_restriction_site,
+			'PrimerBindingSite'      :sbol_primer_binding_site,
+			'5StickyRestrictionSite' :sbol_5_sticky_restriction_site,
+			'3StickyRestrictionSite' :sbol_3_sticky_restriction_site,
+			'UserDefined'      :sbol_user_defined,
+			'Signature'        :sbol_signature,
 			'Repressor'        :temporary_repressor}
 
 	def trace_part_renderers (self):

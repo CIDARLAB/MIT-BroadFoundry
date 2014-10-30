@@ -194,24 +194,11 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 		                 backbone_pad_left=left_pad, 
 		                 backbone_pad_right=right_pad)
 
-	reg_renderers = {'Repression'  :dpl.repress, 
-	                 'Activation'  :dpl.induce}
+	# We default to the standard regulation renderers
+	reg_renderers = dr.std_reg_renderers()
 
 	# We default to the SBOL part renderers
-	part_renderers = {'Promoter'  :dpl.sbol_promoter, 
-	                  'CDS'       :dpl.sbol_cds, 
-                      'Terminator':dpl.sbol_terminator,
-                      'RBS'       :dpl.sbol_rbs,
-                      'Scar'	  :dpl.sbol_scar,
-                      'Spacer'	  :dpl.sbol_spacer,
-                      'Ribozyme'          :dpl.sbol_ribozyme,
-                      'Ribonuclease'      :dpl.sbol_ribonuclease,
-                      'ProteinStability'  :dpl.sbol_protein_stability,
-                      'Protease'          :dpl.sbol_protease,
-                      'Operator'  :dpl.sbol_operator,
-                      'Origin'    :dpl.sbol_origin,
-                      'Insulator' :dpl.sbol_insulator,
-                      'Repressor' :dpl.temporary_repressor}
+	part_renderers = dr.SBOL_part_renderers()
 
     # Create the figure
 	fig = plt.figure(figsize=(plot_params['fig_x'],plot_params['fig_y']))

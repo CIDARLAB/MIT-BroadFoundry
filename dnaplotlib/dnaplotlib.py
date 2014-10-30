@@ -492,11 +492,32 @@ def sbol_scar (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	else:
 		return prev_end, final_end
 
+def sbol_empty_space (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	# Default options
+	x_extent = 12.0
+	# Reset defaults if provided
+	if opts != None:
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+	# Check direction add start padding
+	final_start = prev_end
+	final_end = final_start+x_extent
+
+	if opts != None and 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
+
 
 def sbol_5_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
-	start_pad = 2.0
+	start_pad = 0.0
 	end_pad = 2.0
 	x_extent = 3.0
 	y_extent = 1.0
@@ -557,7 +578,7 @@ def sbol_3_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
-	end_pad = 2.0
+	end_pad = 0.0
 	x_extent = 3.0
 	y_extent = 1.0
 	linestyle = '-'
@@ -614,35 +635,226 @@ def sbol_3_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 		return prev_end, final_end
 
 def sbol_blunt_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
-	return prev_end, prev_end
-
-def sbol_primer_binding_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
-	return prev_end, prev_end
-
-def sbol_5_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
-	return prev_end, prev_end
-
-def sbol_3_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
-	return prev_end, prev_end
-
-def sbol_user_defined  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
-	return prev_end, prev_end
-
-def sbol_signature  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
-	return prev_end, prev_end
-
-def sbol_restriction_site (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
 	end_pad = 2.0
-	x_extent = 3.0
-	y_extent = 1.0
+	y_extent = 4.0
+	x_extent = 1.5
+	site_space = 1.5
 	linestyle = '-'
 	# Reset defaults if provided
 	if opts != None:
 		if 'color' in opts.keys():
 			color = opts['color']
+		if 'site_space' in opts.keys():
+			site_space = opts['site_space']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
+	
+	# Direction is meaningless for this part => start is always < end
+	if start > end:
+		temp_end = end
+		end = start
+		start = temp_end
+
+	# Check direction add start padding
+	final_end = end
+	final_start = prev_end
+	start = prev_end+start_pad
+	end = start+x_extent+site_space+x_extent
+	final_end = end+end_pad
+	
+	l1        = Line2D([start+x_extent,start+x_extent],[-y_extent,y_extent], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	l1_top    = Line2D([start,start+x_extent],[y_extent,y_extent], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	l1_bottom = Line2D([start,start+x_extent],[-y_extent,-y_extent], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+
+	l2        = Line2D([end-x_extent,end-x_extent],[-y_extent,y_extent], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	l2_top    = Line2D([end,end-x_extent],[y_extent,y_extent], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	l2_bottom = Line2D([end,end-x_extent],[-y_extent,-y_extent], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	
+	ax.add_line(l1)
+	ax.add_line(l1_top)
+	ax.add_line(l1_bottom)
+	ax.add_line(l2)
+	ax.add_line(l2_top)
+	ax.add_line(l2_bottom)
+
+	if opts != None and 'label' in opts.keys():
+		write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
+	return final_start, final_end
+
+def sbol_primer_binding_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	return prev_end, prev_end
+
+def sbol_5_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	y_extent = 4.0
+	x_extent = 8.0
+	end_space = 1.0
+	linestyle = '-'
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'end_space' in opts.keys():
+			end_space = opts['end_space']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
+	
+	# Direction is meaningless for this part => start is always < end
+	if start > end:
+		temp_end = end
+		end = start
+		start = temp_end
+
+	# Check direction add start padding
+	final_end = end
+	final_start = prev_end
+	start = prev_end+start_pad
+	end = start+end_space+x_extent+end_space
+	final_end = end+end_pad
+	
+	l1        = Line2D([start+end_space,start+end_space+x_extent],[0,0], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	l1_top    = Line2D([start+end_space,start+end_space],[0,y_extent], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	l1_bottom = Line2D([start+end_space+x_extent,start+end_space+x_extent],[0,-y_extent], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	ax.add_line(l1)
+	ax.add_line(l1_top)
+	ax.add_line(l1_bottom)
+
+	# White rectangle overlays backbone line
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
+		          (end, -y_extent),
+		          (end, y_extent)],
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+
+	ax.add_patch(p1)
+
+	if opts != None and 'label' in opts.keys():
+		write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
+	return final_start, final_end
+
+def sbol_3_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	y_extent = 4.0
+	x_extent = 8.0
+	end_space = 1.0
+	linestyle = '-'
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'end_space' in opts.keys():
+			end_space = opts['end_space']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
+	
+	# Direction is meaningless for this part => start is always < end
+	if start > end:
+		temp_end = end
+		end = start
+		start = temp_end
+
+	# Check direction add start padding
+	final_end = end
+	final_start = prev_end
+	start = prev_end+start_pad
+	end = start+end_space+x_extent+end_space
+	final_end = end+end_pad
+	
+	l1        = Line2D([start+end_space,start+end_space+x_extent],[0,0], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	l1_top    = Line2D([start+end_space+x_extent,start+end_space+x_extent],[0,y_extent], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	l1_bottom = Line2D([start+end_space,start+end_space],[0,-y_extent], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	ax.add_line(l1)
+	ax.add_line(l1_top)
+	ax.add_line(l1_bottom)
+
+	# White rectangle overlays backbone line
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
+		          (end, -y_extent),
+		          (end, y_extent)],
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+
+	ax.add_patch(p1)
+
+	if opts != None and 'label' in opts.keys():
+		write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
+	return final_start, final_end
+
+def sbol_user_defined  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	x_extent = 12.0
+	y_extent = 3.0
+	linestyle = '-'
+	fill_color = (1,1,1)
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'fill_color' in opts.keys():
+			fill_color = opts['fill_color']
 		if 'start_pad' in opts.keys():
 			start_pad = opts['start_pad']
 		if 'end_pad' in opts.keys():
@@ -665,20 +877,117 @@ def sbol_restriction_site (ax, type, num, start, end, prev_end, scale, linewidth
 	end = start+x_extent
 	final_end = end+end_pad
 	
-	l_top    = Line2D([start-x_extent,start+x_extent],[y_extent,y_extent], 
-		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	l_bottom = Line2D([start-x_extent,start],[-1*y_extent,-1*y_extent], 
-		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
 	#white rectangle overlays backbone line
-	p1 = Polygon([(start-x_extent, y_extent), 
-		          (start-x_extent, -y_extent),
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11)		
 
 	ax.add_patch(p1)
-	ax.add_line(l_top)
-	ax.add_line(l_bottom)
+	
+	if opts != None and 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
+
+def sbol_signature  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	x_extent = 12.0
+	y_extent = 3.0
+	linestyle = '-'
+	fill_color = (1,1,1)
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'fill_color' in opts.keys():
+			fill_color = opts['fill_color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
+	# Check direction add start padding
+	final_end = end
+	final_start = prev_end
+
+	start = prev_end+start_pad
+	end = start+x_extent
+	final_end = end+end_pad
+	
+	#white rectangle overlays backbone line
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
+		          (start+x_extent, -y_extent),
+		          (start+x_extent, y_extent)],
+		          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11)		
+
+	ax.add_patch(p1)
+	
+	if opts != None and 'label' in opts.keys():
+		if final_start > final_end:
+			write_label(ax, opts['label'], final_end+((final_start-final_end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], final_start+((final_end-final_start)/2.0), opts=opts)
+
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
+
+def sbol_restriction_site (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	y_extent = 4.0
+	linestyle = '-'
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
+	# Check direction add start padding
+	final_end = end
+	final_start = prev_end
+
+	start = prev_end+start_pad
+	end = start + linewidth
+	final_end = end+end_pad
+	
+	l1    = Line2D([start,start],[-y_extent,y_extent], 
+		           linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
+	ax.add_line(l1)
 
 	if opts != None and 'label' in opts.keys():
 		if final_start > final_end:
@@ -924,7 +1233,7 @@ def sbol_insulator (ax, type, num, start, end, prev_end, scale, linewidth, opts)
 
 def temporary_repressor (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
-	color = (1.0,0.0,0.0)
+	color = (0.7,0.7,0.7)
 	start_pad = 2.0
 	end_pad = 2.0
 	y_extent = 10
@@ -1294,6 +1603,7 @@ class DNARenderer:
 			'RBS'              :sbol_rbs,
 			'Scar'             :sbol_scar,
 			'Spacer'	       :sbol_spacer,
+			'EmptySpace'	   :sbol_empty_space,
 			'Ribozyme'         :sbol_ribozyme,
 			'Ribonuclease'     :sbol_ribonuclease,
 			'ProteinStability' :sbol_protein_stability,
@@ -1331,7 +1641,6 @@ class DNARenderer:
 			- regs: list of regulations on the DNA
 			- reg_renderers: dict of standard regulation renderers
 		"""
-
 		# Plot the parts to the axis
 		part_num = 0
 		prev_end = 0
@@ -1419,11 +1728,8 @@ class DNARenderer:
 			regs.sort(key=lambda x: x['arclength'], reverse=False)
 
 			reg_num = 0
-			
-
 			pos_arc_ranges = [] # arc above DNA backbone if to_part is fwd
 			neg_arc_ranges = [] # arc below DNA backbone if to_part is reverse
-			
 			current_max = 1
 
 			# second pass to render all the arcs

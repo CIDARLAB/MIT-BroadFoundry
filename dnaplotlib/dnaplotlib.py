@@ -240,7 +240,7 @@ def sbol_terminator (ax, type, num, start, end, prev_end, scale, linewidth, opts
 
 def sbol_rbs (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
-	color = (0,0,0)
+	color = (0.7,0.7,0.7)
 	start_pad = 2.0
 	end_pad = 2.0
 	x_extent = 10.0

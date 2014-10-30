@@ -19,7 +19,8 @@ dnaplotlib
 #    All rights reserved.
 #    OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
 
-from matplotlib.patches import Polygon, Ellipse, Wedge, Circle
+from matplotlib.patches import Polygon, Ellipse, Wedge, Circle, PathPatch
+from matplotlib.path import Path
 from matplotlib.lines   import Line2D
 from math import sqrt
 from math import fabs
@@ -704,7 +705,83 @@ def sbol_blunt_restriction_site  (ax, type, num, start, end, prev_end, scale, li
 	return final_start, final_end
 
 def sbol_primer_binding_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
-	return prev_end, prev_end
+	# Default options
+	color = (0,0,0)
+	start_pad = 2.0
+	end_pad = 2.0
+	y_extent = 2.0
+	y_offset = 1.5
+	x_extent = 8.0
+	arrowhead_length = 2.0
+	linestyle = '-'
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'start_pad' in opts.keys():
+			start_pad = opts['start_pad']
+		if 'end_pad' in opts.keys():
+			end_pad = opts['end_pad']
+		if 'x_extent' in opts.keys():
+			x_extent = opts['x_extent']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'y_offset' in opts.keys():
+			y_offset = opts['y_offset']
+		if 'arrowhead_length' in opts.keys():
+			arrowhead_length = opts['arrowhead_length']
+		if 'linestyle' in opts.keys():
+			linestyle = opts['linestyle']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
+	
+	# Direction is meaningless for this part => start is always < end
+	direction = 'F'
+	if start > end:
+		direction = 'R'
+		temp_end = end
+		end = start
+		start = temp_end
+
+	final_end = prev_end
+	final_start = prev_end
+
+	if direction == 'F':
+		final_start = prev_end
+		start = prev_end+start_pad
+		end = start+x_extent
+		final_end = end+end_pad
+	else:
+		final_start = prev_end
+		end = prev_end+end_pad
+		start = end+x_extent
+		final_start = start+start_pad
+
+	if direction == 'F':
+		verts = [(start, y_offset), (end, y_offset), (end-arrowhead_length, y_offset+y_extent)]
+		codes = [Path.MOVETO, Path.LINETO, Path.LINETO]
+		path = Path(verts, codes)
+		patch = PathPatch(path, lw=linewidth, edgecolor=color, facecolor=(1,1,1))
+		ax.add_patch(patch)
+	else:
+		verts = [(start, -y_offset), (end, -y_offset), (end+arrowhead_length, -y_offset-y_extent)]
+		codes = [Path.MOVETO, Path.LINETO, Path.LINETO]
+		path = Path(verts, codes)
+		patch = PathPatch(path, lw=linewidth, edgecolor=color, facecolor=(1,1,1))
+		ax.add_patch(patch)
+
+	if opts != None and 'label' in opts.keys():
+		if start > end:
+			write_label(ax, opts['label'], end+((start-end)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], start+((end-start)/2.0), opts=opts)
+
+	if final_start > final_end:
+		return prev_end, final_start
+	else:
+		return prev_end, final_end
 
 def sbol_5_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
@@ -1230,7 +1307,7 @@ def sbol_insulator (ax, type, num, start, end, prev_end, scale, linewidth, opts)
 	else:
 		return prev_end, final_end
 
-
+# Not used at present
 def temporary_repressor (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	# Default options
 	color = (0.7,0.7,0.7)
@@ -1619,8 +1696,7 @@ class DNARenderer:
 			'5StickyRestrictionSite' :sbol_5_sticky_restriction_site,
 			'3StickyRestrictionSite' :sbol_3_sticky_restriction_site,
 			'UserDefined'      :sbol_user_defined,
-			'Signature'        :sbol_signature,
-			'Repressor'        :temporary_repressor}
+			'Signature'        :sbol_signature}
 
 	def trace_part_renderers (self):
 		return {

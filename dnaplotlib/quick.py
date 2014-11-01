@@ -170,7 +170,7 @@ def main():
 	######################################################################
 	#  make figure
 	######################################################################
-	command = "python -W ignore ../../plot_SBOL_designs.py"
+	command = "~/anaconda/bin/python -W ignore " + os.path.dirname(__file__) + "/plot_SBOL_designs.py"
 	options = ""
 	options += " -params plot_parameters.csv"
 	options += " -parts part_information.csv"

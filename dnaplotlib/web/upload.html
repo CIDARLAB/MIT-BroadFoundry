@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head lang="en">
+    <meta charset="UTF-8">
+    <script src="//code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="js/download.js"></script>
+    <script src="js/jquery.csv-0.71.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Maven+Pro">
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <link rel="shortcut icon" href="images/cds_icon.jpg">
+
+    <title>dnaplotapp</title>
+</head>
+<body>
+
+
+
+<div class="container">
+
+    <input type="file" id="params"  onchange="processParamsFile(this)"><br>
+    <input type="file" id="parts"   onchange="processPartsFile(this)"><br>
+    <input type="file" id="designs" onchange="processDesignsFile(this)"><br>
+    <input type="file" id="reg"     onchange="processRegFile(this)"><br>
+
+    <form id="formSubmit" action="JavaScript:plotDNA()" method="post">
+        <div class="centered">
+            <button class="btn" type="submit" id="submit">submit</button>
+            <br/><br/><br/>
+        </div>
+    </form>
+
+    <iframe id='frame' src="" style="height: 1000px; width: 100%; display: none"></iframe>
+
+</div>
+
+</body>
+</html>
+
+
+
+<script>
+
+    var params_text = "";
+    var parts_text = "";
+    var designs_text = "";
+    var reg_text = "";
+
+    var params_arrays  = null;
+    var parts_arrays   = null;
+    var designs_arrays = null;
+    var reg_arrays = null;
+
+
+    function processParamsFile(that)
+    {
+        if(that.files && that.files[0])
+        {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                params_arrays = $.csv.toArrays(e.target.result);
+                for(var i=0; i<params_arrays.length; i++) {
+                    params_text += params_arrays[i] + 'newline';
+                }
+                var res = params_text.replace(/;/g, "semicolon");
+                params_text = res;
+                //alert(params_text);
+            }
+            reader.readAsText(that.files[0]);
+        }
+    }
+    function processPartsFile(that)
+    {
+        if(that.files && that.files[0])
+        {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                parts_arrays = $.csv.toArrays(e.target.result);
+                for(var i=0; i<parts_arrays.length; i++) {
+                    parts_text += parts_arrays[i] + 'newline';
+                }
+                var res = parts_text.replace(/;/g, "semicolon");
+                parts_text = res;
+                //alert(parts_text);
+            }
+            reader.readAsText(that.files[0]);
+        }
+    }
+    function processDesignsFile(that)
+    {
+        if(that.files && that.files[0])
+        {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                designs_arrays = $.csv.toArrays(e.target.result);
+                for(var i=0; i<designs_arrays.length; i++) {
+                    designs_text += designs_arrays[i] + 'newline';
+                }
+                var res = designs_text.replace(/;/g, "semicolon");
+                designs_text = res;
+                //alert(designs_text);
+            }
+            reader.readAsText(that.files[0]);
+        }
+    }
+    function processRegFile(that)
+    {
+        if(that.files && that.files[0])
+        {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                reg_arrays = $.csv.toArrays(e.target.result);
+                for(var i=0; i<reg_arrays.length; i++) {
+                    reg_text += reg_arrays[i] + 'newline';
+                }
+                var res = reg_text.replace(/;/g, "semicolon");
+                reg_text = res;
+            }
+            reader.readAsText(that.files[0]);
+        }
+    }
+
+    function plotDNA() {
+        jobID = new Date() / 1000;
+        jobID *= 1000;//milliseconds since epoch
+
+        var out_pdf = jobID + "_out.pdf";
+
+        $.ajax({
+            url: "/dnaplotapp/cgi-bin/run_upload.pl",
+            type: "POST",
+            data: 'out_pdf='+out_pdf + '&params='+params_text + '&parts='+parts_text + '&designs='+designs_text + '&reg='+reg_text + '&id='+jobID,
+            success: function() {
+                $('#frame').attr('src', "/dnaplotapp/results/"+out_pdf);
+                $('#frame').css('display', 'block');
+            }
+        });
+    }
+
+
+</script>
+
+<style>
+
+</style>

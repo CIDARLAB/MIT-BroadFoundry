@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head lang="en">
+    <meta charset="UTF-8">
+    <script src="//code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="js/download.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <link rel="shortcut icon" href="images/cds_icon.jpg">
+
+    <title>dnaplotapp</title>
+</head>
+<body oncontextmenu="return false">
+
+<div class="container">
+
+    <div class="centered">
+        <img class="particon" src="images/p.png" id="Promoter">
+        <img class="particon" src="images/i.png" id="Ribozyme">
+        <img class="particon" src="images/r.png" id="RBS">
+        <img class="particon" src="images/c.png" id="CDS">
+        <img class="particon" src="images/t.png" id="Terminator">
+        <img class="particon" src="images/s.png" id="Spacer">
+        <img class="particon" src="images/=.png" id="Scar">
+    </div>
+    <br clear="both">
+    <div class="centered">
+        <img class="reverse_particon" src="images/p.png" id="rPromoter">
+        <img class="reverse_particon" src="images/i.png" id="rRibozyme">
+        <img class="reverse_particon" src="images/r.png" id="rRBS">
+        <img class="reverse_particon" src="images/c.png" id="rCDS">
+        <img class="reverse_particon" src="images/t.png" id="rTerminator">
+        <img class="reverse_particon" src="images/s.png" id="rSpacer">
+        <img class="reverse_particon" src="images/=.png" id="rScar">
+        <br clear="both">
+    </div>
+
+    <br><br>
+    <div class="centered">
+        <canvas class="swatch" id="black"       style="background-color: #000000; border: 5px solid black"></canvas>
+        <canvas class="swatch" id="gray"        style="background-color: #888888" ></canvas>
+        <canvas class="swatch" id="red"         style="background-color: #E31A1C" ></canvas>
+        <canvas class="swatch" id="lightred"    style="background-color: #FB9A99" ></canvas>
+        <canvas class="swatch" id="orange"      style="background-color: #FF7F00" ></canvas>
+        <canvas class="swatch" id="lightorange" style="background-color: #FDBF6F" ></canvas>
+        <canvas class="swatch" id="yellow"      style="background-color: #FFFF00" ></canvas>
+        <canvas class="swatch" id="lightyellow" style="background-color: #FFFF99" ></canvas>
+        <canvas class="swatch" id="green"       style="background-color: #33A02C" ></canvas>
+        <canvas class="swatch" id="lightgreen"  style="background-color: #B2DF8A" ></canvas>
+        <canvas class="swatch" id="blue"        style="background-color: #1F78B4" ></canvas>
+        <canvas class="swatch" id="lightblue"   style="background-color: #A6CEE3" ></canvas>
+        <canvas class="swatch" id="purple"      style="background-color: #6A3D9A" ></canvas>
+        <canvas class="swatch" id="lightpurple" style="background-color: #CAB2D6" ></canvas>
+    </div>
+    <br clear="both">
+
+
+
+    <textarea class="center" id="quick_input" style="width: 100%"> </textarea>
+
+
+    <form id="formSubmit" action="JavaScript:plotDNA()" method="post">
+        <div class="centered">
+            <button class="btn" type="submit" id="submit">submit</button>
+            <br/><br/><br/>
+        </div>
+    </form>
+
+
+    <iframe id='frame' src="" style="width: 100%; display: none"></iframe>
+
+</div>
+
+</body>
+</html>
+
+
+
+<script>
+
+    function plotDNA() {
+        jobID = new Date() / 1000;
+        jobID *= 1000;//milliseconds since epoch
+
+        var in_text = $('#quick_input').val();
+        var out_pdf = jobID + "_out.pdf";
+
+        $.ajax({
+            url: "/dnaplotapp/cgi-bin/run_quick.pl",
+            type: "GET",
+            data: "in_text="+in_text + '&out_pdf='+out_pdf,
+            success: function() {
+                $('#frame').attr('src', "/dnaplotapp/results/"+out_pdf);
+                $('#frame').css('display', 'block');
+            }
+        });
+    }
+
+    var color = "black";
+    //respond to color click
+    $(document).ready(function(){
+        $("canvas").mousedown(function(){
+
+            $("canvas").each(function() {
+                $('#'+this.id).css('border','5px solid white');
+            });
+
+            color = this.id;
+            $('#'+this.id).css('border','5px solid black');
+        });
+    });
+
+
+    //respond to part click
+    $(document).ready(function(){
+        $(".particon").mouseenter(function() {
+            $('#'+this.id).css('border','3px solid black');
+        });
+        $(".particon").mouseleave(function() {
+            $('#'+this.id).css('border','3px solid white');
+        });
+        $(".reverse_particon").mouseenter(function() {
+            $('#'+this.id).css('border','3px solid black');
+        });
+        $(".reverse_particon").mouseleave(function() {
+            $('#'+this.id).css('border','3px solid white');
+        });
+
+        $(".particon").mousedown(function(){
+
+            var letter = "";
+            if (this.id == 'Promoter') {
+                letter = 'p';
+            }
+            if (this.id == 'Ribozyme') {
+                letter = 'i';
+            }
+            if (this.id == 'RBS') {
+                letter = 'r';
+            }
+            if (this.id == 'CDS') {
+                letter = 'c';
+            }
+            if (this.id == 'Terminator') {
+                letter = 't';
+            }
+            if (this.id == 'Spacer') {
+                letter = 's';
+            }
+            if (this.id == 'Scar') {
+                letter = '=';
+            }
+            $('#quick_input').val($('#quick_input').val() + letter + '.' + color + ' ');
+
+        });
+
+        $(".reverse_particon").mousedown(function(){
+
+            var letter = "";
+            if (this.id == 'rPromoter') {
+                letter = '-p';
+            }
+            if (this.id == 'rRibozyme') {
+                letter = '-i';
+            }
+            if (this.id == 'rRBS') {
+                letter = '-r';
+            }
+            if (this.id == 'rCDS') {
+                letter = '-c';
+            }
+            if (this.id == 'rTerminator') {
+                letter = '-t';
+            }
+            if (this.id == 'rSpacer') {
+                letter = '-s';
+            }
+            if (this.id == 'rScar') {
+                letter = '-=';
+            }
+            $('#quick_input').val($('#quick_input').val() + letter + '.' + color + ' ');
+        });
+    });
+
+
+
+</script>
+
+<style>
+</style>

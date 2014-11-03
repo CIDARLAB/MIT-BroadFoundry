@@ -44,7 +44,8 @@ def load_plot_parameters (filename):
 	# Process all parameters
 	for row in param_reader:
 		if len(row) >= 2:
-			plot_params[row[0]] = make_float_if_needed(row[1])
+			if row[1] != '':
+				plot_params[row[0]] = make_float_if_needed(row[1])
 	return plot_params
 
 
@@ -175,6 +176,8 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	right_pad = 0.0
 	scale = 1.0
 	linewidth = 1.0
+	fig_y = 5.0
+	fig_x = 5.0
 	if 'backbone_pad_left' in plot_params.keys():
 		left_pad = plot_params['backbone_pad_left']
 	if 'backbone_pad_right' in plot_params.keys():
@@ -183,6 +186,10 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 		scale = plot_params['scale']
 	if 'linewidth' in plot_params.keys():
 		linewidth = plot_params['linewidth']
+	if 'fig_y' in plot_params.keys():
+		fig_y = plot_params['fig_y']
+	if 'fig_x' in plot_params.keys():
+		fig_x = plot_params['fig_x']
 	dr = dpl.DNARenderer(scale=scale, linewidth=linewidth,
 		                 backbone_pad_left=left_pad, 
 		                 backbone_pad_right=right_pad)
@@ -193,9 +200,9 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	part_renderers = dr.SBOL_part_renderers()
 
     # Create the figure
-	fig = plt.figure(figsize=(plot_params['fig_x'],plot_params['fig_y']))
-	# Cycle through the designs an plot on individual axes
+	fig = plt.figure(figsize=(fig_x,fig_y))
 
+	# Cycle through the designs an plot on individual axes
 	design_list = sorted(dna_designs.keys())
 	if(regs_info != None):
 		regs_list   = sorted(regs_info.keys())
@@ -229,6 +236,13 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 		ax.set_ylim([-plot_params['axis_y'],plot_params['axis_y']])
 		ax.set_aspect('equal')
 		ax.set_axis_off()
+
+	# Update the size of the figure to fit the constructs drawn
+	fig_x_dim = max_dna_len/70.0
+	fig_y_dim = 0.9*len(ax_list)
+	print fig_x_dim, fig_y_dim
+	plt.gcf().set_size_inches( (fig_x_dim, fig_y_dim) )
+
 	# Save the figure
 	plt.tight_layout()
 	fig.savefig(out_filename, transparent=True)

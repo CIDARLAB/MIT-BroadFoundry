@@ -137,7 +137,6 @@ def load_regulatory_information (filename, part_info, dna_designs):
 
 		#middle loop: for each regulation
 		for row in rows:
-			#print i,row
 			
 			#opts
 			reg_attribs_map = {}
@@ -212,7 +211,6 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 		regs_list   = sorted(regs_info.keys())
 	
 	num_of_designs = len(design_list)
-	#print len(design_list),len(regs_list)
 	ax_list = []
 	max_dna_len = 0.0
 	for i in range(num_of_designs):
@@ -244,7 +242,6 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	# Update the size of the figure to fit the constructs drawn
 	fig_x_dim = max_dna_len/70.0
 	fig_y_dim = 0.9*len(ax_list)
-	print fig_x_dim, fig_y_dim
 	plt.gcf().set_size_inches( (fig_x_dim, fig_y_dim) )
 
 	# Save the figure

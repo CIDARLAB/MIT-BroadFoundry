@@ -13,7 +13,7 @@ MINIMAL FUNCTIONALITY FOR VER 1.0
 1.        Fully documented and working dnaplotlib.py file (covers, all SBOL symbols, regulation and traces)
 2.        Tutorial on using library and basic data types
 3. (DONE) CSV input script for SBOL output
-4.        Full SBOL Visual compliance (inc. the weird symbols)
+4. (DONE) Full SBOL Visual compliance (inc. the weird symbols)
 
 
 OUTSTANDING
@@ -22,8 +22,6 @@ OUTSTANDING
 NEEDED FOR RELEASE
 
 - [TG] Spacing is messed up on some elements. Make sure that there is no overlap with default settings.
-
-- ***[TG] Final SBOL icons (ensure full compliance).
 
 - ***[TG] PyDocs everywhere to generate documentation for API.
 
@@ -57,6 +55,8 @@ COMPLETED
 - [EG] Test SBOL figure elements (create some basic diagrams with all parts, see "gallery").
 
 - ***[TG,EG,BD] Gallery of examples covering constructs, circuits, other functionality.
+
+- ***[TG] Final SBOL icons (ensure full compliance).
 
 
 

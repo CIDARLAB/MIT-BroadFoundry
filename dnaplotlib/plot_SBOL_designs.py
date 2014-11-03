@@ -163,14 +163,7 @@ def load_regulatory_information (filename, part_info, dna_designs):
 							reg_info['type'] = row[header_map['type']]
 							reg_info['to_part'] = end_part
 							reg_info['opts'] = reg_attribs_map
-							regs_info[i].append( reg_info );
-
-		#print i,regs_info[i]
-
-	#for reg in regs_info:
-	#	print regs_info[reg]
-
-	#print regs_info
+							regs_info[i].append(reg_info)
 	return regs_info
 
 
@@ -196,7 +189,6 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 
 	# We default to the standard regulation renderers
 	reg_renderers = dr.std_reg_renderers()
-
 	# We default to the SBOL part renderers
 	part_renderers = dr.SBOL_part_renderers()
 
@@ -214,7 +206,6 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	max_dna_len = 0.0
 	for i in range(num_of_designs):
 		# Create axis for the design and plot
-
 		regs = None
 		if(regs_info != None):
 			regs   =  regs_info[i]
@@ -235,9 +226,7 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 		# Set bounds
 		ax.set_xlim([(-0.01*max_dna_len)-left_pad,
 			        max_dna_len+(0.01*max_dna_len)+right_pad])
-
 		ax.set_ylim([-plot_params['axis_y'],plot_params['axis_y']])
-
 		ax.set_aspect('equal')
 		ax.set_axis_off()
 	# Save the figure
@@ -246,26 +235,16 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	# Clear the plotting cache
 	plt.close('all')
 
+
 def is_valid_file(parser, arg):
     if not os.path.exists(arg):
         parser.error("The file %s does not exist!" % arg)
     else:
         return open(arg, 'r')  # return an open file handle
 
-def main():
-	## parse command line options
-	#try:
-	#	opts, args = getopt.getopt(sys.argv[1:], "h", ["help"])
-	#except getopt.error, msg:
-	#	print msg
-	#	print "for help use --help"
-	#	sys.exit(2)
-	## process options
-	#for o, a in opts:
-	#	if o in ("-h", "--help"):
-	#		print __doc__
-	#		sys.exit(0)
-	
+
+def main():	
+	# Parse the arguments
 	parser = ArgumentParser(description="file paths as arguments")
 	parser.add_argument("-params", dest="params", required=True,
 					help="plot_params.csv", metavar="FILE",
@@ -283,20 +262,14 @@ def main():
 					help="output pdf filename")
 	args = parser.parse_args()
 
-	# process arguments
+	# Process arguments
 	plot_params = load_plot_parameters(args.params.name)
-	
 	part_info = load_part_information(args.parts.name)
-
 	dna_designs = load_dna_designs (args.designs.name, part_info)
-	
 	regs_info = None
 	if(args.regulation):
 		regs_info = load_regulatory_information(args.regulation.name, part_info, dna_designs)
-
 	plot_dna(dna_designs, args.output_pdf, plot_params, regs_info)
-
-
 
 if __name__ == "__main__":
  	main()

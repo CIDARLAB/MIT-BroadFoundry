@@ -21,7 +21,7 @@ dnaplotlib
 
 from matplotlib.patches import Polygon, Ellipse, Wedge, Circle, PathPatch
 from matplotlib.path import Path
-from matplotlib.lines   import Line2D
+from matplotlib.lines import Line2D
 from math import sqrt
 from math import fabs
 
@@ -191,7 +191,7 @@ def sbol_terminator (ax, type, num, start, end, prev_end, scale, linewidth, opts
 	start_pad = 2.0
 	end_pad = 2.0
 	y_extent = 10.0
-	x_extent = 4.0
+	x_extent = 8.0
 	# Reset defaults if provided
 	if opts != None:
 		if 'color' in opts.keys():
@@ -222,9 +222,9 @@ def sbol_terminator (ax, type, num, start, end, prev_end, scale, linewidth, opts
 		end = start+x_extent
 		final_end = end+end_pad
 	# Draw the terminator symbol
-	l1 = Line2D([start,start],[0,dir_fac*y_extent], linewidth=linewidth, 
+	l1 = Line2D([start+dir_fac*(x_extent/2.0),start+dir_fac*(x_extent/2.0)],[0,dir_fac*y_extent], linewidth=linewidth, 
 		        color=color, zorder=8)
-	l2 = Line2D([start-x_extent,start+x_extent],[dir_fac*y_extent,dir_fac*y_extent], 
+	l2 = Line2D([start,start+(dir_fac*x_extent)],[dir_fac*y_extent,dir_fac*y_extent], 
 		        linewidth=linewidth, color=color, zorder=9)
 	ax.add_line(l1)
 	ax.add_line(l2)
@@ -438,7 +438,7 @@ def sbol_scar (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	color = (0,0,0)
 	start_pad = 2.0
 	end_pad = 2.0
-	x_extent = 3.0
+	x_extent = 6.0
 	y_extent = 1.0
 	linestyle = '-'
 	# Reset defaults if provided
@@ -467,13 +467,13 @@ def sbol_scar (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	end = start+x_extent
 	final_end = end+end_pad
 	
-	l_top    = Line2D([start-x_extent,start+x_extent],[y_extent,y_extent], 
+	l_top    = Line2D([start,start+x_extent],[y_extent,y_extent], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	l_bottom = Line2D([start-x_extent,start+x_extent],[-1*y_extent,-1*y_extent], 
+	l_bottom = Line2D([start,start+x_extent],[-1*y_extent,-1*y_extent], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
 	#white rectangle overlays backbone line
-	p1 = Polygon([(start-x_extent, y_extent), 
-		          (start-x_extent, -y_extent),
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
 		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
@@ -520,7 +520,7 @@ def sbol_5_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 	color = (0,0,0)
 	start_pad = 0.0
 	end_pad = 2.0
-	x_extent = 3.0
+	x_extent = 6.0
 	y_extent = 1.0
 	linestyle = '-'
 	# Reset defaults if provided
@@ -549,13 +549,13 @@ def sbol_5_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 	end = start+x_extent
 	final_end = end+end_pad
 	
-	l_top    = Line2D([start-x_extent,start+x_extent],[y_extent,y_extent], 
+	l_top    = Line2D([start,start+x_extent],[y_extent,y_extent], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	l_bottom = Line2D([start,start+x_extent],[-1*y_extent,-1*y_extent], 
+	l_bottom = Line2D([start+(x_extent/2.0),start+x_extent],[-1*y_extent,-1*y_extent], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
 	#white rectangle overlays backbone line
-	p1 = Polygon([(start-x_extent, y_extent), 
-		          (start-x_extent, -y_extent),
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
 		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
@@ -580,7 +580,7 @@ def sbol_3_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 	color = (0,0,0)
 	start_pad = 2.0
 	end_pad = 0.0
-	x_extent = 3.0
+	x_extent = 6.0
 	y_extent = 1.0
 	linestyle = '-'
 	# Reset defaults if provided
@@ -609,13 +609,13 @@ def sbol_3_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 	end = start+x_extent
 	final_end = end+end_pad
 	
-	l_top    = Line2D([start-x_extent,start+x_extent],[y_extent,y_extent], 
+	l_top    = Line2D([start,start+x_extent],[y_extent,y_extent], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	l_bottom = Line2D([start-x_extent,start],[-1*y_extent,-1*y_extent], 
+	l_bottom = Line2D([start,start+(x_extent/2.0)],[-1*y_extent,-1*y_extent], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
 	#white rectangle overlays backbone line
-	p1 = Polygon([(start-x_extent, y_extent), 
-		          (start-x_extent, -y_extent),
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
 		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
@@ -1230,9 +1230,9 @@ def sbol_origin (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	start = prev_end+start_pad
 	end = start+x_extent
 	final_end = end+end_pad
-	rbs_center = (start+((end-start)/2.0),0)
+	ori_center = (start+((end-start)/2.0),0)
 	
-	c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
+	c1 = Circle(ori_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
 		        facecolor=(1,1,1), zorder=12)
 	
 	ax.add_patch(c1)
@@ -1253,7 +1253,7 @@ def sbol_operator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	color = (0,0,0)
 	start_pad = 2.0
 	end_pad = 2.0
-	x_extent = 3.0
+	x_extent = 6.0
 	y_extent = 3.0
 	linestyle = '-'
 	# Reset defaults if provided
@@ -1283,8 +1283,8 @@ def sbol_operator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	final_end = end+end_pad
 	
 	#white rectangle overlays backbone line
-	p1 = Polygon([(start-x_extent, y_extent), 
-		          (start-x_extent, -y_extent),
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
 		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
@@ -1307,8 +1307,8 @@ def sbol_insulator (ax, type, num, start, end, prev_end, scale, linewidth, opts)
 	color = (0,0,0)
 	start_pad = 2.0
 	end_pad = 2.0
-	x_extent = 3.0
-	y_extent = 3.0
+	x_extent = 8.0
+	y_extent = 4.0
 	linestyle = '-'
 	# Reset defaults if provided
 	if opts != None:
@@ -1328,26 +1328,32 @@ def sbol_insulator (ax, type, num, start, end, prev_end, scale, linewidth, opts)
 			linewidth = opts['linewidth']
 		if 'scale' in opts.keys():
 			scale = opts['scale']
+	
 	# Check direction add start padding
 	final_end = end
 	final_start = prev_end
-
 	start = prev_end+start_pad
 	end = start+x_extent
 	final_end = end+end_pad
 	
 	#white rectangle overlays backbone line
-	p1 = Polygon([(start-x_extent, y_extent), 
-		          (start-x_extent, -y_extent),
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=12)		
-
-	p2 = Polygon([((start-x_extent)-x_extent/2,  y_extent+x_extent/2), 
-		          ((start-x_extent)-x_extent/2, -y_extent-x_extent/2),
-		          ((start+x_extent)+x_extent/2, -y_extent-x_extent/2),
-		          ((start+x_extent)+x_extent/2,  y_extent+x_extent/2)],
 		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+
+	bits = 5.0
+	gap_size = ((end-start)/bits)
+	x_inset_start = start + gap_size
+	x_inset_end = start + ((bits-1.0)*gap_size)
+
+	# Inside rectangle
+	p2 = Polygon([(x_inset_start,  y_extent-gap_size), 
+		          (x_inset_start, -y_extent+gap_size),
+		          (x_inset_end, -y_extent+gap_size),
+		          (x_inset_end,  y_extent-gap_size)],
+		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=12)		
 
 	ax.add_patch(p1)
 	ax.add_patch(p2)

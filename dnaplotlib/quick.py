@@ -170,7 +170,9 @@ def main():
 	######################################################################
 	#  make figure
 	######################################################################
-	command = "~/anaconda/bin/python -W ignore " + os.path.dirname(__file__) + "/plot_SBOL_designs.py"
+	# [TEG] Commented this out as we shouldn't use paths (instead add python to $PATH)
+	# command = "~/anaconda/bin/python -W ignore " + os.path.dirname(__file__) + "/plot_SBOL_designs.py"
+	command = "python -W ignore " + os.path.dirname(__file__) + "./plot_SBOL_designs.py"
 	options = ""
 	options += " -params plot_parameters.csv"
 	options += " -parts part_information.csv"

@@ -21,18 +21,16 @@ OUTSTANDING
 
 NEEDED FOR RELEASE
 
-- [TG] Spacing is messed up on some elements. Make sure that there is no overlap with default settings.
-
 - ***[TG] PyDocs everywhere to generate documentation for API.
 
 - [EG,BD would like to help] Web-based interface for file input and PDF/PNG output.
-
-- [EG] Short tutorial/user guide for web-interface.
 
 - ***[TG] Final home for the code. Maybe create Voigt lab GitHub Repo? Speak to Chris.
 
 
 FOR LATER...
+
+- [EG] Short tutorial/user guide for web-interface.
 
 - [TG] Take a FASTA file and a list of parts (including their sequence and style to be drawn) and generate plasmid diagram (not for initial release).
 
@@ -45,6 +43,8 @@ FOR LATER...
 
 COMPLETED
 ---------
+
+- [TG] Spacing is messed up on some elements. Make sure that there is no overlap with default settings.
 
 - [TG,BD] Add regulation features.
 

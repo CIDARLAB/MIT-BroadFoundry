@@ -6,7 +6,11 @@
 
  	Usage:
     ------
-    python plot_SBOL_designs.py PARAM_FILENAME PART_FILENAME DESIGN_FILENAME OUT_FILENAME
+    python plot_SBOL_designs.py  -params     PARAM_FILENAME 
+                                 -parts      PART_FILENAME 
+                                 -designs    DESIGN_FILENAME 
+                                [-regulation REG_FILENAME]
+                                 -output     OUT_FILENAME
 """
 #    Plot SBOL Designs
 #    Copyright (C) 2014 by

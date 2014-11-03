@@ -10,6 +10,36 @@ dnaplotlib
     enables the export of publication quality, vector-based figures. Furthermore,
     all standard renderers can be replaced with user defined versions to allow 
     for full customisation of the plot.
+
+    To make use of this module it is necessary to create the rendering object 
+    after importing the module:
+
+    >  import dnaplotlib as dpl
+    >  dr = dpl.DNARenderer()
+
+    This object performs all rendering using the renderDNA() method. To describe
+    what should be plotted, dnaplotlib requires the DNA design in a specific 
+    format. For standard SBOL diagrams a design is a list of dictionaries where
+    each dictionary relates to a specific part and as a minimum contains the
+    keys:
+
+    - name: A name that can be potentially used in regulation.
+    - type: The type of part (decides which renderer to use).
+    - fwd: Boolean defing if the part is in a forward orientation.
+
+    Once this list is defined and an axis object is created the design can be
+    draw using standard renders and to a user created matplotlib axes by running:
+
+    > reg_renderers = dr.std_reg_renderers()
+	> part_renderers = dr.SBOL_part_renderers()
+	> regs = None
+	> design = ... Design is created here ...
+	> ax = ... matplotlib axes created here ...
+    > start, end = dr.renderDNA(ax, design, part_renderers, regs, reg_renderers)
+
+    The function returns the start and end point of the design which can then
+    be used for resizing the axes and figure. For more advanced use cases we 
+    advise looking at the gallery distributed with this module.
 """
 #    dnaplotlib
 #    Copyright (C) 2014 by
@@ -22,8 +52,7 @@ dnaplotlib
 from matplotlib.patches import Polygon, Ellipse, Wedge, Circle, PathPatch
 from matplotlib.path import Path
 from matplotlib.lines import Line2D
-from math import sqrt
-from math import fabs
+import math
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
                Emerson Glassey <eglassey@mit.edu>, Voigt Lab, MIT\n\
@@ -36,6 +65,8 @@ __version__ = '1.0'
 ###############################################################################
 
 def write_label (ax, label_text, x_pos, opts=None):
+	""" Renders labels on parts.
+	"""
 	label_style = 'normal'
 	label_size = 7
 	label_y_offset = 0
@@ -53,6 +84,8 @@ def write_label (ax, label_text, x_pos, opts=None):
 		    verticalalignment='center', fontsize=label_size, fontstyle=label_style, zorder=30)
 
 def sbol_promoter (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL promoter renderer.
+	"""
 	# Default options
 	color = (0.0,0.0,0.0)
 	start_pad = 2.0
@@ -120,6 +153,8 @@ def sbol_promoter (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		return prev_end, final_end
 
 def sbol_cds (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL coding sequence renderer.
+	"""
 	# Default options
 	color = (0.7,0.7,0.7)
 	hatch = ''
@@ -186,6 +221,8 @@ def sbol_cds (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		return prev_end, final_end
 
 def sbol_terminator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL terminator renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -239,6 +276,8 @@ def sbol_terminator (ax, type, num, start, end, prev_end, scale, linewidth, opts
 		return prev_end, final_end
 
 def sbol_rbs (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL ribosome binding site renderer.
+	"""
 	# Default options
 	color = (0.7,0.7,0.7)
 	start_pad = 2.0
@@ -291,15 +330,25 @@ def sbol_rbs (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 
 
 def sbol_ribozyme (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL ribozyme renderer.
+	"""
 	return stick_figure(ax,type,num,start,end,prev_end,scale,linewidth,opts)	
 def sbol_protein_stability (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL protein stability element renderer.
+	"""
 	return stick_figure(ax,type,num,start,end,prev_end,scale,linewidth,opts)	
 def sbol_protease (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL protease site renderer.
+	"""
 	return stick_figure(ax,type,num,start,end,prev_end,scale,linewidth,opts)
 def sbol_ribonuclease (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL ribonuclease site renderer.
+	"""
 	return stick_figure(ax,type,num,start,end,prev_end,scale,linewidth,opts)
 
 def stick_figure (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" General function for drawing stick based parts (e.g., ribozyme and protease sites).
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -434,6 +483,8 @@ def stick_figure (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 
 
 def sbol_scar (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL scar renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -494,6 +545,8 @@ def sbol_scar (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		return prev_end, final_end
 
 def sbol_empty_space (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in empty space renderer.
+	"""
 	# Default options
 	x_extent = 12.0
 	# Reset defaults if provided
@@ -516,6 +569,8 @@ def sbol_empty_space (ax, type, num, start, end, prev_end, scale, linewidth, opt
 
 
 def sbol_5_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL 5' overhang renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 0.0
@@ -576,6 +631,8 @@ def sbol_5_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 		return prev_end, final_end
 
 def sbol_3_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL 3' overhang renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -635,7 +692,9 @@ def sbol_3_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 	else:
 		return prev_end, final_end
 
-def sbol_blunt_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+def sbol_blunt_restriction_site (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL blunt-end restriction site renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -704,7 +763,9 @@ def sbol_blunt_restriction_site  (ax, type, num, start, end, prev_end, scale, li
 
 	return final_start, final_end
 
-def sbol_primer_binding_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+def sbol_primer_binding_site (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL primer binding site renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -783,6 +844,8 @@ def sbol_primer_binding_site  (ax, type, num, start, end, prev_end, scale, linew
 		return prev_end, final_end
 
 def sbol_5_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL 5' sticky-end restriction site renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -850,6 +913,8 @@ def sbol_5_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale,
 	return final_start, final_end
 
 def sbol_3_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL 3' sticky-end restriction site renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -917,6 +982,8 @@ def sbol_3_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale,
 	return final_start, final_end
 
 def sbol_user_defined  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL user-defined element renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -974,6 +1041,8 @@ def sbol_user_defined  (ax, type, num, start, end, prev_end, scale, linewidth, o
 		return prev_end, final_end
 
 def sbol_signature  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL signature renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -1088,6 +1157,8 @@ def sbol_signature  (ax, type, num, start, end, prev_end, scale, linewidth, opts
 		return prev_end, final_end
 
 def sbol_restriction_site (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL restriction site renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -1134,8 +1205,9 @@ def sbol_restriction_site (ax, type, num, start, end, prev_end, scale, linewidth
 		return prev_end, final_end
 
 
-
 def sbol_spacer (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL spacer renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -1172,7 +1244,7 @@ def sbol_spacer (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	center_x = start+(end-start)/2.0
 	radius = x_extent/2
 
-	delta = radius - 0.5 * radius * sqrt(2)
+	delta = radius - 0.5 * radius * math.sqrt(2)
 
 	l1 = Line2D([start+delta,end-delta],[radius-delta,-1*radius+delta], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
@@ -1198,6 +1270,8 @@ def sbol_spacer (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 
 
 def sbol_origin (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL origin renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -1249,6 +1323,8 @@ def sbol_origin (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		return prev_end, final_end
 
 def sbol_operator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL operator renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -1303,6 +1379,8 @@ def sbol_operator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		return prev_end, final_end
 
 def sbol_insulator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL insulator renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -1434,12 +1512,18 @@ def temporary_repressor (ax, type, num, start, end, prev_end, scale, linewidth, 
 ###############################################################################
 
 def repress (ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts):
+	""" Standard repression regulation renderer.
+	"""
 	regulation(ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts)
 
 def induce (ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts):
+	""" Standard induction regulation renderer.
+	"""
 	regulation(ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts)
 
 def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts):
+	""" General function for drawing regulation arcs.
+	"""
 
 	color = (0.0,0.0,0.0)
 	arrowhead_length = 4
@@ -1501,6 +1585,8 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 ###############################################################################
 
 def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
+	""" Built-in trace-based promoter renderer.
+	"""
 	# Default options
 	color = (0.0,0.0,1.0)
 	y_extent = 6
@@ -1562,6 +1648,8 @@ def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth,
 		return start_bp, end_bp
 
 def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
+	""" Built-in trace-based ribosome binding site renderer.
+	"""
 	# Default options
 	color = (0.16,0.68,0.15)
 	y_extent = 3.5
@@ -1607,6 +1695,8 @@ def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts
 		return start_bp, end_bp
 
 def trace_cds (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
+	""" Built-in trace-based coding sequence renderer.
+	"""
 	# Default options
 	color = (0.7,0.7,0.7)
 	hatch = ''
@@ -1655,6 +1745,8 @@ def trace_cds (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts
 		return start_bp, end_bp
 
 def trace_terminator (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
+	""" Built-in trace-based terminator renderer.
+	"""
 	# Default options
 	color = (1.0,0.0,0.0)
 	y_extent = 3.5
@@ -1704,6 +1796,8 @@ def trace_terminator (ax, type, num, start_bp, end_bp, prev_end, scale, linewidt
 ###############################################################################
 
 class DNARenderer:
+	""" Class defining the DNA rendering funtionality.
+	"""
 
 	# Standard part types
 	STD_PART_TYPES = ['Promoter',
@@ -1726,7 +1820,21 @@ class DNARenderer:
 
 	def __init__(self, scale=1.0, linewidth=1.0, 
 		         backbone_pad_left=0.0, backbone_pad_right=0.0):
-		"""Constructor to generate an empty DNARenderer.
+		""" Constructor to generate an empty DNARenderer.
+
+		Parameters
+	    ----------
+	    scale : float (default=1.0)
+	        A scaling factor for the plot. Only used if rendering traces.
+
+	    linewidth : float (default=1.0)
+	    	The default linewidth for all part drawing.
+
+	    backbone_pad_left : float (default=0.0)
+	    	Padding to add to the left side of the backbone.
+
+	    backbone_pad_right : float (default=0.0)
+	    	Padding to add to the left side of the backbone.
 		"""
 		self.scale = scale
 		self.linewidth = linewidth
@@ -1735,6 +1843,8 @@ class DNARenderer:
 		self.reg_height = 15
 
 	def SBOL_part_renderers (self):
+		""" Return dictionary of all standard built-in SBOL part renderers.
+		"""
 		return {
 			'Promoter'         :sbol_promoter, 
 			'CDS'              :sbol_cds, 
@@ -1761,6 +1871,8 @@ class DNARenderer:
 			'Signature'        :sbol_signature}
 
 	def trace_part_renderers (self):
+		""" Return dictionary of all standard built-in trace part renderers.
+		"""
 		return {
 			'Promoter'         :trace_promoter, 
 			'CDS'              :trace_cds, 
@@ -1768,16 +1880,51 @@ class DNARenderer:
 			'RBS'              :trace_rbs} 
 
 	def std_reg_renderers (self):
+		""" Return dictionary of all standard built-in regulation renderers.
+		"""
 		return {
 			'Repression' :repress, 
 			'Activation' :induce}
 
 	def renderDNA(self, ax, parts, part_renderers, regs=None, reg_renderers=None):
-		"""Render the parts on the DNA and regulation.
-			- parts_list: list of dicts defining the parts
-			- part_renderers: standard renderer functions dict to use
-			- regs: list of regulations on the DNA
-			- reg_renderers: dict of standard regulation renderers
+		""" Render the parts on the DNA and regulation.
+
+		Parameters
+	    ----------
+	    ax : matplotlib.axes
+	        Axes to draw the design to.
+
+	    parts : list(dict)
+	    	The design to draw. This is a list of dicts, where each dict relates to
+	    	a part and must contain the following keys:
+	    	- name (string)
+	    	- type (string)  
+	    	- fwd (bool)
+	    	These will then be drawn in accordance with the renders selected
+
+	    part_renderers : dict(functions)
+	    	Dict of functions where the key in the part type and the dictionary returns
+	    	the function to be used to draw that part type.
+
+	    regs : list(dict) (default=None)
+	    	Regulation present in the design. This is a list of dicts, where each dict
+	    	relates to a single regulation arc and must contain the following keys:
+	    	- type (string)
+	    	- from_part (int)  
+	    	- to_part (int)
+	    	These will then be drawn in accordance with the renders selected.
+
+	    reg_renderers : dict(functions) (default=None)
+	    	Dict of functions where the key in the regulation type and the dictionary 
+	    	returns the function to be used to draw that regulation type.
+
+	    Returns
+	    -------
+	    start : float
+	    	The x-point in the axis space that drawing begins.
+
+	    end : float
+	    	The x-point in the axis space that drawing ends.
 		"""
 		# Plot the parts to the axis
 		part_num = 0
@@ -1837,7 +1984,6 @@ class DNARenderer:
 							first_part = False
 			part_num += 1
 		
-
 		# first pass to get all of the arcranges
 		if regs != None:
 
@@ -1858,7 +2004,7 @@ class DNARenderer:
 						arcstart = (reg['from_part']['start'] + reg['from_part']['end']) / 2
 						arcend   = (reg['to_part']['start']   + reg['to_part']['end']) / 2
 						arcrange = [arcstart,arcend]
-						reg['arclength'] = fabs(arcstart-arcend)
+						reg['arclength'] = math.fabs(arcstart-arcend)
 						reg['arc_height_index'] = 1
 						##############################################################################
 

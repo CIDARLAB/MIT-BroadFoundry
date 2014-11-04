@@ -1954,6 +1954,8 @@ class DNARenderer:
 		matplotlib.rcParams['lines.dash_capstyle']   = 'butt'
 		matplotlib.rcParams['lines.solid_joinstyle'] = 'miter'
 		matplotlib.rcParams['lines.solid_capstyle']  = 'projecting'
+		# Make text editable in Adobe Illustrator
+		matplotlib.rcParams['pdf.fonttype']          = 42 
 		# Plot the parts to the axis
 		part_num = 0
 		prev_end = 0

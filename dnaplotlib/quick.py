@@ -23,7 +23,7 @@
 #    All rights reserved.
 #    OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
 
-# Use the correct backend for headless servers
+# Set the backend to use (important for headless servers)
 import matplotlib
 matplotlib.use('Agg')
 

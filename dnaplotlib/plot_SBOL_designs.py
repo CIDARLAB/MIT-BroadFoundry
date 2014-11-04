@@ -241,7 +241,9 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 
 	# Update the size of the figure to fit the constructs drawn
 	fig_x_dim = max_dna_len/70.0
-	fig_y_dim = 0.9*len(ax_list)
+	if fig_x_dim < 1.0:
+		fig_x_dim = 1.0
+	fig_y_dim = 0.8*len(ax_list)
 	plt.gcf().set_size_inches( (fig_x_dim, fig_y_dim) )
 
 	# Save the figure

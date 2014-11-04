@@ -56,6 +56,7 @@ matplotlib.use('Agg')
 from matplotlib.patches import Polygon, Ellipse, Wedge, Circle, PathPatch
 from matplotlib.path import Path
 from matplotlib.lines import Line2D
+from matplotlib.patheffects import Stroke 
 import math
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
@@ -144,7 +145,8 @@ def sbol_promoter (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		          (start+dir_fac*x_extent, dir_fac*y_extent),
 		          (start+dir_fac*x_extent-dir_fac*arrowhead_length, 
 		           dir_fac*y_extent-(arrowhead_height))],
-		          facecolor=color, edgecolor=color, linewidth=linewidth)
+		          facecolor=color, edgecolor=color, linewidth=linewidth, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0
 	ax.add_patch(p1)
 	if opts != None and 'label' in opts.keys():
 		if final_start > final_end:
@@ -212,7 +214,8 @@ def sbol_cds (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		          (end-dir_fac*arrowhead_length, y_extent+arrowhead_height),
 		          (end-dir_fac*arrowhead_length, y_extent)],
 		          edgecolor=(0.0,0.0,0.0), facecolor=color, linewidth=linewidth, 
-		          hatch=hatch, zorder=11)
+		          hatch=hatch, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0
 	ax.add_patch(p1)
 	if opts != None and 'label' in opts.keys():
 		if final_start > final_end:
@@ -531,7 +534,8 @@ def sbol_scar (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 
 	ax.add_patch(p1)
 	ax.add_line(l_top)
@@ -617,7 +621,8 @@ def sbol_5_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 	ax.add_line(l_top)
@@ -679,7 +684,8 @@ def sbol_3_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 	ax.add_line(l_top)
@@ -907,7 +913,8 @@ def sbol_5_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale,
 		          (start, -y_extent),
 		          (end, -y_extent),
 		          (end, y_extent)],
-		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 
@@ -976,7 +983,8 @@ def sbol_3_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale,
 		          (start, -y_extent),
 		          (end, -y_extent),
 		          (end, y_extent)],
-		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 
@@ -1029,7 +1037,8 @@ def sbol_user_defined  (ax, type, num, start, end, prev_end, scale, linewidth, o
 		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11)		
+		          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 	
@@ -1105,7 +1114,8 @@ def sbol_signature  (ax, type, num, start, end, prev_end, scale, linewidth, opts
 			          (start, -y_extent),
 			          (start+x_extent, -y_extent),
 			          (start+x_extent, y_extent)],
-			          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11)		
+			          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 		ax.add_patch(p1)
 		top1x = start + indent_fac
 		top1y = y_extent - indent_fac
@@ -1129,7 +1139,8 @@ def sbol_signature  (ax, type, num, start, end, prev_end, scale, linewidth, opts
 			          (start, -y_extent),
 			          (start-x_extent, -y_extent),
 			          (start-x_extent, y_extent)],
-			          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11)
+			          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 		ax.add_patch(p1)
 		top1x = start - indent_fac
 		top1y = y_extent - indent_fac
@@ -1367,7 +1378,8 @@ def sbol_operator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 	
@@ -1423,7 +1435,8 @@ def sbol_insulator (ax, type, num, start, end, prev_end, scale, linewidth, opts)
 		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	bits = 5.0
 	gap_size = ((end-start)/bits)
@@ -1435,7 +1448,8 @@ def sbol_insulator (ax, type, num, start, end, prev_end, scale, linewidth, opts)
 		          (x_inset_start, -y_extent+gap_size),
 		          (x_inset_end, -y_extent+gap_size),
 		          (x_inset_end,  y_extent-gap_size)],
-		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=12)		
+		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=12, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 	ax.add_patch(p2)
@@ -1633,13 +1647,15 @@ def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth,
 		          (start_bp+dir_fac*(x_extent*scale), dir_fac*y_extent),
 		          (start_bp+dir_fac*x_extent*scale-dir_fac*arrowhead_length*scale, 
 		           dir_fac*y_extent-(arrowhead_height))],
-		          facecolor=color, edgecolor=color, linewidth=linewidth, zorder=14)
+		          facecolor=color, edgecolor=color, linewidth=linewidth, zorder=14, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 	ax.add_patch(p1)
 	# Shade the promoter area (normally smaller than symbol extent)
  	p2 = Polygon([(start_bp, -highlight_y_extent), 
  		          (start_bp, highlight_y_extent),
  		          (end_bp, highlight_y_extent),
- 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=14)
+ 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=14, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 	ax.add_patch(p2)
 	if opts != None and 'label' in opts.keys():
 		if start_bp > end_bp:
@@ -1686,7 +1702,8 @@ def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts
  	p2 = Polygon([(start_bp, -highlight_y_extent), 
  		          (start_bp, highlight_y_extent),
  		          (end_bp, highlight_y_extent),
- 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=13)
+ 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=13, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 	ax.add_patch(p2)
 	if opts != None and 'label' in opts.keys():
 		if start_bp > end_bp:
@@ -1736,7 +1753,8 @@ def trace_cds (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts
 		          (end_bp-dir_fac*arrowhead_length*scale, y_extent+arrowhead_height),
 		          (end_bp-dir_fac*arrowhead_length*scale, y_extent)],
 		          edgecolor=(0.0,0.0,0.0), facecolor=color, linewidth=linewidth, 
-		          hatch=hatch, zorder=15)
+		          hatch=hatch, zorder=15, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 	ax.add_patch(p1)
 	if opts != None and 'label' in opts.keys():
 		if start_bp > end_bp:
@@ -1783,7 +1801,8 @@ def trace_terminator (ax, type, num, start_bp, end_bp, prev_end, scale, linewidt
  	p2 = Polygon([(start_bp, -highlight_y_extent), 
  		          (start_bp, highlight_y_extent),
  		          (end_bp, highlight_y_extent),
- 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=13)
+ 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=13, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 	ax.add_patch(p2)
 	if opts != None and 'label' in opts.keys():
 		if start_bp > end_bp:
@@ -1930,6 +1949,11 @@ class DNARenderer:
 	    end : float
 	    	The x-point in the axis space that drawing ends.
 		"""
+		# Update the matplotlib rendering default for drawing the parts (we want mitered edges)
+		matplotlib.rcParams['lines.dash_joinstyle']  = 'miter'
+		matplotlib.rcParams['lines.dash_capstyle']   = 'butt'
+		matplotlib.rcParams['lines.solid_joinstyle'] = 'miter'
+		matplotlib.rcParams['lines.solid_capstyle']  = 'projecting'
 		# Plot the parts to the axis
 		part_num = 0
 		prev_end = 0

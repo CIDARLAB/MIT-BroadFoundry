@@ -71,7 +71,7 @@ def process_arguments (input):
 				part_fwd = True
 				if part_short_type[0] == '-':
 					part_fwd = False
-					part_short_type = el[1:]
+					part_short_type = part_short_type[1:]
 				if part_short_type in types.keys():
 					part_type = types[part_short_type]
 					part_color = part_parts[1]

@@ -15,7 +15,6 @@
 	allowed colors
 	   black, gray, red, orange, yellow, green, blue, purple, lightred, lightorange, 
 	   lightyellow, lightgreen, lightblue, lightpurple
-
 """
 #    Quickly Plot SBOL Designs
 #    Copyright (C) 2014 by

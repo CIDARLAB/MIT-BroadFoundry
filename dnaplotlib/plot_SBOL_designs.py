@@ -174,7 +174,7 @@ def load_regulatory_information (filename, part_info, dna_designs):
 def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	# Create the renderer
 	if 'axis_y' not in plot_params.keys():
-		plot_params['axis_y'] = 55
+		plot_params['axis_y'] = 35
 	left_pad = 0.0
 	right_pad = 0.0
 	scale = 1.0
@@ -243,9 +243,7 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	fig_x_dim = max_dna_len/70.0
 	if fig_x_dim < 1.0:
 		fig_x_dim = 1.0
-	fig_y_dim = 0.8*len(ax_list)
-	if fig_y_dim < 1.0:
-		fig_y_dim = 1.0
+	fig_y_dim = 1.2*len(ax_list)
 	plt.gcf().set_size_inches( (fig_x_dim, fig_y_dim) )
 
 	# Save the figure

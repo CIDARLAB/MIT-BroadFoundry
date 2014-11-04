@@ -81,7 +81,7 @@ def process_arguments (input):
 					part_list.append( {'name'  : str(part_idx), 
 						               'type'  : part_type, 
 						               'fwd'   : part_fwd, 
-						               'color' : part_rgb} )
+						               'opts'  : {'color': part_rgb}} )
 	return part_list
 
 

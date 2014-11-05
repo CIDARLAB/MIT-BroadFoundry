@@ -375,7 +375,9 @@ class GeneClusterLibrary:
 	    part_data: dict
 	        Dictionary of the part data.
 		"""
-		return self.parts[part_name]
+		if part_name in self.parts.keys():
+			return self.parts[part_name]
+		return None
 
 	def part_attrib (self, part_name, attrib_key):
 		"""Get method for a part's attribute from a part name and key

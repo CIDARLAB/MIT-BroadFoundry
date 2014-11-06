@@ -13,6 +13,7 @@ MINIMAL FUNCTIONALITY FOR VER 1.0
 1. (DONE) Fully documented and working dnaplotlib.py file (covers, all SBOL symbols, regulation and traces)
 2. (DONE) CSV input script for SBOL output
 3. (DONE) Full SBOL Visual compliance (inc. the weird symbols)
+4.        Basic web interface for uploading files, generating simple constructs
 
 
 OUTSTANDING

@@ -26,6 +26,8 @@ dnaplotlib
     - name: A name that can be potentially used in regulation.
     - type: The type of part (decides which renderer to use).
     - fwd: Boolean defing if the part is in a forward orientation.
+    - start: Start position (optional)
+    - end: End position (optional)
 
     Once this list is defined and an axis object is created the design can be
     draw using standard renders and to a user created matplotlib axes by running:
@@ -1923,6 +1925,8 @@ class DNARenderer:
 	    	- name (string)
 	    	- type (string)  
 	    	- fwd (bool)
+	    	- start (float, optional)
+	    	- end (float, optional)
 	    	These will then be drawn in accordance with the renders selected
 
 	    part_renderers : dict(functions)

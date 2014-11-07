@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 """
-	plot_SBOL_designs.py
+    plot_SBOL_designs.py
 
-	Will plot the design of DNA constructs using SBOL notation.
+    Plot the design of DNA constructs using SBOL notation.
 
- 	Usage:
+    Usage:
     ------
     python plot_SBOL_designs.py  -params     PARAM_FILENAME 
                                  -parts      PART_FILENAME 

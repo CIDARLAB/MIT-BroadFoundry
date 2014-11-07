@@ -1,20 +1,27 @@
 #!/usr/bin/env python
 """
-	quick.py
+    quick.py
 
-	Quickly Plot SBOL Designs
+    Quickly Plot SBOL Designs
 
-	Usage:
-	------
-	python quick.py -input "p.gray p.lightblue i.lightred r.green c.orange t.purple -t.black -c.yellow -p.yellow" -output out.pdf
-	allowed part types: 
-	   p: promoter   i: ribozyme   r: rbs   c: cds   t: terminator   s: spacer   =: scar
+    Usage:
+    ------
+    python quick.py -input "p.gray p.lightblue i.lightred r.green c.orange t.purple -t.black -c.yellow -p.yellow" -output out.pdf
+    
+    Allowed part types: 
+       p: promoter
+       i: ribozyme
+       r: rbs
+       c: cds
+       t: terminator
+       s: spacer
+       =: scar
 
-	reverse part direction by using '-' before the 1-letter part type
+    Reverse part direction by using '-' before the 1-letter part type
 
-	allowed colors
-	   black, gray, red, orange, yellow, green, blue, purple, lightred, lightorange, 
-	   lightyellow, lightgreen, lightblue, lightpurple
+    Allowed colors
+       black, gray, red, orange, yellow, green, blue, purple, lightred, lightorange, 
+       lightyellow, lightgreen, lightblue, lightpurple
 """
 #    Quickly Plot SBOL Designs
 #    Copyright (C) 2014 by

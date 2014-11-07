@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-dnaplotlib
+DNAplotlib
 ==========
     This module is designed to allow for highly customisable visualisation of DNA
     fragments. Diagrams can be in the form of conceptual SBOL compliant icons or
@@ -43,7 +43,7 @@ dnaplotlib
     be used for resizing the axes and figure. For more advanced use cases we 
     advise looking at the gallery distributed with this module.
 """
-#    dnaplotlib
+#    DNAplotlib
 #    Copyright (C) 2014 by
 #    Thomas E. Gorochowski <tom@chofski.co.uk>
 #    Bryan Der <bder@mit.edu>

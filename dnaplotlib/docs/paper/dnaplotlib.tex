@@ -6,9 +6,8 @@
 \firstpage{1}
 
 \title[dnaplotlib]{dnaplotlib: visualization of genetic constructs, libraries and associated data}
-\author[Thomas E. Gorochowski \textit{et~al.}]{Thomas~E.~Gorochowski$^{1,\dagger}$, Bryan~Der$^{1,\dagger}$, Emerson~Glassey$^{1,\dagger}$, D. Benjamin Gordon$^{1}$ and Christopher~A.~Voigt$^{1,}$\footnote{to whom correspondence should be addressed}}
-\address{$^{1}$Department of Biological Engineering, Synthetic Biology Center, Massachusetts Institute of Technology, USA.\\
-$^{\dagger}$These authors contributed equally to this work.}
+\author[Thomas E. Gorochowski \textit{et~al.}]{Thomas~E.~Gorochowski$^{1}$, Bryan~Der$^{1}$, Emerson~Glassey$^{1}$, D. Benjamin Gordon$^{1}$ and Christopher~A.~Voigt$^{1,}$\footnote{to whom correspondence should be addressed}}
+\address{$^{1}$Department of Biological Engineering, Synthetic Biology Center, Massachusetts Institute of Technology, USA.}
 
 
 \history{Received on XXXXX; revised on XXXXX; accepted on XXXXX}
@@ -20,7 +19,7 @@ $^{\dagger}$These authors contributed equally to this work.}
 \begin{abstract}
 
 \section{Summary:}
-dnaplotlib is a computational toolkit that enables highly customizable visualization of individual genetic constructs and libraries of design variants. Publication quality vector-based output is produced and all aspects of the rendering process can be easily customized or replaced by the user. dnaplotlib is capable of SBOL Visual compliant diagrams in addition to a format able to better illustrate the precise location and length of each genetic part. This alternative visualization method enables direct comparison with nucleotide-level information such as RNA-seq read depth. While it is envisaged that access will be predominantly via the programming interface, a web interface is also provided to support broader usage.
+dnaplotlib is a computational toolkit that enables highly customizable visualization of individual genetic constructs and libraries of design variants. Publication quality vector-based output is produced and all aspects of the rendering process can be easily customized or replaced by the user. The toolkit is capable of SBOL Visual compliant diagrams in addition to a format able to better illustrate the precise location and length of each genetic part. This alternative visualization method enables direct comparison with nucleotide-level data such as RNA-seq read depth. While it is envisaged that access will be predominantly via the programming interface, a web front-end is also provided to support broader usage.
 
 \section{Availability:}
 dnaplotlib is cross-platform and open-source software developed using Python and released under the OSI recognized NPOSL-3.0 licence. Source code, documentation and a web front-end are available at the project website: \href{http://www.dnaplotlib.org}{http://www.dnaplotlib.org}.
@@ -29,11 +28,17 @@ dnaplotlib is cross-platform and open-source software developed using Python and
 \end{abstract}
 
 % 1. (1 para). Introduction to the need for standardized visualization of genetic designs. Sell the approach.
-Engineering disciplines rely on the use of standards to clearly communicate design information and allow for the construction of large and complex systems. As synthetic biology 
+Engineering disciplines rely on the use of standardized pictorial representation of parts to clearly communicate how these are pieced together in a design to allow for the reliable construction of large complex systems. In biology, DNA sequences are often engineered to probe or perturb the function of natural systems and more recently, create novel capabilities in what has been termed synthetic biology. However, unlike the more traditional engineering fields, the way these designs are represented varies significantly between labs and sub-disciplines in the field. This leads to ambiguities that can hinder understanding and effective reuse of research. The Synthetic Biology Open Language (SBOL) Visual initiative was started to help alleviate this issue by defining a set of agreed pictorial representations for commonly used genetic elements \citep{Quinn13a}. However, so far the standard has seen limited uptake due to a lack of accessible tools that can be directly integrated into existing design and analysis workflows.
+
+
 
 Attempts have been made to visualize conceptual genetic designs 
 To date limited attempts have been made to aid in the visualization of conceptual genetic designs \citep{Bhatia13a} and although many DNA design tools offer the ability to . Firstly, output is generally 
 The biggest limitation of these approaches so far though is an inability to integrate with existing scientific computing visualization and analysis tools. This is essential as 
+
+
+As synthetic biology moves ever closer to automated design procedures that harness the potential to construct huge libraries of design variants \citep{Smanski14a,Bilitchenko11a}, supporting visualization tools will become important to ensure clear communication of these large and diverse designs. The SBOL Visual initiative was started to aid in this task with the definition of agreed pictorial representations of genetic elements \citep{Quinn13a}. However, so far it has seen limited uptake due to a lack a tools that are able to be easily integrated into existing analysis work-flows. dnaplotlib fills this gap by providing a computational toolkit that both adheres to this standard while also enabling highly customizable visualizations that are most appropriate for the specific needs of the laboratory. It is hoped that by providing researchers with this flexibility that they will be more willing to apply such standards to their work, improving general uptake of SBOL Visual across the field.
+
 
 % 2. (1 para). Existing tools that are available and the current difficulties in using them, e.g., PigeonCAD \citep{Bhatia13a}. Why is it needed... difficulty with library designs \citep{Smanski14a,Bilitchenko11a}.
 
@@ -47,6 +52,13 @@ To generate a
 
 In addition to direct library access through Python analysis scripts, we also provide two scripts to enable input in the form of text files
 
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=8.3cm]{Figure1.pdf}
+\caption{\label{fig:overview}Overview of core dnaplotlib functionality. (\textbf{A}) The complete set of SBOL Visual parts is available for use in both forward and reverse orientations. (\textbf{B}) The size, color, shape and labeling of all elements can be easily customized allowing for additional information to be communicated e.g., promoter strengths or spacer lengths. Furthermore, users can provide their own renders to draw parts in a non-standard way or to represent new type of genetic element. (\textbf{C}) To allow for direct comparison between a genetic design and associated nucleotide-level data such as RNA-seq read depths, trace-based renderers are also provided. These use the standard promoter and terminator symbols and a small filled circle to represent an RBS. Indicators of actual part widths are displayed on the DNA backbone (arrow length for CDSs and small filled rectangles for promoters and RBSs) to enable a visual alignment of design information with trace data. (\textbf{D}) An example rendering of a library of genetic design variants implementing the same 3-input (black promoters), 1-output (black CDS) device. Colors have been used to link repressor genes and their cognate promoters.}
+\end{figure}
+
 % 4. (1 para). Web-based interface. What does this include, what it doesn't. Why did we make it.
 
 To ensure broadest application of these tools that included use by non-programmers, we also developed a web-based interface that allows text files describing part styles and DNA designs to be uploaded and processed. These files uploaded to the server, processed by the scripts described previously, and generated images are returned to the user. This ensures broadest use of the library and ensures that members across a lab can share the same styling of diagrams to ensure clear communication of their designs.
@@ -55,20 +67,16 @@ We see a key feature of ensuring adoption as
 
 % 5. (1 para). Broader view. How is this toolkit going to help the community. Broader use of SBOL-compliant figures? Easier communication of ideas. Still able to have a lab ``style'' to differentiate your work and emphasize aspects in unique ways.
 
-As synthetic biology moves ever closer to automated design procedures that harness the potential to construct huge libraries of design variants \citep{Smanski14a,Bilitchenko11a}, supporting visualization tools will become important to ensure clear communication of these large and diverse designs. The SBOL Visual initiative was started to aid in this task with the definition of agreed pictorial representations of genetic elements \citep{Quinn13a}. However, so far it has seen limited uptake due to a lack a tools that are able to be easily integrated into existing analysis work-flows. dnaplotlib fills this gap by providing a computational toolkit that both adheres to this standard while also enabling highly customizable visualizations that are most appropriate for the specific needs of the laboratory. It is hoped that by providing researchers with this flexibility that they will be more willing to apply such standards to their work, improving general uptake of SBOL Visual across the field.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=8.3cm]{Figure1.pdf}
-\caption{\label{fig:overview}Overview of the core dnaplotlib functionality. (\textbf{A}) The full set of SBOL Visual parts is available in both forward and reverse orientations. (\textbf{B}) The size, color and shape of all elements be easily customised by the user. (\textbf{C}) To allow for direct comparison between a genetic design and nucleotide-level data such as RNA-seq read depths, trace-based renderers are provided. These use indicators of actual part widths on the design backbone (CDS length and small filled rectangles) to enable a visual alignment of design information with trace data. (\textbf{D}) An example rendering of a library of genetic design variants implementing the same 3-input (black promoters), 1-output (black CDS) device. Colors have been used to link repressor genes and their cognate promoters.}
-\end{figure}
+
+
 
 % 6. (1 para). Future directions (general point on where it is available and contributions)
 
 dnaplotlib is under continual development with a current focus on broadening the types of genetic element covered to include new synthetic biological parts. The project welcomes contributions from others within the community through the project website and public development repository: \href{http://www.dnaplotlib.org}{http://www.dnaplotlib.org}.
 
 \section*{ACKNOWLEDGEMENTS}
-T.E.G. was supported by TODO. E.G. was supported by TODO. B.D. was supported by TODO. C.A.V. was supported by TODO.
+T.E.G., B.D., E.G., D.B.G. and C.A.V. were supported by...
 
 \begin{thebibliography}{}
 	

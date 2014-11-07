@@ -70,7 +70,7 @@ def load_part_information (filename):
 		part_attribs_map = {}
 		for k in attrib_keys:
 			if row[header_map[k]] != '':
-				if k == 'color':
+				if k == 'color' or k == 'label_color':
 					part_attribs_map[k] = [float(x) for x in row[header_map[k]].split(';')]
 				else:
 					part_attribs_map[k] = make_float_if_needed(row[header_map[k]])

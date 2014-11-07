@@ -2,10 +2,6 @@
 TODO list for dnaplotlib
 ========================
 
-After some thought, unless we can get a website done in next couple weeks we should treat as seperate project
-and make a nice tool for building constructs visually. That is not the goal of this library so lets keep the
-scope of this confined to a framework to build such tools on top of.
-
 
 MINIMAL FUNCTIONALITY FOR VER 1.0
 ---------------------------------
@@ -27,8 +23,6 @@ NEEDED FOR RELEASE
 
 
 FOR LATER...
-
-- [EG] Short tutorial/user guide for web-interface.
 
 - [TG] Take a FASTA file and a list of parts (including their sequence and style to be drawn) and generate plasmid diagram (not for initial release).
 

@@ -33,10 +33,10 @@ DNAplotlib
     draw using standard renders and to a user created matplotlib axes by running:
 
     > reg_renderers = dr.std_reg_renderers()
-	> part_renderers = dr.SBOL_part_renderers()
-	> regs = None
-	> design = ... Design is created here ...
-	> ax = ... matplotlib axes created here ...
+    > part_renderers = dr.SBOL_part_renderers()
+    > regs = None
+    > design = ... Design is created here ...
+    > ax = ... matplotlib axes created here ...
     > start, end = dr.renderDNA(ax, design, part_renderers, regs, reg_renderers)
 
     The function returns the start and end point of the design which can then

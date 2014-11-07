@@ -32,6 +32,11 @@ import argparse
 import dnaplotlib as dpl
 import matplotlib.pyplot as plt
 
+__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
+               Bryan Der <bder@mit.edu>, Voigt Lab, MIT'
+__license__ = 'OSI Non-Profit OSL 3.0'
+__version__ = '1.0'
+
 def process_arguments (input):
 	# Types mapping
 	types = {}

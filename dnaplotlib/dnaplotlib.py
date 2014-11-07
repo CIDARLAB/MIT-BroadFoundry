@@ -46,8 +46,8 @@ dnaplotlib
 #    dnaplotlib
 #    Copyright (C) 2014 by
 #    Thomas E. Gorochowski <tom@chofski.co.uk>
-#    Emerson Glassey <eglassey@mit.edu>
 #    Bryan Der <bder@mit.edu>
+#    Emerson Glassey <eglassey@mit.edu>
 #    All rights reserved.
 #    OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
 
@@ -62,8 +62,8 @@ from matplotlib.patheffects import Stroke
 import math
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
-               Emerson Glassey <eglassey@mit.edu>, Voigt Lab, MIT\n\
-               Bryan Der <bder@mit.edu>, Voigt Lab, MIT'
+               Bryan Der <bder@mit.edu>, Voigt Lab, MIT\n\
+               Emerson Glassey <eglassey@mit.edu>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
 
@@ -1829,19 +1829,29 @@ class DNARenderer:
 	"""
 
 	# Standard part types
-	STD_PART_TYPES = ['Promoter',
-	                  'CDS',
-                      'Terminator',
-                      'RBS',
-                      'Scar',
-                      'Spacer',
-                      'Ribozyme',
-                      'Ribonuclease',
-                      'ProteinStability',
-                      'Protease',
-                      'Operator',
-                      'Origin',
-                      'Insulator']
+	STD_PART_TYPES = ['Promoter', 
+			          'CDS', 
+			          'Terminator',
+			          'RBS',
+			          'Scar',
+			          'Spacer',
+			          'EmptySpace',
+			          'Ribozyme',
+			          'Ribonuclease',
+			          'ProteinStability',
+			          'Protease',
+			          'Operator',
+			          'Origin',
+			          'Insulator',
+			          '5Overhang',
+			          '3Overhang',
+			          'RestrictionSite',
+			          'BluntRestrictionSite',
+			          'PrimerBindingSite',
+			          '5StickyRestrictionSite',
+			          '3StickyRestrictionSite',
+			          'UserDefined',
+			          'Signature']
 
 	# Standard regulatory types
 	STD_REG_TYPES = ['Repression',

@@ -10,7 +10,7 @@ The DNAplotlib library is contained within the `dnaplotlib.py` file and requires
 ``import dnaplotlib``
 
 ##Getting Started
-We provide an extensive gallery of use cases for DNAplotlib in the `gallery` directory. These cover accessing the library directly with Python, to using the quick construct creator (`quick.py`) and the CSV file input script (`plot_SBOL_designs.py`).
+We provide an extensive gallery of use cases for DNAplotlib in the `gallery` directory. These cover accessing the library directly with Python, to using the quick construct creator (`quick.py`) and the CSV file input script (`plot_SBOL_designs.py`). If you would like to set up your own web-based server we provide the entire web front-end in the `web` directory.
 
 ##Usage and Licensing
 DNAplotlib is cross-platform and open-source software developed using Python and released under the OSI recognized NPOSL-3.0 license.

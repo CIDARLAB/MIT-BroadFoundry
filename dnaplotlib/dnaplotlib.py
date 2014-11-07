@@ -25,7 +25,7 @@ DNAplotlib
 
     - name: A name that can be potentially used in regulation.
     - type: The type of part (decides which renderer to use).
-    - fwd: Boolean defing if the part is in a forward orientation.
+    - fwd: Boolean defining if the part is in a forward orientation.
     - start: Start position (optional)
     - end: End position (optional)
 

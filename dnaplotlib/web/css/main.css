@@ -2,7 +2,7 @@
 button:hover { cursor: pointer;}
 input { cursor: pointer; }
 
-button#submit, button#submit_bg, button#download {
+/*button#submit, button#submit_bg, button#download {
 
     height: 40px;
     width: 120px;
@@ -15,7 +15,7 @@ button#submit, button#submit_bg, button#download {
     box-shadow: 1px 1px 1px #888888;
     padding: 5px;
     text-align: center;
-}
+}*/
 
 div.centered {
     text-align: center;
@@ -49,13 +49,13 @@ canvas {
 
 .particon {
     display: inline-block;
-    height: 55px;
+    height: 45px;
     cursor: pointer;
     border: 3px solid white;
 }
 .reverse_particon {
     display: inline-block;
-    height: 55px;
+    height: 45px;
     cursor: pointer;
     border: 3px solid white;
     -moz-transform: scale(-1,-1);

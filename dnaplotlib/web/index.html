@@ -4,16 +4,35 @@
     <meta charset="UTF-8">
     <script src="//code.jquery.com/jquery-1.9.1.js"></script>
     <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
     <script src="js/download.js"></script>
+    <script src="js/pdfobject.js"></script>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
 
     <link rel="stylesheet" type="text/css" href="css/main.css" />
     <link rel="shortcut icon" href="images/cds_icon.jpg">
 
     <title>dnaplotapp</title>
 </head>
-<body oncontextmenu="return false">
+<body>
 
-<div class="container">
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="index.html">DNAPlotApp</a>
+            <ul class="nav">
+                <li class="active"><a href="index.html">Quick</a></li>
+                <li><a href="upload.html">Upload</a></li>
+                <li><a href="examples.html">Examples</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="margin-top:50px">
 
     <div class="centered">
         <img class="particon" src="images/p.png" id="Promoter">
@@ -23,20 +42,12 @@
         <img class="particon" src="images/t.png" id="Terminator">
         <img class="particon" src="images/s.png" id="Spacer">
         <img class="particon" src="images/=.png" id="Scar">
-    </div>
-    <br clear="both">
-    <div class="centered">
-        <img class="reverse_particon" src="images/p.png" id="rPromoter">
-        <img class="reverse_particon" src="images/i.png" id="rRibozyme">
-        <img class="reverse_particon" src="images/r.png" id="rRBS">
-        <img class="reverse_particon" src="images/c.png" id="rCDS">
         <img class="reverse_particon" src="images/t.png" id="rTerminator">
-        <img class="reverse_particon" src="images/s.png" id="rSpacer">
-        <img class="reverse_particon" src="images/=.png" id="rScar">
-        <br clear="both">
+        <img class="reverse_particon" src="images/c.png" id="rCDS">
+        <img class="reverse_particon" src="images/r.png" id="rRBS">
+        <img class="reverse_particon" src="images/i.png" id="rRibozyme">
+        <img class="reverse_particon" src="images/p.png" id="rPromoter">
     </div>
-
-    <br><br>
     <div class="centered">
         <canvas class="swatch" id="black"       style="background-color: #000000; border: 5px solid black"></canvas>
         <canvas class="swatch" id="gray"        style="background-color: #888888" ></canvas>
@@ -57,18 +68,20 @@
 
 
 
-    <textarea class="center" id="quick_input" style="width: 100%"> </textarea>
+    <textarea class="center" id="quick_input" style="width: 100%; height: 20px"> </textarea>
 
 
     <form id="formSubmit" action="JavaScript:plotDNA()" method="post">
         <div class="centered">
-            <button class="btn" type="submit" id="submit">submit</button>
-            <br/><br/><br/>
+            <button class="btn btn-large btn-success" type="submit" id="submit">submit</button>
+            <a id="download_pdf" style="display: block" download="">download PDF</a>
         </div>
     </form>
 
+    <div class="centered">
+        <img id="img_jpg" src="">
+    </div>
 
-    <iframe id='frame' src="" style="width: 100%; display: none"></iframe>
 
 </div>
 
@@ -79,20 +92,24 @@
 
 <script>
 
+    var out_pdf = null;
+
     function plotDNA() {
         jobID = new Date() / 1000;
         jobID *= 1000;//milliseconds since epoch
 
         var in_text = $('#quick_input').val();
-        var out_pdf = jobID + "_out.pdf";
+        out_pdf = jobID + "_out.pdf";
+        var out_jpg = jobID + "_out.jpg";
 
         $.ajax({
             url: "/dnaplotapp/cgi-bin/run_quick.pl",
             type: "GET",
             data: "in_text="+in_text + '&out_pdf='+out_pdf,
             success: function() {
-                $('#frame').attr('src', "/dnaplotapp/results/"+out_pdf);
-                $('#frame').css('display', 'block');
+                $('#img_jpg').attr('src', "/dnaplotapp/results/"+out_jpg);
+                $('#img_jpg').css('border', '1px solid black');
+                $('#download_pdf').attr('href', '/dnaplotapp/results/'+out_pdf);
             }
         });
     }
@@ -188,4 +205,8 @@
 </script>
 
 <style>
+    #img_jpg{
+        width:100%;
+        max-width:400px;
+    }
 </style>

@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1415649981 "dnaplotlib.tex" "dnaplotlib.pdf" "dnaplotlib" 1415649982
+["pdflatex"] 1415654594 "dnaplotlib.tex" "dnaplotlib.pdf" "dnaplotlib" 1415654594
   "/usr/local/texlive/2014/texmf-dist/tex/context/base/supp-pdf.mkii" 1337017135 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/etexcmds.sty" 1335995445 7612 c47308d923ec19888707b0f1792b326a ""
   "/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/ifluatex.sty" 1303254447 7324 11d14f318d865f420e692d4e6c9c18c3 ""
@@ -40,14 +40,14 @@
   "color.sty" 1413811100 6350 d2029a31a64684d3a4c440f14095e812 ""
   "crop.cfg" 1413811100 1621 ead12c03143111934b54c6d221c69e97 ""
   "crop.sty" 1413811100 12915 1148d1dc94f5f1e09af6c390c13b4e0a ""
-  "dnaplotlib.aux" 1415649982 2166 3743ec6d9f444fa18a87d15b93ae18a9 ""
-  "dnaplotlib.tex" 1415649981 11737 a1879804f9d71813c389356fd5f2e5f1 ""
+  "dnaplotlib.aux" 1415654594 2163 aa02b6c7c0358377751293427f0912fc ""
+  "dnaplotlib.tex" 1415654592 11729 cdb760b3b85485aec708dbf98cbae7fb ""
   "flushend.sty" 1413811100 5252 1967113c380536f01446542c0e9d70d1 ""
   "graphicx.sty" 1413811100 8119 f9c117256f23f06531632b4ea8151d14 ""
   "natbib.sty" 1413811100 35030 e8af73603d5c055d67faa3405f72c6f0 ""
   "stfloats.sty" 1413811100 9927 05caa27fdd0860e336f7ce7ffc5e0daa ""
   "times.sty" 1413811100 693 6949716156b2ab0cbc03425ae196930f ""
   (generated)
+  "dnaplotlib.aux"
   "dnaplotlib.pdf"
   "dnaplotlib.log"
-  "dnaplotlib.aux"

@@ -21,78 +21,31 @@
 DNAplotlib is a computational toolkit that enables highly customizable visualization of single genetic constructs and libraries of design variants. Publication quality vector-based output is produced and all aspects of the rendering process can be easily customized or extended by the user. DNAplotlib is capable of outputting SBOL Visual compliant diagrams, in addition to a trace-based format that is able to better illustrate the precise location and length of each genetic part. This alternative visualization method enables direct comparison with nucleotide-level data such as RNA-seq read depth. While it is envisaged that access will be predominantly via the programming interface, command-line and web-based front-ends are also provided to support broader usage.
 
 \section{Availability:}
-DNAplotlib is cross-platform and open-source software developed using Python and released under the OSI recognized NPOSL-3.0 licence. Source code, documentation and a web front-end are available at the project website: \href{http://www.dnaplotlib.org}{http://www.dnaplotlib.org}.
+DNAplotlib is cross-platform and open-source software developed using Python and released under the OSI recognized NPOSL-3.0 license. Source code, documentation and a web front-end are available at the project website: \href{http://www.dnaplotlib.org}{http://www.dnaplotlib.org}.
 
 \section{Contact:} \href{cavoigt@gmail.com}{cavoigt@gmail.com}
 \end{abstract}
 
-% Background to standardized designs... highlight the problem
-Engineering disciplines rely on standardized pictorial representations of parts and their interconnections to clearly communicate how these should be pieced together to allow for the reliable construction of large complex systems. In biology, DNA sequences are often engineered to create genetic constructs that probe or perturb the function of natural systems, or more recently, create novel capabilities in what has been termed ``synthetic biology'' \citep{Church14a}. Unlike traditional engineering fields, the way that these designs are visually represented varies significantly between labs and in different areas of the field, leading to ambiguities that can hinder understanding and the effective reuse of this research. The Synthetic Biology Open Language (SBOL) Visual initiative was started to help alleviate this problem by defining a set of agreed symbols for commonly used genetic elements \citep{Quinn13a}. However, so far this standard has seen limited uptake due to a lack of accessible tools that can be directly integrated into existing design and analysis workflows.
+Engineering disciplines rely on standardized pictorial representations of parts and their interconnections to clearly communicate how these should be pieced together and allow for the reliable construction of large complex systems. In biology, DNA sequences are often engineered to create genetic constructs that probe or perturb the function of natural systems, or more recently, create novel capabilities in what has been termed ``synthetic biology'' \citep{Church14a}. Unlike traditional engineering fields, the way that these genetic designs are visually represented varies significantly between labs and across different areas of the field. This leads to ambiguities that can hinder understanding and the effective reuse of research. The Synthetic Biology Open Language (SBOL) Visual initiative was started to help alleviate this problem by defining a set of agreed symbols for commonly used genetic elements \citep{Quinn13a}, see Fig.~\ref{fig:overview}A. However, so far this standard has seen limited uptake due to a lack of accessible tools that can be directly integrated into existing design and analysis workflows.
 
-% Place in the context of existing literature/tools. Why don't these solve the problems highlighted
-Some attempts to automate the creation of standard-compliant diagrams have been made, with the most prominent being PigeonCAD \citep{Bhatia13a}. This web-based tool interprets a custom text-based syntax used to specify a genetic design and automatically transforms this into visual representation. The major problem with this approach is that the syntax provides limited ability to customise the visualisations produced, the output is 
+To our knowledge, the only attempt so far to automate the creation of standard-compliant diagrams has been PigeonCAD \citep{Bhatia13a}. This web-based tool interprets a custom syntax used to specify genetic designs and automatically transforms these into visual representations. The main issues with this tool are: (i)~it does not provide access to the full set of SBOL symbols limiting the types of construct it can display, (ii)~output is in the form of poor-quality images that do not scale well, and (iii)~the fixed design syntax restricts the ability for users to customize visualizations for their specific needs or extend the functionality to include new forms of part. Furthermore, synthetic biology is increasingly pushing towards automated design procedures that harness the potential to construct huge libraries of design variants \citep{Smanski14a,Bilitchenko11a}, see Fig.~\ref{fig:overview}D. Under these scenarios, efficient automation of visualization tasks is essential to ensure clear communication of these large design spaces. The inability to tightly integrate PigeonCAD into such workflows makes it unsuitable for these tasks.
 
-Furthermore, 
-
- While this tool is Unfortunately, this tool is hampered by several limitations. The biggest limitation of these approaches so far though is an inability to integrate with existing scientific computing visualization and analysis tools. This is essential as 
-
-% Libraries in synthetic biology and growing need to automate these processes.
-% 2. (1 para). Existing tools that are available and the current difficulties in using them, e.g., PigeonCAD \citep{Bhatia13a}. Why is it needed... difficulty with library designs \citep{Smanski14a,Bilitchenko11a}.
-Another growing area of research that is not well supported by such existing tools is the push towards automated design procedures that harness the potential to construct huge libraries of design variants \citep{Smanski14a,Bilitchenko11a}. Under these scenarios, automation of visualization tasks is essential to ensure clear communication of these large and diverse design spaces. No existing tools are available to support this need. 
-
-
-
-
-As synthetic biology moves ever closer to automated design procedures that harness the potential to construct huge libraries of design variants \citep{Smanski14a,Bilitchenko11a}, supporting visualization tools will become important to ensure clear communication of these large and diverse designs. 
-
-
-
-% Clearly explain what we have created and how it fills this void
-To tackle these limitations we developed DNAplotlib, a computational toolkit that facilitates highly-customisable visualiations of genetic constucts. By providing access at the levels 
-
-
-
-
-
-
-
-
-
-\begin{figure}[t]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=8.3cm]{Figure1.pdf}
-\caption{\label{fig:overview}Overview of core DNAplotlib functionality. All visualizations were generated driectly from DNAplotlib. (\textbf{A})~The complete set of SBOL Visual parts that capture the majority of widely used genetic elements are available for use in both forward and reverse orientations. (\textbf{B})~The size, color, shape and labeling of all elements can be easily customized allowing for additional information to be communicated e.g., promoter strengths or spacer lengths. Users can further supply their own functions to draw parts in a non-standard way or to represent new types of genetic element yet to be incorporated into SBOL Visual. (\textbf{C})~To allow for direct comparison between a genetic design and associated nucleotide-level data, such as RNA-seq read depths, trace-based renderers are also provided. These use the standard promoter and terminator symbols and a small filled circle to represent an RBS. Indicators of actual part widths (arrow length for coding sequences and small filled rectangles for promoters and RBSs) are displayed on the DNA backbone to enable a clear visual alignment of design information with trace data. (\textbf{D})~Visualization of a library of genetic design variants implementing the same 3-input (black promoters), 1-output (black coding sequences) device. Colors have been used to link repressor genes to their cognate promoters.}
+\caption{\label{fig:overview}Overview of core DNAplotlib functionality. All visualizations were generated driectly from DNAplotlib. (\textbf{A})~The complete set of SBOL Visual parts that capture the majority of widely used genetic elements are available for use in both forward and reverse orientations. (\textbf{B})~The size, color, shape and labeling of all elements can be easily customized enabling additional information to be communicated e.g., promoter strengths or spacer lengths. Users can further supply their own functions to draw parts in a non-standard way or to represent new types of genetic element yet to be incorporated into SBOL Visual. (\textbf{C})~To facilitate direct comparison between a genetic design and associated nucleotide-level data, such as RNA-seq read depths, trace-based renderers are also provided. These use the standard promoter and terminator symbols and a small filled circle to represent an RBS. Indicators of actual part widths (arrow length for coding sequences and small filled rectangles for promoters and RBSs) are displayed on the DNA backbone to enable a clear visual alignment of design information with trace data. (\textbf{D})~Visualization of a library of genetic design variants implementing the same 3-input (black promoters), 1-output (black coding sequences) device. Colors have been used to link repressor genes to their cognate promoters.}
 \end{figure}
 
-% Technicalities of DNAplotlib
-DNAplotlib has been built using matplotlib \citep{Hunter07a}, a Python-based 2D graphics library that allows for graphical output in the form of vector-based PDFs or rasterized images. Python was chosen as the underlying language due to its increasing use during the analysis of biological data \citep{Cock09a}, which ensured that visualizations generated by DNAplotlib could be easily integrated into existing analysis scripts and workflows with minimal effort. Furthermore, Python is highly-portable ensuring availability across all major operating systems.
+To address these limitation we developed a computational toolkit called DNAplotlib that enables highly-customizable visualization of genetic constructs in a programmable way (Fig.~\ref{fig:overview}B). DNAplotlib has been developed in Python and makes significant use of matplotlib \citep{Hunter07a}, a 2D graphics library that can produce graphical output in the form of vector-based PDFs or rasterized images e.g., JPEGs. Python was chosen as the underlying language due to its increasing use in the analysis of biological data \citep{Cock09a}, which enables visualizations generated by DNAplotlib to be integrated into existing analysis workflows with minimal effort. Furthermore, Python is highly-portable ensuring availability of our tools across all major operating systems.
 
-Designs are stored as a standard Python list where each element is a dictionary defining details regarding the part at that position in the construct. Visualisations are generated automatically by scanning this data structure and calling functions associated to the type of part at each position. Standard functions are provided to generate SBOL Visual symbols as well as
+At the core of the toolkit is the main rendering pipeline. This is structured such that individual functions are provided when run to draw each symbol type. Standard built-in functions can be chosen that cover the full range of SBOL Visual parts (Fig.~\ref{fig:overview}A), or the user can specify their own which may include new forms of part type not currently available. In addition, we also provide what are termed trace-based renderers that draw promoters, ribosome binding sites (RBSs), coding sequences (CDSs) and terminators such that the start and end points relate to their actual position within a construct (Fig.~\ref{fig:overview}C). Unlike the conceptual SBOL Visual renderers where only ordering and orientation information are maintained, trace-based renders allow for a direct comparison between nucleotide-level data and the associated design information, see Fig.~\ref{fig:overview}C.
 
-Regulation is handled in a similar way with arcs.
+To create a visualization, designs are provided in the form of a standard list data type, where each element is a dictionary defining the part at that position and any other design information, e.g., orientation, length and styling options. By using a dictionary, varying options for each part type can be easily accommodated. Visualizations are then generated by scanning this list and calling functions associated to each part type encountered. If a part type is unknown or an attribute not used, this element is ignored ensuring that renderers providing differing levels of functionality do not break the entire pipeline. Regulation is handled in a similar way with start and end points provided in addition to styling options. All rendering is performed using a matplotlib axis, allowing for genetic designs to be incorporated into standard plotting routines.
 
-% Rendering pipeline
-A key consideration in the design of DNAplotlib was ensuring that all aspects of the rendering process can be customized to a users' requirements. The rapid pace at which biological research progresses has resulted in the continual discovery of new forms of genetic part. 
+Although directly accessing DNAplotlib from Python gives greatest flexibility, in many cases it is simpler for a user to specify designs and part customizations in text-based files. These can be shared more easily and allow for better reuse of design or styling information. For these purposes we developed two command-line interfaces. The first mimics the idea of PigeonCAD using a simple syntax to define basic constructs as a single line of text. This is useful for the quick creation of small constructs with limited customization. The second is designed for visualization of large libraries of designs. Users are required to provide several text files defining the parts, their styling, and the part ordering, orientation and regulatory links. These are then processed and a visualization of the full library output.
 
+To further ensure broadest access to non-programmers, web-based interfaces for each of these command-line scripts is available. These were developed using Jetty and provide a graphical user interface for creating simple constructs and the ability to upload text-based files of library designs. Visualizations can be previewed and downloaded as JPEG or PDF files.
 
-As fields such as synthetic biology are still evolving, the the precise way in which such tools will be used and the discovery of new types of genetic part that need to be included, but may not yet have a standardized representation. Enabling custom elements to be easily added and refined over time will ensure such elements are captured and also contribute to the standardization process. 
-
-dictionary that contains core attributes corresponding to part type and orientation, in addition to other attributes that influence the style of the part. Attributes that are not used by a particular renderer are ignored, meaning that it is easy to swap these functions without fear of breaking the entire rendering pipeline.
-
-
-Although directly accessing DNAplotlib using Python gives the greatest flexibility, we recognized that in many cases 
-
-
-% Scripts to ease use - text based input, simple construct definition language
-To generate a 
-In addition to direct library access through Python analysis scripts, we also provide two scripts to enable input in the form of text files
-
-% Web-based interface. What does this include, what it doesn't. Why did we make it.
-To ensure broadest application of these tools by non-programmers, a web-based interface is also provided. The website is built using Jetty and enables a user to simply upload 
-
-This dire access to the two scripts described previously and removes the need for a user to have a local installation of Python or the library. The websites run using on top of the Jetty ...
-
-% Future directions (general point on where it is available and potential for external contributions)
 DNAplotlib is under continual development with a current focus on broadening the types of genetic element covered to include new synthetic biological parts. The project welcomes contributions from others within the community through the project website and public development repository: \href{http://www.dnaplotlib.org}{http://www.dnaplotlib.org}.
 
 \section*{ACKNOWLEDGEMENTS}
@@ -119,7 +72,3 @@ Quinn, J., Beal, J., Bhatia, S., Cai, P., Chen, J., Clancy, K., Hillson, N., Gal
 \end{thebibliography}
 
 \end{document}
-
-
-
-%The SBOL Visual initiative was started to aid in this task with the definition of agreed pictorial representations of genetic elements \citep{Quinn13a}. However, so far it has seen limited uptake due to a lack a tools that are able to be easily integrated into existing analysis work-flows. DNAplotlib fills this gap by providing a computational toolkit that both adheres to this standard while also enabling highly customizable visualizations that are most appropriate for the specific needs of the laboratory. It is hoped that by providing researchers with this flexibility that they will be more willing to apply such standards to their work, improving general uptake of SBOL Visual across the field.

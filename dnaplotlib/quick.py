@@ -141,7 +141,7 @@ def main():
 	
 	# Save the figure
 	plt.tight_layout()
-	fig.savefig(args.output, transparent=True)
+	fig.savefig(args.output, transparent=True, dpi=300)
 	
 
 # Enable the script to be run from the command line	

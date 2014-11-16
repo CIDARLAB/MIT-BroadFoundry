@@ -41,21 +41,21 @@ canvas {
 }
 
 .swatch {
-    height: 30px;
-    width:  30px;
+    height: 35px;
+    width:  35px;
     cursor: pointer;
     border: 5px solid white;
 }
 
 .particon {
     display: inline-block;
-    height: 45px;
+    height: 35px;
     cursor: pointer;
     border: 3px solid white;
 }
 .reverse_particon {
     display: inline-block;
-    height: 45px;
+    height: 35px;
     cursor: pointer;
     border: 3px solid white;
     -moz-transform: scale(-1,-1);

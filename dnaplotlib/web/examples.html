@@ -13,8 +13,6 @@
     <link rel="stylesheet" type="text/css" href="css/main.css" />
     <link rel="shortcut icon" href="images/cds_icon.jpg">
 
-    <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">-->
-
     <title>dnaplotapp</title>
 </head>
 <body>
@@ -22,65 +20,41 @@
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
-            <a class="brand" href="index.html">DNAPlotApp</a>
+            <a class="brand" href="index.html">DNAplotlib</a>
             <ul class="nav">
-                <li><a href="index.html">Quick</a></li>
-                <li><a href="upload.html">Upload</a></li>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="single.html">Single design</a></li>
+                <li><a href="library.html">Library design</a></li>
                 <li class="active"><a href="examples.html">Examples</a></li>
             </ul>
         </div>
     </div>
 </div>
 
-<div class="container" style="margin-top:50px">
+<div style="margin-top:50px; width: 500px" id="examples">
 
     <a id="all_elements_dl">download</a>
-    <div id="all_elements" class="example">
-        <img src="examples/all_elements/all_elements.jpg">
-    </div>
+    <img src="examples/all_elements/all_elements.jpg">
 
-    <a id="cello_notgate_dl">download</a>
-    <div id="cello_notgate" class="example">
-        <img src="examples/cello_notgate/cello_notgate.jpg">
-    </div>
+    <a id="parts_custom_dl">download</a>
+    <img src="examples/customizations/customizations.jpg">
 
-    <a id="cello_gates_dl">download</a>
-    <div id="cello_gates" class="example">
-        <img src="examples/cello_gates/cello_gates.jpg">
-    </div>
+
+
 
     <a id="cello_eugene_dl">download</a>
-    <div id="cello_eugene" class="example">
-        <img src="examples/cello_eugene/cello_eugene.jpg">
-    </div>
+    <img src="examples/cello_eugene/cello_eugene_preview.jpg">
 
-    <a id="cello_truthtable_dl">download</a>
-    <div id="cello_truthtable" class="example">
-        <img src="examples/cello_truthtable/cello_truthtable.jpg">
-    </div>
-
-    <a id="stata_library_dl">download</a>
-    <div id="stata_library" class="example">
-        <img src="examples/stata_library/stata_library.jpg">
-    </div>
-
-
+    <br><br><br>
 </div>
-
 
 </body>
 <script>
 
     $('a#all_elements_dl').attr({target: '_blank',
         href  : '/dnaplotapp/examples/all_elements.zip'});
-    $('a#cello_notgate_dl').attr({target: '_blank',
-        href  : '/dnaplotapp/examples/cello_notgate.zip'});
-    $('a#cello_gates_dl').attr({target: '_blank',
-        href  : '/dnaplotapp/examples/cello_gates.zip'});
-    $('a#cello_eugene_dl').attr({target: '_blank',
-        href  : '/dnaplotapp/examples/cello_eugene.zip'});
-    $('a#cello_truthtable_dl').attr({target: '_blank',
-        href  : '/dnaplotapp/examples/cello_truthtable.zip'});
+    $('a#parts_custom_dl').attr({target: '_blank',
+        href  : '/dnaplotapp/examples/customizations.zip'});
     $('a#stata_library_dl').attr({target: '_blank',
         href  : '/dnaplotapp/examples/stata_library.zip'});
 
@@ -89,13 +63,14 @@
 
 
 <style>
-    .example {
-        max-height: 250px;
-        margin-left: 60px;
-        width: 75%;
-        overflow: scroll;
+    img {
+        margin-left: 50px;
+        width: 500px;
         border: 3px solid gray;
+    }
 
+    #examples a {
+        margin-left: 50px;
     }
 
 </style>

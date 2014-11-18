@@ -1349,7 +1349,7 @@ class GeneClusterLibrary:
 		return units
 
 	def transcriptional_unit_seqs (self, variant, tus):
-		"""Extract the sequences of tus for a specific variant.
+		"""Extract the sequences of TUs for a specific variant.
 
 	    Parameters
 	    ----------

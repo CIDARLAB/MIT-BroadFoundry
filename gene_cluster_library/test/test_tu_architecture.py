@@ -15,3 +15,6 @@ print 'There are', len(tus_basic), 'normal TUs and', len(tus_all), 'full. Should
 
 # Extract all the sequences for the TUs (we can use this data for fitting)
 gca.generate_all_variant_tus_fasta (nifs, './tu_arch_seqs/tu_arch_')
+
+# Extract all the sequences for the TUs (we can use this data for fitting)
+gca.generate_all_variant_tus_fasta (nifs, './tu_arch_seqs_trunc/tu_arch_', truncate_ends=1)

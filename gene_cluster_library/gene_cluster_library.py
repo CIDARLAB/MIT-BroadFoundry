@@ -1266,7 +1266,7 @@ class GeneClusterLibrary:
 		f_out.write('# Arcs\n')
 		f_out.close()
 
-	def transcriptional_units (self, non_terminated=False, read_through=False):
+	def transcriptional_units (self, non_terminated=False, read_through=False, truncate_ends=0):
 		"""Extract all valid transcriptional units from a GeneClusterLibrary.
 
 		Note: double promoters will generate two transcriptional units.
@@ -1326,12 +1326,19 @@ class GeneClusterLibrary:
 				for tu_idx in range(len(fwd_tus)):
 					all_fwd_tus.append(fwd_tus[tu_idx])
 					for next_tu_idx in range(tu_idx+1,len(fwd_tus)):
+						# We only want to add a single None transcript (at end)
 						if fwd_tus[next_tu_idx][1] != None:
 							new_tu = [fwd_tus[tu_idx][0], fwd_tus[next_tu_idx][1]]
 							if new_tu not in all_fwd_tus:
 								all_fwd_tus.append(new_tu)
+					# Add the None transcript if it doesn't already exist
 					if fwd_tus[tu_idx][1] != None:
-						all_fwd_tus.append([fwd_tus[tu_idx][0], None])
+						if truncate_ends == 0:
+							all_fwd_tus.append([fwd_tus[tu_idx][0], None])
+						else:
+							# Add index: max_index-truncate_ends
+							var_len = len(self.variant_part_list(v_key))
+							all_fwd_tus.append([fwd_tus[tu_idx][0], var_len-truncate_ends])
 				# Process rev TUs
 				for tu_idx in range(len(rev_tus)):
 					all_rev_tus.append(rev_tus[tu_idx])
@@ -1341,10 +1348,14 @@ class GeneClusterLibrary:
 							if new_tu not in all_rev_tus:
 								all_rev_tus.append(new_tu)
 					if rev_tus[tu_idx][1] != None:
-						all_rev_tus.append([rev_tus[tu_idx][0], None])
+						if truncate_ends == 0:
+							all_rev_tus.append([rev_tus[tu_idx][0], None])
+						else:
+							# Add index: max_index-truncate_ends
+							all_rev_tus.append([rev_tus[tu_idx][0], truncate_ends-1])
 				# Add the full set of TUs
 				all_units[v_key] = all_fwd_tus + all_rev_tus
-			# We wantto return all TUs (overwrite existing ones)
+			# We want to return all TUs (overwrite existing ones)
 			units = all_units
 		return units
 

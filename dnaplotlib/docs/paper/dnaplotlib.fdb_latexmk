@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1415746670 "dnaplotlib.tex" "dnaplotlib.pdf" "dnaplotlib" 1415746823
+["pdflatex"] 1416882265 "dnaplotlib.tex" "dnaplotlib.pdf" "dnaplotlib" 1416882265
   "/usr/local/texlive/2014/texmf-dist/tex/context/base/supp-pdf.mkii" 1337017135 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/etexcmds.sty" 1335995445 7612 c47308d923ec19888707b0f1792b326a ""
   "/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/ifluatex.sty" 1303254447 7324 11d14f318d865f420e692d4e6c9c18c3 ""
@@ -33,21 +33,21 @@
   "/usr/local/texlive/2014/texmf-dist/tex/latex/psnfss/omsphv.fd" 1137110629 576 929ce6fef69dfb1784acc37a3a60b968 ""
   "/usr/local/texlive/2014/texmf-dist/tex/latex/psnfss/ot1phv.fd" 1137110629 1684 0ac4554419e828cf2c810306539da167 ""
   "/usr/local/texlive/2014/texmf-dist/tex/latex/psnfss/ot1ptm.fd" 1137110629 961 15056f4a61917ceed3a44e4ac11fcc52 ""
-  "Figure1.pdf" 1415744139 2493495 81f6bf9a1c7e2b996830c61965fa012d ""
+  "Figure1.pdf" 1416882225 2493626 bea4bc5e30b91bf3070e13fd09463e59 ""
   "array.sty" 1413811100 13420 c53a69ab9cae971bde15ba2d8c60667b ""
   "bioinfo.cls" 1413811100 29244 75730def31df312532d75957e13c7751 ""
   "chngpage.sty" 1413811100 10939 11621119fca4cec538e727b64c216aa1 ""
   "color.sty" 1413811100 6350 d2029a31a64684d3a4c440f14095e812 ""
   "crop.cfg" 1413811100 1621 ead12c03143111934b54c6d221c69e97 ""
   "crop.sty" 1413811100 12915 1148d1dc94f5f1e09af6c390c13b4e0a ""
-  "dnaplotlib.aux" 1415746671 2154 028d6be54a96e160f586ad56b29f76ca ""
-  "dnaplotlib.tex" 1415746822 11849 770f3264c52816e06b6118fe68c88c72 ""
+  "dnaplotlib.aux" 1416882265 2154 028d6be54a96e160f586ad56b29f76ca ""
+  "dnaplotlib.tex" 1416882229 11849 770f3264c52816e06b6118fe68c88c72 ""
   "flushend.sty" 1413811100 5252 1967113c380536f01446542c0e9d70d1 ""
   "graphicx.sty" 1413811100 8119 f9c117256f23f06531632b4ea8151d14 ""
   "natbib.sty" 1413811100 35030 e8af73603d5c055d67faa3405f72c6f0 ""
   "stfloats.sty" 1413811100 9927 05caa27fdd0860e336f7ce7ffc5e0daa ""
   "times.sty" 1413811100 693 6949716156b2ab0cbc03425ae196930f ""
   (generated)
-  "dnaplotlib.pdf"
   "dnaplotlib.aux"
   "dnaplotlib.log"
+  "dnaplotlib.pdf"

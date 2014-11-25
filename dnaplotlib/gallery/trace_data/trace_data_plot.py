@@ -52,7 +52,7 @@ ax2.set_ylim([-1.5,1.5])
 
 # Save the figure
 plt.tight_layout()
-fig.savefig('dna_axis_plot.pdf', transparent=True)
+fig.savefig('trace_data_plot.pdf', transparent=True)
 
 # Clear the plotting cache
 plt.close('all')

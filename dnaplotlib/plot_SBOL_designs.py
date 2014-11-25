@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 """
-	plot_SBOL_designs.py
+    plot_SBOL_designs.py
 
-	Will plot the design of DNA constructs using SBOL notation.
+    Plot the design of DNA constructs using SBOL notation.
 
- 	Usage:
+    Usage:
     ------
-    python plot_SBOL_designs.py PARAM_FILENAME PART_FILENAME DESIGN_FILENAME OUT_FILENAME
+    python plot_SBOL_designs.py  -params     PARAM_FILENAME 
+                                 -parts      PART_FILENAME 
+                                 -designs    DESIGN_FILENAME 
+                                [-regulation REG_FILENAME]
+                                 -output     OUT_FILENAME
 """
 #    Plot SBOL Designs
 #    Copyright (C) 2014 by
@@ -14,6 +18,10 @@
 #    Bryan Der <bder@mit.edu>
 #    All rights reserved.
 #    OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
+
+# Set the backend to use (important for headless servers)
+import matplotlib
+matplotlib.use('Agg')
 
 import sys
 import getopt
@@ -44,7 +52,8 @@ def load_plot_parameters (filename):
 	# Process all parameters
 	for row in param_reader:
 		if len(row) >= 2:
-			plot_params[row[0]] = make_float_if_needed(row[1])
+			if row[1] != '':
+				plot_params[row[0]] = make_float_if_needed(row[1])
 	return plot_params
 
 
@@ -61,7 +70,7 @@ def load_part_information (filename):
 		part_attribs_map = {}
 		for k in attrib_keys:
 			if row[header_map[k]] != '':
-				if k == 'color':
+				if k == 'color' or k == 'label_color':
 					part_attribs_map[k] = [float(x) for x in row[header_map[k]].split(';')]
 				else:
 					part_attribs_map[k] = make_float_if_needed(row[header_map[k]])
@@ -132,7 +141,6 @@ def load_regulatory_information (filename, part_info, dna_designs):
 
 		#middle loop: for each regulation
 		for row in rows:
-			#print i,row
 			
 			#opts
 			reg_attribs_map = {}
@@ -163,25 +171,20 @@ def load_regulatory_information (filename, part_info, dna_designs):
 							reg_info['type'] = row[header_map['type']]
 							reg_info['to_part'] = end_part
 							reg_info['opts'] = reg_attribs_map
-							regs_info[i].append( reg_info );
-
-		#print i,regs_info[i]
-
-	#for reg in regs_info:
-	#	print regs_info[reg]
-
-	#print regs_info
+							regs_info[i].append(reg_info)
 	return regs_info
 
 
 def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 	# Create the renderer
 	if 'axis_y' not in plot_params.keys():
-		plot_params['axis_y'] = 55
+		plot_params['axis_y'] = 35
 	left_pad = 0.0
 	right_pad = 0.0
 	scale = 1.0
 	linewidth = 1.0
+	fig_y = 5.0
+	fig_x = 5.0
 	if 'backbone_pad_left' in plot_params.keys():
 		left_pad = plot_params['backbone_pad_left']
 	if 'backbone_pad_right' in plot_params.keys():
@@ -190,31 +193,32 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 		scale = plot_params['scale']
 	if 'linewidth' in plot_params.keys():
 		linewidth = plot_params['linewidth']
+	if 'fig_y' in plot_params.keys():
+		fig_y = plot_params['fig_y']
+	if 'fig_x' in plot_params.keys():
+		fig_x = plot_params['fig_x']
 	dr = dpl.DNARenderer(scale=scale, linewidth=linewidth,
 		                 backbone_pad_left=left_pad, 
 		                 backbone_pad_right=right_pad)
 
 	# We default to the standard regulation renderers
 	reg_renderers = dr.std_reg_renderers()
-
 	# We default to the SBOL part renderers
 	part_renderers = dr.SBOL_part_renderers()
 
     # Create the figure
-	fig = plt.figure(figsize=(plot_params['fig_x'],plot_params['fig_y']))
-	# Cycle through the designs an plot on individual axes
+	fig = plt.figure(figsize=(fig_x,fig_y))
 
+	# Cycle through the designs an plot on individual axes
 	design_list = sorted(dna_designs.keys())
 	if(regs_info != None):
 		regs_list   = sorted(regs_info.keys())
 	
 	num_of_designs = len(design_list)
-	#print len(design_list),len(regs_list)
 	ax_list = []
 	max_dna_len = 0.0
 	for i in range(num_of_designs):
 		# Create axis for the design and plot
-
 		regs = None
 		if(regs_info != None):
 			regs   =  regs_info[i]
@@ -235,16 +239,23 @@ def plot_dna (dna_designs, out_filename, plot_params, regs_info):
 		# Set bounds
 		ax.set_xlim([(-0.01*max_dna_len)-left_pad,
 			        max_dna_len+(0.01*max_dna_len)+right_pad])
-
 		ax.set_ylim([-plot_params['axis_y'],plot_params['axis_y']])
-
 		ax.set_aspect('equal')
 		ax.set_axis_off()
+
+	# Update the size of the figure to fit the constructs drawn
+	fig_x_dim = max_dna_len/70.0
+	if fig_x_dim < 1.0:
+		fig_x_dim = 1.0
+	fig_y_dim = 1.2*len(ax_list)
+	plt.gcf().set_size_inches( (fig_x_dim, fig_y_dim) )
+
 	# Save the figure
 	plt.tight_layout()
-	fig.savefig(out_filename, transparent=True)
+	fig.savefig(out_filename, transparent=True, dpi=300)
 	# Clear the plotting cache
 	plt.close('all')
+
 
 def is_valid_file(parser, arg):
     if not os.path.exists(arg):
@@ -252,20 +263,9 @@ def is_valid_file(parser, arg):
     else:
         return open(arg, 'r')  # return an open file handle
 
-def main():
-	## parse command line options
-	#try:
-	#	opts, args = getopt.getopt(sys.argv[1:], "h", ["help"])
-	#except getopt.error, msg:
-	#	print msg
-	#	print "for help use --help"
-	#	sys.exit(2)
-	## process options
-	#for o, a in opts:
-	#	if o in ("-h", "--help"):
-	#		print __doc__
-	#		sys.exit(0)
-	
+
+def main():	
+	# Parse the arguments
 	parser = ArgumentParser(description="file paths as arguments")
 	parser.add_argument("-params", dest="params", required=True,
 					help="plot_params.csv", metavar="FILE",
@@ -283,12 +283,11 @@ def main():
 					help="output pdf filename")
 	args = parser.parse_args()
 
-	# process arguments
+	# Process arguments
 	plot_params = load_plot_parameters(args.params.name)
-	
 	part_info = load_part_information(args.parts.name)
-
 	dna_designs = load_dna_designs (args.designs.name, part_info)
+<<<<<<< HEAD
 	
 	for param in plot_params.items():
 		print param
@@ -306,9 +305,12 @@ def main():
 		for reg in regs_info.items():
 			print reg
 
+=======
+	regs_info = None
+	if(args.regulation):
+		regs_info = load_regulatory_information(args.regulation.name, part_info, dna_designs)
+>>>>>>> 204dba66f33210aff26029ecf3df81db218a811b
 	plot_dna(dna_designs, args.output_pdf, plot_params, regs_info)
-
-
 
 if __name__ == "__main__":
  	main()

@@ -1,0 +1,54 @@
+
+TODO list for dnaplotlib
+========================
+
+
+MINIMAL FUNCTIONALITY FOR VER 1.0
+---------------------------------
+
+1. (DONE) Fully documented and working dnaplotlib.py file (covers, all SBOL symbols, regulation and traces)
+2. (DONE) CSV input script for SBOL output
+3. (DONE) Full SBOL Visual compliance (inc. the weird symbols)
+4.        Basic web interface for uploading files, generating simple constructs
+
+
+OUTSTANDING
+-----------
+
+NEEDED FOR RELEASE
+
+- [EG,BD would like to help] Web-based interface for file input and PDF/PNG output.
+
+- ***[TG] Final home for the code. Maybe create Voigt lab GitHub Repo? Speak to Chris.
+
+
+FOR LATER...
+
+- [TG] Take a FASTA file and a list of parts (including their sequence and style to be drawn) and generate plasmid diagram (not for initial release).
+
+- [BD] Read SBOL file format to generate image, write SBOL file specifying the 'DnaComponents' (not for initial release).
+
+- [BD] Automatic generation of all state diagrams of circuit regulation?
+
+- [EG] ORM for integration with other tools in lab (less important at moment).
+
+
+COMPLETED
+---------
+
+- ***[TG] PyDocs everywhere to generate documentation for API.
+
+- [TG] Spacing is messed up on some elements. Make sure that there is no overlap with default settings.
+
+- [TG,BD] Add regulation features.
+
+- ***[TG] Add ability to show transcriptional traces and plot space correct symbols
+
+- ***[TG] Option to label a part with the part name.
+
+- [EG] Test SBOL figure elements (create some basic diagrams with all parts, see "gallery").
+
+- ***[TG,EG,BD] Gallery of examples covering constructs, circuits, other functionality.
+
+- ***[TG] Final SBOL icons (ensure full compliance).
+

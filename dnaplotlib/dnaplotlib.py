@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-dnaplotlib
+DNAplotlib
 ==========
     This module is designed to allow for highly customisable visualisation of DNA
     fragments. Diagrams can be in the form of conceptual SBOL compliant icons or
@@ -10,24 +10,60 @@ dnaplotlib
     enables the export of publication quality, vector-based figures. Furthermore,
     all standard renderers can be replaced with user defined versions to allow 
     for full customisation of the plot.
+
+    To make use of this module it is necessary to create the rendering object 
+    after importing the module:
+
+    >  import dnaplotlib as dpl
+    >  dr = dpl.DNARenderer()
+
+    This object performs all rendering using the renderDNA() method. To describe
+    what should be plotted, dnaplotlib requires the DNA design in a specific 
+    format. For standard SBOL diagrams a design is a list of dictionaries where
+    each dictionary relates to a specific part and as a minimum contains the
+    keys:
+
+    - name: A name that can be potentially used in regulation.
+    - type: The type of part (decides which renderer to use).
+    - fwd: Boolean defining if the part is in a forward orientation.
+    - start: Start position (optional)
+    - end: End position (optional)
+
+    Once this list is defined and an axis object is created the design can be
+    draw using standard renders and to a user created matplotlib axes by running:
+
+    > reg_renderers = dr.std_reg_renderers()
+    > part_renderers = dr.SBOL_part_renderers()
+    > regs = None
+    > design = ... Design is created here ...
+    > ax = ... matplotlib axes created here ...
+    > start, end = dr.renderDNA(ax, design, part_renderers, regs, reg_renderers)
+
+    The function returns the start and end point of the design which can then
+    be used for resizing the axes and figure. For more advanced use cases we 
+    advise looking at the gallery distributed with this module.
 """
-#    dnaplotlib
+#    DNAplotlib
 #    Copyright (C) 2014 by
 #    Thomas E. Gorochowski <tom@chofski.co.uk>
-#    Emerson Glassey <eglassey@mit.edu>
 #    Bryan Der <bder@mit.edu>
+#    Emerson Glassey <eglassey@mit.edu>
 #    All rights reserved.
 #    OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
 
+# Set the backend to use (important for headless servers)
+import matplotlib
+matplotlib.use('Agg')
+
 from matplotlib.patches import Polygon, Ellipse, Wedge, Circle, PathPatch
 from matplotlib.path import Path
-from matplotlib.lines   import Line2D
-from math import sqrt
-from math import fabs
+from matplotlib.lines import Line2D
+from matplotlib.patheffects import Stroke 
+import math
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
-               Emerson Glassey <eglassey@mit.edu>, Voigt Lab, MIT\n\
-               Bryan Der <bder@mit.edu>, Voigt Lab, MIT'
+               Bryan Der <bder@mit.edu>, Voigt Lab, MIT\n\
+               Emerson Glassey <eglassey@mit.edu>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
 
@@ -36,10 +72,13 @@ __version__ = '1.0'
 ###############################################################################
 
 def write_label (ax, label_text, x_pos, opts=None):
+	""" Renders labels on parts.
+	"""
 	label_style = 'normal'
 	label_size = 7
 	label_y_offset = 0
 	label_x_offset = 0
+	label_color = (0,0,0)
 	if opts != None:
 		if 'label_style' in opts.keys():
 			label_style = opts['label_style']
@@ -49,10 +88,15 @@ def write_label (ax, label_text, x_pos, opts=None):
 			label_y_offset = opts['label_y_offset']
 		if 'label_x_offset' in opts.keys():
 			label_x_offset = opts['label_x_offset']
+		if 'label_color' in opts.keys():
+			label_color = opts['label_color']
 	ax.text(x_pos+label_x_offset, label_y_offset, label_text, horizontalalignment='center',
-		    verticalalignment='center', fontsize=label_size, fontstyle=label_style, zorder=30)
+		    verticalalignment='center', fontsize=label_size, fontstyle=label_style, 
+		    color=label_color, zorder=30)
 
 def sbol_promoter (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL promoter renderer.
+	"""
 	# Default options
 	color = (0.0,0.0,0.0)
 	start_pad = 2.0
@@ -107,7 +151,8 @@ def sbol_promoter (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		          (start+dir_fac*x_extent, dir_fac*y_extent),
 		          (start+dir_fac*x_extent-dir_fac*arrowhead_length, 
 		           dir_fac*y_extent-(arrowhead_height))],
-		          facecolor=color, edgecolor=color, linewidth=linewidth)
+		          facecolor=color, edgecolor=color, linewidth=linewidth, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0
 	ax.add_patch(p1)
 	if opts != None and 'label' in opts.keys():
 		if final_start > final_end:
@@ -120,6 +165,8 @@ def sbol_promoter (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		return prev_end, final_end
 
 def sbol_cds (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL coding sequence renderer.
+	"""
 	# Default options
 	color = (0.7,0.7,0.7)
 	hatch = ''
@@ -173,7 +220,8 @@ def sbol_cds (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		          (end-dir_fac*arrowhead_length, y_extent+arrowhead_height),
 		          (end-dir_fac*arrowhead_length, y_extent)],
 		          edgecolor=(0.0,0.0,0.0), facecolor=color, linewidth=linewidth, 
-		          hatch=hatch, zorder=11)
+		          hatch=hatch, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0
 	ax.add_patch(p1)
 	if opts != None and 'label' in opts.keys():
 		if final_start > final_end:
@@ -186,12 +234,14 @@ def sbol_cds (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		return prev_end, final_end
 
 def sbol_terminator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL terminator renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
 	end_pad = 2.0
 	y_extent = 10.0
-	x_extent = 4.0
+	x_extent = 8.0
 	# Reset defaults if provided
 	if opts != None:
 		if 'color' in opts.keys():
@@ -222,9 +272,9 @@ def sbol_terminator (ax, type, num, start, end, prev_end, scale, linewidth, opts
 		end = start+x_extent
 		final_end = end+end_pad
 	# Draw the terminator symbol
-	l1 = Line2D([start,start],[0,dir_fac*y_extent], linewidth=linewidth, 
+	l1 = Line2D([start+dir_fac*(x_extent/2.0),start+dir_fac*(x_extent/2.0)],[0,dir_fac*y_extent], linewidth=linewidth, 
 		        color=color, zorder=8)
-	l2 = Line2D([start-x_extent,start+x_extent],[dir_fac*y_extent,dir_fac*y_extent], 
+	l2 = Line2D([start,start+(dir_fac*x_extent)],[dir_fac*y_extent,dir_fac*y_extent], 
 		        linewidth=linewidth, color=color, zorder=9)
 	ax.add_line(l1)
 	ax.add_line(l2)
@@ -239,6 +289,8 @@ def sbol_terminator (ax, type, num, start, end, prev_end, scale, linewidth, opts
 		return prev_end, final_end
 
 def sbol_rbs (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL ribosome binding site renderer.
+	"""
 	# Default options
 	color = (0.7,0.7,0.7)
 	start_pad = 2.0
@@ -291,15 +343,25 @@ def sbol_rbs (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 
 
 def sbol_ribozyme (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL ribozyme renderer.
+	"""
 	return stick_figure(ax,type,num,start,end,prev_end,scale,linewidth,opts)	
 def sbol_protein_stability (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL protein stability element renderer.
+	"""
 	return stick_figure(ax,type,num,start,end,prev_end,scale,linewidth,opts)	
 def sbol_protease (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL protease site renderer.
+	"""
 	return stick_figure(ax,type,num,start,end,prev_end,scale,linewidth,opts)
 def sbol_ribonuclease (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL ribonuclease site renderer.
+	"""
 	return stick_figure(ax,type,num,start,end,prev_end,scale,linewidth,opts)
 
 def stick_figure (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" General function for drawing stick based parts (e.g., ribozyme and protease sites).
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -434,11 +496,13 @@ def stick_figure (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 
 
 def sbol_scar (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL scar renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
 	end_pad = 2.0
-	x_extent = 3.0
+	x_extent = 6.0
 	y_extent = 1.0
 	linestyle = '-'
 	# Reset defaults if provided
@@ -467,16 +531,17 @@ def sbol_scar (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	end = start+x_extent
 	final_end = end+end_pad
 	
-	l_top    = Line2D([start-x_extent,start+x_extent],[y_extent,y_extent], 
+	l_top    = Line2D([start,start+x_extent],[y_extent,y_extent], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	l_bottom = Line2D([start-x_extent,start+x_extent],[-1*y_extent,-1*y_extent], 
+	l_bottom = Line2D([start,start+x_extent],[-1*y_extent,-1*y_extent], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
 	#white rectangle overlays backbone line
-	p1 = Polygon([(start-x_extent, y_extent), 
-		          (start-x_extent, -y_extent),
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 
 	ax.add_patch(p1)
 	ax.add_line(l_top)
@@ -494,6 +559,8 @@ def sbol_scar (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		return prev_end, final_end
 
 def sbol_empty_space (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in empty space renderer.
+	"""
 	# Default options
 	x_extent = 12.0
 	# Reset defaults if provided
@@ -516,11 +583,13 @@ def sbol_empty_space (ax, type, num, start, end, prev_end, scale, linewidth, opt
 
 
 def sbol_5_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL 5' overhang renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 0.0
 	end_pad = 2.0
-	x_extent = 3.0
+	x_extent = 6.0
 	y_extent = 1.0
 	linestyle = '-'
 	# Reset defaults if provided
@@ -549,16 +618,17 @@ def sbol_5_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 	end = start+x_extent
 	final_end = end+end_pad
 	
-	l_top    = Line2D([start-x_extent,start+x_extent],[y_extent,y_extent], 
+	l_top    = Line2D([start,start+x_extent],[y_extent,y_extent], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	l_bottom = Line2D([start,start+x_extent],[-1*y_extent,-1*y_extent], 
+	l_bottom = Line2D([start+(x_extent/2.0),start+x_extent],[-1*y_extent,-1*y_extent], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
 	#white rectangle overlays backbone line
-	p1 = Polygon([(start-x_extent, y_extent), 
-		          (start-x_extent, -y_extent),
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 	ax.add_line(l_top)
@@ -576,11 +646,13 @@ def sbol_5_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 		return prev_end, final_end
 
 def sbol_3_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL 3' overhang renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
 	end_pad = 0.0
-	x_extent = 3.0
+	x_extent = 6.0
 	y_extent = 1.0
 	linestyle = '-'
 	# Reset defaults if provided
@@ -609,16 +681,17 @@ def sbol_3_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 	end = start+x_extent
 	final_end = end+end_pad
 	
-	l_top    = Line2D([start-x_extent,start+x_extent],[y_extent,y_extent], 
+	l_top    = Line2D([start,start+x_extent],[y_extent,y_extent], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	l_bottom = Line2D([start-x_extent,start],[-1*y_extent,-1*y_extent], 
+	l_bottom = Line2D([start,start+(x_extent/2.0)],[-1*y_extent,-1*y_extent], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
 	#white rectangle overlays backbone line
-	p1 = Polygon([(start-x_extent, y_extent), 
-		          (start-x_extent, -y_extent),
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 	ax.add_line(l_top)
@@ -635,7 +708,9 @@ def sbol_3_overhang (ax, type, num, start, end, prev_end, scale, linewidth, opts
 	else:
 		return prev_end, final_end
 
-def sbol_blunt_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+def sbol_blunt_restriction_site (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL blunt-end restriction site renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -704,7 +779,9 @@ def sbol_blunt_restriction_site  (ax, type, num, start, end, prev_end, scale, li
 
 	return final_start, final_end
 
-def sbol_primer_binding_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+def sbol_primer_binding_site (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL primer binding site renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -783,6 +860,8 @@ def sbol_primer_binding_site  (ax, type, num, start, end, prev_end, scale, linew
 		return prev_end, final_end
 
 def sbol_5_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL 5' sticky-end restriction site renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -840,7 +919,8 @@ def sbol_5_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale,
 		          (start, -y_extent),
 		          (end, -y_extent),
 		          (end, y_extent)],
-		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 
@@ -850,6 +930,8 @@ def sbol_5_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale,
 	return final_start, final_end
 
 def sbol_3_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL 3' sticky-end restriction site renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -907,7 +989,8 @@ def sbol_3_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale,
 		          (start, -y_extent),
 		          (end, -y_extent),
 		          (end, y_extent)],
-		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(1,1,1), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 
@@ -917,6 +1000,8 @@ def sbol_3_sticky_restriction_site  (ax, type, num, start, end, prev_end, scale,
 	return final_start, final_end
 
 def sbol_user_defined  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL user-defined element renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -958,7 +1043,8 @@ def sbol_user_defined  (ax, type, num, start, end, prev_end, scale, linewidth, o
 		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11)		
+		          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 	
@@ -974,6 +1060,8 @@ def sbol_user_defined  (ax, type, num, start, end, prev_end, scale, linewidth, o
 		return prev_end, final_end
 
 def sbol_signature  (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL signature renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -1032,7 +1120,8 @@ def sbol_signature  (ax, type, num, start, end, prev_end, scale, linewidth, opts
 			          (start, -y_extent),
 			          (start+x_extent, -y_extent),
 			          (start+x_extent, y_extent)],
-			          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11)		
+			          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 		ax.add_patch(p1)
 		top1x = start + indent_fac
 		top1y = y_extent - indent_fac
@@ -1056,7 +1145,8 @@ def sbol_signature  (ax, type, num, start, end, prev_end, scale, linewidth, opts
 			          (start, -y_extent),
 			          (start-x_extent, -y_extent),
 			          (start-x_extent, y_extent)],
-			          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11)
+			          edgecolor=color, facecolor=fill_color, linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 		ax.add_patch(p1)
 		top1x = start - indent_fac
 		top1y = y_extent - indent_fac
@@ -1088,6 +1178,8 @@ def sbol_signature  (ax, type, num, start, end, prev_end, scale, linewidth, opts
 		return prev_end, final_end
 
 def sbol_restriction_site (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL restriction site renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -1134,8 +1226,9 @@ def sbol_restriction_site (ax, type, num, start, end, prev_end, scale, linewidth
 		return prev_end, final_end
 
 
-
 def sbol_spacer (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL spacer renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -1172,7 +1265,7 @@ def sbol_spacer (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	center_x = start+(end-start)/2.0
 	radius = x_extent/2
 
-	delta = radius - 0.5 * radius * sqrt(2)
+	delta = radius - 0.5 * radius * math.sqrt(2)
 
 	l1 = Line2D([start+delta,end-delta],[radius-delta,-1*radius+delta], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
@@ -1198,6 +1291,8 @@ def sbol_spacer (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 
 
 def sbol_origin (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL origin renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
@@ -1230,9 +1325,9 @@ def sbol_origin (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	start = prev_end+start_pad
 	end = start+x_extent
 	final_end = end+end_pad
-	rbs_center = (start+((end-start)/2.0),0)
+	ori_center = (start+((end-start)/2.0),0)
 	
-	c1 = Circle(rbs_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
+	c1 = Circle(ori_center, x_extent/2.0, linewidth=linewidth, edgecolor=color, 
 		        facecolor=(1,1,1), zorder=12)
 	
 	ax.add_patch(c1)
@@ -1249,11 +1344,13 @@ def sbol_origin (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		return prev_end, final_end
 
 def sbol_operator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL operator renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
 	end_pad = 2.0
-	x_extent = 3.0
+	x_extent = 6.0
 	y_extent = 3.0
 	linestyle = '-'
 	# Reset defaults if provided
@@ -1283,11 +1380,12 @@ def sbol_operator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	final_end = end+end_pad
 	
 	#white rectangle overlays backbone line
-	p1 = Polygon([(start-x_extent, y_extent), 
-		          (start-x_extent, -y_extent),
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 	
@@ -1303,12 +1401,14 @@ def sbol_operator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		return prev_end, final_end
 
 def sbol_insulator (ax, type, num, start, end, prev_end, scale, linewidth, opts):
+	""" Built-in SBOL insulator renderer.
+	"""
 	# Default options
 	color = (0,0,0)
 	start_pad = 2.0
 	end_pad = 2.0
-	x_extent = 3.0
-	y_extent = 3.0
+	x_extent = 8.0
+	y_extent = 4.0
 	linestyle = '-'
 	# Reset defaults if provided
 	if opts != None:
@@ -1328,26 +1428,34 @@ def sbol_insulator (ax, type, num, start, end, prev_end, scale, linewidth, opts)
 			linewidth = opts['linewidth']
 		if 'scale' in opts.keys():
 			scale = opts['scale']
+	
 	# Check direction add start padding
 	final_end = end
 	final_start = prev_end
-
 	start = prev_end+start_pad
 	end = start+x_extent
 	final_end = end+end_pad
 	
 	#white rectangle overlays backbone line
-	p1 = Polygon([(start-x_extent, y_extent), 
-		          (start-x_extent, -y_extent),
+	p1 = Polygon([(start, y_extent), 
+		          (start, -y_extent),
 		          (start+x_extent, -y_extent),
 		          (start+x_extent, y_extent)],
-		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=12)		
+		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=11, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
-	p2 = Polygon([((start-x_extent)-x_extent/2,  y_extent+x_extent/2), 
-		          ((start-x_extent)-x_extent/2, -y_extent-x_extent/2),
-		          ((start+x_extent)+x_extent/2, -y_extent-x_extent/2),
-		          ((start+x_extent)+x_extent/2,  y_extent+x_extent/2)],
-		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=11)		
+	bits = 5.0
+	gap_size = ((end-start)/bits)
+	x_inset_start = start + gap_size
+	x_inset_end = start + ((bits-1.0)*gap_size)
+
+	# Inside rectangle
+	p2 = Polygon([(x_inset_start,  y_extent-gap_size), 
+		          (x_inset_start, -y_extent+gap_size),
+		          (x_inset_end, -y_extent+gap_size),
+		          (x_inset_end,  y_extent-gap_size)],
+		          edgecolor=(0,0,0), facecolor=(1,1,1), linewidth=linewidth, zorder=12, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)		
 
 	ax.add_patch(p1)
 	ax.add_patch(p2)
@@ -1428,12 +1536,18 @@ def temporary_repressor (ax, type, num, start, end, prev_end, scale, linewidth, 
 ###############################################################################
 
 def repress (ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts):
+	""" Standard repression regulation renderer.
+	"""
 	regulation(ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts)
 
 def induce (ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts):
+	""" Standard induction regulation renderer.
+	"""
 	regulation(ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts)
 
 def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts):
+	""" General function for drawing regulation arcs.
+	"""
 
 	color = (0.0,0.0,0.0)
 	arrowhead_length = 4
@@ -1495,6 +1609,8 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 ###############################################################################
 
 def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
+	""" Built-in trace-based promoter renderer.
+	"""
 	# Default options
 	color = (0.0,0.0,1.0)
 	y_extent = 6
@@ -1537,13 +1653,15 @@ def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth,
 		          (start_bp+dir_fac*(x_extent*scale), dir_fac*y_extent),
 		          (start_bp+dir_fac*x_extent*scale-dir_fac*arrowhead_length*scale, 
 		           dir_fac*y_extent-(arrowhead_height))],
-		          facecolor=color, edgecolor=color, linewidth=linewidth, zorder=14)
+		          facecolor=color, edgecolor=color, linewidth=linewidth, zorder=14, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 	ax.add_patch(p1)
 	# Shade the promoter area (normally smaller than symbol extent)
  	p2 = Polygon([(start_bp, -highlight_y_extent), 
  		          (start_bp, highlight_y_extent),
  		          (end_bp, highlight_y_extent),
- 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=14)
+ 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=14, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 	ax.add_patch(p2)
 	if opts != None and 'label' in opts.keys():
 		if start_bp > end_bp:
@@ -1556,6 +1674,8 @@ def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth,
 		return start_bp, end_bp
 
 def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
+	""" Built-in trace-based ribosome binding site renderer.
+	"""
 	# Default options
 	color = (0.16,0.68,0.15)
 	y_extent = 3.5
@@ -1588,7 +1708,8 @@ def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts
  	p2 = Polygon([(start_bp, -highlight_y_extent), 
  		          (start_bp, highlight_y_extent),
  		          (end_bp, highlight_y_extent),
- 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=13)
+ 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=13, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 	ax.add_patch(p2)
 	if opts != None and 'label' in opts.keys():
 		if start_bp > end_bp:
@@ -1601,6 +1722,8 @@ def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts
 		return start_bp, end_bp
 
 def trace_cds (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
+	""" Built-in trace-based coding sequence renderer.
+	"""
 	# Default options
 	color = (0.7,0.7,0.7)
 	hatch = ''
@@ -1636,7 +1759,8 @@ def trace_cds (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts
 		          (end_bp-dir_fac*arrowhead_length*scale, y_extent+arrowhead_height),
 		          (end_bp-dir_fac*arrowhead_length*scale, y_extent)],
 		          edgecolor=(0.0,0.0,0.0), facecolor=color, linewidth=linewidth, 
-		          hatch=hatch, zorder=15)
+		          hatch=hatch, zorder=15, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 	ax.add_patch(p1)
 	if opts != None and 'label' in opts.keys():
 		if start_bp > end_bp:
@@ -1649,6 +1773,8 @@ def trace_cds (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts
 		return start_bp, end_bp
 
 def trace_terminator (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
+	""" Built-in trace-based terminator renderer.
+	"""
 	# Default options
 	color = (1.0,0.0,0.0)
 	y_extent = 3.5
@@ -1681,7 +1807,8 @@ def trace_terminator (ax, type, num, start_bp, end_bp, prev_end, scale, linewidt
  	p2 = Polygon([(start_bp, -highlight_y_extent), 
  		          (start_bp, highlight_y_extent),
  		          (end_bp, highlight_y_extent),
- 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=13)
+ 		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=13, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 	ax.add_patch(p2)
 	if opts != None and 'label' in opts.keys():
 		if start_bp > end_bp:
@@ -1698,21 +1825,33 @@ def trace_terminator (ax, type, num, start_bp, end_bp, prev_end, scale, linewidt
 ###############################################################################
 
 class DNARenderer:
+	""" Class defining the DNA rendering funtionality.
+	"""
 
 	# Standard part types
-	STD_PART_TYPES = ['Promoter',
-	                  'CDS',
-                      'Terminator',
-                      'RBS',
-                      'Scar',
-                      'Spacer',
-                      'Ribozyme',
-                      'Ribonuclease',
-                      'ProteinStability',
-                      'Protease',
-                      'Operator',
-                      'Origin',
-                      'Insulator']
+	STD_PART_TYPES = ['Promoter', 
+			          'CDS', 
+			          'Terminator',
+			          'RBS',
+			          'Scar',
+			          'Spacer',
+			          'EmptySpace',
+			          'Ribozyme',
+			          'Ribonuclease',
+			          'ProteinStability',
+			          'Protease',
+			          'Operator',
+			          'Origin',
+			          'Insulator',
+			          '5Overhang',
+			          '3Overhang',
+			          'RestrictionSite',
+			          'BluntRestrictionSite',
+			          'PrimerBindingSite',
+			          '5StickyRestrictionSite',
+			          '3StickyRestrictionSite',
+			          'UserDefined',
+			          'Signature']
 
 	# Standard regulatory types
 	STD_REG_TYPES = ['Repression',
@@ -1720,7 +1859,21 @@ class DNARenderer:
 
 	def __init__(self, scale=1.0, linewidth=1.0, 
 		         backbone_pad_left=0.0, backbone_pad_right=0.0):
-		"""Constructor to generate an empty DNARenderer.
+		""" Constructor to generate an empty DNARenderer.
+
+		Parameters
+	    ----------
+	    scale : float (default=1.0)
+	        A scaling factor for the plot. Only used if rendering traces.
+
+	    linewidth : float (default=1.0)
+	    	The default linewidth for all part drawing.
+
+	    backbone_pad_left : float (default=0.0)
+	    	Padding to add to the left side of the backbone.
+
+	    backbone_pad_right : float (default=0.0)
+	    	Padding to add to the left side of the backbone.
 		"""
 		self.scale = scale
 		self.linewidth = linewidth
@@ -1729,6 +1882,8 @@ class DNARenderer:
 		self.reg_height = 15
 
 	def SBOL_part_renderers (self):
+		""" Return dictionary of all standard built-in SBOL part renderers.
+		"""
 		return {
 			'Promoter'         :sbol_promoter, 
 			'CDS'              :sbol_cds, 
@@ -1755,6 +1910,8 @@ class DNARenderer:
 			'Signature'        :sbol_signature}
 
 	def trace_part_renderers (self):
+		""" Return dictionary of all standard built-in trace part renderers.
+		"""
 		return {
 			'Promoter'         :trace_promoter, 
 			'CDS'              :trace_cds, 
@@ -1762,17 +1919,61 @@ class DNARenderer:
 			'RBS'              :trace_rbs} 
 
 	def std_reg_renderers (self):
+		""" Return dictionary of all standard built-in regulation renderers.
+		"""
 		return {
 			'Repression' :repress, 
 			'Activation' :induce}
 
 	def renderDNA(self, ax, parts, part_renderers, regs=None, reg_renderers=None):
-		"""Render the parts on the DNA and regulation.
-			- parts_list: list of dicts defining the parts
-			- part_renderers: standard renderer functions dict to use
-			- regs: list of regulations on the DNA
-			- reg_renderers: dict of standard regulation renderers
+		""" Render the parts on the DNA and regulation.
+
+		Parameters
+	    ----------
+	    ax : matplotlib.axes
+	        Axes to draw the design to.
+
+	    parts : list(dict)
+	    	The design to draw. This is a list of dicts, where each dict relates to
+	    	a part and must contain the following keys:
+	    	- name (string)
+	    	- type (string)  
+	    	- fwd (bool)
+	    	- start (float, optional)
+	    	- end (float, optional)
+	    	These will then be drawn in accordance with the renders selected
+
+	    part_renderers : dict(functions)
+	    	Dict of functions where the key in the part type and the dictionary returns
+	    	the function to be used to draw that part type.
+
+	    regs : list(dict) (default=None)
+	    	Regulation present in the design. This is a list of dicts, where each dict
+	    	relates to a single regulation arc and must contain the following keys:
+	    	- type (string)
+	    	- from_part (int)  
+	    	- to_part (int)
+	    	These will then be drawn in accordance with the renders selected.
+
+	    reg_renderers : dict(functions) (default=None)
+	    	Dict of functions where the key in the regulation type and the dictionary 
+	    	returns the function to be used to draw that regulation type.
+
+	    Returns
+	    -------
+	    start : float
+	    	The x-point in the axis space that drawing begins.
+
+	    end : float
+	    	The x-point in the axis space that drawing ends.
 		"""
+		# Update the matplotlib rendering default for drawing the parts (we want mitered edges)
+		matplotlib.rcParams['lines.dash_joinstyle']  = 'miter'
+		matplotlib.rcParams['lines.dash_capstyle']   = 'butt'
+		matplotlib.rcParams['lines.solid_joinstyle'] = 'miter'
+		matplotlib.rcParams['lines.solid_capstyle']  = 'projecting'
+		# Make text editable in Adobe Illustrator
+		matplotlib.rcParams['pdf.fonttype']          = 42 
 		# Plot the parts to the axis
 		part_num = 0
 		prev_end = 0
@@ -1831,7 +2032,6 @@ class DNARenderer:
 							first_part = False
 			part_num += 1
 		
-
 		# first pass to get all of the arcranges
 		if regs != None:
 
@@ -1852,7 +2052,7 @@ class DNARenderer:
 						arcstart = (reg['from_part']['start'] + reg['from_part']['end']) / 2
 						arcend   = (reg['to_part']['start']   + reg['to_part']['end']) / 2
 						arcrange = [arcstart,arcend]
-						reg['arclength'] = fabs(arcstart-arcend)
+						reg['arclength'] = math.fabs(arcstart-arcend)
 						reg['arc_height_index'] = 1
 						##############################################################################
 

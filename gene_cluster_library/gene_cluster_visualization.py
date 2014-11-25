@@ -54,6 +54,12 @@ def plot_variant_arch (ax, gcl, variant, start_idx=0, end_idx=None, linewidth=1.
 		else:
 			part_start_bp += part_list[el_idx]['seq_len']
 		opts = {}
+		# Add all attributes to the opts dictionary to potentially influence rendering
+		part_data = gcl.part_data(part_name)
+		for k in part_data.keys():
+			if k not in ['type', 'seq']:
+				opts[k] = part_data[k]
+		# Variant attributes overwrite part atributes (they should be more specific)
 		for k in part_list[el_idx].keys():
 			if k not in ['part_name', 'type', 'seq_idx', 'dir']:
 				opts[k] = part_list[el_idx][k]

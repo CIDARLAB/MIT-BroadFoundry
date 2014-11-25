@@ -1,5 +1,7 @@
 
 
+
+
 import sqlalchemy
 import sqlalchemy.orm
 import sqlalchemy.ext.declarative
@@ -7,7 +9,6 @@ import os
 import re
 
 import pymongo
-
 
 #In order to parallelize with pp, you cannot have from ... import clauses, so I import sqlalchemy
 # and then reassign different functions within it:
@@ -30,6 +31,16 @@ MongoClient = pymongo.MongoClient
 
 #Open declarative base builder to build object-db mappers
 Base = declarative_base()
+
+pr = Table('parts_rxns', Base.metadata,
+	Column('part_id', Integer, ForeignKey('parts.pid'), primary_key=True),
+	Column('rxn_id', Integer, ForeignKey('rxns.rid'), primary_key=True)
+	)
+	
+vr = Table('designs_rxns', Base.metadata,
+	Column('design_id', Integer, ForeignKey('designs.did'), primary_key=True),
+	Column('rxn_id', Integer, ForeignKey('rxns.rid'), primary_key=True)
+	)
 	
 ct = Table('constructs_tubes', Base.metadata,
 	Column('construct_id', Integer, ForeignKey('constructs.cid'), primary_key=True),
@@ -43,9 +54,9 @@ def connect(sqldb, mongodb, verb=False):
 	global mdb
 	client = MongoClient('localhost', 27017)
 	mdb = client[mongodb]
-	return engine, mdb
+	return engine
 	
-def sync_mongo(collection, atts):
+def syn_mongo(collection, atts):
 	return list(mdb[collection].find(atts))[0]
 	
 def update_mongo(collection, id, atts):
@@ -61,7 +72,6 @@ class Part(Base):
 	host = Column(String)
 	protein = Column(String)
 	dna = Column(String, unique=True, nullable=True)
-	length = Column(Integer)
 	type = Column(String)
 	accession = Column(String)
 	enzyme = Column(String)
@@ -69,36 +79,31 @@ class Part(Base):
 	version = Column(String)
 	
 	#list of designs that contain this part
-	#designparts = relationship with designs that contain this part.
+	
+	#list of reactions that this part performs
+	rxns = relationship('Rxn', secondary=pr, backref=backref('parts'))
 	
 	#tubes variable created by one-to-many relationship specified in Tube()
 	#tubes = relationship(Tube, backref=backref('part'))
 	
 	def __init__(self, dict):
-		self.mon = {}
 		self.reset(dict)
 	
 	def reset(self, dict):
 		defined = ['pid', 'ec', 'host', 'protein', 'dna', 'type', 'accession', 'enzyme',
-				'name', 'version', 'length']
+				'name', 'version']
 		for k, v in dict.items():
 			if k in defined:
 				setattr(self, k, v)
 			else:
-				self.mon[k] = v
-		if self.dna:
-			self.length = len(self.dna)
+				self.mongo[k] = v
 		
 	@sqlalchemy.orm.reconstructor
-	def get_mon(self):
-		self.mon = sync_mongo('parts', {'pid': self.pid})
+	def get_mongo(self):
+		self.mongo = sync_mongo('parts', {'pid': self.pid})
 		
-	def insert_mon(self):
-		self.mon['pid'] = self.pid
-		mdb['parts'].insert(self.mon)
-		
-	def push_mon(self):
-		self.mon = update_mongo('parts', {'pid': self.pid}, self.mon)
+	def push_mango(self):
+		self.mongo = update_mongo('parts', {'pid': self.pid}, self.mongo)
 
 
 class Design(Base):
@@ -113,34 +118,28 @@ class Design(Base):
 	#DesignPart variable created by many-to-many relationship specified in Part()
 	#designparts = list of links to parts in the design
 	
+	#list of reactions that this design performs
+	rxns = relationship('Rxn', secondary=vr, backref=backref('designs'))
+	
 	#constructs variable created by one-to-many relationship specified in Construct()
 	#constructs = list of constructs that are specified by this design
 	
 	def __init__(self, dict):
-		self.mon = {}
 		self.reset(dict)
 	
 	def reset(self, dict):
-		defined = ['did', 'type', 'spec', 'name']
 		for k, v in dict.items():
-			if k in defined:
-				setattr(self, k, v)
-			else:
-				self.mon[k] = v
+			setattr(self, k, v)
 	
 	@sqlalchemy.orm.reconstructor
-	def get_mon(self):
-		self.mon = sync_mon('designs', {'did': self.did})
+	def get_mongo(self):
+		self.mongo = sync_mongo('designs', {'did': self.vid})
 		
-	def insert_mon(self):
-		self.mon['did'] = self.did
-		mdb['designs'].insert(self.mon)
-		
-	def push_mon(self):
-		self.mon = update_mongo('designs', {'did': self.did}, self.mon)
+	def push_mango(self):
+		self.mongo = update_mongo('parts', {'pid': self.pid}, self.mongo)
 	
 	def plot(self):
-		return self.name, [designpart_plot.plot() for designpart_plot in self.designparts]
+		return self.name, [designpart_plot.plot() for designpart_plot in designparts]
 		
 class DesignPart(Base):
 	
@@ -165,9 +164,33 @@ class DesignPart(Base):
 			setattr(self, k, v)
 			
 	def plot(self):
-		fwd = True if self.direction == 1 else False
-		return {'name': self.part.name, 'start': self.start, 'end': self.end, 'fwd': fwd,
-				'type': self.part.type, 'opts': self.part.mon}
+		fwd = True if direction == 1 else False
+		return {'name': part.name, 'start': self.start, 'end': self.end, 'fwd': fwd,
+				'type': part.type, 'opts': part.mongo}
+
+class Rxn(Base):
+
+	__tablename__ = 'rxns'
+	
+	rid = Column(Integer, primary_key=True)
+	substrate = Column(String, nullable=False)
+	product = Column(String, nullable=False)
+	cosubstrate = Column(String)
+	coproduct = Column(String)
+	name = Column(String, unique=True, nullable=True)
+	
+	#parts variable created by many-to-many relationship specified in Part()
+	#parts = list of parts that perform this reaction
+	
+	#designs variable created by many-to-many relationship specified in Design()
+	#designs = list of designs that perform this reaction
+	
+	def __init__(self, dict):
+		self.reset(dict)
+	
+	def reset(self, dict):
+		for k, v in dict.items():
+			setattr(self, k, v)
 
 class Tube(Base):
 
@@ -199,11 +222,11 @@ class Tube(Base):
 			setattr(self, k, v)
 	
 	@sqlalchemy.orm.reconstructor
-	def get_mon(self):
-		self.mon = sync_mongo('tubes', {'tid': self.tid})
+	def get_mongo(self):
+		self.mongo = sync_mongo('tubes', {'tid': self.tid})
 		
-	def push_mon(self):
-		self.mon = update_mongo('parts', {'pid': self.pid}, self.mon)
+	def push_mango(self):
+		self.mongo = update_mongo('parts', {'pid': self.pid}, self.mongo)
 
 class Construct(Base):
 
@@ -235,9 +258,9 @@ class Construct(Base):
 			setattr(self, k, v)
 
 	@sqlalchemy.orm.reconstructor
-	def get_mon(self):
-		self.mon = sync_mongo('constructs', {'cid': self.cid})
+	def get_mongo(self):
+		self.mongo = sync_mongo('constructs', {'cid': self.cid})
 		
-	def push_mon(self):
-		self.mon = update_mongo('parts', {'pid': self.pid}, self.mon)	
+	def push_mango(self):
+		self.mongo = update_mongo('parts', {'pid': self.pid}, self.mongo)	
 	

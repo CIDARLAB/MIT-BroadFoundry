@@ -1,0 +1,5 @@
+name	type	length
+ProA	Promoter	100
+ATGC	Scar	4
+CDS1	CDS	200
+TermA	Terminator	100

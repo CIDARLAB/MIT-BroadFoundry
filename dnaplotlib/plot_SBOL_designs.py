@@ -290,9 +290,21 @@ def main():
 
 	dna_designs = load_dna_designs (args.designs.name, part_info)
 	
+	for param in plot_params.items():
+		print param
+	for part in part_info.items():
+		print part
+	for dna in dna_designs.items():
+		print dna[0]
+		for construct in dna[1]:
+			print construct
+	
 	regs_info = None
 	if(args.regulation):
 		regs_info = load_regulatory_information(args.regulation.name, part_info, dna_designs)
+		
+		for reg in regs_info.items():
+			print reg
 
 	plot_dna(dna_designs, args.output_pdf, plot_params, regs_info)
 

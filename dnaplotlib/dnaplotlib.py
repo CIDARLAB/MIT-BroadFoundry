@@ -2168,3 +2168,143 @@ class DNARenderer:
 			        linewidth=self.linewidth, color=(0,0,0), zorder=10)
 		ax.add_line(l1)
 		return first_start, prev_end
+
+###############################################################################
+# Helper functions to simplify plotting
+###############################################################################
+
+def plot_sbol_designs (axes, dna_designs, regulations=None, plot_params={}, plot_names=None):
+	""" Plot SBOL designs to axes.
+
+	Parameters
+    ----------
+    axes : list(matplotlib.axis)
+        List of axis objects to plot the designs to. 
+
+    dna_designs : list(dict(design_information))
+    	List of designs to plot.
+
+    regulations : list(dict(regulation_information)) (default=None)
+    	List of regulations to use for each design.
+
+    plot_params : dict (default={})
+    	General plotting parameters to use.
+
+    plot_names : list(string) (default=None)
+    	List of names to use on each plot. If None provided then no titles displayed.
+
+    Returns
+    -------
+    xlims : [float, float]
+        The x-axis range for each axis.
+
+    ylims : [float, float]
+        The y-axis range for each axis.
+	"""
+	# Standard plotting parameters
+	if 'axis_y' not in plot_params.keys():
+		plot_params['axis_y'] = 35
+	left_pad = 0.0
+	right_pad = 0.0
+	scale = 1.0
+	linewidth = 1.0
+	fig_y = 5.0
+	fig_x = 5.0
+	if 'backbone_pad_left' in plot_params.keys():
+		left_pad = plot_params['backbone_pad_left']
+	if 'backbone_pad_right' in plot_params.keys():
+		right_pad = plot_params['backbone_pad_right']
+	if 'scale' in plot_params.keys():
+		scale = plot_params['scale']
+	if 'linewidth' in plot_params.keys():
+		linewidth = plot_params['linewidth']
+	dr = dpl.DNARenderer(scale=scale, linewidth=linewidth,
+		                 backbone_pad_left=left_pad, 
+		                 backbone_pad_right=right_pad)
+
+	# We default to the standard regulation renderers
+	reg_renderers = dr.std_reg_renderers()
+	# We default to the SBOL part renderers
+	part_renderers = dr.SBOL_part_renderers()
+
+	# Plot each design on the appropriate axis
+	num_of_designs = len(dna_designs)
+	max_dna_len = 0.0
+	for i in range(num_of_designs):
+
+		# Create axis for the design and plot
+		regs = None
+		if(regulations != None):
+			regs   =  regulations[i]
+		design =  dna_designs[i]
+		ax = axes[i]
+
+		if plot_names != None:
+			ax.set_title(plot_names[i], fontsize=8)
+
+		start, end = dr.renderDNA(ax, design, part_renderers, regs, reg_renderers)
+
+		dna_len = end-start
+		if max_dna_len < dna_len:
+			max_dna_len = dna_len
+
+	# Update formatting and resize all axis in similar way
+	for ax in axes:
+		ax.set_xticks([])
+		ax.set_yticks([])
+		# Set bounds
+		ax.set_xlim([(-0.01*max_dna_len)-left_pad,
+			        max_dna_len+(0.01*max_dna_len)+right_pad])
+		ax.set_ylim([-plot_params['axis_y'],plot_params['axis_y']])
+		ax.set_aspect('equal')
+		ax.set_axis_off()
+
+	# xlims, ylims are returned
+	return [(-0.01*max_dna_len)-left_pad, max_dna_len+(0.01*max_dna_len)+right_pad]], [-plot_params['axis_y'],plot_params['axis_y']]
+
+def save_sbol_designs (filename, dna_designs, regulations=None, plot_params={}, plot_names=None):
+	""" Plot SBOL designs to axes.
+
+	Parameters
+    ----------
+    filename : string
+    	Image filename to save designs to. Extention provided will determine format
+    	and must be supported by matplotlib.
+
+    dna_designs : list(dict(design_information))
+    	List of designs to plot.
+
+    regulations : list(dict(regulation_information)) (default=None)
+    	List of regulations to use for each design.
+
+    plot_params : dict (default={})
+    	General plotting parameters to use.
+
+    plot_names : list(string) (default=None)
+    	List of names to use on each plot. If None provided then no titles displayed.
+	"""
+
+	# Create the figure
+	fig = plt.figure(figsize=(10,10))
+
+	# Create all the axes required
+	axes = []
+	for i in range(len(dna_designs)):
+		ax = fig.add_subplot(len(dna_designs),1,i+1)
+		axes.append(ax)
+
+	# Plot design to the axes
+	plot_sbol_designs (axes, dna_designs, regulations=regulations, plot_params=plot_params, plot_names=plot_names)
+
+	# Update the size of the figure to fit the constructs drawn
+	fig_x_dim = max_dna_len/70.0
+	if fig_x_dim < 1.0:
+		fig_x_dim = 1.0
+	fig_y_dim = 1.2*len(ax_list)
+	plt.gcf().set_size_inches( (fig_x_dim, fig_y_dim) )
+
+	# Save the figure
+	plt.tight_layout()
+	fig.savefig(filename, transparent=True, dpi=300)
+	# Clear the plotting cache
+	plt.close('all')

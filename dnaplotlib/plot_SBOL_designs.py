@@ -287,8 +287,7 @@ def main():
 	plot_params = load_plot_parameters(args.params.name)
 	part_info = load_part_information(args.parts.name)
 	dna_designs = load_dna_designs (args.designs.name, part_info)
-<<<<<<< HEAD
-	
+
 	for param in plot_params.items():
 		print param
 	for part in part_info.items():

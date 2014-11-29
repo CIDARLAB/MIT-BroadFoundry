@@ -4,7 +4,24 @@ from sqlalchemy.orm import sessionmaker
 import sys
 
 import dnaplotlib as dpl
-import plot_SBOL_designs as plsbol
+
+def convert_float(num):
+	"""Function accepts text, converts to float if possible.
+	"""
+	try:
+		return float(num)
+	except ValueError:
+		return num
+
+def analyze_cell(c):
+	"""Function accepts a cell of data as text. If it's a number, it gets converted to a
+	float, if it is semicolon delimeted numbers, they are converted to a list of floats.
+	"""
+	if ';' in c:
+		return [convert_float(ci) for ci in c.split(";")]
+	else:
+		return convert_float(c)
+		
 
 def parse_data(f):
 	"""Function accepts an open file object or read in text from a tab delimited text
@@ -14,7 +31,7 @@ def parse_data(f):
 	labels = f.readline().strip().split("\t")
 	rows = []
 	for line in f:
-		rows.append(dict([(label, value) for label, value in zip(labels, line.strip().split("\t"))]))
+		rows.append(dict([(label, analyze_cell(value)) for label, value in zip(labels, line.strip().split("\t")) if value]))
 	return rows
 
 def combine(s1, s2):
@@ -30,6 +47,7 @@ def combine(s1, s2):
 	for e1 in s1:
 		for e2 in s2:
 			combs.append(e1 + e2)
+	print combs
 	return combs
 	
 def reverse(combs):
@@ -50,24 +68,32 @@ class connection():
 		Session = sessionmaker(bind=engine)
 		self.session = Session()
 		
-	def dict_sql_match(self, match_type, match_dict, match_columns = []):
+	def dict_match(self, match_type, match_dict, match_columns = []):
 		"""Function accepts a match type (object defined in the dbmap orm) and a match
-		dict. Function returns the first object of the type match_type that matches all
+		dict. Function returns the all objects of the type match_type that matches all
 		of the columns values (specified as key value pairs) in the match_dict.
 		If you want to match a subset of the columns in the match_dict, you can include
 		them in the list match_columns. If match_columns includes a column name that
 		the match_dict doesn't have a key-value pair for, it is ignored.
 		"""
 		if not match_columns:
-			match_columns = match_dict.keys()
-		
+			mongo_columns = [col for col in match_dict.keys() if col not in match_type.defined]
+			sql_columns = [col for col in match_dict.keys() if col in match_type.defined]
+		else:
+			mongo_columns = dict([col for col in match_columns if col in match_dict.keys() and col not in match_type.defined])
+			sql_columns = [col for col in match_columns if col in match_dict.keys() and col in match_type.defined]
+			
+		ids = dbmap.get_mdb_ids(match_type.__tablename__, dict([(col, match_dict[col]) for col in mongo_columns]))
+				
 		q = self.session.query(match_type)
-		for column in set(match_columns) & set(match_dict.keys()):
+		col = getattr(match_type, match_type.defined[0])
+		q.filter(col.in_(ids))
+		for column in sql_columns:
 			col = getattr(match_type, column)
 			q = q.filter(col == match_dict[column])
 		return q.all()
 		
-	def dict_sql_match_one(self, match_type, match_dict, match_columns):
+	def dict_match_one(self, match_type, match_dict, match_columns):
 		"""Function accepts a match type (object defined in the dbmap orm) and a match
 		dict. Function returns the first object of the type match_type that matches one
 		of the columns values (specified as key value pairs) in the match_dict). The 
@@ -95,7 +121,7 @@ class connection():
 		"""
 		for part_dict in data:
 			print part_dict
-			part = self.dict_sql_match_one(dbmap.Part, part_dict, ['pid', 'dna', 'name'])
+			part = self.dict_match_one(dbmap.Part, part_dict, ['pid', 'dna', 'name'])
 			new = False
 			if not part:
 				part = dbmap.Part(part_dict)
@@ -124,13 +150,15 @@ class connection():
 					last = last + part[0].length
 				self.session.add(design)
 				self.session.flush()
+				for designpart in design.designparts:
+					designpart.insert_mon()
 				design.insert_mon()
 				
 	
 	def part_lookup(self, spec):
 		spec = spec.split(";")
 		atts = dict([att.split(":") for att in spec])
-		parts = self.dict_sql_match(dbmap.Part, atts)
+		parts = self.dict_match(dbmap.Part, atts)
 		return [[[part, 1]] for part in parts]
 	
 	def spec_parse(self, spec):
@@ -199,10 +227,11 @@ class connection():
 		star = spec.find("*")
 		if star > plus:
 			l, r = spec.split("*", 1)
-			combs = combine(self.spec_parse(l), self.spec_parse(r)) +\
+			return combine(self.spec_parse(l), self.spec_parse(r)) +\
 					combine(self.spec_parse(r), self.spec_parse(l))
 		if plus > star:
 			l, r = spec.split("+", 1)
+			print 'going...'
 			return combine(self.spec_parse(l), self.spec_parse(r))
 		if star == plus == -1:
 			if spec.startswith("-"):
@@ -216,84 +245,3 @@ class connection():
 		self.designs = self.session.query(dbmap.Design).all()
 		self.tubes = self.session.query(dbmap.Tube).all()
 		self.constructs = self.session.query(dbmap.Construct).all()
-		
-	def plot_designs(self, plot_parameters={'linewidth':1.5,'scale':1.0,'fig_x':8.0,
-			'fig_y':2.0,'show_title':'N','backbone_pad_left':3.0,'backbone_pad_right':3.0}):
-		dr = dpl.DNARenderer()
-		reg_renderers = dr.std_reg_renderers()
-		part_renderers = dr.SBOL_part_renderers()
-		plot_parameters = {'linewidth':1.5, 'scale':1.0, 'fig_x':8.0, 'fig_y':2.0 'show_title':'N', 
-				'backbone_pad_left':3.0, 'backbone_pad_right':3.0}
-		
-		dna_designs = self.designs
-		
-		if 'axis_y' not in plot_params.keys():
-			plot_params['axis_y'] = 55
-		left_pad = 0.0
-		right_pad = 0.0
-		scale = 1.0
-		linewidth = 1.0
-		if 'backbone_pad_left' in plot_params.keys():
-			left_pad = plot_params['backbone_pad_left']
-		if 'backbone_pad_right' in plot_params.keys():
-			right_pad = plot_params['backbone_pad_right']
-		if 'scale' in plot_params.keys():
-			scale = plot_params['scale']
-		if 'linewidth' in plot_params.keys():
-			linewidth = plot_params['linewidth']
-		dr = dpl.DNARenderer(scale=scale, linewidth=linewidth,
-							 backbone_pad_left=left_pad, 
-							 backbone_pad_right=right_pad)
-
-		# We default to the standard regulation renderers
-		reg_renderers = dr.std_reg_renderers()
-
-		# We default to the SBOL part renderers
-		part_renderers = dr.SBOL_part_renderers()
-
-		# Create the figure
-		fig = plt.figure(figsize=(plot_params['fig_x'],plot_params['fig_y']))
-		# Cycle through the designs an plot on individual axes
-
-		design_list = sorted(dna_designs.keys())
-		if(regs_info != None):
-			regs_list   = sorted(regs_info.keys())
-	
-		num_of_designs = len(design_list)
-		#print len(design_list),len(regs_list)
-		ax_list = []
-		max_dna_len = 0.0
-		for i in range(num_of_designs):
-			# Create axis for the design and plot
-
-			regs = None
-			if(regs_info != None):
-				regs   =  regs_info[i]
-			design =  dna_designs[design_list[i]]
-
-			ax = fig.add_subplot(num_of_designs,1,i+1)
-			if 'show_title' in plot_params.keys() and plot_params['show_title'] == 'Y':
-				ax.set_title(design_list[i], fontsize=8)
-			start, end = dr.renderDNA(ax, design, part_renderers, regs, reg_renderers)
-
-			dna_len = end-start
-			if max_dna_len < dna_len:
-				max_dna_len = dna_len
-			ax_list.append(ax)
-		for ax in ax_list:
-			ax.set_xticks([])
-			ax.set_yticks([])
-			# Set bounds
-			ax.set_xlim([(-0.01*max_dna_len)-left_pad,
-						max_dna_len+(0.01*max_dna_len)+right_pad])
-
-			ax.set_ylim([-plot_params['axis_y'],plot_params['axis_y']])
-
-			ax.set_aspect('equal')
-			ax.set_axis_off()
-		# Save the figure
-		plt.tight_layout()
-		fig.savefig(out_filename, transparent=True)
-		# Clear the plotting cache
-		plt.close('all')
-		

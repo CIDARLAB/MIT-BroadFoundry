@@ -2218,7 +2218,7 @@ def plot_sbol_designs (axes, dna_designs, regulations=None, plot_params={}, plot
 		scale = plot_params['scale']
 	if 'linewidth' in plot_params.keys():
 		linewidth = plot_params['linewidth']
-	dr = dpl.DNARenderer(scale=scale, linewidth=linewidth,
+	dr = DNARenderer(scale=scale, linewidth=linewidth,
 		                 backbone_pad_left=left_pad, 
 		                 backbone_pad_right=right_pad)
 
@@ -2260,7 +2260,7 @@ def plot_sbol_designs (axes, dna_designs, regulations=None, plot_params={}, plot
 		ax.set_axis_off()
 
 	# xlims, ylims are returned
-	return [(-0.01*max_dna_len)-left_pad, max_dna_len+(0.01*max_dna_len)+right_pad]], [-plot_params['axis_y'],plot_params['axis_y']]
+	return [(-0.01*max_dna_len)-left_pad, max_dna_len+(0.01*max_dna_len)+right_pad], [-plot_params['axis_y'],plot_params['axis_y']]
 
 def save_sbol_designs (filename, dna_designs, regulations=None, plot_params={}, plot_names=None):
 	""" Plot SBOL designs to axes.

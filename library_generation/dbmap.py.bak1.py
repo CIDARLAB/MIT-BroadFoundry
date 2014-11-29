@@ -52,9 +52,6 @@ def update_mongo(collection, id, atts):
 	mdb[collection].update(id, atts)
 	return list(mdb[collection].find(id))[0]
 	
-def get_mdb_ids(collection, atts, rfields={'_id':1}):
-	return list(mdb[collection].find(atts, rfields))
-	
 class Part(Base):
 
 	__tablename__ = 'parts'
@@ -112,7 +109,7 @@ class Design(Base):
 	did = Column(Integer, primary_key=True)
 	type = Column(String)
 	spec = Column(String)
-	name = Column(String)
+	name = Column(String, unique=True, nullable=True)
 	
 	#DesignPart variable created by many-to-many relationship specified in Part()
 	#designparts = list of links to parts in the design
@@ -136,7 +133,7 @@ class Design(Base):
 	
 	@sqlalchemy.orm.reconstructor
 	def get_mon(self):
-		self.mon = sync_mongo('designs', {'did': self.did})
+		self.mon = sync_mon('designs', {'did': self.did})
 		
 	def insert_mon(self):
 		self.mon['did'] = self.did
@@ -152,9 +149,8 @@ class DesignPart(Base):
 	
 	__tablename__ = 'designparts'
 	
-	dpid = Column(Integer, primary_key=True)
-	pid = Column(Integer, ForeignKey('parts.pid'))
-	did = Column(Integer, ForeignKey('designs.did'))
+	pid = Column(Integer, ForeignKey('parts.pid'), primary_key = True)
+	did = Column(Integer, ForeignKey('designs.did'), primary_key = True)
 	
 	start = Column(Integer)
 	end = Column(Integer)
@@ -164,10 +160,9 @@ class DesignPart(Base):
 	
 	design = relationship('Design', backref=backref('designparts'))
 	
-	defined = ['dpid', 'pid', 'did', 'start', 'end', 'direction']
+	defined = ['pid', 'did', 'start', 'end', 'direction']
 	
 	def __init__(self, dict):
-		self.mon = {}
 		self.reset(dict)
 	
 	def reset(self, dict):
@@ -179,14 +174,15 @@ class DesignPart(Base):
 			
 	@sqlalchemy.orm.reconstructor
 	def get_mon(self):
-		self.mon = sync_mongo('designparts', {'dpid': self.dpid})
+		self.mon = sync_mon('designparts', {'did': self.did, 'pid': self.pid})
 		
 	def insert_mon(self):
-		self.mon['dpid'] = self.dpid
+		self.mon['did'] = self.did
+		self.mon['pid'] = self.pid
 		mdb['designparts'].insert(self.mon)
 		
 	def push_mon(self):
-		self.mon = update_mongo('designparts', {'dpid': self.dpid}, self.mon)
+		self.mon = update_mongo('designparts', {'did': self.did, 'pid': self.pid}, self.mon)
 			
 	def plot(self):
 		fwd = True if self.direction == 1 else False

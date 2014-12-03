@@ -1279,6 +1279,9 @@ class GeneClusterLibrary:
 	    read_through : bool (default=False)
 	    	Should TUs be generated that would occur if read through is present.
 
+	    truncate_ends : int (default=0)
+	    	The number of parts to skip at the ends (can be used to remove vector backbone).
+
 	    Returns
 	    -------
 	    units: dict(list([PromoterID, TerminatorID]))
@@ -1359,7 +1362,7 @@ class GeneClusterLibrary:
 			units = all_units
 		return units
 
-	def transcriptional_unit_seqs (self, variant, tus):
+	def transcriptional_unit_seqs (self, variant, tus, none_end_idx_offset=0, none_end_bp_pad=0):
 		"""Extract the sequences of TUs for a specific variant.
 
 	    Parameters
@@ -1369,6 +1372,11 @@ class GeneClusterLibrary:
 
 	    tus : list([promoter_idx, terminator_idx], ...)
 	    	TUs to find sequence for.
+
+	    none_end_bp_pad : int (default=None)
+	        If None encountered at end index then if this is != None this
+	        number of bp is read past the last or first part in the design
+	        depending on the direction of the TU.
 
 	    Returns
 	    -------
@@ -1383,8 +1391,17 @@ class GeneClusterLibrary:
 			tu_end_bp = self.variant_part_idx_start_bp(variant, tu[1])
 			tu_id = ''
 			if tu_dir == 'F':
+				if tu[1] == None:
+					last_idx = len(self.variant_part_list(variant))-1
+					tu_end_bp = self.variant_part_idx_start_bp(variant, last_idx-none_end_idx_offset)+none_end_bp_pad
+					if tu_end_bp > len(self.variants[variant]['seq']):
+						tu_end_bp = len(self.variants[variant]['seq'])
 				tu_id = str(variant) + '_F_' + str(tu[0]) + '-'  + str(tu[1]) + '_'  + str(tu_start_bp) + '-'  + str(tu_end_bp)
 			else:
+				if tu[1] == None:
+					tu_end_bp = self.variant_part_idx_start_bp(variant, none_end_idx_offset)-none_end_bp_pad
+					if tu_end_bp < 0:
+						tu_end_bp = 0
 				tu_id = str(variant) + '_R_' + str(tu[0]) + '-'  + str(tu[1]) + '_'  + str(tu_start_bp) + '-'  + str(tu_end_bp)
 			tu_seqs.append([tu_id, self.extract_seq_range(variant, tu_start_bp, tu_end_bp, direction=tu_dir)])
 		return tu_seqs

@@ -38,12 +38,15 @@ ct = Table('constructs_tubes', Base.metadata,
 	
 def connect(sqldb, mongodb, verb=False):
 	engine = create_engine('sqlite:///'+sqldb, echo=verb)
+	Session = sessionmaker(bind=engine)
+	global session
+	session = Session()
 	metadata = Base.metadata
 	metadata.create_all(engine)
 	global mdb
 	client = MongoClient('localhost', 27017)
 	mdb = client[mongodb]
-	return engine, mdb
+	return session, mdb
 	
 def sync_mongo(collection, atts):
 	return list(mdb[collection].find(atts))[0]
@@ -83,6 +86,9 @@ class Part(Base):
 	def __init__(self, dict):
 		self.mon = {}
 		self.reset(dict)
+		session.add(self)
+		session.flush()
+		self.insert_mon()
 	
 	def reset(self, dict):
 		for k, v in dict.items():
@@ -125,6 +131,9 @@ class Design(Base):
 	def __init__(self, dict):
 		self.mon = {}
 		self.reset(dict)
+		session.add(self)
+		session.flush()
+		self.insert_mon()
 	
 	def reset(self, dict):
 		
@@ -169,6 +178,9 @@ class DesignPart(Base):
 	def __init__(self, dict):
 		self.mon = {}
 		self.reset(dict)
+		session.add(self)
+		session.flush()
+		self.insert_mon()
 	
 	def reset(self, dict):
 		for k, v in dict.items():

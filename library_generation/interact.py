@@ -15,7 +15,8 @@ def convert_float(num):
 
 def analyze_cell(c):
 	"""Function accepts a cell of data as text. If it's a number, it gets converted to a
-	float, if it is semicolon delimeted numbers, they are converted to a list of floats.
+	float, if it is semicolon delimited values, they are converted to a list of floats 
+	(if the values are numbers).
 	"""
 	if ';' in c:
 		return [convert_float(ci) for ci in c.split(";")]
@@ -47,7 +48,6 @@ def combine(s1, s2):
 	for e1 in s1:
 		for e2 in s2:
 			combs.append(e1 + e2)
-	print combs
 	return combs
 	
 def reverse(combs):
@@ -64,9 +64,7 @@ def reverse(combs):
 class connection():
 	
 	def __init__(self, sqldb, mongodb):
-		engine, self.mdb = dbmap.connect(sqldb, mongodb)
-		Session = sessionmaker(bind=engine)
-		self.session = Session()
+		self.session, self.mdb = dbmap.connect(sqldb, mongodb)
 		
 	def dict_match(self, match_type, match_dict, match_columns = []):
 		"""Function accepts a match type (object defined in the dbmap orm) and a match
@@ -120,18 +118,7 @@ class connection():
 		them into the db. 
 		"""
 		for part_dict in data:
-			print part_dict
-			part = self.dict_match_one(dbmap.Part, part_dict, ['pid', 'dna', 'name'])
-			new = False
-			if not part:
-				part = dbmap.Part(part_dict)
-				new = True
-			else:
-				part.reset(part_dict)
-			if new:
-				self.session.add(part)
-			self.session.flush()
-			part.insert_mon()
+			part = dbmap.Part(part_dict)
 				
 	def import_designs(self, data):
 		"""Function accepts a list of design specs represented as dictionaries, and
@@ -148,11 +135,6 @@ class connection():
 					designpart.direction = part[1]
 					designpart.design = design
 					last = last + part[0].length
-				self.session.add(design)
-				self.session.flush()
-				for designpart in design.designparts:
-					designpart.insert_mon()
-				design.insert_mon()
 				
 	
 	def part_lookup(self, spec):
@@ -162,11 +144,12 @@ class connection():
 		return [[[part, 1]] for part in parts]
 	
 	def spec_parse(self, spec):
-		"""function accepts a string representing a 'spec'. This includes (), *, +, -, and data
+		"""function accepts a string representing a 'spec'. This includes (), *, +, -, ~, and data
 		specifying documents in the database. Example:
 			A+B = AB
 			-A+B = reverse complement of A, plus B
 			-(A+B) = reverse complment of AB
+			~A+B = AB and reverse complement of A, plus B
 			A*B = AB, BA
 			A+B*C = (A+B)*C = ABC, CAB
 			(A*B)+(C*D) = ABCD, BACD, ABDC, BADC
@@ -183,6 +166,9 @@ class connection():
 			if spec.startswith("-("):
 				spec = spec[1:]
 				direction = -1
+			elif spec.startswith("~("):
+				spec = spec[1:]
+				direction = 0
 			else:
 				direction = 1
 			recording = True
@@ -211,12 +197,16 @@ class connection():
 								combine(self.spec_parse(rec), self.spec_parse(spec[:-(ind+1)]))
 						if direction == -1:
 							return reverse(combs)
+						elif direction == 0:
+							return combs + reverse(combs)
 						else:
 							return combs
 					if char == "+":
 						combs = combine(self.spec_parse(spec[:-(ind+1)]), self.spec_parse(rec))
 						if direction == -1:
 							return reverse(combs)
+						elif direction == 0:
+							return combs + reverse(combs)
 						else:
 							return combs
 					else:
@@ -237,6 +227,9 @@ class connection():
 			if spec.startswith("-"):
 				combs = self.part_lookup(spec[1:])
 				return reverse(combs)
+			elif spec.startswith("~"):
+				combs = self.part_lookup(spec[1:])
+				return combs + reverse(combs)
 			else:
 				return self.part_lookup(spec)
 				

@@ -63,7 +63,7 @@ def reverse(combs):
 
 class connection():
 	
-	def __init__(self, sqldb, mongodb):
+	def __init__(self, sqldb = ":memory:", mongodb = "temp"):
 		self.session, self.mdb = dbmap.connect(sqldb, mongodb)
 		
 	def dict_match(self, match_type, match_dict, match_columns = []):

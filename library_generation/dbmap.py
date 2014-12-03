@@ -25,6 +25,7 @@ sessionmaker = sqlalchemy.orm.sessionmaker
 relationship = sqlalchemy.orm.relationship
 backref = sqlalchemy.orm.backref
 mapper = sqlalchemy.orm.mapper
+NullPool = sqlalchemy.pool.NullPool
 
 MongoClient = pymongo.MongoClient
 
@@ -37,16 +38,24 @@ ct = Table('constructs_tubes', Base.metadata,
 	)
 	
 def connect(sqldb, mongodb, verb=False):
-	engine = create_engine('sqlite:///'+sqldb, echo=verb)
+	engine = create_engine('sqlite:///'+sqldb)
+	metadata = Base.metadata
+	metadata.create_all(engine)
 	Session = sessionmaker(bind=engine)
 	global session
 	session = Session()
-	metadata = Base.metadata
-	metadata.create_all(engine)
+	
 	global mdb
 	client = MongoClient('localhost', 27017)
 	mdb = client[mongodb]
+	if mongodb=='temp':
+		mdb.connection.drop_database('temp')
+		mdb = client[mongodb]
 	return session, mdb
+	
+def close_all():
+	session.close()
+	mdb.close()
 	
 def sync_mongo(collection, atts):
 	return list(mdb[collection].find(atts))[0]

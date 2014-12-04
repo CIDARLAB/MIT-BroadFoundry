@@ -10,7 +10,7 @@ def maine() :
 def pro_ter_sub(design_number) :
 
     # Define location of data
-    iB = 'Library Design.xlsx'
+    iB = 'Library Design New Data.xlsx'
     lS = 'Levels'
     dS = 'Design %(n)s' % {'n' : design_number}
 
@@ -75,10 +75,10 @@ def pro_ter_sub(design_number) :
             if 0 < strength  <= 1000 :
                 level = 'L'
                 
-            if 1000 < strength <= 1500 :
+            if 1000 < strength <= 4000 :
                 level = 'M'
                 
-            if 1500 < strength <= 5000 :
+            if 4000 < strength <= 5000 :
                 level = 'H'
                 
             if 5000 < strength <=10000 :

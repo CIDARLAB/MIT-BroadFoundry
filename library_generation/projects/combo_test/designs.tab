@@ -1,1 +1,1 @@
-name	specAlec Circuit	type:Promoter+type:Ribozyme+type:RBS+type:CDS+type:Terminator
+name	specAlec Circuit	~(type:Promoter+type:Ribozyme+type:RBS+type:CDS+type:Terminator)

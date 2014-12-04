@@ -52,14 +52,17 @@ def combine(s1, s2):
 	
 def reverse(combs):
 	"""Function accepts a list of designs (which is itself a list of tuples, where each
-	tuple is a (part, direction), and direction is -1 or 1) and gives the reverse
+	tuple is (part, direction), and direction is -1 or 1) and gives the reverse
 	complement of each sequence. This means the direction in each of the designparts is
 	reversed, and each design list itself is also reversed.
 	"""
+	new_combs = []
 	for comb in combs:
+		new_comb = []
 		for part in comb:
-			part[1] *= -1
-	return [part for comb in combs for part in comb[::-1]]		
+			new_comb.append([part[0], -1*part[1]])
+		new_combs.append(new_comb[::-1])
+	return new_combs	
 
 class connection():
 	
@@ -129,6 +132,7 @@ class connection():
 			for variantlist in self.spec_parse(design_dict['spec']):
 				design = dbmap.Design(design_dict)
 				last = 0
+				print variantlist
 				for part in variantlist:
 					designpart = dbmap.DesignPart({'start':last+1, 'end':last+part[0].length})
 					designpart.part = part[0]
@@ -162,7 +166,7 @@ class connection():
 			print "Missing Parentheses"
 			return
 	
-		if spec.startswith("(") or spec.startswith("-("):
+		if spec.startswith("(") or spec.startswith("-(") or spec.startswith("~("):
 			if spec.startswith("-("):
 				spec = spec[1:]
 				direction = -1
@@ -183,18 +187,21 @@ class connection():
 						closed += 1
 					recorded.append(char)
 					if opened == closed:
+						recording = False
 						if ind == len(spec) - 1:
-							combs = spec_parse("".join(rec[1:-1]))
+							combs = self.spec_parse("".join(recorded[1:-1]))
 							if direction == -1:
 								return reverse(combs)
+							elif direction == 0:
+								return combs + reverse(combs)
 							else:
 								return combs
 						continue
 				else:
-					rec = "".join(rec[1:-1])
+					rec = "".join(recorded[1:-1])
 					if char == "*":
-						combs = combine(self.spec_parse(spec[:-(ind+1)]), self.spec_parse(rec)) +\
-								combine(self.spec_parse(rec), self.spec_parse(spec[:-(ind+1)]))
+						combs = combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):])) +\
+								combine(self.spec_parse(spec[(ind+1):]), self.spec_parse(rec))
 						if direction == -1:
 							return reverse(combs)
 						elif direction == 0:
@@ -202,7 +209,7 @@ class connection():
 						else:
 							return combs
 					if char == "+":
-						combs = combine(self.spec_parse(spec[:-(ind+1)]), self.spec_parse(rec))
+						combs = combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):]))
 						if direction == -1:
 							return reverse(combs)
 						elif direction == 0:

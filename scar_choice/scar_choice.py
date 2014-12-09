@@ -56,6 +56,8 @@ def scar_compatible (scar_set, new_scar, max_homology=2, allowed_set=[]):
 		full_check_set = list(scar_set)
 		for scar in scar_set:
 			full_check_set.append(reverse_complement(scar))
+		# Also add the reverse complement of the new scar
+		full_check_set.append(reverse_complement(new_scar))
 		for scar in full_check_set:
 			homology_count = 0
 			for scar_bp in range(len(scar)):

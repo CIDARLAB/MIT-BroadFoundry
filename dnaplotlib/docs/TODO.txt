@@ -9,17 +9,19 @@ MINIMAL FUNCTIONALITY FOR VER 1.0
 1. (DONE) Fully documented and working dnaplotlib.py file (covers, all SBOL symbols, regulation and traces)
 2. (DONE) CSV input script for SBOL output
 3. (DONE) Full SBOL Visual compliance (inc. the weird symbols)
-4.        Basic web interface for uploading files, generating simple constructs
+4. (DONE) Basic web interface for uploading files, generating simple constructs
+
+VERSION 1.1
+-----------
+
+1. New part types (recombinases, protein tags)
+2. TBA
 
 
 OUTSTANDING
 -----------
 
 NEEDED FOR RELEASE
-
-- [EG,BD would like to help] Web-based interface for file input and PDF/PNG output.
-
-- ***[TG] Final home for the code. Maybe create Voigt lab GitHub Repo? Speak to Chris.
 
 
 FOR LATER...
@@ -30,11 +32,15 @@ FOR LATER...
 
 - [BD] Automatic generation of all state diagrams of circuit regulation?
 
-- [EG] ORM for integration with other tools in lab (less important at moment).
-
 
 COMPLETED
 ---------
+
+- [TG] Final home for the code. Maybe create Voigt lab GitHub Repo? Speak to Chris. (worry about at publication)
+
+- [EG] ORM for integration with other tools in lab (less important at moment).
+
+- [EG,BD would like to help] Web-based interface for file input and PDF/PNG output.
 
 - ***[TG] PyDocs everywhere to generate documentation for API.
 

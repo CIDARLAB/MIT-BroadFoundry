@@ -203,7 +203,7 @@ def cds_insts_from_tu_insts (gcl, tu_insts):
 
 def generate_all_variant_tus_fasta (gcl, fasta_filename_prefix, non_terminated=False, 
 	                                read_through=True, truncate_ends=0, 
-	                                none_end_idx_offset=0, none_end_bp_pad=0):
+	                                none_end_idx_offset=0, none_end_bp_pad=0, id_prefix=''):
 	all_tus = gcl.transcriptional_units(read_through=read_through, 
 		                                non_terminated=non_terminated, truncate_ends=truncate_ends)
 	for v_key in all_tus.keys():
@@ -212,6 +212,9 @@ def generate_all_variant_tus_fasta (gcl, fasta_filename_prefix, non_terminated=F
 			                                    none_end_bp_pad=none_end_bp_pad)
 		f = open(fasta_filename_prefix+str(v_key)+'.fa', 'w')
 		for el in tu_seqs:
-			f.write('>' + el[0] + '\n')
+			if id_prefix != '':
+				f.write('>' + id_prefix + '_' + el[0] + '\n')
+			else:
+				f.write('>' + el[0] + '\n')
 			f.write(el[1].upper() + '\n\n')
 		f.close()

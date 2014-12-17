@@ -8,6 +8,8 @@ import re
 
 import pymongo
 
+import string
+
 
 #In order to parallelize with pp, you cannot have from ... import clauses, so I import sqlalchemy
 # and then reassign different functions within it:
@@ -67,6 +69,12 @@ def update_mongo(collection, id, atts):
 def get_mdb_ids(collection, atts, rfields={'_id':1}):
 	return list(mdb[collection].find(atts, rfields))
 	
+complement_table = string.maketrans("ACGT", "TGCA")
+def reverse_comp(dna):
+	"""Function accpets a string (of DNA) and returns the reverse complement DNA strand
+	sequence."""
+	return dna[::-1].translate(complement_table)
+	
 class Part(Base):
 
 	__tablename__ = 'parts'
@@ -80,7 +88,7 @@ class Part(Base):
 	type = Column(String)
 	accession = Column(String)
 	enzyme = Column(String)
-	name = Column(String, unique=True, nullable=True)
+	name = Column(String)
 	version = Column(String)
 	
 	#list of designs that contain this part
@@ -90,7 +98,7 @@ class Part(Base):
 	#tubes = relationship(Tube, backref=backref('part'))
 	
 	defined = ['pid', 'ec', 'host', 'protein', 'dna', 'type', 'accession', 'enzyme',
-			'name', 'version', 'length']
+			'name', 'version', 'length', 'neg_reg']
 	
 	def __init__(self, dict):
 		self.mon = {}
@@ -100,12 +108,13 @@ class Part(Base):
 		self.insert_mon()
 	
 	def reset(self, dict):
+		self.dna == None
 		for k, v in dict.items():
 			if k in self.defined:
 				setattr(self, k, v)
 			else:
 				self.mon[k] = v
-		if self.dna:
+		if not self.dna == None:
 			self.length = len(self.dna)
 		
 	@sqlalchemy.orm.reconstructor
@@ -162,6 +171,15 @@ class Design(Base):
 		
 	def push_mon(self):
 		self.mon = update_mongo('designs', {'did': self.did}, self.mon)
+		
+	def sequence(self):
+		return "".join([designpart_seq.sequence() for designpart_seq in self.designparts])
+		
+	def regulation(self):
+		reg = dict()
+		names = [designpart.part.name for designpart in self.designparts]
+		for designpart in self.designparts:
+			
 	
 	def plot(self):
 		return self.name, [designpart_plot.plot() for designpart_plot in self.designparts]
@@ -208,11 +226,20 @@ class DesignPart(Base):
 		
 	def push_mon(self):
 		self.mon = update_mongo('designparts', {'dpid': self.dpid}, self.mon)
+	
+	def sequence(self):
+		if direction == 1:
+			return part.dna
+		else:
+			return reverse_comp(part.dna)
 			
 	def plot(self):
-		fwd = True if self.direction == 1 else False
-		return {'name': self.part.name, 'start': self.start, 'end': self.end, 'fwd': fwd,
-				'type': self.part.type, 'opts': self.part.mon}
+		if self.direction == 1:
+			return {'name': self.part.name, 'start': self.start, 'end': self.end,
+				'fwd': True, 'type': self.part.type, 'opts': self.part.mon}
+		else:
+			return {'name': self.part.name, 'start': self.end, 'end': self.start,
+				'fwd': False, 'type': self.part.type, 'opts': self.part.mon}
 
 class Tube(Base):
 

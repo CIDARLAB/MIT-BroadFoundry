@@ -5,6 +5,9 @@ import sys
 
 import dnaplotlib as dpl
 
+import sqlalchemy
+
+
 def convert_float(num):
 	"""Function accepts text, converts to float if possible.
 	"""
@@ -121,24 +124,30 @@ class connection():
 		them into the db. 
 		"""
 		for part_dict in data:
-			part = dbmap.Part(part_dict)
+			try:
+				part = dbmap.Part(part_dict)
+			except sqlalchemy.exc.IntegrityError:
+				self.session.rollback()
+				print "WAS NOT UNIQUE:\n", part_dict
+		self.load_db()
 				
 	def import_designs(self, data):
 		"""Function accepts a list of design specs represented as dictionaries, and
 		imports them into the db.
 		"""
+		self.load_db()
 		for design_dict in data:
 			num = 1
 			for variantlist in self.spec_parse(design_dict['spec']):
 				design = dbmap.Design(design_dict)
 				last = 0
-				print variantlist
 				for part in variantlist:
 					designpart = dbmap.DesignPart({'start':last+1, 'end':last+part[0].length})
 					designpart.part = part[0]
 					designpart.direction = part[1]
 					designpart.design = design
 					last = last + part[0].length
+		self.load_db()
 				
 	
 	def part_lookup(self, spec):
@@ -228,7 +237,6 @@ class connection():
 					combine(self.spec_parse(r), self.spec_parse(l))
 		if plus > star:
 			l, r = spec.split("+", 1)
-			print 'going...'
 			return combine(self.spec_parse(l), self.spec_parse(r))
 		if star == plus == -1:
 			if spec.startswith("-"):

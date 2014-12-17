@@ -1275,6 +1275,7 @@ class GeneClusterLibrary:
 	    ----------
 	    non_terminated : bool (default=False)
 	        Should TUs that are not terminated be included e.g., reach end of construct.
+	        These will be classified as having and end_idx of None.
 
 	    read_through : bool (default=False)
 	    	Should TUs be generated that would occur if read through is present.
@@ -1362,7 +1363,8 @@ class GeneClusterLibrary:
 			units = all_units
 		return units
 
-	def transcriptional_unit_seqs (self, variant, tus, none_end_idx_offset=0, none_end_bp_pad=0):
+	def transcriptional_unit_seqs (self, variant, tus, none_end_idx_offset=0, none_end_bp_pad=0,
+		                           none_start_bp_pad=0):
 		"""Extract the sequences of TUs for a specific variant.
 
 	    Parameters
@@ -1373,10 +1375,17 @@ class GeneClusterLibrary:
 	    tus : list([promoter_idx, terminator_idx], ...)
 	    	TUs to find sequence for.
 
-	    none_end_bp_pad : int (default=None)
+	    none_end_bp_pad : int (default=0)
 	        If None encountered at end index then if this is != None this
 	        number of bp is read past the last or first part in the design
 	        depending on the direction of the TU.
+
+	    none_start_bp_pad : int (default=0)
+	        For promoters at the ends (pointing into a construct), if this
+	        value is >0 then additional TU seqs will be added with a None
+	        start_idx and sequence with this upstream offset from the start
+	        of the promoter. Useful for including read in to any strength
+	        calculations.
 
 	    Returns
 	    -------
@@ -1404,6 +1413,59 @@ class GeneClusterLibrary:
 						tu_end_bp = 0
 				tu_id = str(variant) + '_R_' + str(tu[0]) + '-'  + str(tu[1]) + '_'  + str(tu_start_bp) + '-'  + str(tu_end_bp)
 			tu_seqs.append([tu_id, self.extract_seq_range(variant, tu_start_bp, tu_end_bp, direction=tu_dir)])
+		# We need to add potential read in TU seqs
+		if none_start_bp_pad > 0:
+			# Find if first and last promoter exist
+			first_p_idx = None
+			last_p_idx = None
+			for tu in tus:
+				tu_dir = self.variant_part_idx_dir(variant, tu[0])
+				if tu_dir == 'F':
+					if first_p_idx == None:
+						first_p_idx = tu[0]
+					else:
+						if first_p_idx > tu[0]:
+							first_p_idx = tu[0]
+				else:
+					if last_p_idx == None:
+						last_p_idx = tu[0]
+					else:
+						if last_p_idx < tu[0]:
+							last_p_idx = tu[0]
+			# Extract all the TU seqs and append to tu_seqs
+			if first_p_idx != None:
+				for tu in tus:
+					if tu[0] == first_p_idx:
+						# Must be in forward direction
+						tu_dir = 'F'
+						tu_start_bp = self.variant_part_idx_end_bp(variant, tu[0])
+						tu_start_bp = tu_start_bp - none_start_bp_pad
+						if tu_start_bp < 0:
+							tu_start_bp = 0
+						tu_end_bp = self.variant_part_idx_start_bp(variant, tu[1])
+						if tu[1] == None:
+							last_idx = len(self.variant_part_list(variant))-1
+							tu_end_bp = self.variant_part_idx_start_bp(variant, last_idx-none_end_idx_offset)+none_end_bp_pad
+							if tu_end_bp > len(self.variants[variant]['seq']):
+								tu_end_bp = len(self.variants[variant]['seq'])
+						tu_id = str(variant) + '_F_None-'  + str(tu[1]) + '_'  + str(tu_start_bp) + '-'  + str(tu_end_bp)
+						tu_seqs.append([tu_id, self.extract_seq_range(variant, tu_start_bp, tu_end_bp, direction=tu_dir)])
+			if last_p_idx != None:
+				for tu in tus:
+					if tu[0] == last_p_idx:
+						# Must be in reverse direction
+						tu_dir = 'R'
+						tu_start_bp = self.variant_part_idx_end_bp(variant, tu[0])
+						tu_start_bp = tu_start_bp + none_start_bp_pad
+						if tu_start_bp > len(self.variants[variant]['seq']):
+							tu_start_bp = len(self.variants[variant]['seq'])
+						tu_end_bp = self.variant_part_idx_start_bp(variant, tu[1])
+						if tu[1] == None:
+							tu_end_bp = self.variant_part_idx_start_bp(variant, none_end_idx_offset)-none_end_bp_pad
+							if tu_end_bp < 0:
+								tu_end_bp = 0
+						tu_id = str(variant) + '_R_None-'  + str(tu[1]) + '_'  + str(tu_start_bp) + '-'  + str(tu_end_bp)
+						tu_seqs.append([tu_id, self.extract_seq_range(variant, tu_start_bp, tu_end_bp, direction=tu_dir)])
 		return tu_seqs
 
 	def monocistronic_units (self):

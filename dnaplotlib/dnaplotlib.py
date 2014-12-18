@@ -2157,7 +2157,6 @@ class DNARenderer:
 									arcrange[2] = reg['arc_height_index']
 							neg_arc_ranges.append(arcrange)
 						##############################################################################
-						
 						reg_renderers[reg['type']](ax, reg['type'], 
 							           reg_num, reg['from_part'], 
 							           reg['to_part'], self.scale, 

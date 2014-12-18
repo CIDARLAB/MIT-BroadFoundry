@@ -19,7 +19,9 @@ create_engine = sqlalchemy.create_engine
 ForeignKey = sqlalchemy.ForeignKey
 Table = sqlalchemy.Table
 Column = sqlalchemy.Column
+UniqueConstraint = sqlalchemy.UniqueConstraint
 Integer = sqlalchemy.Integer
+Boolean = sqlalchemy.Boolean
 String = sqlalchemy.String
 MetaData = sqlalchemy.MetaData
 Float = sqlalchemy.Float
@@ -38,6 +40,9 @@ ct = Table('constructs_tubes', Base.metadata,
 	Column('construct_id', Integer, ForeignKey('constructs.cid'), primary_key=True),
 	Column('tube_id', Integer, ForeignKey('tubes.tid'), primary_key=True)
 	)
+	
+default_lengths = {'CDS':60, 'Terminator':20, 'Ribozyme':10, 'RBS':10, 'Promoter':15}
+
 	
 def connect(sqldb, mongodb, verb=False):
 	engine = create_engine('sqlite:///'+sqldb)
@@ -59,12 +64,21 @@ def close_all():
 	session.close()
 	mdb.close()
 	
+def uni_to_str(dictionary):
+    """Recursively converts dictionary keys to strings."""
+    if not isinstance(dictionary, dict):
+    	if isinstance(dictionary, int) or isinstance(dictionary, float) or isinstance(dictionary, list):
+    		return dictionary
+    	else:
+        	return str(dictionary)
+    return dict((str(k), uni_to_str(v)) for k, v in dictionary.items())
+	
 def sync_mongo(collection, atts):
-	return list(mdb[collection].find(atts))[0]
+	return uni_to_str(list(mdb[collection].find(atts))[0])
 	
 def update_mongo(collection, id, atts):
 	mdb[collection].update(id, atts)
-	return list(mdb[collection].find(id))[0]
+	return uni_to_str(list(mdb[collection].find(id))[0])
 	
 def get_mdb_ids(collection, atts, rfields={'_id':1}):
 	return list(mdb[collection].find(atts, rfields))
@@ -98,7 +112,7 @@ class Part(Base):
 	#tubes = relationship(Tube, backref=backref('part'))
 	
 	defined = ['pid', 'ec', 'host', 'protein', 'dna', 'type', 'accession', 'enzyme',
-			'name', 'version', 'length', 'neg_reg']
+			'name', 'version', 'length']
 	
 	def __init__(self, dict):
 		self.mon = {}
@@ -106,6 +120,15 @@ class Part(Base):
 		session.add(self)
 		session.flush()
 		self.insert_mon()
+		
+	def __getitem__(self, k):
+		return getattr(self, k)
+	
+	def __setitem__(self, k, v):
+		setattr(self, k, v)
+	
+	def __delitem__(self, k):
+		delattr(self, k)
 	
 	def reset(self, dict):
 		self.dna == None
@@ -116,6 +139,8 @@ class Part(Base):
 				self.mon[k] = v
 		if not self.dna == None:
 			self.length = len(self.dna)
+		if self.length == None:
+			self.length = default_lengths[self.type]
 		
 	@sqlalchemy.orm.reconstructor
 	def get_mon(self):
@@ -127,6 +152,58 @@ class Part(Base):
 		
 	def push_mon(self):
 		self.mon = update_mongo('parts', {'pid': self.pid}, self.mon)
+		
+class Regulator(Base):
+	
+	__tablename__ = 'regulators'
+	
+	rid = Column(Integer, primary_key=True)
+	sid = Column(Integer, ForeignKey('parts.pid'))
+	tid = Column(Integer, ForeignKey('parts.pid'))
+	#type is an integer, but needs to be either negative or positive to
+	# denote negative or positive regulation, respectively.
+	type = Column(Integer)
+	
+	__table_args__ = (UniqueConstraint('sid', 'tid', name='source_target'),)
+	
+	source = relationship('Part', primaryjoin = 'Regulator.sid == Part.pid', 
+			backref=backref('targets'))
+	target = relationship('Part', primaryjoin = 'Regulator.tid == Part.pid',
+			backref=backref('sources'))
+			
+	defined = ['type']
+			
+	def __init__(self, dict):
+		self.mon = {}
+		self.reset(dict)
+		session.add(self)
+		session.flush()
+		self.insert_mon()
+		
+	def reset(self, dict):
+		for k, v in dict.items():
+			if k in self.defined:
+				setattr(self, k, v)
+			else:
+				self.mon[k] = v
+
+		
+	@sqlalchemy.orm.reconstructor
+	def get_mon(self):
+		self.mon = sync_mongo('regulators', {'rid': self.rid})
+		
+	def insert_mon(self):
+		self.mon['rid'] = self.rid
+		mdb['regulators'].insert(self.mon)
+		
+	def push_mon(self):
+		self.mon = update_mongo('regulators', {'rid': self.rid}, self.mon)
+		
+	def reg_type(self):
+		if self.type < 0:
+			return 'Repression'
+		if self.type > 0:
+			return 'Activation'
 
 
 class Design(Base):
@@ -174,15 +251,11 @@ class Design(Base):
 		
 	def sequence(self):
 		return "".join([designpart_seq.sequence() for designpart_seq in self.designparts])
-		
-	def regulation(self):
-		reg = dict()
-		names = [designpart.part.name for designpart in self.designparts]
-		for designpart in self.designparts:
-			
-	
+
 	def plot(self):
-		return self.name, [designpart_plot.plot() for designpart_plot in self.designparts]
+		designs = [designpart_plot.plot() for designpart_plot in self.designparts]
+		regs = [reg for designpart_reg in self.designparts for reg in designpart_reg.regulates()]
+		return self.name, designs, regs
 		
 class DesignPart(Base):
 	
@@ -204,10 +277,20 @@ class DesignPart(Base):
 	
 	def __init__(self, dict):
 		self.mon = {}
+		self.part_dict = {}
 		self.reset(dict)
 		session.add(self)
 		session.flush()
 		self.insert_mon()
+		
+	def __getitem__(self, k):
+		return getattr(self, k)
+	
+	def __setitem__(self, k, v):
+		setattr(self, k, v)
+	
+	def __delitem__(self, k):
+		delattr(self, k)
 	
 	def reset(self, dict):
 		for k, v in dict.items():
@@ -232,15 +315,28 @@ class DesignPart(Base):
 			return part.dna
 		else:
 			return reverse_comp(part.dna)
+	
+	@sqlalchemy.orm.reconstructor
+	def reset_dict(self):
+		if self.direction == 1:
+			self.part_dict = {'name': self.part.name, 'start': self.start, 'end': self.end,
+					'fwd': True, 'type': self.part.type, 'opts': self.part.mon}
+		else:
+			self.part_dict = {'name': self.part.name, 'start': self.end, 'end': self.start,
+					'fwd': False, 'type': self.part.type, 'opts': self.part.mon}
+	
+	def regulates(self):
+		regs = []
+		for reg_targets in self.part.targets:
+			for designpart in self.design.designparts:
+				if reg_targets.target == designpart.part:
+					regs.append({'from_part': self.part_dict, 'to_part': designpart.part_dict,
+							'type': reg_targets.reg_type(), 'opts': reg_targets.mon})
+		return regs
 			
 	def plot(self):
-		if self.direction == 1:
-			return {'name': self.part.name, 'start': self.start, 'end': self.end,
-				'fwd': True, 'type': self.part.type, 'opts': self.part.mon}
-		else:
-			return {'name': self.part.name, 'start': self.end, 'end': self.start,
-				'fwd': False, 'type': self.part.type, 'opts': self.part.mon}
-
+		return self.part_dict
+		
 class Tube(Base):
 
 	__tablename__ = 'tubes'

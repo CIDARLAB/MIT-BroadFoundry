@@ -1,0 +1,2 @@
+design_name	spec
+Design A000P000: 1414088611009_A000P000	((((((~(name:input_pTet+name:RiboJ51+name:js2_hlyiir+name:HlyIIR(js)+name:ECK120033736))*~(name:input_pBAD+name:RiboJ10+name:an3_srpr+name:SrpR+name:ECK120029600))*~(name:input_pTac+name:SarJ+name:js2_bm3r1+name:BM3R1+name:L3S2P11))*~(name:pSrpR+name:pHlyIIR+name:RiboJ60+name:js_qacr+name:QacR+name:ECK120010818))*~(name:pQacR+name:PlmJ+name:an2_litr+name:LitR+name:L3S2P24))*~(name:pBM3R1+name:pLitR+name:RiboJ53+name:an1_phlf+name:PhlF+name:ECK120033737))+(name:pPhlF+name:output_YFP)

@@ -32,10 +32,10 @@ def parse_data(f):
 	file. Returns a list of dictionaries, one dictionary for each row, with the keys
 	being the column headings, and the values being the data for the relevant row.
 	"""
-	labels = f.readline().strip().split("\t")
+	labels = f.readline().strip("\n").split("\t")
 	rows = []
 	for line in f:
-		rows.append(dict([(label, analyze_cell(value)) for label, value in zip(labels, line.strip().split("\t")) if value]))
+		rows.append(dict([(label, analyze_cell(value)) for label, value in zip(labels, line.strip("\n").split("\t")) if value]))
 	return rows
 
 def combine(s1, s2):
@@ -123,12 +123,31 @@ class connection():
 		"""Function accepts a list of parts represented as dictionaries, and imports
 		them into the db. 
 		"""
+		#List of regulators with the source filled out. The target needs to be updated
+		# after the first iteration of the for loop in case the target has not been
+		# added to the database yet.
+		regulators = []
 		for part_dict in data:
+			neg_reg = part_dict.pop('neg_reg', None)
+			pos_reg = part_dict.pop('pos_reg', None)
 			try:
 				part = dbmap.Part(part_dict)
 			except sqlalchemy.exc.IntegrityError:
 				self.session.rollback()
 				print "WAS NOT UNIQUE:\n", part_dict
+			color = None if 'color' not in part_dict else part_dict['color']
+			if neg_reg:
+				regulators.append((part, -1, neg_reg, color))
+			if pos_reg:
+				regulators.append((part, 1, pos_reg, color))
+		for regulator in regulators:
+			for regulated in self.part_lookup(regulator[2]):
+				if regulator[3]:
+					reg = dbmap.Regulator({'type':regulator[1], 'color':regulator[3]})
+				else:
+					reg = dbmap.Regulator({'type':regulator[1]})
+				reg.source = regulator[0]
+				reg.target = regulated
 		self.load_db()
 				
 	def import_designs(self, data):
@@ -143,6 +162,7 @@ class connection():
 				last = 0
 				for part in variantlist:
 					designpart = dbmap.DesignPart({'start':last+1, 'end':last+part[0].length})
+					print last, part[0].length
 					designpart.part = part[0]
 					designpart.direction = part[1]
 					designpart.design = design
@@ -154,7 +174,7 @@ class connection():
 		spec = spec.split(";")
 		atts = dict([att.split(":") for att in spec])
 		parts = self.dict_match(dbmap.Part, atts)
-		return [[[part, 1]] for part in parts]
+		return list(parts)
 	
 	def spec_parse(self, spec):
 		"""function accepts a string representing a 'spec'. This includes (), *, +, -, ~, and data
@@ -209,22 +229,25 @@ class connection():
 				else:
 					rec = "".join(recorded[1:-1])
 					if char == "*":
-						combs = combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):])) +\
+						if direction == -1:
+							return combine(reverse(self.spec_parse(rec)), self.spec_parse(spec[(ind+1):])) +\
+								combine(self.spec_parse(spec[(ind+1):]), reverse(self.spec_parse(rec)))
+						elif direction == 0:
+							return combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):])) +\
+								combine(self.spec_parse(spec[(ind+1):]), self.spec_parse(rec)) +\
+								combine(reverse(self.spec_parse(rec)), self.spec_parse(spec[(ind+1):])) +\
+								combine(self.spec_parse(spec[(ind+1):]), reverse(self.spec_parse(rec)))
+						else:
+							return combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):])) +\
 								combine(self.spec_parse(spec[(ind+1):]), self.spec_parse(rec))
-						if direction == -1:
-							return reverse(combs)
-						elif direction == 0:
-							return combs + reverse(combs)
-						else:
-							return combs
 					if char == "+":
-						combs = combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):]))
 						if direction == -1:
-							return reverse(combs)
+							return combine(reverse(self.spec_parse(rec)), self.spec_parse(spec[(ind+1):]))
 						elif direction == 0:
-							return combs + reverse(combs)
+							return combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):])) +\
+									combine(reverse(self.spec_parse(rec)), self.spec_parse(spec[(ind+1):]))
 						else:
-							return combs
+							return combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):]))
 					else:
 						sys.stderr('You broke it. Smooth. Something is not quite right with the parantheses')
 						return
@@ -240,13 +263,13 @@ class connection():
 			return combine(self.spec_parse(l), self.spec_parse(r))
 		if star == plus == -1:
 			if spec.startswith("-"):
-				combs = self.part_lookup(spec[1:])
+				combs = [[[part, 1] for part in self.part_lookup(spec[1:])]]
 				return reverse(combs)
 			elif spec.startswith("~"):
-				combs = self.part_lookup(spec[1:])
+				combs = [[[part, 1] for part in self.part_lookup(spec[1:])]]
 				return combs + reverse(combs)
 			else:
-				return self.part_lookup(spec)
+				return [[[part, 1] for part in self.part_lookup(spec)]]
 				
 	def load_db(self):
 		self.parts = self.session.query(dbmap.Part).all()

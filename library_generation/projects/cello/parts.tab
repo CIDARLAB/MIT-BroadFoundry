@@ -1,6 +1,6 @@
 neg_reg	name	type	x_extent	y_extent	start_pad	end_pad	color	hatch	arrowhead_height	arrowhead_length	linestyle	linewidth
 	RiboJ10	Ribozyme					0.12;0.47;0.71					
-name:pHlyIIR	HlyIIR(js)	CDS					0.42;0.24;0.60					
+name:pHlyIIR	HlyIIR_js	CDS					0.42;0.24;0.60					
 	js_qacr	RBS					0.98;0.60;0.60					
 name:pQacR	QacR	CDS					0.98;0.60;0.60					
 	L3S2P11	Terminator					0.20;0.63;0.17					

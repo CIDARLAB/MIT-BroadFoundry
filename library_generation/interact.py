@@ -7,6 +7,9 @@ import dnaplotlib as dpl
 
 import sqlalchemy
 
+import re
+import itertools
+
 
 def convert_float(num):
 	"""Function accepts text, converts to float if possible.
@@ -65,7 +68,22 @@ def reverse(combs):
 		for part in comb:
 			new_comb.append([part[0], -1*part[1]])
 		new_combs.append(new_comb[::-1])
-	return new_combs	
+	return new_combs
+	
+
+	
+def multi_split(str, chars):
+	parts = []
+	for c in str:
+		if c in chars:
+			parts.append([c])
+			parts.append([])
+		else:
+			if len(parts) == 0:
+				parts.append([])
+			parts[-1].append(c)
+	return ["".join(part) for part in parts]
+					
 
 class connection():
 	
@@ -157,12 +175,15 @@ class connection():
 		self.load_db()
 		for design_dict in data:
 			num = 1
-			for variantlist in self.spec_parse(design_dict['spec']):
+			variants = self.spec_parse(design_dict['spec'])
+			for variantlist in variants:
+				if num % 1000 == 0:
+					print num, ' of ', len(variants)
+				num += 1
 				design = dbmap.Design(design_dict)
 				last = 0
 				for part in variantlist:
 					designpart = dbmap.DesignPart({'start':last+1, 'end':last+part[0].length})
-					print last, part[0].length
 					designpart.part = part[0]
 					designpart.direction = part[1]
 					designpart.design = design
@@ -172,104 +193,97 @@ class connection():
 	
 	def part_lookup(self, spec):
 		spec = spec.split(";")
+		print spec
 		atts = dict([att.split(":") for att in spec])
-		parts = self.dict_match(dbmap.Part, atts)
-		return list(parts)
+		print atts
+		return self.dict_match(dbmap.Part, atts)
+		
+	def parens(self, spec):
+		if len([c for c in spec if c in "()+*-~"]) == 0:
+			return [spec]
+		new = []
+		prev_counter = 0
+		counter = 0
+		save = True
+		for char in multi_split(spec, ")(+*-~"):
+			if not char:
+				continue
+			if char == "(":
+				counter += 1
+				if prev_counter == 0:
+					save = False
+					new.append([])
+			if char == ")":
+				counter -= 1
+				if prev_counter == 1:
+					save = False
+				
+			if counter == 0 and prev_counter == 0:
+				new.append(char)
+			else:
+				if save:
+					new[-1].append(char)
+			
+			if not save:
+				save = True
+			prev_counter = counter
+		return ["".join(n) for n in new]
 	
+	def combine(self, group):
+		combs = [list(itertools.chain(*c)) for c in itertools.product(*group)]
+		return combs
+
+	def star(self, group):
+		#All I have to say is... Sorry. But a list comprehension was easier here.
+		perms = [sub for group in list(itertools.permutations([list(g)[0] \
+				for k,g in itertools.groupby(group, lambda x: x == '*') if not k])) \
+				for sub in self.combine(group)]
+		return perms
+
+	def plus(self, group):
+		combs = self.combine([list(g)[0] for k,g in itertools.groupby(group,
+								lambda x: x == '+') if not k])
+		return combs
+
 	def spec_parse(self, spec):
-		"""function accepts a string representing a 'spec'. This includes (), *, +, -, ~, and data
-		specifying documents in the database. Example:
-			A+B = AB
-			-A+B = reverse complement of A, plus B
-			-(A+B) = reverse complment of AB
-			~A+B = AB and reverse complement of A, plus B
-			A*B = AB, BA
-			A+B*C = (A+B)*C = ABC, CAB
-			(A*B)+(C*D) = ABCD, BACD, ABDC, BADC
-		Each variable (A, B, C, D) can be a part:
-			substrate:L-TRYPTOPHAN;product:5-HYDROXY-L-TRYPTOPHAN+substrate:5-HYDROXY-L-TRYPTOPHAN;product:SEROTONIN
-		this concatenates all combinations of parts that satisfy that spec.
-		"""
-		
-		if not spec.count("(") == spec.count(")"):
-			print "Missing Parentheses"
-			return
-	
-		if spec.startswith("(") or spec.startswith("-(") or spec.startswith("~("):
-			if spec.startswith("-("):
-				spec = spec[1:]
-				direction = -1
-			elif spec.startswith("~("):
-				spec = spec[1:]
-				direction = 0
+		separated = self.parens(spec)
+		new_sep = []
+		dir = 1
+		for comp in separated:
+			if comp == '-':
+				dir = -1
+				continue
+			if comp == '~':
+				dir = 0
+				continue
+			if comp in '*+':
+				new_sep.append(comp)
+			elif '(' in comp or '*' in comp or '+' in comp:
+				if dir == 1:
+					new_sep.append(self.spec_parse(comp))
+				if dir == -1:
+					new_sep.append(reverse(self.spec_parse(comp)))
+				if dir == 0:
+					new_sep.append(self.spec_parse(comp) + reverse(self.spec_parse(comp)))
+				dir = 1
 			else:
-				direction = 1
-			recording = True
-			recorded = []
-			opened = 0
-			closed = 0
-			for ind, char in enumerate(spec):
-				if recording:
-					if char == "(":
-						opened += 1
-					if char == ")":
-						closed += 1
-					recorded.append(char)
-					if opened == closed:
-						recording = False
-						if ind == len(spec) - 1:
-							combs = self.spec_parse("".join(recorded[1:-1]))
-							if direction == -1:
-								return reverse(combs)
-							elif direction == 0:
-								return combs + reverse(combs)
-							else:
-								return combs
-						continue
-				else:
-					rec = "".join(recorded[1:-1])
-					if char == "*":
-						if direction == -1:
-							return combine(reverse(self.spec_parse(rec)), self.spec_parse(spec[(ind+1):])) +\
-								combine(self.spec_parse(spec[(ind+1):]), reverse(self.spec_parse(rec)))
-						elif direction == 0:
-							return combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):])) +\
-								combine(self.spec_parse(spec[(ind+1):]), self.spec_parse(rec)) +\
-								combine(reverse(self.spec_parse(rec)), self.spec_parse(spec[(ind+1):])) +\
-								combine(self.spec_parse(spec[(ind+1):]), reverse(self.spec_parse(rec)))
-						else:
-							return combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):])) +\
-								combine(self.spec_parse(spec[(ind+1):]), self.spec_parse(rec))
-					if char == "+":
-						if direction == -1:
-							return combine(reverse(self.spec_parse(rec)), self.spec_parse(spec[(ind+1):]))
-						elif direction == 0:
-							return combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):])) +\
-									combine(reverse(self.spec_parse(rec)), self.spec_parse(spec[(ind+1):]))
-						else:
-							return combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):]))
-					else:
-						sys.stderr('You broke it. Smooth. Something is not quite right with the parantheses')
-						return
+				if dir == 1:
+					new_sep.append([[[p, 1]] for p in self.part_lookup(comp)])
+				if dir == -1:
+					new_sep.append(reverse([[[p, 1]] for p in self.part_lookup(comp)]))
+				if dir == 0:
+					stuff = [[[p, 1]] for p in self.part_lookup(comp)]
+					new_sep.append(stuff + reverse(stuff))
+				dir = 1
+					
+		separated = new_sep
 		
-		plus = spec.find("+")
-		star = spec.find("*")
-		if star > plus:
-			l, r = spec.split("*", 1)
-			return combine(self.spec_parse(l), self.spec_parse(r)) +\
-					combine(self.spec_parse(r), self.spec_parse(l))
-		if plus > star:
-			l, r = spec.split("+", 1)
-			return combine(self.spec_parse(l), self.spec_parse(r))
-		if star == plus == -1:
-			if spec.startswith("-"):
-				combs = [[[part, 1] for part in self.part_lookup(spec[1:])]]
-				return reverse(combs)
-			elif spec.startswith("~"):
-				combs = [[[part, 1] for part in self.part_lookup(spec[1:])]]
-				return combs + reverse(combs)
-			else:
-				return [[[part, 1] for part in self.part_lookup(spec)]]
+		if '*' in separated:
+			return self.star(separated)
+		elif '+' in separated:
+			return self.plus(separated)
+		else:
+			return separated[0]
 				
 	def load_db(self):
 		self.parts = self.session.query(dbmap.Part).all()

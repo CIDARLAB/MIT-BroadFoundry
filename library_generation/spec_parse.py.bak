@@ -1,0 +1,94 @@
+	def spec_parse(self, spec):
+		"""function accepts a string representing a 'spec'. This includes (), *, +, -, ~, and data
+		specifying documents in the database. Example:
+			A+B = AB
+			-A+B = reverse complement of A, plus B
+			-(A+B) = reverse complment of AB
+			~A+B = AB and reverse complement of A, plus B
+			A*B = AB, BA
+			A+B*C = (A+B)*C = ABC, CAB
+			(A*B)+(C*D) = ABCD, BACD, ABDC, BADC
+		Each variable (A, B, C, D) can be a part:
+			substrate:L-TRYPTOPHAN;product:5-HYDROXY-L-TRYPTOPHAN+substrate:5-HYDROXY-L-TRYPTOPHAN;product:SEROTONIN
+		this concatenates all combinations of parts that satisfy that spec.
+		"""
+		
+		if not spec.count("(") == spec.count(")"):
+			print "Missing Parentheses"
+			return
+	
+		if spec.startswith("(") or spec.startswith("-(") or spec.startswith("~("):
+			if spec.startswith("-("):
+				spec = spec[1:]
+				direction = -1
+			elif spec.startswith("~("):
+				spec = spec[1:]
+				direction = 0
+			else:
+				direction = 1
+			recording = True
+			recorded = []
+			opened = 0
+			closed = 0
+			for ind, char in enumerate(spec):
+				if recording:
+					if char == "(":
+						opened += 1
+					if char == ")":
+						closed += 1
+					recorded.append(char)
+					if opened == closed:
+						recording = False
+						if ind == len(spec) - 1:
+							combs = self.spec_parse("".join(recorded[1:-1]))
+							if direction == -1:
+								return reverse(combs)
+							elif direction == 0:
+								return combs + reverse(combs)
+							else:
+								return combs
+						continue
+				else:
+					rec = "".join(recorded[1:-1])
+					if char == "*":
+						if direction == -1:
+							return combine(reverse(self.spec_parse(rec)), self.spec_parse(spec[(ind+1):])) +\
+								combine(self.spec_parse(spec[(ind+1):]), reverse(self.spec_parse(rec)))
+						elif direction == 0:
+							return combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):])) +\
+								combine(self.spec_parse(spec[(ind+1):]), self.spec_parse(rec)) +\
+								combine(reverse(self.spec_parse(rec)), self.spec_parse(spec[(ind+1):])) +\
+								combine(self.spec_parse(spec[(ind+1):]), reverse(self.spec_parse(rec)))
+						else:
+							return combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):])) +\
+								combine(self.spec_parse(spec[(ind+1):]), self.spec_parse(rec))
+					if char == "+":
+						if direction == -1:
+							return combine(reverse(self.spec_parse(rec)), self.spec_parse(spec[(ind+1):]))
+						elif direction == 0:
+							return combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):])) +\
+									combine(reverse(self.spec_parse(rec)), self.spec_parse(spec[(ind+1):]))
+						else:
+							return combine(self.spec_parse(rec), self.spec_parse(spec[(ind+1):]))
+					else:
+						sys.stderr('You broke it. Smooth. Something is not quite right with the parantheses')
+						return
+		
+		plus = spec.find("+")
+		star = spec.find("*")
+		if star > plus:
+			l, r = spec.split("*", 1)
+			return combine(self.spec_parse(l), self.spec_parse(r)) +\
+					combine(self.spec_parse(r), self.spec_parse(l))
+		if plus > star:
+			l, r = spec.split("+", 1)
+			return combine(self.spec_parse(l), self.spec_parse(r))
+		if star == plus == -1:
+			if spec.startswith("-"):
+				combs = [[[part, 1] for part in self.part_lookup(spec[1:])]]
+				return reverse(combs)
+			elif spec.startswith("~"):
+				combs = [[[part, 1] for part in self.part_lookup(spec[1:])]]
+				return combs + reverse(combs)
+			else:
+				return [[[part, 1] for part in self.part_lookup(spec)]]

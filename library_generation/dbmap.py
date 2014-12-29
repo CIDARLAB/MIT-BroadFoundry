@@ -61,6 +61,7 @@ def connect(sqldb, mongodb, verb=False):
 	return session, mdb
 	
 def close_all():
+	session.commit()
 	session.close()
 	mdb.close()
 	
@@ -75,10 +76,6 @@ def uni_to_str(dictionary):
 	
 def sync_mongo(collection, atts):
 	return uni_to_str(list(mdb[collection].find(atts))[0])
-	
-def update_mongo(collection, id, atts):
-	mdb[collection].update(id, atts)
-	return uni_to_str(list(mdb[collection].find(id))[0])
 	
 def get_mdb_ids(collection, atts, rfields={'_id':1}):
 	return list(mdb[collection].find(atts, rfields))
@@ -119,16 +116,26 @@ class Part(Base):
 		self.reset(dict)
 		session.add(self)
 		session.flush()
-		self.insert_mon()
+		self.push_mon()
 		
 	def __getitem__(self, k):
-		return getattr(self, k)
+		if k in self.defined:
+			return getattr(self, k)
+		else:
+			return self.mon[k]
 	
 	def __setitem__(self, k, v):
-		setattr(self, k, v)
+		if k in self.defined:
+			setattr(self, k, v)
+		else:
+			self.mon[k] = v
+		self.push_mon()
 	
 	def __delitem__(self, k):
-		delattr(self, k)
+		if k in self.defined:
+			delattr(self, k)
+		else:
+			del self.mon[k]
 	
 	def reset(self, dict):
 		self.dna == None
@@ -144,14 +151,12 @@ class Part(Base):
 		
 	@sqlalchemy.orm.reconstructor
 	def get_mon(self):
-		self.mon = sync_mongo('parts', {'pid': self.pid})
-		
-	def insert_mon(self):
-		self.mon['pid'] = self.pid
-		mdb['parts'].insert(self.mon)
+		self.mon = sync_mongo('parts', {'_id': self.pid})
 		
 	def push_mon(self):
-		self.mon = update_mongo('parts', {'pid': self.pid}, self.mon)
+		self.mon['_id'] = self.pid
+		mdb['parts'].save(self.mon)
+
 		
 class Regulator(Base):
 	
@@ -178,7 +183,7 @@ class Regulator(Base):
 		self.reset(dict)
 		session.add(self)
 		session.flush()
-		self.insert_mon()
+		self.push_mon()
 		
 	def reset(self, dict):
 		for k, v in dict.items():
@@ -190,14 +195,11 @@ class Regulator(Base):
 		
 	@sqlalchemy.orm.reconstructor
 	def get_mon(self):
-		self.mon = sync_mongo('regulators', {'rid': self.rid})
-		
-	def insert_mon(self):
-		self.mon['rid'] = self.rid
-		mdb['regulators'].insert(self.mon)
+		self.mon = sync_mongo('regulators', {'_id': self.rid})
 		
 	def push_mon(self):
-		self.mon = update_mongo('regulators', {'rid': self.rid}, self.mon)
+		self.mon['_id'] = self.rid
+		mdb['regulators'].save(self.mon)
 		
 	def reg_type(self):
 		if self.type < 0:
@@ -228,7 +230,7 @@ class Design(Base):
 		self.reset(dict)
 		session.add(self)
 		session.flush()
-		self.insert_mon()
+		self.push_mon()
 	
 	def reset(self, dict):
 		
@@ -240,21 +242,18 @@ class Design(Base):
 	
 	@sqlalchemy.orm.reconstructor
 	def get_mon(self):
-		self.mon = sync_mongo('designs', {'did': self.did})
-		
-	def insert_mon(self):
-		self.mon['did'] = self.did
-		mdb['designs'].insert(self.mon)
+		self.mon = sync_mongo('designs', {'_id': self.did})
 		
 	def push_mon(self):
-		self.mon = update_mongo('designs', {'did': self.did}, self.mon)
-		
+		self.mon['_id'] = self.did
+		mdb['designs'].save(self.mon)
+				
 	def sequence(self):
 		return "".join([designpart_seq.sequence() for designpart_seq in self.designparts])
 
-	def plot(self):
+	def plot(self, omit = []):
 		designs = [designpart_plot.plot() for designpart_plot in self.designparts]
-		regs = [reg for designpart_reg in self.designparts for reg in designpart_reg.regulates()]
+		regs = [reg for designpart_reg in self.designparts for reg in designpart_reg.regulates() if designpart_reg.part.name not in omit]
 		return self.name, designs, regs
 		
 class DesignPart(Base):
@@ -281,7 +280,7 @@ class DesignPart(Base):
 		self.reset(dict)
 		session.add(self)
 		session.flush()
-		self.insert_mon()
+		self.push_mon()
 		
 	def __getitem__(self, k):
 		return getattr(self, k)
@@ -301,15 +300,12 @@ class DesignPart(Base):
 			
 	@sqlalchemy.orm.reconstructor
 	def get_mon(self):
-		self.mon = sync_mongo('designparts', {'dpid': self.dpid})
-		
-	def insert_mon(self):
-		self.mon['dpid'] = self.dpid
-		mdb['designparts'].insert(self.mon)
+		self.mon = sync_mongo('designparts', {'_id': self.dpid})
 		
 	def push_mon(self):
-		self.mon = update_mongo('designparts', {'dpid': self.dpid}, self.mon)
-	
+		self.mon['_id'] = self.dpid
+		mdb['designparts'].save(self.mon)
+		
 	def sequence(self):
 		if direction == 1:
 			return part.dna
@@ -372,14 +368,12 @@ class Tube(Base):
 	
 	@sqlalchemy.orm.reconstructor
 	def get_mon(self):
-		self.mon = sync_mon('tubes', {'tid': self.tid})
-		
-	def insert_mon(self):
-		self.mon['tid'] = self.tid
-		mdb['tubes'].insert(self.mon)
+		self.mon = sync_mon('tubes', {'_id': self.tid})
 		
 	def push_mon(self):
-		self.mon = update_mongo('tubes', {'tid': self.tid}, self.mon)
+		self.mon['_id'] = self.tid
+		mdb['tubes'].save(self.mon)
+
 
 class Construct(Base):
 
@@ -415,11 +409,11 @@ class Construct(Base):
 	
 	@sqlalchemy.orm.reconstructor
 	def get_mon(self):
-		self.mon = sync_mon('constructs', {'cid': self.cid})
+		self.mon = sync_mon('constructs', {'_id': self.cid})
 		
-	def insert_mon(self):
-		self.mon['cid'] = self.cid
-		mdb['constructs'].insert(self.mon)
+	def push_mon(self):
+		self.mon['_id'] = self.cid
+		mdb['constructs'].save(self.mon)
 		
 	def push_mon(self):
 		self.mon = update_mongo('constructs', {'cid': self.cid}, self.mon)

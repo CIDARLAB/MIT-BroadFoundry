@@ -55,6 +55,8 @@ DNAplotlib
 import matplotlib
 matplotlib.use('Agg')
 
+import matplotlib.pyplot as plt
+
 from matplotlib.patches import Polygon, Ellipse, Wedge, Circle, PathPatch
 from matplotlib.path import Path
 from matplotlib.lines import Line2D
@@ -2259,7 +2261,7 @@ def plot_sbol_designs (axes, dna_designs, regulations=None, plot_params={}, plot
 		ax.set_axis_off()
 
 	# xlims, ylims are returned
-	return [(-0.01*max_dna_len)-left_pad, max_dna_len+(0.01*max_dna_len)+right_pad], [-plot_params['axis_y'],plot_params['axis_y']]
+	return max_dna_len, [(-0.01*max_dna_len)-left_pad, max_dna_len+(0.01*max_dna_len)+right_pad], [-plot_params['axis_y'],plot_params['axis_y']]
 
 def save_sbol_designs (filename, dna_designs, regulations=None, plot_params={}, plot_names=None):
 	""" Plot SBOL designs to axes.
@@ -2285,21 +2287,22 @@ def save_sbol_designs (filename, dna_designs, regulations=None, plot_params={}, 
 
 	# Create the figure
 	fig = plt.figure(figsize=(10,10))
+	fig.patch.set_facecolor('white')
 
 	# Create all the axes required
 	axes = []
 	for i in range(len(dna_designs)):
-		ax = fig.add_subplot(len(dna_designs),1,i+1)
+		ax = fig.add_subplot(len(dna_designs),1,i+1, axisbg='white')
 		axes.append(ax)
 
 	# Plot design to the axes
-	plot_sbol_designs (axes, dna_designs, regulations=regulations, plot_params=plot_params, plot_names=plot_names)
+	max_dna_len, lims, params = plot_sbol_designs (axes, dna_designs, regulations=regulations, plot_params=plot_params, plot_names=plot_names)
 
 	# Update the size of the figure to fit the constructs drawn
 	fig_x_dim = max_dna_len/70.0
 	if fig_x_dim < 1.0:
 		fig_x_dim = 1.0
-	fig_y_dim = 1.2*len(ax_list)
+	fig_y_dim = 1.2*len(axes)
 	plt.gcf().set_size_inches( (fig_x_dim, fig_y_dim) )
 
 	# Save the figure

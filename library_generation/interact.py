@@ -89,6 +89,9 @@ class connection():
 	
 	def __init__(self, sqldb = ":memory:", mongodb = "temp"):
 		self.session, self.mdb = dbmap.connect(sqldb, mongodb)
+	
+	def disconnect(self):
+		dbmap.close_all()
 		
 	def dict_match(self, match_type, match_dict, match_columns = []):
 		"""Function accepts a match type (object defined in the dbmap orm) and a match
@@ -193,9 +196,7 @@ class connection():
 	
 	def part_lookup(self, spec):
 		spec = spec.split(";")
-		print spec
 		atts = dict([att.split(":") for att in spec])
-		print atts
 		return self.dict_match(dbmap.Part, atts)
 		
 	def parens(self, spec):

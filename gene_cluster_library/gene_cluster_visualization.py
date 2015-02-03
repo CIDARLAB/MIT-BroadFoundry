@@ -125,8 +125,8 @@ def plot_traces_with_arch (ax_arch, ax_traces, gcl, variant, traces, start_idx=N
 		# Plot the traces (shared axis ensures only valid region plotted)
 		ts = np.array(traces[ax_idx])
 		trace_len = len(ts[0])
-		ax_trace.fill_between(range(trace_len),ts[0],np.zeros(trace_len), color='pink', edgecolor='red', linewidth=linewidth, zorder=1)
-		ax_trace.fill_between(range(trace_len),-ts[1],np.zeros(trace_len), color='lightblue', edgecolor='blue', linewidth=linewidth, zorder=1)
+		ax_trace.fill_between(range(trace_len),ts[0],np.zeros(trace_len), color=(0.5,0.5,0.5), edgecolor=(0.5,0.5,0.5), linewidth=linewidth, zorder=1)
+		ax_trace.fill_between(range(trace_len),-ts[1],np.zeros(trace_len), color=(0.5,0.5,0.5), edgecolor=(0.5,0.5,0.5), linewidth=linewidth, zorder=1)
 		ax_trace.plot(range(trace_len), np.zeros(trace_len), color=(0,0,0), linewidth=linewidth, zorder=2)
 		# Scale the y-axis of the traces appropriately
 		max_read_depth = max(ts[0])

@@ -11,15 +11,39 @@ rcParams['xtick.direction'] = 'out'
 rcParams['ytick.direction'] = 'out'
 rcParams['mathtext.fontset'] = 'stixsans'
 
+'''
+This script creates a heatmap with promoters on the x-axis and terminators on the y.
+The input values must be saved as log10 values in Excel in .xlsx format.
+'''
+
 
 def maine():
     pt_heatmap_plotter()
 
 def pt_heatmap_plotter():
+
+    # This function reads in the data to be heatmapped
+    data = load_value_array()
+
+    # These are mostly custom settings that are messy
+    # and really cloud the formatting settings for the plot.
+    # I moved them into a helper function for better readability
+    # of the other code.
+    plot_settings = plot_specific_settings()
+
+    # This function plots the data. Many settings can be found here.
+    heatmap_plot(data, plot_settings)
+
+def load_value_array():
+
+    wb_filename = 'P-T Combo All Values'
+
+    sheetname = 'Sq Log Sorted Vals' 
     
-    wb = load_workbook('\Users\Eric\Dropbox (MIT)\Data\Flow\Analysis #4.xlsx', data_only=True)
+    wb = load_workbook('\Users\Eric\Dropbox (MIT)\Data\Flow\%(f)s.xlsx' % {'f':wb_filename},
+                       data_only=True)
     
-    ws = wb.get_sheet_by_name('Log New Values')
+    ws = wb.get_sheet_by_name(sheetname)
 
     cell_array = ws.rows
 
@@ -31,13 +55,17 @@ def pt_heatmap_plotter():
 
     for row in cell_array :
         gfp_values = []
+
         for cell in row :
+
             xy = coordinate_from_string(cell.coordinate)
             col = column_index_from_string(xy[0])
             row = xy[1]
 
+
             if row is 1 :
                 if col >= 2 :
+
                     x_labels.append(cell.value)
 
             if row >= 2 :
@@ -46,7 +74,7 @@ def pt_heatmap_plotter():
 
             if row > 2:              
                 if col > 2:
-                    if 0 <= cell.value <= 10 :
+                    if 0 <= cell.value <= 10:
                         z_values.append(cell.value)
                         gfp_values.append(cell.value)
                     else :
@@ -55,22 +83,70 @@ def pt_heatmap_plotter():
 
         if row > 2:
                 value_array.append(gfp_values)
-   
+
+    return [value_array, x_labels, y_labels]
+
+def plot_specific_settings():
+
+    # How many logs will the values span?
+    # What scale are the numbers in Excel in?
+    n_logs = 5
+    scale = 'log'
+    
+    # This is a placeholder for more complex custom colormaps.
+    # When using a standard colormap, enter it in the heatmap_plot
+    color_map = 'jetwz'
+
+    settingsD = {}
+    
+    # Define a new colormap so that '0' values are white or use a standard colormap
+    jetwz = [('white')] + [(cm.jet(i)) for i in xrange(1,256)]
+
+    jetwz_map = matplotlib.colors.LinearSegmentedColormap.from_list('new_map', jetwz, N=256)
+
+    cmapD = {'jetwz': jetwz_map}
+
+    settingsD['color_map'] = cmapD[color_map]
+
+    # Generate scale and tick marks for color code bar
+    stD = {4: [[r'$10^0$', r'$10^1$', r'$10^2$', r'$10^3$', r'$10^4$'],[0,1,2,3,4]],
+           5: [[r'$10^0$', r'$10^1$', r'$10^2$', r'$10^3$', r'$10^4$', r'$10^5$'],[0,1,2,3,4,5]]}
+
+    settingsD['scale'] = stD[n_logs][0]
+    settingsD['ticks'] = stD[n_logs][1]
+    
+    # Set proper minor tick marks for scale being used
+    minor_tickD = {'log':[0.301029996,0.477121255,0.602059991,0.698970004,0.77815125,0.84509804,0.903089987,0.954242509,
+                          1.301029996,1.477121255,1.602059991,1.698970004,1.77815125,1.84509804,1.903089987,1.954242509,
+                          2.301029996,2.477121255,2.602059991,2.698970004,2.77815125,2.84509804,2.903089987,2.954242509,
+                          3.301029996,3.477121255,3.602059991,3.698970004,3.77815125,3.84509804,3.903089987,3.954242509],
+                          #4.301029996,4.477121255,4.602059991,4.698970004],
+                   'log_on_linear' :[2,3,4,5,6,7,8,9,1,
+                                     20,30,40,50,60,70,80,90,
+                                     200,300,400,500,600,700,800,900,
+                                     2000,3000,4000,5000,6000,7000,8000,9000,
+                                     20000,30000,40000,50000,60000,70000,80000,90000]}
+    
+    settingsD['minorticks'] = minor_tickD[scale]
+
+    return settingsD
+
+def heatmap_plot(data, plotD):
+    
     fig, ax = plt.subplots()
 
-    # Define a new colormap so that '0' values are white
-    colors = [('white')] + [(cm.jet(i)) for i in xrange(1,256)]
-    new_map = matplotlib.colors.LinearSegmentedColormap.from_list('new_map', colors, N=256)
+    im = plt.imshow(data[0],
+                    interpolation='nearest',
+                    cmap=plotD['color_map'])
 
-    im = plt.imshow(value_array, interpolation='nearest', cmap=new_map)
-
-    # Format colorbar to show log10 demarcations and ticks outward
-    cbar = fig.colorbar(im, ticks=[0,1,2,3,4,5])
-    cbar.ax.set_yticklabels([r'$10^0$', r'$10^1$', r'$10^2$', r'$10^3$', r'$10^4$', r'$10^5$'], fontsize=15)
+    # Format colorbar to show log10 demarcations and ticks outward, including minor tick marks
+    cbar = fig.colorbar(im, ticks=plotD['ticks'])
+    
+    cbar.ax.set_yticklabels(plotD['scale'], fontsize=15)
+    
     cbar.ax.tick_params(axis='y', direction='out')
 
-    minorticks = im.norm(minor_tick_list('log'))
-    cbar.ax.yaxis.set_ticks(minorticks, minor=True)
+    cbar.ax.yaxis.set_ticks(im.norm(plotD['minorticks']), minor=True)
 
     # Set colorbar to same height as figure
     ax.axis('tight')
@@ -100,29 +176,11 @@ def pt_heatmap_plotter():
     ax.tick_params(axis='y', direction='out')
 
     # Rename the labels using the lists created from the data
-    ax.set_xticklabels(x_labels, rotation=45, horizontalalignment='left')
-    ax.set_yticklabels(y_labels)
+    ax.set_xticklabels(data[1], rotation=45, horizontalalignment='left')
+    ax.set_yticklabels(data[2])
     
     plt.show()
 
-def minor_tick_list(kind) :
 
-    if kind is 'log' :
-        minor_ticks = [0.301029996,0.477121255,0.602059991,0.698970004,0.77815125,0.84509804,0.903089987,0.954242509,
-                       1.301029996,1.477121255,1.602059991,1.698970004,1.77815125,1.84509804,1.903089987,1.954242509,
-                       2.301029996,2.477121255,2.602059991,2.698970004,2.77815125,2.84509804,2.903089987,2.954242509,
-                       3.301029996,3.477121255,3.602059991,3.698970004,3.77815125,3.84509804,3.903089987,3.954242509,
-                       4.301029996,4.477121255,4.602059991,4.698970004]
-
-    if kind is 'log_on_linear' :
-        minor_ticks = [2,3,4,5,6,7,8,9,1,
-                       20,30,40,50,60,70,80,90,
-                       200,300,400,500,600,700,800,900,
-                       2000,3000,4000,5000,6000,7000,8000,9000,
-                       20000,30000,40000,50000,60000,70000,80000,90000]
-
-    return minor_ticks
-
-    
 if __name__ == "__maine__" :
     maine()

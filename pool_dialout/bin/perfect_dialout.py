@@ -114,7 +114,7 @@ with open(r1_filename, "rU") as r1, open(r2_filename, "rU") as r2:
 				found_barcode = list(m1.groups()) + [revcomp(x) for x in m2.groups()]
 				barcode_key = "-".join(found_barcode)
 				
-				# HARD CODED ##################################################
+				# CHECK BARCODES ##################################################
 				if found_barcode[fwd_bc_idx] not in barcodes_to_check[0].keys():
 					barcodes_to_check[0][found_barcode[fwd_bc_idx]] = [found_design]
 				else:
@@ -164,7 +164,6 @@ for design in sorted(found_designs.keys()):
 	unique_barcodes = []
 	unique_for_design = False
 	for bc in found_designs[design]:
-		# HARD CODED ##########################################################
 		# Check to see where barcode is used (if unique for design)
 		keys_0 = barcodes_to_check[0].keys()
 		keys_1 = barcodes_to_check[1].keys()
@@ -176,7 +175,6 @@ for design in sorted(found_designs.keys()):
 		     (revcomp(bc[rev_bc_idx]) not in keys_1) and
 		     (bc[rev_bc_idx] not in keys_0) and
 		     (revcomp(bc[rev_bc_idx]) not in keys_0) ):
-		#######################################################################
 			unique_barcodes.append(bc)
 			n_unique_bc += 1
 			unique_for_design = True

@@ -64,6 +64,7 @@ with open(design_filename, "rU") as design_file:
 
 # Process the raw reads and try to match
 print("Starting to process read...", file=sys.stdout)
+sys.stdout.flush()
 n_reads = 0
 n_accepted = 0
 n_matched = 0
@@ -78,6 +79,7 @@ with open(r1_filename, "rU") as r1, open(r2_filename, "rU") as r2:
 		# Give indication of progress
 		if n_reads % 1000 == 0:
 			print("Processed {} reads".format(n_reads), file=sys.stdout)
+			sys.stdout.flush()
 
 		# Extract data and clean
 		seq1, seq2 = r1_r2.next()
@@ -158,6 +160,7 @@ n_unique_bc = 0
 design_with_unique_bc = []
 for design in sorted(found_designs.keys()):
 	print("Processing design: {}".format(design), file=sys.stdout)
+	sys.stdout.flush()
 	unique_barcodes = []
 	unique_for_design = False
 	for bc in found_designs[design]:
@@ -223,3 +226,5 @@ log.close()
 
 print("Done ({0:.2f} seconds)".format(stop_time-start_time), file=sys.stdout)
 print("")
+sys.stdout.flush()
+

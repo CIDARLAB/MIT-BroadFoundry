@@ -152,7 +152,7 @@ with open(r1_filename, "rU") as r1, open(r2_filename, "rU") as r2:
 print("Writing dialout for designs...", file=sys.stdout)
 # Design, # Reads, # Barcodes, # Unique Barcodes, Unique Barcodes... 
 design_file = open(out_prefix + "dialout_designs.csv", "w")
-design_file.write("Design,# Barcode Reads,# Unique Barcode Reads\n")
+design_file.write("Design,# Barcoded Designs,# Unique Barcoded Designs\n")
 # Design, Barcode, # Reads 
 unique_bc_file = open(out_prefix + "dialout_design_unique_barcodes.csv", "w")
 unique_bc_file.write("Design,Unique Barcode,# Reads\n")
@@ -219,7 +219,7 @@ print("Uniquely barcoded designs: \t{0:.2f}%".format((float(len(design_with_uniq
 print("", file=log)
 print("RUNTIME", file=log)
 stop_time = timeit.default_timer()
-print("Total time: \t{0:.2f}%".format(stop_time-start_time), file=log)
+print("Total time (sec): \t{0:.2f}".format(stop_time-start_time), file=log)
 log.close()
 
 print("Done ({0:.2f} seconds)".format(stop_time-start_time), file=sys.stdout)

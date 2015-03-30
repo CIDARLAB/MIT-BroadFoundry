@@ -29,6 +29,7 @@ bin_path       = home_prefix + 'bin/'
 fwd_barcode_idx = 1
 rev_barcode_idx = 2
 
+# The names of the raw read files and the length of the forward and reverse primer.
 run_data = {}
 run_data['AmeR_NOT'] = ['AmeR-NOT-tagged-57_S1_L001_R1_001.fastq',      'AmeR-NOT-tagged-57_S1_L001_R2_001.fastq', '20', '20']
 run_data['AmtR_NOT'] = ['AmtR-NOT-tagged-726_S2_L001_R1_001.fastq',     'AmtR-NOT-tagged-726_S2_L001_R2_001.fastq', '20', '20']

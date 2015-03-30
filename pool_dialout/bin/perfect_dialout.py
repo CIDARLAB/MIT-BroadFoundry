@@ -8,6 +8,9 @@ Dialout barcodes from pool
 	reads. Matched groups should be the barcodes and are recoded against the 
 	matched read for reporting. Forward and reverse primer for generating the
 	sequencing library are required to orientate the pair of reads.
+
+	Important to consider that barcodes are given as found starting from the 
+	forward primer 0...n (barcodes on the paired reads are therefore reversed).
 """
 from __future__ import print_function, division
 import itertools
@@ -33,19 +36,31 @@ def revcomp(seq, trans=string.maketrans("ACGT", "TGCA")):
 start_time = timeit.default_timer()
 
 # Parse command line parameters
-if len(sys.argv) != 7:
+if len(sys.argv) != 9:
 	print("Usage: python {} <design regexs> <R1 fastq> <R2 fastq> <fwd primer> <rev primer> <output prefix>".format(sys.argv[0]), file=sys.stderr)
 	sys.exit()
-design_filename, r1_filename, r2_filename, fwd_primer, rev_primer, out_prefix = sys.argv[1:]
+design_filename, r1_filename, r2_filename, fwd_primer_len, rev_primer_len, fwd_bc_idx, rev_bc_idx, out_prefix = sys.argv[1:]
+out_prefix = out_prefix.strip()
+
+# Allow user to specify index starting at 1 (not 0)
+fwd_bc_idx = int(fwd_bc_idx) - 1
+rev_bc_idx = int(rev_bc_idx) - 1
+fwd_primer_len = int(fwd_primer_len)
+rev_primer_len = int(rev_primer_len)
 
 # Load regular expressions uniquely defining each design and compile
 design_regexs = {}
+fwd_primer = ''
+rev_primer = ''
 with open(design_filename, "rU") as design_file:
 	for header in design_file:
 		design_name = header[1:].strip()
 		regex_fwd = design_file.next().strip()
 		regex_rev = design_file.next().strip()
 		design_regexs[design_name] = (re.compile(regex_fwd), re.compile(regex_rev))
+		# set the primer
+		fwd_primer = regex_fwd[0:fwd_primer_len]
+		rev_primer = regex_rev[0:rev_primer_len]
 
 # Process the raw reads and try to match
 print("Starting to process read...", file=sys.stdout)
@@ -98,16 +113,16 @@ with open(r1_filename, "rU") as r1, open(r2_filename, "rU") as r2:
 				barcode_key = "-".join(found_barcode)
 				
 				# HARD CODED ##################################################
-				if found_barcode[1] not in barcodes_to_check[0].keys():
-					barcodes_to_check[0][found_barcode[1]] = [found_design]
+				if found_barcode[fwd_bc_idx] not in barcodes_to_check[0].keys():
+					barcodes_to_check[0][found_barcode[fwd_bc_idx]] = [found_design]
 				else:
-					if found_design not in barcodes_to_check[0][found_barcode[1]]:
-						barcodes_to_check[0][found_barcode[1]].append(found_design)
-				if found_barcode[2] not in barcodes_to_check[1].keys():
-					barcodes_to_check[1][found_barcode[2]] = [found_design]
+					if found_design not in barcodes_to_check[0][found_barcode[fwd_bc_idx]]:
+						barcodes_to_check[0][found_barcode[fwd_bc_idx]].append(found_design)
+				if found_barcode[rev_bc_idx] not in barcodes_to_check[1].keys():
+					barcodes_to_check[1][found_barcode[rev_bc_idx]] = [found_design]
 				else:
-					if found_design not in barcodes_to_check[1][found_barcode[2]]:
-						barcodes_to_check[1][found_barcode[2]].append(found_design)
+					if found_design not in barcodes_to_check[1][found_barcode[rev_bc_idx]]:
+						barcodes_to_check[1][found_barcode[rev_bc_idx]].append(found_design)
 				###############################################################
 
 				if barcode_key not in found_barcodes.keys():
@@ -150,14 +165,14 @@ for design in sorted(found_designs.keys()):
 		# Check to see where barcode is used (if unique for design)
 		keys_0 = barcodes_to_check[0].keys()
 		keys_1 = barcodes_to_check[1].keys()
-		if ( (len(barcodes_to_check[0][bc[1]]) == 1) and
-		     (revcomp(bc[1]) not in keys_0) and
-		     (bc[1] not in keys_1) and
-		     (revcomp(bc[1]) not in keys_1) and
-		     (len(barcodes_to_check[1][bc[2]]) == 1) and
-		     (revcomp(bc[2]) not in keys_1) and
-		     (bc[2] not in keys_0) and
-		     (revcomp(bc[2]) not in keys_0) ):
+		if ( (len(barcodes_to_check[0][bc[fwd_bc_idx]]) == 1) and
+		     (revcomp(bc[fwd_bc_idx]) not in keys_0) and
+		     (bc[fwd_bc_idx] not in keys_1) and
+		     (revcomp(bc[fwd_bc_idx]) not in keys_1) and
+		     (len(barcodes_to_check[1][bc[rev_bc_idx]]) == 1) and
+		     (revcomp(bc[rev_bc_idx]) not in keys_1) and
+		     (bc[rev_bc_idx] not in keys_0) and
+		     (revcomp(bc[rev_bc_idx]) not in keys_0) ):
 		#######################################################################
 			unique_barcodes.append(bc)
 			n_unique_bc += 1
@@ -201,7 +216,10 @@ print("Matched reads: \t{0:.2f}%".format((float(n_matched)/n_reads)*100.0), file
 print("Unique barcodes: \t{0:.2f}%".format((float(n_unique_bc)/n_matched)*100.0), file=log)
 print("Uniquely barcoded designs: \t{0:.2f}%".format((float(len(design_with_unique_bc))/len(design_regexs.keys()))*100.0), file=log)
 print("", file=log)
+print("RUNTIME", file=log)
+stop_time = timeit.default_timer()
+print("Total time: \t{0:.2f}%".format(stop_time-start_time), file=log)
 log.close()
 
-stop_time = timeit.default_timer()
 print("Done ({0:.2f} seconds)".format(stop_time-start_time), file=sys.stdout)
+print("")

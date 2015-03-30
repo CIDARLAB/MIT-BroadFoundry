@@ -1,0 +1,1 @@
+python perfect_dialout.py ./data/AmeR_2NOR_regexs.txt ./data/AmeR-2NOR-tagged-741_S11_L001_R1_001.fastq ./data/AmeR-2NOR-tagged-741_S11_L001_R2_001.fastq GTCTACCAGGTTAGTTGCGTTCCTAGCCT CACCTTTACGCACCTGATCAATGGTTTTG ./output/AmeR-2NOR_

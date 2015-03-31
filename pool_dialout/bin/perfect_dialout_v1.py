@@ -23,7 +23,7 @@ import timeit
 __author__  = 'Tarjei Mikkelsen, BTL, Broad Institute\n\
                Thomas E. Gorochowski, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
-__version__ = '2.0'
+__version__ = '1.0'
 
 ## HELPERS ====================================================================
 
@@ -72,108 +72,81 @@ found_designs = {}
 found_barcodes = {}
 found_barcode_reads = {}
 barcodes_to_check = [{},{}]
+with open(r1_filename, "rU") as r1, open(r2_filename, "rU") as r2:
+	r1_r2 = itertools.izip(r1, r2)
+	for header1, header2 in r1_r2:
 
-# Read it all in (hope there is enough memory)
-file_r1 = open(r1_filename, "rU")
-file_r2 = open(r2_filename, "rU")
-r1_content = file_r1.readlines()
-r2_content = file_r2.readlines()
-line_idx = 0
-max_line_idx = len(r1_content)
-designs_list = design_regexs.keys()
+		# Give indication of progress
+		if n_reads % 1000 == 0:
+			print("Processed {} reads".format(n_reads), file=sys.stdout)
+			sys.stdout.flush()
 
-barcodes_to_check_set_0 = set()
-barcodes_to_check_set_1 = set()
-found_barcodes_set = set()
-found_designs_set = set()
+		# Extract data and clean
+		seq1, seq2 = r1_r2.next()
+		plus1, plus2 = r1_r2.next()
+		qual1, qual2 = r1_r2.next()
+		seq1, seq2 = seq1.strip(), seq2.strip()
+		qual1, qual2 = qual1.strip(), qual2.strip()
+		# Check that paired-end read
+		read_name1, read_name2 = header1.split()[0][1:], header2.split()[0][1:]
+		assert read_name1 == read_name2
+		n_reads += 1
+		# Flip reads if the reverse primer is seen read first
+		if (seq1.startswith(rev_primer) and
+			seq2.startswith(fwd_primer)):
+			seq1, seq2 = seq2, seq1
+			qual1, qual2 = qual2, qual1
+		# Reject reads if we don't see perfect primer matches
+		if not (seq1.startswith(fwd_primer) and
+				seq2.startswith(rev_primer)):
+			continue
+		n_accepted += 1
 
-while line_idx < max_line_idx:
-	# Give indication of progress
-	if (line_idx/4) % 10000 == 0:
-		print("Processed {} reads".format(line_idx/4), file=sys.stdout)
-	
-	# Extract data and clean
-	header1 = r1_content[line_idx]
-	header2 = r2_content[line_idx]
-	seq1 = r1_content[line_idx+1]
-	seq2 = r2_content[line_idx+1]
-	plus1 = r1_content[line_idx+2]
-	plus2 = r2_content[line_idx+2]
-	qual1 = r1_content[line_idx+3]
-	qual2 = r2_content[line_idx+3]
-	line_idx += 4
-	seq1, seq2 = seq1.strip(), seq2.strip()
-	qual1, qual2 = qual1.strip(), qual2.strip()
-	# Check that paired-end read
-	read_name1, read_name2 = header1.split()[0][1:], header2.split()[0][1:]
-	assert read_name1 == read_name2
-	n_reads += 1
-	# Flip reads if the reverse primer is seen read first
-	if (seq1.startswith(rev_primer) and
-		seq2.startswith(fwd_primer)):
-		seq1, seq2 = seq2, seq1
-		qual1, qual2 = qual2, qual1
-	# Reject reads if we don't see perfect primer matches
-	if not (seq1.startswith(fwd_primer) and
-			seq2.startswith(rev_primer)):
-		continue
-	n_accepted += 1
-
-	# Attempt to match to regexs
-	found_design = None
-	found_barcode = None
-	for design in designs_list:
-		m1 = re.match(design_regexs[design][0], seq1)
-		m2 = re.match(design_regexs[design][1], seq2)
-		# Assumes paired matches are unique
-		if (m1 != None) and (m2 != None):
-			found_design = design
-			found_barcode = list(m1.groups()) + [revcomp(x) for x in m2.groups()]
-			barcode_key = "-".join(found_barcode)
-			
-			# CHECK BARCODES ##################################################
-			if found_barcode[fwd_bc_idx] not in barcodes_to_check_set_0:
-				barcodes_to_check[0][found_barcode[fwd_bc_idx]] = [found_design]
-				barcodes_to_check_set_0.add(found_barcode[fwd_bc_idx])
-			else:
-				if found_design not in barcodes_to_check[0][found_barcode[fwd_bc_idx]]:
-					barcodes_to_check[0][found_barcode[fwd_bc_idx]].append(found_design)
-					barcodes_to_check_set_0.add(found_barcode[fwd_bc_idx])
-			if found_barcode[rev_bc_idx] not in barcodes_to_check_set_1:
-				barcodes_to_check[1][found_barcode[rev_bc_idx]] = [found_design]
-				barcodes_to_check_set_1.add(found_barcode[rev_bc_idx])
-			else:
-				if found_design not in barcodes_to_check[1][found_barcode[rev_bc_idx]]:
-					barcodes_to_check[1][found_barcode[rev_bc_idx]].append(found_design)
-					barcodes_to_check_set_1.add(found_barcode[rev_bc_idx])
-			###############################################################
-
-			if barcode_key not in found_barcodes_set:
-				found_barcodes[barcode_key] = {}
-				found_barcodes[barcode_key][found_design] = 1
-				found_barcodes_set.add(barcode_key)
-			else:
-				if found_design in found_barcodes[barcode_key].keys():
-					found_barcodes[barcode_key][found_design] += 1
+		# Attempt to match to regexs
+		found_design = None
+		found_barcode = None
+		for design in design_regexs.keys():
+			m1 = re.match(design_regexs[design][0], seq1)
+			m2 = re.match(design_regexs[design][1], seq2)
+			# Assumes paired matches are unique
+			if (m1 != None) and (m2 != None):
+				found_design = design
+				found_barcode = list(m1.groups()) + [revcomp(x) for x in m2.groups()]
+				barcode_key = "-".join(found_barcode)
+				
+				# CHECK BARCODES ##################################################
+				if found_barcode[fwd_bc_idx] not in barcodes_to_check[0].keys():
+					barcodes_to_check[0][found_barcode[fwd_bc_idx]] = [found_design]
 				else:
+					if found_design not in barcodes_to_check[0][found_barcode[fwd_bc_idx]]:
+						barcodes_to_check[0][found_barcode[fwd_bc_idx]].append(found_design)
+				if found_barcode[rev_bc_idx] not in barcodes_to_check[1].keys():
+					barcodes_to_check[1][found_barcode[rev_bc_idx]] = [found_design]
+				else:
+					if found_design not in barcodes_to_check[1][found_barcode[rev_bc_idx]]:
+						barcodes_to_check[1][found_barcode[rev_bc_idx]].append(found_design)
+				###############################################################
+
+				if barcode_key not in found_barcodes.keys():
+					found_barcodes[barcode_key] = {}
 					found_barcodes[barcode_key][found_design] = 1
-			break
-	# If found match then process else continue to next read
-	if found_design is None:
-		continue
-	n_matched += 1
+				else:
+					if found_design in found_barcodes[barcode_key].keys():
+						found_barcodes[barcode_key][found_design] += 1
+					else:
+						found_barcodes[barcode_key][found_design] = 1
+				break
+		# If found match then process else continue to next read
+		if found_design is None:
+			continue
+		n_matched += 1
 
-	# Only add barcode if not already seen
-	if found_design not in found_designs_set:
-		found_designs[found_design] = [found_barcode]
-		found_designs_set.add(found_design)
-	else:
-		if found_barcode not in found_designs[found_design]:
-			found_designs[found_design].append(found_barcode)
-
-# Signal memory can be freed
-r1_content = None
-r2_content = None
+		# Only add barcode if not already seen
+		if found_design not in found_designs.keys():
+			found_designs[found_design] = [found_barcode]
+		else:
+			if found_barcode not in found_designs[found_design]:
+				found_designs[found_design].append(found_barcode)
 
 # Output the matched designs and barcode data
 print("Writing dialout for designs...", file=sys.stdout)
@@ -192,14 +165,16 @@ for design in sorted(found_designs.keys()):
 	unique_for_design = False
 	for bc in found_designs[design]:
 		# Check to see where barcode is used (if unique for design)
+		keys_0 = barcodes_to_check[0].keys()
+		keys_1 = barcodes_to_check[1].keys()
 		if ( (len(barcodes_to_check[0][bc[fwd_bc_idx]]) == 1) and
-		     (revcomp(bc[fwd_bc_idx]) not in barcodes_to_check_set_0) and
-		     (bc[fwd_bc_idx] not in barcodes_to_check_set_1) and
-		     (revcomp(bc[fwd_bc_idx]) not in barcodes_to_check_set_1) and
+		     (revcomp(bc[fwd_bc_idx]) not in keys_0) and
+		     (bc[fwd_bc_idx] not in keys_1) and
+		     (revcomp(bc[fwd_bc_idx]) not in keys_1) and
 		     (len(barcodes_to_check[1][bc[rev_bc_idx]]) == 1) and
-		     (revcomp(bc[rev_bc_idx]) not in barcodes_to_check_set_1) and
-		     (bc[rev_bc_idx] not in barcodes_to_check_set_0) and
-		     (revcomp(bc[rev_bc_idx]) not in barcodes_to_check_set_0) ):
+		     (revcomp(bc[rev_bc_idx]) not in keys_1) and
+		     (bc[rev_bc_idx] not in keys_0) and
+		     (revcomp(bc[rev_bc_idx]) not in keys_0) ):
 			unique_barcodes.append(bc)
 			n_unique_bc += 1
 			unique_for_design = True

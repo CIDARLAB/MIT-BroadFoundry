@@ -63,7 +63,7 @@ with open(design_filename, "rU") as design_file:
 		rev_primer = regex_rev[0:rev_primer_len]
 
 # Process the raw reads and try to match
-print("Starting to process read...", file=sys.stdout)
+print("Starting to process reads...", file=sys.stdout)
 sys.stdout.flush()
 n_reads = 0
 n_accepted = 0
@@ -91,6 +91,7 @@ while line_idx < max_line_idx:
 	# Give indication of progress
 	if (line_idx/4) % 10000 == 0:
 		print("Processed {} reads".format(line_idx/4), file=sys.stdout)
+		sys.stdout.flush()
 	
 	# Extract data and clean
 	header1 = r1_content[line_idx]

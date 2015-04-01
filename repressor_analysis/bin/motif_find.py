@@ -5,17 +5,12 @@ Motif Find
 	Will search for potential binding sites of repressors based on a PWM matrix
 	of the binding seqeunces. See main method for details on calling function.
 """
-#    Motif Find
-#    Copyright (C) 2015 by
-#    Thomas E. Gorochowski <tom@chofski.co.uk>
-#    Jing Zhang <jgzhang@mit.edu>
-#    All rights reserved.
-#    OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
 
-from argparse import ArgumentParser
+import csv
 from Bio import SeqIO
 from Bio import motifs
 from Bio.Seq import Seq
+from Bio.Alphabet.IUPAC import IUPACUnambiguousDNA
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
 			   Jing Zhang <jgzhang@mit.edu>, Voigt Lab, MIT'
@@ -37,67 +32,65 @@ def load_genome_seq (genome_filename):
 	"""
 	genome_seqs = {}
 	fasta_sequences = SeqIO.parse(open(genome_filename),'fasta')
-    for fasta in fasta_sequences:
-        name, sequence = fasta.id, fasta.seq.tostring()
-        genome_seqs[name] = Seq(sequence)
+	for fasta in fasta_sequences:
+		name, sequence = fasta.id, str(fasta.seq)
+		genome_seqs[name] = Seq(sequence, IUPACUnambiguousDNA())
 	return genome_seqs
 
+def load_tss (tss_filename):
+	tss = {}
+	with open('tss_filename.csv', 'rU') as tssfile:
+		tssreader = csv.reader(tssfile, delimiter='\t')
+		for row in tssreader:
+			tss[row[0]] = [row[1], 
+			               [x.strip() for x in row[2].split(',')],
+			               row[3],
+			               int(row[4])]
+	return tss
 
+def genome_background (genome_seq):
+	"""Generate a background fraction for each base from genome
+	"""
+	background = {}
+	counts = {'A': 0, 'T': 0, 'G': 0, 'C': 0}
+	total_count = 0.0
+	for c in genome_seq.keys():
+		for b in 'ATGC':
+			counts[b] += genome_seq[c].count(b)
+		total_count += len(genome_seq[c])
+	for b in 'ATGC':
+		background[b] = float(counts[b])/total_count
+	return background
 
-print(load_motifs('./data/AmeR.csv'))
+def calculate_scores (pssm, genome_seq):
+	"""Calculate the scores for a matrix on +ve and -ve strands
+	"""
+	scores = {}
+	rpssm = pssm.reverse_complement()
+	for c in genome_seq.keys():
+		scores[c] = {}
+		scores[c]['+'] = pssm.calculate(genome_seq[c])
+		scores[c]['-'] = rpssm.calculate(genome_seq[c])
+	return scores
 
+def search_score_hits (pssm, genome_seq, threshold=0.0):
+	"""Search for positions where score is above given threshold
+	   Positions are given as +ve and -ve indexes to use in: 
+	   seq[pos:pos+len(motif)]
+	"""
+	scores = {}
+	for c in genome_seq.keys():
+		scores[c] = []
+		for position, score in pssm.search(genome_seq[c], threshold=threshold):
+			scores[c].append([position, score])
+	return scores
 
+def total_hits (scores):
+	count = 0
+	for c in scores.keys():
+		count += len(scores[c])
+	return count
 
-instances = [Seq("TACAA"), Seq("TATTA"), Seq("GGGAA"), Seq("TACAC")]
-m = motifs.create(instances)
-print(m.counts)
-print(m.consensus)
-r = m.reverse_complement()
-print(r.consensus)
-
-# Normalise to the approx base distribution of the host (avoid overfitting)
-pwm = m.counts.normalize(pseudocounts=0.5)
-pwm = m.counts.normalize(pseudocounts={'A':0.6, 'C': 0.4, 'G': 0.4, 'T': 0.6})
-print(pwm)
-
-# Position-specific scoring matrix
-background = {'A':0.3,'C':0.2,'G':0.2,'T':0.3}
-pssm = pwm.log_odds(background)
-
-
-test_seq=Seq("TACACTGCATTACAACCCAAGCATTA", m.alphabet)
-len(test_seq)
-
-# threshold of 0 is more likely to be motif than background.
-for position, score in pssm.search(test_seq, threshold=3.0):
-	print("Position %d: score = %5.3f" % (position, score))
-
-
-# positions are are 
-test_seq[pos:pos+len(m)]
-
-# for all positions
-pssm.calculate(test_seq)
-rpssm = pssm.reverse_complement()
-rpssm.calculate(test_seq)
-
-
-
-# selectiong threshold
-distribution = pssm.distribution(background=background, precision=10**4)
-
-# based on FDR
-threshold = distribution.threshold_fpr(0.01)
-
-
-
-
-
-
-
-
-
-
-
-
-
+def extract_tss_hits (tss, scores, us_window, ds_window):
+	
+	return None

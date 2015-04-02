@@ -21,36 +21,27 @@ def run_analysis (repressor_filename, genome_seq, background, output_prefix):
 	"""All analysis is coordinated from here
 	"""
 	# Load the motif
-	print('Loading motifs')
+	print('\tLoading motifs')
 	motif = mf.load_motifs(repressor_filename)
 	# Normalise to the approx base distribution of the host (avoid overfitting)
-	print('Generating PWM and PSSM')
+	print('\tGenerating PWM and PSSM')
 	pwm = motif.counts.normalize(pseudocounts=0.5)
 	pssm = pwm.log_odds(background)
-	# Generate score profile
-	print('Calculating full score profile')
-	full_scores = mf.calculate_scores(pssm, genome_seq)
 	# Calculate threshold to use
-	print('Calculating threshold')
+	print('\tCalculating threshold')
 	distribution = pssm.distribution(background=background, precision=10**4)
 	threshold = distribution.threshold_patser()
+	print('\tThreshold = '+str(threshold))
 	# Find hits
-	print('Searching for score hits above threshold')
+	print('\tSearching for score hits above threshold')
 	score_hits = mf.search_score_hits(pssm, genome_seq, threshold=threshold)
 	# Save data to file
-	print('Saving score profile')
-	f_out = open(output_prefix+'all_scores.csv', 'w')
-	for c in full_scores.keys():
-		f_out.write('>'+c+'\n')
-		f_out.write(','.join(full_scores[c]['+'])+'\n')
-		f_out.write(','.join(full_scores[c]['-'])+'\n')
-	f_out.close()
-	print('Saving score hits')
+	print('\tSaving score hits')
 	f_out = open(output_prefix+'score_hits.csv', 'w')
 	for c in score_hits.keys():
 		f_out.write('>'+c+'\n')
 		for el in score_hits[c]:
-			f_out.write(','.join(el)+'\n')
+			f_out.write(','.join([str(x) for x in el])+'\n')
 	f_out.close()
 
 # Load data files
@@ -62,4 +53,4 @@ for r in repressors:
 	print('Processing '+r+'...')
 	run_analysis('../data/motifs/'+r+'.txt', genome_seq, 
 		         background, '../results/'+r+'_')
-print('Done')
+print('Done.')

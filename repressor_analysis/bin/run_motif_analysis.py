@@ -4,6 +4,7 @@ Repressor analysis (E.coli DH10B)
 """
 
 import motif_find as mf
+import math
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
 			   Jing Zhang <jgzhang@mit.edu>, Voigt Lab, MIT'
@@ -15,7 +16,30 @@ __version__ = '1.0'
 genome_filename = '../data/genomes/DH10B.fasta'
 repressors = ['AmeR', 'AmtR', 'ButR', 'LitR', 'McbR', 'Orf2', 
               'PsrA', 'QacR', 'ScbR', 'SrpR', 'TarA']
+repressors = ['McbR', 'Orf2', 
+              'PsrA', 'QacR', 'ScbR', 'SrpR', 'TarA']
 ###############################################################################
+
+def calculate_pseudocounts(motif): 
+	alphabet = motif.alphabet 
+	background = motif.background 
+	# It is possible to have unequal column sums so use the average 
+	# number of instances. 
+	total = 0 
+	for i in xrange(motif.length): 
+		total += sum([float(motif.counts[letter][i]) for letter in alphabet.letters]) 
+	avg_nb_instances = total / motif.length 
+	sq_nb_instances = math.sqrt(avg_nb_instances)  
+	if background: 
+		background = dict(background) 
+	else: 
+		background = dict.fromkeys(sorted(alphabet.letters), 1.0) 
+	total = sum(background.values()) 
+	pseudocounts = {} 
+	for letter in alphabet.letters: 
+		background[letter] /= total 
+		pseudocounts[letter] = sq_nb_instances * background[letter]  
+	return pseudocounts 
 
 def run_analysis (repressor_filename, genome_seq, background, output_prefix):
 	"""All analysis is coordinated from here
@@ -23,18 +47,21 @@ def run_analysis (repressor_filename, genome_seq, background, output_prefix):
 	# Load the motif
 	print('\tLoading motifs')
 	motif = mf.load_motifs(repressor_filename)
+	motif.background = background
+	motif.pseudocounts = calculate_pseudocounts(motif)
 	# Normalise to the approx base distribution of the host (avoid overfitting)
 	print('\tGenerating PWM and PSSM')
-	pwm = motif.counts.normalize(pseudocounts=0.5)
-	pssm = pwm.log_odds(background)
+	pwm = motif.counts.normalize(pseudocounts=calculate_pseudocounts(motif))
+	pssm = pwm.log_odds()
 	# Calculate threshold to use
-	print('\tCalculating threshold')
-	distribution = pssm.distribution(background=background, precision=10**4)
-	threshold = distribution.threshold_patser()
+	#print('\tCalculating threshold')
+	#distribution = pssm.distribution(background=background, precision=10**4)
+	#threshold = distribution.threshold_patser()
+	threshold = 0.0
 	print('\tThreshold = '+str(threshold))
 	# Find hits
 	print('\tSearching for score hits above threshold')
-	score_hits = mf.search_score_hits(pssm, genome_seq, threshold=threshold)
+	score_hits = mf.search_pssm_hits(pssm, genome_seq, threshold=threshold)
 	# Save data to file
 	print('\tSaving score hits')
 	f_out = open(output_prefix+'score_hits.csv', 'w')

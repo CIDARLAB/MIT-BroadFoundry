@@ -28,8 +28,8 @@ repressors = ['AmeR', 'McbR', 'PsrA', 'SrpR',
               'ScbR', 'Orf2',
               'LitR']
 #repressors = ['AmtR', 'LitR'] #, 'SrpR']
-us_window = 80
-ds_window = 80
+us_window = 100
+ds_window = 100
 
 thresholds = [0.0, 2.5, 5.0]
 
@@ -101,7 +101,7 @@ for r in repressors:
 f_out.close()
 
 ###############################################################################
-# Changes in FPKM values
+# Essential genes that are hit
 
 ess_locus_ids = []
 for gene in metadata.keys():
@@ -122,6 +122,11 @@ for r in repressors:
 
 
 
+
+
+
+###############################################################################
+# Changes in FPKM values
 
 a = False
 if a == True:

@@ -47,12 +47,20 @@ def run_analysis (repressor_filename, genome_seq, background, output_prefix):
 	# Load the motif
 	print('\tLoading motifs')
 	motif = mf.load_motifs(repressor_filename)
-	motif.background = background
-	motif.pseudocounts = calculate_pseudocounts(motif)
+	#motif.background = background
+	#motif.pseudocounts = 1.0
+	
+	pwm = m.counts.normalize(pseudocounts=0.5)
+	pssm = pwm.log_odds()
+
+	#motif.pseudocounts = calculate_pseudocounts(motif)
+	
 	# Normalise to the approx base distribution of the host (avoid overfitting)
 	print('\tGenerating PWM and PSSM')
-	pwm = motif.counts.normalize(pseudocounts=calculate_pseudocounts(motif))
-	pssm = pwm.log_odds()
+	#pwm = motif.counts.normalize(pseudocounts=calculate_pseudocounts(motif))
+	#pssm = pwm.log_odds()
+	
+
 	# Calculate threshold to use
 	#print('\tCalculating threshold')
 	#distribution = pssm.distribution(background=background, precision=10**4)

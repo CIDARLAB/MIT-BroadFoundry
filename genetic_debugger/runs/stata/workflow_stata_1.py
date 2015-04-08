@@ -55,7 +55,10 @@ def create_dir_if_needed (directory):
 	"""Create a directory if it doesn't exist
 	"""
 	if not os.path.exists(directory):
-		os.makedirs(directory)
+		try:
+			os.makedirs(directory)
+		except IOError as e:
+			print("WARNING: Directory already exists.")
 
 # Make sure the logs directory exists
 create_dir_if_needed(RESULTS_PREFIX+'logs')

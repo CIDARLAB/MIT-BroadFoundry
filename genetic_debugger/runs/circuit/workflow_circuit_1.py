@@ -28,11 +28,6 @@ blocked_designs = [['1_1','2_1','3_1','4_1'],
                    ['1_2','2_2','3_2','4_2'],
                    ['5_2','6_2','7_2','8_2']]
 
-# For testing
-#blocked_designs = [['1_1'],
-#                   ['2_1']]
-#designs_to_process = ['1_1', '2_1']
-
 for block in blocked_designs:
 	print 'Block', block
 
@@ -44,7 +39,10 @@ def create_dir_if_needed (directory):
 	"""Create a directory if it doesn't exist
 	"""
 	if not os.path.exists(directory):
-		os.makedirs(directory)
+		try:
+			os.makedirs(directory)
+		except IOError as e:
+			print("WARNING: Directory already exists.")
 
 # Make sure the logs directory exists
 create_dir_if_needed(RESULTS_PREFIX+'logs')

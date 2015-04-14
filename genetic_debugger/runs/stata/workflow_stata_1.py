@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-	Run eXpress expression estimates workflow for the Stata data set
+	Workflow for the stata data set - PART I
 """
 #	Copyright (C) 2014 by
 #	Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT
@@ -32,10 +32,10 @@ for idx in range(len(designs_to_process)):
 	if designs_to_process[idx] not in ['17', '18', '33', '45', '57', '69', '76', '81']:
 		temp_designs.append(designs_to_process[idx])
 designs_to_process = temp_designs
-print 'workflow_stata_express.py INFO: Processing designs:', designs_to_process
+print 'workflow_stata_1.py INFO: Processing designs:', designs_to_process
 
 # Split the designs into a set number of jobs
-print 'workflow_stata_express.py INFO: Processing designs in these blocks:'
+print 'workflow_stata_1.py INFO: Processing designs in these blocks:'
 designs_per_block = int(len(designs_to_process)/CONCURRENT_JOBS)
 blocked_designs = []
 for b_idx in range(CONCURRENT_JOBS):
@@ -77,5 +77,5 @@ for designs in blocked_designs:
 	                  ' -data_prefix '+DATA_PREFIX + \
 	                  ' -results_prefix '+RESULTS_PREFIX + \
 	                  ' -clean_up Y"'
-	print 'workflow_stata_express.py RUNNING:', cmd_express_run
+	print 'workflow_stata_1.py RUNNING:', cmd_express_run
 	subprocess.call(cmd_express_run, shell=True)

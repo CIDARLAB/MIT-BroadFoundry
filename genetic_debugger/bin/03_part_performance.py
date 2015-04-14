@@ -55,7 +55,7 @@ def load_express_gene_results (filename):
 			p_idxs = []
 			p_bps = []
 			tx_data['name'] = row[1]
-			if 'SYNTHETIC_' in row[1]: # len(id_name) == 1 and 
+			if 'SYNTHETIC_' in row[1]:
 				id_parts = id_name[0].split('_')
 				if len(id_parts) >= 4: 
 					tx_data['dir'] = id_parts[-3]
@@ -81,12 +81,11 @@ def load_express_gene_results (filename):
 # EXTRACT THE PERFORMANCE ESTIMATES
 ###############################################################################
 
-def run_express_extract (GCL_DATA, MEASURE_TO_USE, EXPRESS_DATA_PREFIX, 
-	                     EXPRESS_GENE_DATA_PREFIX, RESULTS_PREFIX):
+def run_express_extract (GCL_DATA, designs_to_process, MEASURE_TO_USE, EXPRESS_DATA_PREFIX, RESULTS_PREFIX):
 	"""Extract eXpress performance data from a set of designs
 	"""
 
-	EXPRS_FILENAME = 'results_norm_edger.xprs'
+	EXPRS_FILENAME = 'results_norm.xprs'
 
 	# Make sure we have somewhere to save our results
 	create_dir_if_needed(RESULTS_PREFIX)
@@ -103,7 +102,7 @@ def run_express_extract (GCL_DATA, MEASURE_TO_USE, EXPRESS_DATA_PREFIX,
 	p_perf_data = {}
 
 	# For each design extract performance data
-	for design in gcl_data.variants.keys():
+	for design in designs_to_process:
 		# Add placeholder for data
 		p_perf_data[design] = {}
 
@@ -146,9 +145,9 @@ def run_express_extract (GCL_DATA, MEASURE_TO_USE, EXPRESS_DATA_PREFIX,
 				p_perf_data[design][promoter_idx] = [np.sum(tx_readthrough), np.sum(tx_promoter)]
 
 	# Write the performance data to file
-	p_out = open(RESULTS_PREFIX+'promoter_express_pref.txt', 'w')
+	p_out = open(RESULTS_PREFIX+'promoter_perf.txt', 'w')
 	# Write header
-	p_out.write('variant,promoter_idx,promoter_name,tx_readthrough('+MEASURE_TO_USE+'),tx_promoter('+MEASURE_TO_USE+')\n')
+	p_out.write('variant,promoter_idx,promoter_name,tx_in('+MEASURE_TO_USE+'),tx_promoter('+MEASURE_TO_USE+')\n')
 	# Write strength data
 	for design in sorted(p_perf_data.keys()):
 		for promoter_idx in p_perf_data[design]:
@@ -165,7 +164,7 @@ def run_express_extract (GCL_DATA, MEASURE_TO_USE, EXPRESS_DATA_PREFIX,
 	t_perf_data = {}
 
 	# For each design extract performance data
-	for design in gcl_data.variants.keys():
+	for design in designs_to_process:
 		# Add placeholder for data
 		t_perf_data[design] = {}
 
@@ -207,7 +206,7 @@ def run_express_extract (GCL_DATA, MEASURE_TO_USE, EXPRESS_DATA_PREFIX,
 				                                 np.sum(tx_before)/(np.sum(tx_before)+np.sum(tx_after))]
 
 	# Write the performance data to file
-	t_out = open(RESULTS_PREFIX+'terminator_express_pref.txt', 'w')
+	t_out = open(RESULTS_PREFIX+'terminator_perf.txt', 'w')
 	# Write header
 	t_out.write('variant,terminator_idx,terminator_name,tx_in('+MEASURE_TO_USE+'),tx_out('+MEASURE_TO_USE+'),strength('+MEASURE_TO_USE+')\n')
 	# Write strength data
@@ -224,17 +223,15 @@ def run_express_extract (GCL_DATA, MEASURE_TO_USE, EXPRESS_DATA_PREFIX,
 	# ---------------
 
 	# List of the extracted performances
-	gene_host_perf_data = {}
-	gene_syn_perf_data = {}
+	gene_perf_data = {}
 
 	# For each design extract performance data
-	for design in gcl_data.variants.keys():
+	for design in designs_to_process:
 		# Add placeholder for data
-		gene_host_perf_data[design] = {}
-		gene_syn_perf_data[design] = {}
+		gene_perf_data[design] = {}
 
 		# Load the data
-		design_file = EXPRESS_GENE_DATA_PREFIX+design+'/'+EXPRS_FILENAME
+		design_file = EXPRESS_DATA_PREFIX+design+'/'+EXPRS_FILENAME
 		design_data = load_express_gene_results(design_file)
 
 		for gene_data in design_data:
@@ -254,26 +251,21 @@ def run_express_extract (GCL_DATA, MEASURE_TO_USE, EXPRESS_DATA_PREFIX,
 			new_data.append(cur_data['solvable'])
 			new_data.append(cur_data['tpm'])
 
-			if 'SYNTHETIC_' in cur_data['name']:
-				gene_id = cur_data['name'].split('|')[0]
-				gene_syn_perf_data[design][gene_id] = new_data
+			if 'SYNGENE_' in cur_data['name'] or 'SYNTHETIC_' in cur_data['name']:
+				gene_id = cur_data['name']
+				gene_perf_data[design][gene_id] = new_data
 			else:
-				gene_parts = cur_data['name'].split('|')
-				gene_id = gene_parts[0]
-				gene_host_perf_data[design][gene_id] = new_data
+				gene_id = cur_data['name'].split('|')[0]
+				gene_perf_data[design][gene_id] = new_data
 		
 	# Write the host genome data
-	data_out = open(RESULTS_PREFIX+'gene_express_pref.txt', 'w')
+	data_out = open(RESULTS_PREFIX+'gene_perf.txt', 'w')
 	# Write header
 	data_out.write('design,gene_id,length,eff_length,tot_counts,uniq_counts,est_counts,eff_counts,ambig_distr_alpha,ambig_distr_beta,fpkm,fpkm_conf_low,fpkm_conf_high,solvable,tpm\n')
 	# Write strength data for host genes
-	for design in sorted(gene_host_perf_data.keys()):
-		for gene in sorted(gene_host_perf_data[design]):
-			data_out.write(design + ',' + gene + ',' + ','.join([str(x) for x in gene_host_perf_data[design][gene]]) + '\n')
-	# Write strength data for synthetic genes
-	for design in sorted(gene_syn_perf_data.keys()):
-		for gene in sorted(gene_syn_perf_data[design]):
-			data_out.write(design + ',' + gene + ',' + ','.join([str(x) for x in gene_syn_perf_data[design][gene]]) + '\n')
+	for design in sorted(gene_perf_data.keys()):
+		for gene in sorted(gene_perf_data[design]):
+			data_out.write(design + ',' + gene + ',' + ','.join([str(x) for x in gene_perf_data[design][gene]]) + '\n')
 	data_out.close()
 
 ###############################################################################
@@ -284,49 +276,20 @@ def main():
 	# Parse the command line inputs
 	parser = argparse.ArgumentParser(description="eXpress extract performance")
 	parser.add_argument("-library",  dest="library",  required=True,  help="GeneClusterLibrary.txt", metavar="string")
-	parser.add_argument("-measure",  dest="measure",  required=True,  help="tpm", metavar="string")
+	parser.add_argument("-designs", dest="designs", required=True, help="1,2,3", metavar="string")
+	parser.add_argument("-measure",  dest="measure",  required=True,  help="fpkm", metavar="string")
 	parser.add_argument("-data_prefix",  dest="data_prefix",  required=True,  help="/data/", metavar="string")
-	parser.add_argument("-gene_data_prefix",  dest="gene_data_prefix",  required=True,  help="/gene_data/", metavar="string")
 	parser.add_argument("-results_prefix",  dest="results_prefix",  required=True,  help="/results/", metavar="string")
 	args = parser.parse_args()
 	# Set global variables
-	GCL_DATA = args.library 
+	GCL_DATA = args.library
 	MEASURE_TO_USE = args.measure
 	EXPRESS_DATA_PREFIX = args.data_prefix
-	EXPRESS_GENE_DATA_PREFIX = args.gene_data_prefix
 	RESULTS_PREFIX = args.results_prefix
-	# Run script
-	run_express_extract(GCL_DATA, MEASURE_TO_USE, EXPRESS_DATA_PREFIX, 
-	                    EXPRESS_GENE_DATA_PREFIX, RESULTS_PREFIX)
+	# Extract the designs to process
+	designs_to_process = args.designs.split(',')
+	run_express_extract(GCL_DATA, designs_to_process, MEASURE_TO_USE, EXPRESS_DATA_PREFIX, RESULTS_PREFIX)
 
-#if __name__ == "__main__":
-#	main()
+if __name__ == "__main__":
+	main()
 
-###############################################################################
-# PARAMETERS
-###############################################################################
-
-# Inputs:
-# 1. GeneClusterLibrary of design
-# 2. Location to eXpress data (both transcript and gene level)
-# 3. Location to save results to
-
-# Which data to process?
-
-# STATA LIBRARY
-LIBRARY_TO_PROCESS = 'stata'
-GCL_DATA = '../data/'+LIBRARY_TO_PROCESS+'/stata_library.txt'
-
-# CIRCUIT WORKING/BROKEN
-#LIBRARY_TO_PROCESS = 'circuit'
-#GCL_DATA = '../data/'+LIBRARY_TO_PROCESS+'/circuit_library.txt'
-
-# Measure to use to calculate performance
-MEASURE_TO_USE = 'fpkm' # tpm/fpkm
-
-# Standard locations
-EXPRESS_DATA_PREFIX = '../results/'+LIBRARY_TO_PROCESS+'/exp_transcript/'
-EXPRESS_GENE_DATA_PREFIX = '../results/'+LIBRARY_TO_PROCESS+'/exp_gene/'
-RESULTS_PREFIX = '../results/'+LIBRARY_TO_PROCESS+'/part_perf/'
-
-run_express_extract (GCL_DATA, MEASURE_TO_USE, EXPRESS_DATA_PREFIX, EXPRESS_GENE_DATA_PREFIX, RESULTS_PREFIX)

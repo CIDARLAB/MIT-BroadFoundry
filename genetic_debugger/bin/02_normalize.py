@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """
-	Normalize the data from an eXpress run by using DESeq to calculate
-	factors that can then be applied.
+	Normalize the data from an eXpress.
 """
 #	Copyright (C) 2014 by
 #	Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT
@@ -11,9 +10,9 @@
 # Required modules
 import os
 import csv
-import subprocess
 import argparse
 import math
+import gene_cluster_library as gcl
 
 ###############################################################################
 # SUPPORTING FUNCTIONS
@@ -65,14 +64,42 @@ def load_factors (filename):
 			factor_data[des] = row_data
 	return factor_data
 
+def cds_names_in_idx_range (gcl_data, design, idx_start, idx_end, gene_dir):
+	syngenes = {} # Gene name as key, length as value
+	# Check direction
+	if gene_dir != 'F':
+		tmp = idx_start
+		idx_start = idx_end
+		idx_end = tmp
+	# Make sure indexes are correct
+	if idx_start == None:
+		idx_start = 0
+	if idx_end == None:
+		idx_end = len(gcl_data.variants[design]['part_list'])
+	# Output all CDSs
+	for cur_idx in range(idx_start, idx_end+1):
+		cur_part_name = gcl_data.variants[design]['part_list'][cur_idx]['part_name']
+		if ( gcl_data.variant_part_idx_type(design, cur_idx) == 'CDS' and 
+			 gcl_data.variant_part_idx_dir(design, cur_idx) == gene_dir ):
+			new_name = 'SYNGENE_'+cur_part_name+'_'+cur_idx
+			syngenes[new_name] = gcl_data.variant_part_idx_seq_len(design, cur_idx)
+	return syngenes
+
 ###############################################################################
 # RUN THE WORKFLOW
 ###############################################################################
 
-def run_express_normalizer (designs_to_process, RESULTS_PREFIX, normaliser='DESeq', inc_syn_genes=True,
-	                        cnts_to_use='uniq_counts', len_to_use='length'):
-	"""Run the normalizer on eXpress generated data
+def run_normalizer (GCL_DATA, designs_to_process, RESULTS_PREFIX, normaliser='edgeR', inc_syn_genes=True,
+	                cnts_to_use='est_counts', len_to_use='length'):
+	"""Run the normalizer (cnts_to_use can be: est_counts, eff_counts, uniq_counts)
 	"""
+
+	# All header items
+	norm_head = ['bundle_id','target_id', 'length', 'eff_length', 
+		         'tot_counts', 'uniq_counts', 'est_counts', 'eff_counts', 
+		         'ambig_distr_alpha', 'ambig_distr_beta', 'fpkm', 
+		         'fpkm_conf_low', 'fpkm_conf_high', 'solvable', 'tpm']
+
 	gene_data = {}
 	for design in designs_to_process:
 		# Check file exists 
@@ -83,6 +110,7 @@ def run_express_normalizer (designs_to_process, RESULTS_PREFIX, normaliser='DESe
 	# Save the unique mapped reads to matrix
 	read_out = open(RESULTS_PREFIX+'counts.txt', 'w')
 	# Write header (designs)
+	read_out.write('transcript')
 	designs_found = sorted(gene_data.keys())
 	for design in designs_found:
 		read_out.write('\t' + design)
@@ -93,23 +121,19 @@ def run_express_normalizer (designs_to_process, RESULTS_PREFIX, normaliser='DESe
 	for gene in sorted(gene_ids):
 		read_out.write(gene)
 		for design in designs_found:
-			# We use the effective counts, not unique counts: 'uniq_counts'
 			read_out.write('\t' + str(round(gene_data[design][gene][cnts_to_use],0)))
 		read_out.write('\n')
 	read_out.close()
 
 	# Run normaliser on matrix to generate correction factors
-	norm_filename = RESULTS_PREFIX+design+'/results_norm.xprs'
 	if normaliser == 'DESeq':
 		cmd_norm = 'Rscript normalize_DESeq.r ' + RESULTS_PREFIX 
 		print 'express_normalizer.py RUNNING:', cmd_norm
 		subprocess.call(cmd_norm, shell=True)
-		norm_filename = RESULTS_PREFIX+design+'/results_norm_deseq.xprs'
 	elif normaliser == 'edgeR':
 		cmd_norm = 'Rscript normalize_edgeR.r ' + RESULTS_PREFIX 
 		print 'express_normalizer.py RUNNING:', cmd_norm
 		subprocess.call(cmd_norm, shell=True)
-		norm_filename = RESULTS_PREFIX+design+'/results_norm_edger.xprs'
 	else:
 		print 'express_normalizer.py ERROR: normalizer type not known, ', normaliser
 		return
@@ -127,9 +151,51 @@ def run_express_normalizer (designs_to_process, RESULTS_PREFIX, normaliser='DESe
 		for gene_name in gene_data[design].keys():
 			design_lib_size[design] += gene_data[design][gene_name][cnts_to_use]
 
+	# Generate counts for synthetic genes aswell
+
+	# Load the design data (needed to link genes to part idxs)
+	gcl_data = gcl.GeneClusterLibrary()
+	gcl_data.load(GCL_DATA)
+
+	# Cycle through each SYNTHETIC transcript and see if present
 	for design in gene_data.keys():
-		#if normaliser == 'edgeR':
-		#	print design_lib_size[design], factors[design][1]
+		for gene_name in gene_data[design].keys():
+			if 'SYNTHETIC_' in gene_name:
+				# Extract start and end indexes
+				idx_start = 0
+				idx_end = 0
+				id_parts = gene_name.split('_')
+				gene_dir = id_parts[-3]
+				p_idxs = id_parts[-2].split('-')
+				if p_idxs[0] == 'None':
+					idx_start = None
+				else:
+					idx_start = int(p_idxs[0])
+				if p_idxs[1] == 'None':
+					idx_end = None
+				else:
+					idx_end = int(p_idxs[1])
+				syngenes = cds_names_in_idx_range(gcl_data, design, idx_start, idx_end, gene_dir)
+				# Update the counts of each gene
+				for syngene in syngenes.keys():
+					if syngene not in gene_data[design].keys():
+						gene_data[design][syngene] = {}
+						for h in norm_head:
+							if h == 'target_id':
+								gene_data[design][syngene][h] = syngene
+							elif h == 'solvable':
+								gene_data[design][syngene][h] = ''
+							elif h == 'length' or h == 'eff_length':
+								gene_data[design][syngene][h] = syngenes[syngene]
+							else:
+								gene_data[design][syngene][h] = 0
+					# Add counts
+					gene_data[design][syngene]['tot_counts'] += gene_data[design][gene_name]['tot_counts']
+					gene_data[design][syngene]['uniq_counts'] += gene_data[design][gene_name]['uniq_counts']
+					gene_data[design][syngene]['est_counts'] += gene_data[design][gene_name]['est_counts']
+					gene_data[design][syngene]['eff_counts'] += gene_data[design][gene_name]['eff_counts']
+
+	for design in gene_data.keys():
 		for gene_name in gene_data[design].keys(): 
 			if normaliser == 'DESeq':
 				if gene_data[design][gene_name][len_to_use] == 0.0:
@@ -137,25 +203,15 @@ def run_express_normalizer (designs_to_process, RESULTS_PREFIX, normaliser='DESe
 				else:
 					gene_data[design][gene_name]['fpkm'] = (math.pow(10,9) * gene_data[design][gene_name][cnts_to_use])/float(design_lib_size[design]*gene_data[design][gene_name][len_to_use]*factors[design][0])
 			elif normaliser == 'edgeR':
-				#eff_lib_size = factors[design][1]*factors[design][0]
-				if gene_data[design][gene_name][len_to_use] == 0.0: # or eff_lib_size == 0.0:
+				if gene_data[design][gene_name][len_to_use] == 0.0:
 					gene_data[design][gene_name]['fpkm'] = 0.0
 				else:
 					gene_data[design][gene_name]['fpkm'] = (math.pow(10,9) * gene_data[design][gene_name][cnts_to_use])/float(design_lib_size[design]*gene_data[design][gene_name][len_to_use]*factors[design][0])
-					#gene_data[design][gene_name]['fpkm'] = (math.pow(10,9) * gene_data[design][gene_name][cnts_to_use])/float(eff_lib_size*gene_data[design][gene_name][len_to_use])
+					
 	# Write the updated data to file
 	for design in gene_data.keys():
 		norm_filename = RESULTS_PREFIX+design+'/results_norm.xprs'
-		if normaliser == 'DESeq':
-			norm_filename = RESULTS_PREFIX+design+'/results_norm_deseq.xprs'
-		elif normaliser == 'edgeR':
-			norm_filename = RESULTS_PREFIX+design+'/results_norm_edger.xprs'
-
 		norm_out = open(norm_filename, 'w')
-		norm_head = ['bundle_id','target_id', 'length', 'eff_length', 
-		             'tot_counts', 'uniq_counts', 'est_counts', 'eff_counts', 
-		             'ambig_distr_alpha', 'ambig_distr_beta', 'fpkm', 
-		             'fpkm_conf_low', 'fpkm_conf_high', 'solvable', 'tpm']
 		norm_out.write('\t'.join(norm_head) + '\n')
 		for gene_name in sorted(gene_data[design].keys()):
 			first_f = True
@@ -171,67 +227,28 @@ def run_express_normalizer (designs_to_process, RESULTS_PREFIX, normaliser='DESe
 			norm_out.write('\n')
 		norm_out.close()
 
-
-
-# Some tests
-designs_to_process = ['1_1', '2_1', '3_1', '4_1', '5_1', '6_1', '7_1', '8_1', '1_2', '2_2', '3_2', '4_2', '5_2', '6_2', '7_2', '8_2']
-run_express_normalizer(designs_to_process, '/Users/Tom/Dropbox/Research/projects/MIT_Voigt_Lab/rnaseq_workflow/results/circuit/exp_gene/',
-	                   normaliser='DESeq', inc_syn_genes=True, cnts_to_use='uniq_counts', len_to_use='length')
-run_express_normalizer(designs_to_process, '/Users/Tom/Dropbox/Research/projects/MIT_Voigt_Lab/rnaseq_workflow/results/circuit/exp_transcript/',
-	                   normaliser='DESeq', inc_syn_genes=False, cnts_to_use='eff_counts', len_to_use='eff_length')
-run_express_normalizer(designs_to_process, '/Users/Tom/Dropbox/Research/projects/MIT_Voigt_Lab/rnaseq_workflow/results/circuit/exp_gene/',
-	                   normaliser='edgeR', inc_syn_genes=True, cnts_to_use='uniq_counts', len_to_use='length')
-run_express_normalizer(designs_to_process, '/Users/Tom/Dropbox/Research/projects/MIT_Voigt_Lab/rnaseq_workflow/results/circuit/exp_transcript/',
-	                   normaliser='edgeR', inc_syn_genes=False, cnts_to_use='eff_counts', len_to_use='eff_length')
-
-# Which designs to create estimates for (85 to process all designs)
-designs_to_process = [str(x) for x in range(1,85)]
-# Remove designs with sequencing errors
-temp_designs = []
-for idx in range(len(designs_to_process)):
-	if designs_to_process[idx] not in ['17', '18', '33', '45', '57', '69', '76', '81']:
-		temp_designs.append(designs_to_process[idx])
-designs_to_process = temp_designs
-run_express_normalizer(designs_to_process,
-	                   '/Users/Tom/Dropbox/Research/projects/MIT_Voigt_Lab/rnaseq_workflow/results/stata/exp_gene/',
-	                   normaliser='DESeq', inc_syn_genes=True, cnts_to_use='uniq_counts', len_to_use='length')
-run_express_normalizer(designs_to_process,
-	                   '/Users/Tom/Dropbox/Research/projects/MIT_Voigt_Lab/rnaseq_workflow/results/stata/exp_transcript/',
-	                   normaliser='DESeq', inc_syn_genes=False, cnts_to_use='eff_counts', len_to_use='eff_length')
-# cnts_to_use='eff_counts', len_to_use='eff_length'
-run_express_normalizer(designs_to_process,
-	                   '/Users/Tom/Dropbox/Research/projects/MIT_Voigt_Lab/rnaseq_workflow/results/stata/exp_gene/',
-	                   normaliser='edgeR', inc_syn_genes=True, cnts_to_use='uniq_counts', len_to_use='length')
-run_express_normalizer(designs_to_process,
-	                   '/Users/Tom/Dropbox/Research/projects/MIT_Voigt_Lab/rnaseq_workflow/results/stata/exp_transcript/',
-	                   normaliser='edgeR', inc_syn_genes=False, cnts_to_use='eff_counts', len_to_use='eff_length')
-
 ###############################################################################
 # MAIN FUNCTION
 ###############################################################################
 
 def main():
 	# Parse the command line inputs
-	parser = argparse.ArgumentParser(description="eXpress run")
-	parser.add_argument("-designs",  dest="designs",  required=True,  help="1,2,3", metavar="string")
-	parser.add_argument("-fastq_prefix",  dest="fastq_prefix",  required=True,  help="/fastq/", metavar="string")
-	parser.add_argument("-data_prefix",  dest="data_prefix",  required=True,  help="/data/", metavar="string")
-	parser.add_argument("-results_gene_prefix",  dest="results_gene_prefix",  required=True,  help="/results_gene/", metavar="string")
-	parser.add_argument("-results_prefix",  dest="results_prefix",  required=True,  help="/results/", metavar="string")
-	parser.add_argument("-normaliser",  dest="normaliser",  required=False,  help="edgeR", metavar="string")
+	parser = argparse.ArgumentParser(description="normalize")
+	parser.add_argument("-library",  dest="library",  required=True,  help="GeneClusterLibrary.txt", metavar="string")
+	parser.add_argument("-designs", dest="designs", required=True, help="1,2,3", metavar="string")
+	parser.add_argument("-results_prefix", dest="results_prefix", required=True, help="/results/", metavar="string")
+	parser.add_argument("-normaliser", dest="normaliser", required=False, help="edgeR", metavar="string")
 	args = parser.parse_args()
 	# Set global variables
-	FASTQ_PREFIX = args.fastq_prefix
-	DATA_PREFIX = args.data_prefix
-	RESULTS_GENE_PREFIX = args.results_gene_prefix
+	GCL_DATA = args.library
 	RESULTS_PREFIX = args.results_prefix
+	valid_normalisers = ['edgeR', 'DESeq']
 	NORMER = 'edgeR'
 	if args.normaliser:
 		NORMER = args.normaliser
-	# Extract the designs to process and run
+	# Extract the designs to process
 	designs_to_process = args.designs.split(',')
-	# Run RSEM commands
-	run_express_normalizer(designs_to_process, RESULTS_GENE_PREFIX, RESULTS_PREFIX, normaliser=NORMER)
+	run_express_normalizer(GCL_DATA, designs_to_process, RESULTS_PREFIX, normaliser=NORMER)
 
-#if __name__ == "__main__":
-#	main()
+if __name__ == "__main__":
+	main()

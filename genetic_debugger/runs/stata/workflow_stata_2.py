@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-	Run eXpress expression estimates workflow for the Stata data set
+	Workflow for the Stata data set - PART II
 """
 #	Copyright (C) 2014 by
 #	Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT
@@ -19,9 +19,7 @@ import subprocess
 HOME_DIR = '/home/unix/tgorocho/genetic_debugger/'
 DATA_PREFIX = HOME_DIR+'runs/stata/data/'
 RESULTS_PREFIX = '/broad/hptmp/tgorocho/stata/'
-
-# Number of concurrent jobs to run (WARNING: lots of disk activity required)
-CONCURRENT_JOBS = 10
+LIBRARY_FILE = DATA_PREFIX+'stata_library.txt'
 
 # Which designs to create estimates for (85 to process all designs)
 designs_to_process = [str(x) for x in range(1,85)]
@@ -31,18 +29,24 @@ for idx in range(len(designs_to_process)):
 	if designs_to_process[idx] not in ['17', '18', '33', '45', '57', '69', '76', '81']:
 		temp_designs.append(designs_to_process[idx])
 designs_to_process = temp_designs
-print 'workflow_stata_express.py INFO: Processing designs:', designs_to_process
 
 ###############################################################################
 # RUN THE WORKFLOW
 ###############################################################################
 
-run_express_normalizer(designs_to_process,
-	                   RESULTS_PREFIX + 'express_gene_exp/',
-	                   RESULTS_PREFIX + 'express_exp/',
-	                   normaliser='DESeq')
-run_express_normalizer(designs_to_process,
-	                   RESULTS_PREFIX + 'express_gene_exp/',
-	                   RESULTS_PREFIX + 'express_exp/',
-	                   normaliser='edgeR')
+cmd_express_run = 'python '+HOME_DIR+'bin/02_normalize.py'+ \
+				      ' -library '+LIBRARY_FILE + \
+	                  ' -designs '+','.join(designs) + \
+	                  ' -results_prefix '+RESULTS_PREFIX + \
+	                  ' -normaliser edgeR'
+print 'workflow_stata_2.py RUNNING:', cmd_express_run
+subprocess.call(cmd_express_run, shell=True)
 
+cmd_express_run = 'python '+HOME_DIR+'bin/03_part_performance.py'+ \
+				      ' -library '+LIBRARY_FILE + \
+	                  ' -designs '+','.join(designs) + \
+	                  ' -measure fpkm' + \
+	                  ' -data_prefix '+RESULTS_PREFIX + \
+	                  ' -results_prefix '+RESULTS_PREFIX+'part_performance/'
+print 'workflow_stata_2.py RUNNING:', cmd_express_run
+subprocess.call(cmd_express_run, shell=True)

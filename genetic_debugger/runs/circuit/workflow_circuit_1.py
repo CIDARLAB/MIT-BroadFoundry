@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-	Run eXpress expression estimates workflow for the circuit data set
+	Workflow for the circuit data set - PART I
 """
 #	Copyright (C) 2014 by
 #	Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT
@@ -22,7 +22,7 @@ DATA_PREFIX = HOME_DIR+'runs/circuit/data/'
 RESULTS_PREFIX = '/broad/hptmp/tgorocho/circuit/'
 
 # Split the designs into a set number of jobs (4 processors will be used)
-print 'rsem_workflow.py INFO: Processing designs in these blocks:'
+print 'workflow_circuit_1.py INFO: Processing designs in these blocks:'
 blocked_designs = [['1_1','2_1','3_1','4_1'],
                    ['5_1','6_1','7_1','8_1'], 
                    ['1_2','2_2','3_2','4_2'],
@@ -49,17 +49,17 @@ create_dir_if_needed(RESULTS_PREFIX+'logs')
 
 # For each design run eXpress (in parallel)
 for designs in blocked_designs:
-	err_log_name = 'express_run-'+'_'.join(designs)+'.err'
-	out_log_name = 'express_run-'+'_'.join(designs)+'.out'
-	cmd_express_run = 'qsub -N express_run_'+designs[0]+'-'+designs[-1] + \
-	                  ' -e '+RESULTS_PREFIX+'logs/'+err_log_name + \
-	                  ' -o '+RESULTS_PREFIX+'logs/'+out_log_name + \
-	                  ' -b y -q gaag' + \
-	                  ' "python '+HOME_DIR+'01_estimate_expression/express_run_bowtie2.py'+ \
-	                  ' -designs '+','.join(designs) + \
-	                  ' -fastq_prefix '+FASTQ_PREFIX + \
-	                  ' -data_prefix '+DATA_PREFIX + \
-	                  ' -results_prefix '+RESULTS_PREFIX + \
-	                  ' -clean_up Y"'
-	print 'workflow_circuit_express.py RUNNING:', cmd_express_run
-	subprocess.call(cmd_express_run, shell=True)
+	err_log_name = 'circuit_1-'+'_'.join(designs)+'.err'
+	out_log_name = 'circuit_1-'+'_'.join(designs)+'.out'
+	cmd_to_run   = 'qsub -N cir1_'+designs[0]+'-'+designs[-1] + \
+	               ' -e '+RESULTS_PREFIX+'logs/'+err_log_name + \
+	               ' -o '+RESULTS_PREFIX+'logs/'+out_log_name + \
+	               ' -b y -q gaag' + \
+	               ' "python '+HOME_DIR+'bin/01_map_expression.py'+ \
+	               ' -designs '+','.join(designs) + \
+	               ' -fastq_prefix '+FASTQ_PREFIX + \
+	               ' -data_prefix '+DATA_PREFIX + \
+	               ' -results_prefix '+RESULTS_PREFIX + \
+	               ' -clean_up Y"'
+	print 'workflow_circuit_1.py RUNNING:', cmd_express_run
+	subprocess.call(cmd_to_run, shell=True)

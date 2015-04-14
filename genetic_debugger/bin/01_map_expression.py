@@ -73,8 +73,7 @@ def run_express (designs_to_process, FASTQ_PREFIX, DATA_PREFIX, RESULTS_PREFIX, 
 	fasta_out_dir = RESULTS_PREFIX+'fasta/'
 	refs_out_dir = RESULTS_PREFIX+'refs/'
 	#refs_gene_out_dir = RESULTS_PREFIX+'refs_gene/'
-	express_out_dir = RESULTS_PREFIX+'exp_transcript/'
-	express_gene_out_dir = RESULTS_PREFIX+'exp_gene/'
+	express_out_dir = RESULTS_PREFIX+'expression/'
 
 	# Location of mapping from design to raw read files
 	FASTQ_MAP_FILENAME = DATA_PREFIX+'fastq_mapping.csv'
@@ -84,9 +83,6 @@ def run_express (designs_to_process, FASTQ_PREFIX, DATA_PREFIX, RESULTS_PREFIX, 
 	
 	# Create a location to save the Bowtie indexes and reference TUs
 	create_dir_if_needed(refs_out_dir)
-
-	# Create a location to save the Bowtie indexes and reference TUs
-	#create_dir_if_needed(refs_gene_out_dir)
 
 	# For each design process with eXpress
 	for design in designs_to_process:
@@ -140,7 +136,7 @@ def run_express (designs_to_process, FASTQ_PREFIX, DATA_PREFIX, RESULTS_PREFIX, 
 			# Create somewhere to save eXpress expression estimate data
 			create_dir_if_needed(express_out_dir+'/'+design)
 
-			# Build and run eXpress command -p -k 1000 -p 8 --phred64
+			# Build and run eXpress command
 			cmd_express_exp_ests = 'bowtie2 -a -X 600 --no-discordant --no-mixed --rdg 6,5 --rfg 6,5 --score-min L,-.6,-.4 -x ' + \
 								    bowtie_ref_out_file + ' ' + \
 			                        '-1 ' + FASTQ_PREFIX + fastq_filenames[0] + ' ' + \
@@ -157,86 +153,6 @@ def run_express (designs_to_process, FASTQ_PREFIX, DATA_PREFIX, RESULTS_PREFIX, 
 				if clean_ref_tus == True:
 					cmd_clean_up = 'rm ' + ref_tus
 					subprocess.call(cmd_clean_up, shell=True)
-				#cmd_clean_up = 'rmdir ' + refs_out_dir
-				#subprocess.call(cmd_clean_up, shell=True)
-
-		# -----------------------------------------------------------------------------
-		# 3. PERFORM MAPPING AND EXPRESSION QUANTIFICATION FOR HOST AND SYN GENE SEQS
-		#    Requirements:
-		#    - Genome FASTA file (ORFs as proxy)
-		#    - Synethic Genes FASTA file (ORFs as proxy)
-		#    - Raw reads in FASTQ format (assumes paired-end reads)
-		# -----------------------------------------------------------------------------
-
-		if design not in fastq_mapping.keys():
-			print 'express_run.py ERROR:', design, 'not found in fastq_mapping, skipping.'
-		else:
-			if os.path.isfile(ref_genome_in) == False or os.path.isfile(ref_syn_genes_in) == False:
-				print 'express_run.py ERROR: host and syn gene sequences not found, skipping step for design', design, '.'
-			else:
-
-				# MAPPING WITH BOWTIE
-				# -------------------
-
-				# Merge gene sequences for circuit and genome
-				ref_tus = refs_out_dir+'genes_'+design+'.fa'
-				merge_fasta_files (ref_genome_in, ref_syn_genes_in, ref_tus)
-
-				# Build and run Bowtie command
-				#bowtie_ref_out_file = bowtie_gene_out_dir+'transcripts_'+design
-				#cmd_bowtie_build_idx = 'bowtie-build --offrate 1 ' + \
-				#                        ref_tus + ' ' + \
-				#                        bowtie_ref_out_file
-				#print 'express-run.py RUNNING:', cmd_bowtie_build_idx
-				#subprocess.call(cmd_bowtie_build_idx, shell=True)
-
-				bwa_ref_out_file = refs_out_dir+'bwa_genes_'+design				
-				cmd_bwa_build_idx = 'bwa index -p ' + \
-				                        bwa_ref_out_file + ' ' + \
-				                        ref_tus
-				print 'express-run.py RUNNING:', cmd_bwa_build_idx
-				subprocess.call(cmd_bwa_build_idx, shell=True)
-
-				# EXPRESSION ESTIMATION (BWA for gene-level)
-				# ------------------------------------------
-
-				# Find the raw file names
-				fastq_filenames = fastq_mapping[design]
-
-				# Create somewhere to save eXpress expression estimate data
-				create_dir_if_needed(express_gene_out_dir+'/'+design)
-
-				# Use BWA for gene mapping - we do not want multi-mapped reads here (better quality)
-				#'bwa mem -t 4 ./hg19.fasta ./s1_1.fastq ./s1_2.fastq > s1.sam'
-				cmd_express_exp_ests = 'bwa mem -t 4 ' + \
-									    bwa_ref_out_file + ' ' + \
-				                        FASTQ_PREFIX + fastq_filenames[0] + ' ' + \
-				                        FASTQ_PREFIX + fastq_filenames[1] + ' | ' + \
-				                        'express --no-bias-correct ' + ref_tus + ' ' + \
-				                        '-o ' + express_gene_out_dir + design
-				print 'express_run.py RUNNING:', cmd_express_exp_ests
-				subprocess.call(cmd_express_exp_ests, shell=True)
-
-				# Build and run eXpress command
-				#cmd_express_exp_ests = 'bowtie -aS -X 800 --offrate 1 ' + \
-				#					    bowtie_ref_out_file + ' ' + \
-				#                        '-1 ' + FASTQ_PREFIX + fastq_filenames[0] + ' ' + \
-				#                        '-2 ' + FASTQ_PREFIX + fastq_filenames[1] + ' | ' + \
-				#                        'express ' + ref_tus + ' ' + \
-				#                        '-o ' + express_gene_out_dir + design
-				#print 'express_run.py RUNNING:', cmd_express_exp_ests
-				#subprocess.call(cmd_express_exp_ests, shell=True)
-
-
-				# Clean-up by removing Bowtie index for design
-				if CLEAN_UP == True:
-					cmd_clean_up = 'rm ' + bwa_ref_out_file + '*.*'
-					subprocess.call(cmd_clean_up, shell=True)
-					cmd_clean_up = 'rm ' + ref_tus
-					subprocess.call(cmd_clean_up, shell=True)
-					#cmd_clean_up = 'rmdir ' + refs_gene_out_dir
-					#subprocess.call(cmd_clean_up, shell=True)
-
 
 ###############################################################################
 # MAIN FUNCTION
@@ -260,7 +176,7 @@ def main():
 		CLEAN_UP = True
 	# Extract the designs to process and run
 	designs_to_process = args.designs.split(',')
-	# Run RSEM commands
+	# Run commands
 	run_express(designs_to_process, FASTQ_PREFIX, DATA_PREFIX, RESULTS_PREFIX, CLEAN_UP)
 
 if __name__ == "__main__":

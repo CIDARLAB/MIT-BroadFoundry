@@ -50,12 +50,12 @@ def merge_fasta_files (fasta_file_1, fasta_file_2, fasta_file_out):
 	"""Merge the contents of 2 FASTA files
 	"""
 	f_out = open(fasta_file_out, 'w')
-	f1_in = open(fasta_file_1, 'r')
+	f1_in = open(fasta_file_1, 'rU')
 	for line in f1_in:
 		f_out.write(line)
 	f1_in.close()
 	f_out.write('\n')
-	f2_in = open(fasta_file_2, 'r')
+	f2_in = open(fasta_file_2, 'rU')
 	for line in f2_in:
 		f_out.write(line)
 	f2_in.close()

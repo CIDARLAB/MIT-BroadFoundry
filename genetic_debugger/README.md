@@ -5,7 +5,6 @@ The genetic debugger allows for synthetic genetic circuits to be integrogated us
 ##Dependancies
 
 - Bowtie2 (2.2.4)
-- BWA (0.7.10)
 - eXpress (1.5.1)
-- (for normalization) R + edgeR 
+- R + edgeR (for normalization) 
 

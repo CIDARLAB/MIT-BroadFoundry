@@ -37,7 +37,7 @@ start_time = timeit.default_timer()
 
 # Parse command line parameters
 if len(sys.argv) != 9:
-	print("Usage: python {} <design regexs> <R1 fastq> <R2 fastq> <fwd primer> <rev primer> <output prefix>".format(sys.argv[0]), file=sys.stderr)
+	print("Usage: python {} <design regexs> <R1 fastq> <R2 fastq> <fwd primer length> <rev primer length> <fwd barcode index> <rev barcode index> <output prefix>".format(sys.argv[0]), file=sys.stderr)
 	sys.exit()
 design_filename, r1_filename, r2_filename, fwd_primer_len, rev_primer_len, fwd_bc_idx, rev_bc_idx, out_prefix = sys.argv[1:]
 out_prefix = out_prefix.strip()

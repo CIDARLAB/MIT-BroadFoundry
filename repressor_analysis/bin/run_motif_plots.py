@@ -27,7 +27,7 @@ repressors = ['AmeR', 'McbR', 'PsrA', 'SrpR',
               'AmtR', 'ButR', 'QacR', 'TarA',
               'ScbR', 'Orf2',
               'LitR']
-#repressors = ['AmtR', 'LitR'] #, 'SrpR']
+repressors = ['AmtR', 'LitR'] #, 'SrpR']
 us_window = 100
 ds_window = 100
 

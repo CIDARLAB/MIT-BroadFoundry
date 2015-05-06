@@ -16,8 +16,7 @@ __version__ = '1.0'
 genome_filename = '../data/genomes/DH10B.fasta'
 repressors = ['AmeR', 'AmtR', 'ButR', 'LitR', 'McbR', 'Orf2', 
               'PsrA', 'QacR', 'ScbR', 'SrpR', 'TarA']
-repressors = ['McbR', 'Orf2', 
-              'PsrA', 'QacR', 'ScbR', 'SrpR', 'TarA']
+repressors = ['McbR', 'Orf2'] 
 ###############################################################################
 
 def calculate_pseudocounts(motif): 
@@ -50,7 +49,7 @@ def run_analysis (repressor_filename, genome_seq, background, output_prefix):
 	#motif.background = background
 	#motif.pseudocounts = 1.0
 	
-	pwm = m.counts.normalize(pseudocounts=0.5)
+	pwm = motif.counts.normalize(pseudocounts=0.5)
 	pssm = pwm.log_odds()
 
 	#motif.pseudocounts = calculate_pseudocounts(motif)
@@ -60,7 +59,6 @@ def run_analysis (repressor_filename, genome_seq, background, output_prefix):
 	#pwm = motif.counts.normalize(pseudocounts=calculate_pseudocounts(motif))
 	#pssm = pwm.log_odds()
 	
-
 	# Calculate threshold to use
 	#print('\tCalculating threshold')
 	#distribution = pssm.distribution(background=background, precision=10**4)

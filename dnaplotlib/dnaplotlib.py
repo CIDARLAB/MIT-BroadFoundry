@@ -1986,7 +1986,7 @@ class DNARenderer:
 			# Check the part has minimal details required
 			if 'type' in keys:
 				if 'fwd' not in keys:
-					part['fwd'] = 'True'
+					part['fwd'] = True
 				if 'start' not in keys:
 					if part['fwd'] == True:
 						part['start'] = part_num

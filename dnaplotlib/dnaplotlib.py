@@ -1569,6 +1569,8 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 			linewidth = opts['linewidth']
 		if 'color' in opts.keys():
 			color = opts['color']
+		if 'arc_height' in opts.keys():
+			arcHeight = opts['arc_height']
 	
 	start = (from_part['start'] + from_part['end']) / 2
 	end   = (to_part['start']   + to_part['end']) / 2

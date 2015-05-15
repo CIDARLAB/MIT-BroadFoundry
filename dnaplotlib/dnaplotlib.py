@@ -81,6 +81,7 @@ def write_label (ax, label_text, x_pos, opts=None):
 	label_y_offset = 0
 	label_x_offset = 0
 	label_color = (0,0,0)
+	label_rotation = 0
 	if opts != None:
 		if 'label_style' in opts.keys():
 			label_style = opts['label_style']
@@ -92,9 +93,11 @@ def write_label (ax, label_text, x_pos, opts=None):
 			label_x_offset = opts['label_x_offset']
 		if 'label_color' in opts.keys():
 			label_color = opts['label_color']
+		if 'label_rotation' in opts.keys():
+			label_rotation = opts['label_rotation']
 	ax.text(x_pos+label_x_offset, label_y_offset, label_text, horizontalalignment='center',
 		    verticalalignment='center', fontsize=label_size, fontstyle=label_style, 
-		    color=label_color, zorder=30)
+		    color=label_color, rotation=label_rotation, zorder=30)
 
 def sbol_promoter (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	""" Built-in SBOL promoter renderer.

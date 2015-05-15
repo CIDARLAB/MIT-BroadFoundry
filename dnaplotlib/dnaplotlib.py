@@ -1673,9 +1673,9 @@ def trace_promoter (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth,
 		else:
 			write_label(ax, opts['label'], start_bp+((end_bp-start_bp)/2.0), opts=opts)
 	if start_bp > end_bp:
-		return end_bp, start_bp
+		return prev_end, start_bp
 	else:
-		return start_bp, end_bp
+		return prev_end, end_bp
 
 def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
 	""" Built-in trace-based ribosome binding site renderer.
@@ -1721,9 +1721,9 @@ def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts
 		else:
 			write_label(ax, opts['label'], start_bp+((end_bp-start_bp)/2.0), opts=opts)
 	if start_bp > end_bp:
-		return end_bp, start_bp
+		return prev_end, start_bp
 	else:
-		return start_bp, end_bp
+		return prev_end, end_bp
 
 def trace_cds (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
 	""" Built-in trace-based coding sequence renderer.
@@ -1772,9 +1772,9 @@ def trace_cds (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts
 		else:
 			write_label(ax, opts['label'], start_bp+((end_bp-start_bp)/2.0), opts=opts)
 	if start_bp > end_bp:
-		return end_bp, start_bp
+		return prev_end, start_bp
 	else:
-		return start_bp, end_bp
+		return prev_end, end_bp
 
 def trace_terminator (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
 	""" Built-in trace-based terminator renderer.
@@ -1820,9 +1820,9 @@ def trace_terminator (ax, type, num, start_bp, end_bp, prev_end, scale, linewidt
 		else:
 			write_label(ax, opts['label'], start_bp+((end_bp-start_bp)/2.0), opts=opts)
 	if start_bp > end_bp:
-		return end_bp, start_bp
+		return prev_end, start_bp
 	else:
-		return start_bp, end_bp
+		return prev_end, end_bp
 
 ###############################################################################
 # The DNA renderer
@@ -2012,8 +2012,8 @@ class DNARenderer:
 						             opts=part_opts)
 
 					#update start,end for regulation
-					part['start'] = prev_start
-					part['end'] = prev_end
+					#part['start'] = prev_start
+					#part['end'] = prev_end
 
 					if first_part == True:
 						first_start = prev_start
@@ -2028,8 +2028,8 @@ class DNARenderer:
 							           self.linewidth, opts=part_opts)
 						
 						#update start,end for regulation
-						part['start'] = prev_start
-						part['end'] = prev_end
+						# part['start'] = prev_start
+						# part['end'] = prev_end
 						
 						if first_part == True:
 							first_start = prev_start

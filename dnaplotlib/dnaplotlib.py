@@ -1728,6 +1728,48 @@ def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts
 	else:
 		return prev_end, end_bp
 
+def trace_user_defined (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
+	""" Built-in trace-based coding sequence renderer.
+	"""
+	# Default options
+	color = (0.7,0.7,0.7)
+	hatch = ''
+	y_extent = 1.5
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'hatch' in opts.keys():
+			hatch = opts['hatch']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
+	# Check direction add start padding
+	dir_fac = 1.0
+	if start_bp > end_bp:
+		dir_fac = -1.0
+	# Draw the CDS symbol
+	p1 = Polygon([(start_bp, y_extent), 
+		          (start_bp, -y_extent),
+		          (end_bp-dir_fac*scale, -y_extent),
+		          (end_bp-dir_fac*scale, y_extent)],
+		          edgecolor=(0.0,0.0,0.0), facecolor=color, linewidth=linewidth, 
+		          hatch=hatch, zorder=15, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
+	ax.add_patch(p1)
+	if opts != None and 'label' in opts.keys():
+		if start_bp > end_bp:
+			write_label(ax, opts['label'], end_bp+((start_bp-end_bp)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], start_bp+((end_bp-start_bp)/2.0), opts=opts)
+	if start_bp > end_bp:
+		return prev_end, start_bp
+	else:
+		return prev_end, end_bp
+
 def trace_cds (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
 	""" Built-in trace-based coding sequence renderer.
 	"""
@@ -1923,7 +1965,8 @@ class DNARenderer:
 			'Promoter'         :trace_promoter, 
 			'CDS'              :trace_cds, 
 			'Terminator'       :trace_terminator,
-			'RBS'              :trace_rbs} 
+			'RBS'              :trace_rbs,
+			'UserDefined'      :trace_user_defined} 
 
 	def std_reg_renderers (self):
 		""" Return dictionary of all standard built-in regulation renderers.

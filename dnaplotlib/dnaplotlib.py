@@ -1557,10 +1557,9 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 	color = (0.0,0.0,0.0)
 	arrowhead_length = 4
 	linestyle = '-'
-	
-	#Warning: change these to params instead of hard-coded numbers
-	arcHeight = 15 + arc_height_index*5
-	startHeight = 10
+	arcHeightConst = 15
+	arcHeightSpacing = 5
+	arcStartHeight = 10
 	
 	# Reset defaults if provided
 	if opts != None:
@@ -1574,7 +1573,17 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 			color = opts['color']
 		if 'arc_height' in opts.keys():
 			arcHeight = opts['arc_height']
-	
+		if 'arc_height_const' in opts.keys():
+			arcHeightConst = opts['arc_height_const']
+		if 'arc_height_spacing' in opts.keys():
+			arcHeightSpacing = opts['arc_height_spacing']
+		if 'arc_height_start' in opts.keys():
+			arcHeightStart = opts['arc_height_start']
+
+	if opts == None or 'arc_height' not in opts.keys():
+		arcHeight = arcHeightConst + arc_height_index*arcHeightSpacing
+	startHeight = arcHeightStart
+
 	start = (from_part['start'] + from_part['end']) / 2
 	end   = (to_part['start']   + to_part['end']) / 2
 

@@ -1559,7 +1559,9 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 	linestyle = '-'
 	arcHeightConst = 15
 	arcHeightSpacing = 5
-	arcStartHeight = 10
+	arcHeightStart = 10
+	arcHeight = arcHeightConst + arc_height_index*arcHeightSpacing
+	arcHeightEnd = arcHeightStart*1.5
 	
 	# Reset defaults if provided
 	if opts != None:
@@ -1579,6 +1581,8 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 			arcHeightSpacing = opts['arc_height_spacing']
 		if 'arc_height_start' in opts.keys():
 			arcHeightStart = opts['arc_height_start']
+		if 'arc_height_end' in opts.keys():
+			arcHeightEnd = opts['arc_height_end']
 
 	if opts == None or 'arc_height' not in opts.keys():
 		arcHeight = arcHeightConst + arc_height_index*arcHeightSpacing
@@ -1592,7 +1596,8 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 	indHeight = arrowhead_length
 	
 	if(to_part['fwd'] == False):
-		base = -1*startHeight
+		#base = -1*startHeight
+		arcHeightEnd = -arcHeightEnd
 		top  = -1*arcHeight
 		indHeight = -1*arrowhead_length
 
@@ -1600,13 +1605,13 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
 	line_across = Line2D([start,end],[top,top], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	line_toward = Line2D([end,end],[top,base*1.5], 
+	line_toward = Line2D([end,end],[top,arcHeightEnd], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	line_rep    = Line2D([end-arrowhead_length,end+arrowhead_length],[base*1.5,base*1.5], 
+	line_rep    = Line2D([end-arrowhead_length,end+arrowhead_length],[arcHeightEnd,arcHeightEnd], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle='-')
-	line_ind1   = Line2D([end-arrowhead_length,end],[base*1.5+indHeight,base*1.5], 
+	line_ind1   = Line2D([end-arrowhead_length,end],[arcHeightEnd+indHeight,arcHeightEnd], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle='-')
-	line_ind2    = Line2D([end+arrowhead_length,end],[base*1.5+indHeight,base*1.5], 
+	line_ind2    = Line2D([end+arrowhead_length,end],[arcHeightEnd+indHeight,arcHeightEnd], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle='-')
 
 	ax.add_line(line_away)

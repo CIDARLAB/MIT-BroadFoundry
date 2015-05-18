@@ -2257,8 +2257,8 @@ class DNARenderer:
 							           self.linewidth, opts=part_opts)
 						
 						#update start,end for regulation
-						# part['start'] = prev_start
-						# part['end'] = prev_end
+						part['start'] = prev_start
+						part['end'] = prev_end
 						
 						if first_part == True:
 							first_start = prev_start

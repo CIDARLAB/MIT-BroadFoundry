@@ -1557,10 +1557,11 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 	color = (0.0,0.0,0.0)
 	arrowhead_length = 4
 	linestyle = '-'
-	
-	#Warning: change these to params instead of hard-coded numbers
-	arcHeight = 15 + arc_height_index*5
-	startHeight = 10
+	arcHeightConst = 15
+	arcHeightSpacing = 5
+	arcHeightStart = 10
+	arcHeight = arcHeightConst + arc_height_index*arcHeightSpacing
+	arcHeightEnd = arcHeightStart*1.5
 	
 	# Reset defaults if provided
 	if opts != None:
@@ -1574,7 +1575,19 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 			color = opts['color']
 		if 'arc_height' in opts.keys():
 			arcHeight = opts['arc_height']
-	
+		if 'arc_height_const' in opts.keys():
+			arcHeightConst = opts['arc_height_const']
+		if 'arc_height_spacing' in opts.keys():
+			arcHeightSpacing = opts['arc_height_spacing']
+		if 'arc_height_start' in opts.keys():
+			arcHeightStart = opts['arc_height_start']
+		if 'arc_height_end' in opts.keys():
+			arcHeightEnd = opts['arc_height_end']
+
+	if opts == None or 'arc_height' not in opts.keys():
+		arcHeight = arcHeightConst + arc_height_index*arcHeightSpacing
+	startHeight = arcHeightStart
+
 	start = (from_part['start'] + from_part['end']) / 2
 	end   = (to_part['start']   + to_part['end']) / 2
 
@@ -1583,7 +1596,8 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 	indHeight = arrowhead_length
 	
 	if(to_part['fwd'] == False):
-		base = -1*startHeight
+		#base = -1*startHeight
+		arcHeightEnd = -arcHeightEnd
 		top  = -1*arcHeight
 		indHeight = -1*arrowhead_length
 
@@ -1591,13 +1605,13 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
 	line_across = Line2D([start,end],[top,top], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	line_toward = Line2D([end,end],[top,base*1.5], 
+	line_toward = Line2D([end,end],[top,arcHeightEnd], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
-	line_rep    = Line2D([end-arrowhead_length,end+arrowhead_length],[base*1.5,base*1.5], 
+	line_rep    = Line2D([end-arrowhead_length,end+arrowhead_length],[arcHeightEnd,arcHeightEnd], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle='-')
-	line_ind1   = Line2D([end-arrowhead_length,end],[base*1.5+indHeight,base*1.5], 
+	line_ind1   = Line2D([end-arrowhead_length,end],[arcHeightEnd+indHeight,arcHeightEnd], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle='-')
-	line_ind2    = Line2D([end+arrowhead_length,end],[base*1.5+indHeight,base*1.5], 
+	line_ind2    = Line2D([end+arrowhead_length,end],[arcHeightEnd+indHeight,arcHeightEnd], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle='-')
 
 	ax.add_line(line_away)
@@ -1718,6 +1732,48 @@ def trace_rbs (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts
  		          (end_bp, -highlight_y_extent)], facecolor=color, edgecolor=color, linewidth=linewidth, zorder=13, 
 		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
 	ax.add_patch(p2)
+	if opts != None and 'label' in opts.keys():
+		if start_bp > end_bp:
+			write_label(ax, opts['label'], end_bp+((start_bp-end_bp)/2.0), opts=opts)
+		else:
+			write_label(ax, opts['label'], start_bp+((end_bp-start_bp)/2.0), opts=opts)
+	if start_bp > end_bp:
+		return prev_end, start_bp
+	else:
+		return prev_end, end_bp
+
+def trace_user_defined (ax, type, num, start_bp, end_bp, prev_end, scale, linewidth, opts):
+	""" Built-in trace-based coding sequence renderer.
+	"""
+	# Default options
+	color = (0.7,0.7,0.7)
+	hatch = ''
+	y_extent = 1.5
+	# Reset defaults if provided
+	if opts != None:
+		if 'color' in opts.keys():
+			color = opts['color']
+		if 'hatch' in opts.keys():
+			hatch = opts['hatch']
+		if 'y_extent' in opts.keys():
+			y_extent = opts['y_extent']
+		if 'linewidth' in opts.keys():
+			linewidth = opts['linewidth']
+		if 'scale' in opts.keys():
+			scale = opts['scale']
+	# Check direction add start padding
+	dir_fac = 1.0
+	if start_bp > end_bp:
+		dir_fac = -1.0
+	# Draw the CDS symbol
+	p1 = Polygon([(start_bp, y_extent), 
+		          (start_bp, -y_extent),
+		          (end_bp-dir_fac*scale, -y_extent),
+		          (end_bp-dir_fac*scale, y_extent)],
+		          edgecolor=(0.0,0.0,0.0), facecolor=color, linewidth=linewidth, 
+		          hatch=hatch, zorder=15, 
+		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0)
+	ax.add_patch(p1)
 	if opts != None and 'label' in opts.keys():
 		if start_bp > end_bp:
 			write_label(ax, opts['label'], end_bp+((start_bp-end_bp)/2.0), opts=opts)
@@ -1923,7 +1979,8 @@ class DNARenderer:
 			'Promoter'         :trace_promoter, 
 			'CDS'              :trace_cds, 
 			'Terminator'       :trace_terminator,
-			'RBS'              :trace_rbs} 
+			'RBS'              :trace_rbs,
+			'UserDefined'      :trace_user_defined} 
 
 	def std_reg_renderers (self):
 		""" Return dictionary of all standard built-in regulation renderers.

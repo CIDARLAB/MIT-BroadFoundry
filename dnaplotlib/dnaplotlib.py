@@ -1715,6 +1715,11 @@ def induce (ax, type, num, from_part, to_part, scale, linewidth, arc_height_inde
 	"""
 	regulation(ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts)
 
+def connect (ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts):
+	""" Standard induction regulation renderer.
+	"""
+	regulation(ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts)
+
 def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_index, opts):
 	""" General function for drawing regulation arcs.
 	"""
@@ -1760,13 +1765,13 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 	base = startHeight;
 	indHeight = arrowhead_length
 	
-	if(to_part['fwd'] == False):
+	if(to_part['fwd'] == False and type != 'Connection'):
 		#base = -1*startHeight
 		arcHeightEnd = -arcHeightEnd
 		top  = -1*arcHeight
 		indHeight = -1*arrowhead_length
 
-	line_away   = Line2D([start,start],[base/1.2,top], 
+	line_away   = Line2D([start,start],[base,top], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
 	line_across = Line2D([start,end],[top,top], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle=linestyle)
@@ -1789,6 +1794,10 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 	if(type == 'Activation'):
 		ax.add_line(line_ind1)
 		ax.add_line(line_ind2)
+
+	#if(type == 'Connection'):
+		#dont draw any arrow lines	
+
 
 ###############################################################################
 # Trace Icon Renderers (icon width corrisponds to trace data)
@@ -2085,7 +2094,8 @@ class DNARenderer:
 
 	# Standard regulatory types
 	STD_REG_TYPES = ['Repression',
-	                 'Activation']
+	                 'Activation',
+	                 'Connection']
 
 	def __init__(self, scale=1.0, linewidth=1.0, 
 		         backbone_pad_left=0.0, backbone_pad_right=0.0):
@@ -2156,7 +2166,8 @@ class DNARenderer:
 		"""
 		return {
 			'Repression' :repress, 
-			'Activation' :induce}
+			'Activation' :induce,
+			'Connection' :connect}
 
 	def renderDNA(self, ax, parts, part_renderers, regs=None, reg_renderers=None):
 		""" Render the parts on the DNA and regulation.
@@ -2212,8 +2223,10 @@ class DNARenderer:
 		prev_end = 0
 		first_start = 0
 		first_part = True
+
 		for part in parts:
 			keys = part.keys()
+
 			# Check the part has minimal details required
 			if 'type' in keys:
 				if 'fwd' not in keys:
@@ -2257,8 +2270,12 @@ class DNARenderer:
 							           self.linewidth, opts=part_opts)
 						
 						#update start,end for regulation
-						part['start'] = prev_start
-						part['end'] = prev_end
+						if part['fwd'] == True:
+							part['start'] = prev_start
+							part['end'] = prev_end
+						else:
+							part['start'] = prev_end
+							part['end'] = prev_start
 						
 						if first_part == True:
 							first_start = prev_start

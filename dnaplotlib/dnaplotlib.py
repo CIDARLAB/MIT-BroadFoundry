@@ -60,7 +60,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon, Ellipse, Wedge, Circle, PathPatch
 from matplotlib.path import Path
 from matplotlib.lines import Line2D
-from matplotlib.patheffects import Stroke 
+from matplotlib.patheffects import Stroke
+import matplotlib.patches as patches
 import math
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT\n\
@@ -1784,19 +1785,26 @@ def regulation (ax, type, num, from_part, to_part, scale, linewidth, arc_height_
 	line_ind2    = Line2D([end+arrowhead_length,end],[arcHeightEnd+indHeight,arcHeightEnd], 
 		        linewidth=linewidth, color=color, zorder=12, linestyle='-')
 
-	ax.add_line(line_away)
-	ax.add_line(line_across)
-	ax.add_line(line_toward)
-
 	if(type == 'Repression'):
 		ax.add_line(line_rep)
+		ax.add_line(line_away)
+		ax.add_line(line_across)
+		ax.add_line(line_toward)
 
 	if(type == 'Activation'):
 		ax.add_line(line_ind1)
 		ax.add_line(line_ind2)
+		ax.add_line(line_away)
+		ax.add_line(line_across)
+		ax.add_line(line_toward)
 
-	#if(type == 'Connection'):
-		#dont draw any arrow lines	
+	if(type == 'Connection'):
+		verts = [ (start, base), (start, top), (end, top),  (end, base) ]
+		codes = [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4]
+		path1 = Path(verts, codes)
+		patch = patches.PathPatch(path1, facecolor='none', lw=linewidth, edgecolor=color)
+		ax.add_patch(patch)
+		
 
 
 ###############################################################################

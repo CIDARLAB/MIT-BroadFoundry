@@ -182,6 +182,7 @@ def sbol_cds (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 	x_extent = 30
 	arrowhead_height = 4
 	arrowhead_length = 8
+	edgecolor = (0,0,0)
 	# Reset defaults if provided
 	if opts != None:
 		if 'color' in opts.keys():
@@ -204,6 +205,9 @@ def sbol_cds (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 			linewidth = opts['linewidth']
 		if 'scale' in opts.keys():
 			scale = opts['scale']
+		if 'edgecolor' in opts.keys():
+			edgecolor = opts['edgecolor']
+
 	# Check direction add start padding
 	dir_fac = 1.0
 	final_end = end
@@ -225,7 +229,7 @@ def sbol_cds (ax, type, num, start, end, prev_end, scale, linewidth, opts):
 		          (end, 0),
 		          (end-dir_fac*arrowhead_length, y_extent+arrowhead_height),
 		          (end-dir_fac*arrowhead_length, y_extent)],
-		          edgecolor=(0.0,0.0,0.0), facecolor=color, linewidth=linewidth, 
+		          edgecolor=edgecolor, facecolor=color, linewidth=linewidth, 
 		          hatch=hatch, zorder=11, 
 		          path_effects=[Stroke(joinstyle="miter")]) # This is a work around for matplotlib < 1.4.0
 	ax.add_patch(p1)

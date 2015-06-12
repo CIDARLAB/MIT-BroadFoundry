@@ -16,7 +16,9 @@ This script creates a heatmap with promoters on the x-axis and terminators on th
 def heatmap_plot(data) :
 
     array = data[0]
+    x_title = 'Promoters'
     x_labels = data[1]
+    y_title = 'Terminators'
     y_labels = data[2]
     
     fig, ax = plt.subplots()
@@ -56,9 +58,9 @@ def heatmap_plot(data) :
     ax.yaxis.set_ticks_position('left')
     ax.xaxis.set_ticks_position('top')
 
-    ax.set_xlabel('Promoters', fontsize=18)
+    ax.set_xlabel(x_title, fontsize=18)
     ax.xaxis.set_label_position('top')
-    ax.set_ylabel('Terminators', fontsize=18)
+    ax.set_ylabel(y_title, fontsize=18)
     
     # Reset tick mark location from default 
     ax.locator_params(axis = 'x', nbins = 43)

@@ -11,9 +11,11 @@ def pt_barchart_plotter():
 
     #mode = 'Terminators'
 
-    parts = ['P5', 'P4']
-    
+    parts = ['P13','P12', 'P23', 'P35', 'P30', 'P15']
     #parts = ['T1','T4','T22']
+
+    # sort 'Y/N' and part_name to sort by
+    sort = ['Y', 'P15']
 
     color_scale = [0.2, 0.4]
     #color_scale = [0.67, 0.4]

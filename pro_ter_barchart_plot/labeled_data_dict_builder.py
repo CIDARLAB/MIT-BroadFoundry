@@ -42,8 +42,11 @@ def labeled_data_dict_builder(directory,
     namesD = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6,
               'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6}
 
-    k = namesD[first_data_cell[0]]
-    m = namesD[first_data_cell[1]]
+    first_data_col = first_data_cell[0]
+    first_data_row = first_data_cell[1]
+
+    k = namesD[first_data_col]
+    m = namesD[first_data_row]
 
     x_labelL = []
     y_labelL = []

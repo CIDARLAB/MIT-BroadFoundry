@@ -14,10 +14,10 @@ plt.ion()
 
 #Simple Regulator
 #activation
-xMax = 160
+xMax = 200
 yMax = 120
 B = 1                       # rate of production of Y
-a = 0.04                    # rate of degradation/dilution
+a = 0.02                    # rate of degradation/dilution
 Yst = B/a                   # steady state
 Tr = math.log(2)/a          # response time
 Y0 = [0]                    # initial concentration of Y

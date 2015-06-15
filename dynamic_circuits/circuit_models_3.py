@@ -14,19 +14,20 @@ plt.ion()
 xMax = 10.
 yMax = 2
 # B0 = 0.                           # basal rate of production 
-Bx = 2                              # rate of production of X
-By = 2.                             # rate of production of Y
-Bz = 2.                             # rate of production of Z
+Bxi = 2.                              # rate of production of X
+Byi = 2.                             # rate of production of Y
+Bzi = 2.                             # rate of production of Z
 a = 0.1                             # rate of degradation/dilution (same for X,Y & Z)
 c0 = [0,4,5]                        # initial concentrations [X,Y,Z]
-Xst=Bx/a                            # steady state of X
-Yst=By/a                            # steady state of Y
-Zst=Bz/a                            # steady state of Z
+Xst=Bxi/a                            # steady state of X
+Yst=Byi/a                            # steady state of Y
+Zst=Bzi/a                            # steady state of Z
 Kxy = 5.                            # activation threshold of Y
 Kyz = 5.                            # activation threshold of Z 
 xTr = np.log(2)/a                   # response time
 yTres = max(0,np.log((Xst-c0[0])/(Xst-Kxy))/a)     # Y activation time
 zTres = max(0,np.log((Yst-c0[1])/(Yst-Kyz))/a)     # Z activation time
+Bx = Bxi
 
 # solve the system dx/dt = f(x, t)
 def f(x, t):
@@ -47,7 +48,7 @@ if c0[1] != 0 and yTres != 0:
     sol = odeint(f, c0,ty)
     Y = sol[:,1]
     c0[1]=Y[999]
-By = 2.
+By = Byi
 
 ty2 = np.linspace(yTres, xMax, 1000)
 
@@ -58,13 +59,12 @@ if c0[2] !=0 and zTres != 0:
         sol = odeint(f,c0,tz)
         Z = sol[:,2]
         c0[2]=Z[999]
-    if yTres+zTres > yTres:
-        tz2 = np.linspace(yTres, yTres+zTres, 1000)
-        Bz = 0
-        sol = odeint(f,c0,tz2)
-        Z2 = sol[:,2]        
-        c0[2]=Z2[999]
-Bz = 2
+    tz2 = np.linspace(yTres, yTres+zTres, 1000)
+    Bz = 0
+    sol = odeint(f,c0,tz2)
+    Z2 = sol[:,2]        
+    c0[2]=Z2[999]
+Bz = Bzi
   
 tz3 = np.linspace(yTres+zTres, xMax, 1000)
 
@@ -99,8 +99,7 @@ ax2.set_ylabel('[Y]/[Y]st')
 if c0[2] != 0 and zTres != 0:
     if yTres != 0:
         ax3.plot(tz, Z/Zst)
-    if yTres+zTres > yTres:
-        ax3.plot(tz2, Z2/Zst)
+    ax3.plot(tz2, Z2/Zst)
 
 ax3.plot(tz3, Z3/Zst)
 ax3.axvline(x=yTres, color='r', ls='--')

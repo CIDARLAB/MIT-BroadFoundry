@@ -18,7 +18,7 @@ Bx = 2                              # rate of production of X
 By = 2.                             # rate of production of Y
 Bz = 2.                             # rate of production of Z
 a = 0.1                             # rate of degradation/dilution (same for X,Y & Z)
-c0 = [0,6,0]                        # initial concentrations [X,Y,Z]
+c0 = [0,4,5]                        # initial concentrations [X,Y,Z]
 Xst=Bx/a                            # steady state of X
 Yst=By/a                            # steady state of Y
 Zst=Bz/a                            # steady state of Z
@@ -50,10 +50,22 @@ if c0[1] != 0 and yTres != 0:
 By = 2.
 
 ty2 = np.linspace(yTres, xMax, 1000)
-'''
+
 if c0[2] !=0 and zTres != 0:
-    tz = np.linspace(0, zTres, 1000)
-'''  
+    if yTres != 0:                            # initial decay
+        tz = np.linspace(0, yTres, 1000)
+        Bz = 0
+        sol = odeint(f,c0,tz)
+        Z = sol[:,2]
+        c0[2]=Z[999]
+    if yTres+zTres > yTres:
+        tz2 = np.linspace(yTres, yTres+zTres, 1000)
+        Bz = 0
+        sol = odeint(f,c0,tz2)
+        Z2 = sol[:,2]        
+        c0[2]=Z2[999]
+Bz = 2
+  
 tz3 = np.linspace(yTres+zTres, xMax, 1000)
 
 # solve the DEs
@@ -83,6 +95,12 @@ ax2.plot(ty2, Y2/Yst)
 ax2.axvline(x=yTres, color='r', ls='--')
 ax2.axvline(x=yTres+zTres, ymax=heightY, color='r', ls='--')
 ax2.set_ylabel('[Y]/[Y]st')
+
+if c0[2] != 0 and zTres != 0:
+    if yTres != 0:
+        ax3.plot(tz, Z/Zst)
+    if yTres+zTres > yTres:
+        ax3.plot(tz2, Z2/Zst)
 
 ax3.plot(tz3, Z3/Zst)
 ax3.axvline(x=yTres, color='r', ls='--')

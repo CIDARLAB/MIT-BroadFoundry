@@ -17,13 +17,13 @@ yMax = 100
 B = 1.                       # rate of production of Y
 B0 = 0.021                   # rate of auto-activation
 a = 0.02                     # rate of degradation/dilution
-X0 = [0,0,0]                 # initial concentration of Y
+X0 = [0,0,0]                 # initial concentrations
 Yst=B/a                      # steady state
 K = 50.                      # repression threshold
 Tr = math.log(2)/a           # response time
 n = 4                        # hill coefficient
 
-# solve the system dy/dt = f(y, t)
+# solve the system dx/dt = f(x, t)
 def f(x, t):
         Xi = x[0]
         Yi = x[1]
@@ -42,6 +42,8 @@ X = soln[:,0]
 Y = soln[:,1]
 Z = soln[:,2]
 
+#Concentration over time, positive autoregulator can be seen to have the 
+#greatest growth
 plt.figure()
 plt.axis([0, xMax, 0, yMax])
 plt.plot(t,Z, label = 'pos. autoregulator')
@@ -54,6 +56,8 @@ plt.xlabel('Time')
 plt.ylabel('[Concentration]')
 plt.legend(loc=0)
 
+#Ratio of Concentration/Steady state concentration over time, shows the 
+#relative rates at which Tr is reached (control is simple regulator)
 plt.figure()
 plt.axis([0,2,0,1])
 plt.axhline(y=0.5, xmax=0.7, color='r', ls='dashed')

@@ -10,17 +10,18 @@ import numpy as np
 from scipy.integrate import odeint
 plt.ion()
 
-xMax = 10
-yMax = 1.1 
+xMax = 8
+yMax = 5.1 
+amp = 2     # amplitude of signal
 per = 4     # period of sinusoid
 itr = 1000  # time iterations
 y = [0,0,0]     # initial conditions
-ax = 0.
-ay = 0.2       # degradation rate
 Bx = 1     # rate of production of X
+ax = 0.2   # degradation rate of X
 By = 1     # rate of production of Y
-n = 1000     # hill coefficient
-Ky = 5      # activation coefficient
+ay = 0.5      # degradation rate of Y
+n = 500     # hill coefficient
+Ky = 1      # activation coefficient
        
 t = np.linspace(0, xMax, itr)   # time grid
 
@@ -30,7 +31,7 @@ def f(y, t):
         Yi = y[1]
         Y2i = y[2]
         # the model equations
-        f0 = np.pi/per*np.sin(np.pi*t/(0.5*per))
+        f0 = amp*np.pi/per*np.sin(np.pi*t/(0.5*per))
         f1 = By*(np.power(Xi,n)/(np.power(Xi,n)+np.power(Ky,n))) - ay*Yi
         f2 = By/(1+np.power(Xi/Ky,n)) - ay*Y2i
         return [f0 , f1, f2]

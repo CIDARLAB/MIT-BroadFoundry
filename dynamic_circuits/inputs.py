@@ -5,6 +5,7 @@ Created on Thu Jun 18 11:56:25 2015
 @author: Alex Lim
 """
 import numpy as np
+from scipy import signal
 
 # sinusoidal Input Function (xMax = per*nwaves; yMax = amp+0.1; nwaves = 2)
 def sinInput(t):
@@ -18,7 +19,7 @@ def linInput(t):
     intc = 0    # intercept of signal
     return slp * t + intc
     
-def stepInput(t, lo, up):
+def stepInput(t, lo, up): # variation 1
     loB = lo    # lower bound
     upB = up    # upper bound
     step = 2    # magnitude of signal
@@ -38,3 +39,17 @@ def stepInput(t, lo, up):
                 output[inc] = 0
                 inc+=1
         return output
+
+def squInput(t):
+    amp = 3
+    per = 2
+    return 0.5*amp*(1+signal.square(2*np.pi*t/per))        
+    
+def sawInput(t):
+    amp = 3
+    per = 2
+    return 0.5*amp*(1+signal.sawtooth(2*np.pi*t/per))
+    
+    
+    
+    

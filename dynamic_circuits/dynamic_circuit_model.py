@@ -11,7 +11,9 @@ import inputs
 from scipy.integrate import odeint
 plt.ion()
 
-xMax = 5
+xMin = 0
+xMax = 10
+yMin = 0
 yMax = 4
 itr = 100          # time iterations
 inic = [0,0]        # initial conditions
@@ -19,15 +21,18 @@ By = 1.             # rate of production of Y
 ay = 0.5            # degradation rate of Y
 Bz = 1.             # rate of production of Z
 az = 0.5            # degradation rate of Z
-n = 1000.              # hill coefficient
+n = 1.              # hill coefficient
 Ky = 1.             # activation coefficient
+Ky = 0.2             # activation coefficient
 
 t = np.linspace(0, xMax, itr)   # time grid
-X = inputs.stepInput(t, 1, 2.5)
+    
+
+X = inputs.squInput(t)
 
 # solve the system dx/dt = f(x, t)
 def f(y, t):
-        Xi = inputs.stepInput(t, 1, 2.5)
+        Xi = inputs.squInput(t)
         Yi = y[0]
         Zi = y[1]    
         # Activator Equation
@@ -43,7 +48,7 @@ Z = soln[:,1]
 
 # Input Plot
 plt.figure()
-plt.axis([0,xMax,0,yMax])
+plt.axis([xMin,xMax,yMin,yMax])
 plt.plot(t,X)
 plt.xlabel('time')
 plt.ylabel('concentration')

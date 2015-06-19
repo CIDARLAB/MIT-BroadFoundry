@@ -20,7 +20,7 @@ ay = 0.5            # degradation rate of Y
 Bz = 1.             # rate of production of Z
 az = 0.5            # degradation rate of Z
 n = 1000.              # hill coefficient
-Ky = 1.             # activation coefficient
+Ky = 1             # activation coefficient
 
 t = np.linspace(0, xMax, itr)   # time grid
 X = inputs.stepInput(t, 1, 2.5)

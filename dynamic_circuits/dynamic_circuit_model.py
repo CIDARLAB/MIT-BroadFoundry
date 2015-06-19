@@ -14,31 +14,30 @@ plt.ion()
 xMin = 0
 xMax = 10
 yMin = 0
-yMax = 4
-itr = 100          # time iterations
+yMax = 3
+itr = 100           # time iterations
 inic = [0,0]        # initial conditions
 By = 1.             # rate of production of Y
 ay = 0.5            # degradation rate of Y
 Bz = 1.             # rate of production of Z
 az = 0.5            # degradation rate of Z
-n = 1.              # hill coefficient
-Ky = 1.             # activation coefficient
-Ky = 0.2             # activation coefficient
+n = 100.              # hill coefficient
+Ky = 1            # activation coefficient of Y
+Kz = 1            # activation coefficient of Z
 
-t = np.linspace(0, xMax, itr)   # time grid
-    
+t = np.linspace(xMin, xMax, itr)   # time grid
 
-X = inputs.squInput(t)
+X = inputs.sinInput(t)
 
 # solve the system dx/dt = f(x, t)
-def f(y, t):
-        Xi = inputs.squInput(t)
-        Yi = y[0]
-        Zi = y[1]    
+def f(ic, t):
+        Xi = inputs.sinInput(t)
+        Yi = ic[0]
+        Zi = ic[1]    
         # Activator Equation
         f0 = By*(np.power(Xi,n)/(np.power(Xi,n)+np.power(Ky,n))) - ay*Yi
         # Repressor Equation        
-        f1 = Bz/(1+np.power(Xi/Ky,n)) - az*Zi
+        f1 = Bz/(1+np.power(Xi/Kz,n)) - az*Zi
         return [f0 , f1]
 
 # solve the DEs
@@ -56,9 +55,15 @@ plt.title('Input: X concentration')
 
 # Plot of outputs: activity (activator and repressor)
 plt.figure()
-plt.axis([0,xMax,0,2])
+plt.axis([xMin,xMax,0,2])
 plt.plot(t,Y, label = 'activator')
 plt.plot(t,Z, label = 'repressor')
+plt.axhline(y=1, xmin=0, color ='r', ls = '--')
+plt.axvline(x=1, ymin=0, color ='r', ls = '--')
+plt.axvline(x=8, ymin=0, color ='r', ls = '--')
+plt.axvline(x=3, ymin=0, color ='r', ls = '--')
+plt.axvline(x=4, ymin=0, color ='r', ls = '--')
+plt.axvline(x=5, ymin=0, color ='r', ls = '--')
 plt.xlabel('time')
 plt.ylabel('concentration')
 plt.title('Output: Activity')

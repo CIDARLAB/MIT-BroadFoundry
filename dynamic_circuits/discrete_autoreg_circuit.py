@@ -8,29 +8,28 @@ Created on Fri Jun 12 12:36:54 2015
 # cell transcription circuit modeling
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 from scipy.integrate import odeint
 plt.ion()
 
 #Autoregulator
-xMax = 160.
-yMax = 60.
-B = 1.                       # rate of production of Y
+xMax = 10.
+yMax = 6.
+B = 1.                      # rate of production of X
 a = 0.02                    # rate of degradation/dilution
-X0 = [0]                    # initial concentration of Y
-K = 50.                     # repression threshold
-Tr = K/(2*B)                  # response time
-n = 1000000.                 # hill coefficient
+X0 = [0]                    # initial concentration of X
+K = 5.                      # repression threshold
+Tr = K/(2*B)                # response time
+n = 1.                      # hill coefficient
 
 # solve the system dy/dt = f(y, t)
 def f(x, t):
-        Xi = x[0]
         # the model equations
         f0 = B
         return f0
         
 t = np.linspace(0, 2*Tr, 1000)   # time grid
 t2 = np.linspace(0, 160, 1000)
+
 # solve the DEs
 soln = odeint(f, X0, t)
 soln2 = odeint(f, X0, t2)
@@ -48,11 +47,3 @@ plt.title('Autoregulator')
 plt.xlabel('Time')
 plt.ylabel('Concentration X')
 plt.legend(loc=0)
-
-
-
-
-
-#AND-Gate C1-FFL
-
-#OR-Gate C1-FFL

@@ -8,10 +8,11 @@ import numpy as np
 from scipy import signal
 
 # sinusoidal Input Function (xMax = per*nwaves; yMax = amp+0.1; nwaves = 2)
-def sinInput(t):
+def sinInput(t, per=4, amp=2, dis=0, bas=0):
     per = 4     # period of sinusoid 
     amp = 2     # amplitude of signal
-    return 0.5*amp*(1-np.cos(np.pi*t/(0.5*per)))
+    dis = 0
+    return 0.5*amp*(1-np.cos(np.pi*(t-dis)/(0.5*per)))
 
 # Linear Input Function (xMax = 10; yMax = max(xMax*slp,0.5*xMax))  
 def linInput(t):

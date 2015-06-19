@@ -21,7 +21,7 @@ By = 1.             # rate of production of Y
 ay = 0.5            # degradation rate of Y
 Bz = 1.             # rate of production of Z
 az = 0.5            # degradation rate of Z
-n = 100.              # hill coefficient
+n = 1.              # hill coefficient
 Ky = 1            # activation coefficient of Y
 Kz = 1            # activation coefficient of Z
 
@@ -58,12 +58,12 @@ plt.figure()
 plt.axis([xMin,xMax,0,2])
 plt.plot(t,Y, label = 'activator')
 plt.plot(t,Z, label = 'repressor')
-plt.axhline(y=1, xmin=0, color ='r', ls = '--')
-plt.axvline(x=1, ymin=0, color ='r', ls = '--')
-plt.axvline(x=8, ymin=0, color ='r', ls = '--')
-plt.axvline(x=3, ymin=0, color ='r', ls = '--')
-plt.axvline(x=4, ymin=0, color ='r', ls = '--')
-plt.axvline(x=5, ymin=0, color ='r', ls = '--')
+#plt.axhline(y=1, xmin=0, color ='r', ls = '--')
+#plt.axvline(x=1, ymin=0, color ='r', ls = '--')
+#plt.axvline(x=8, ymin=0, color ='r', ls = '--')
+#plt.axvline(x=3, ymin=0, color ='r', ls = '--')
+#plt.axvline(x=4, ymin=0, color ='r', ls = '--')
+#plt.axvline(x=5, ymin=0, color ='r', ls = '--')
 plt.xlabel('time')
 plt.ylabel('concentration')
 plt.title('Output: Activity')

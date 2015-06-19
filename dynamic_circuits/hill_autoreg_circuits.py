@@ -11,16 +11,16 @@ import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 plt.ion()
 
-#Autoregulators
+#Autoregulators (Hill Function)
 xMax = 20.
-yMax = 12.
-B = 1                          # rate of production of X
-B0 = 0.05                          # basal production rate
+yMax = 10.
+B = 1                           # rate of production of X
+B0 = 0                          # basal production rate
 a = 0.1                         # rate of degradation/dilution
-K = 5                      # repression threshold
-c0 = [K-1,K,K+1,0,K,2*K]  # initial concentration of X
+K = 5                           # repression threshold
+c0 = [K-1,K,K+1,0,K,2*K]        # initial concentration of X
 Tr = K/(2*B)                    # response time
-n = 50.                         # hill coefficient
+n = 30.                         # hill coefficient
 
 # solve the system dy/dt = f(y, t)
 def f(ic, t):
@@ -33,7 +33,7 @@ def f(ic, t):
         Yi[1] = ic[4]
         Yi[2] = ic[5]
         
-        # the model equations
+        # the model equations of hill functions
         f0 = B0 + B*(np.power(Xi[0],n)/(np.power(Xi[0],n)+np.power(K,n))) - a*Xi[0]
         f1 = B0 + B*(np.power(Xi[1],n)/(np.power(Xi[1],n)+np.power(K,n))) - a*Xi[1]
         f2 = B0 + B*(np.power(Xi[2],n)/(np.power(Xi[2],n)+np.power(K,n))) - a*Xi[2]

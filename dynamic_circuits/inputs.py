@@ -3,24 +3,63 @@
 Created on Thu Jun 18 11:56:25 2015
 
 @author: Alex Lim
+Output of not gate IPTG vs activation
+Object, object
+activating promoter and gene
+simulate time scales
+production (B) and degradation (a) of generic proteins, rates (# protein/s)
+potential transcriptional (assume faster than translation) and translational steps
+Promoters models, attributes (inhibition function)
+Rbs = factor for the rate, (IPTG vs YFP)-->(t vs YFP @ IPTG = N)
+
+Information
+rate Repressor, steady state
+value of production rate (Rbs) and degradation rate
+Repressor (Pmin, Pmax, K, n)
+Gene (alpha(RBS),gamma
+design and derivative function for design, generic
+defining it
+Truth table and inputs
+
+Start with differential equations
+concentration (vector)
+
+promoter - not - promoter
+then nor
+output derivative calculates (only) change of each gene, given current state
+treat independently, observe changes
+
+long term goal:
+handle circuit with feedback
+data structure, dictionary, gene, states and how promoter activates it, where state comes from
+external or other gene input, parameter
+
 """
 import numpy as np
 from scipy import signal
-
-# sinusoidal Input Function (xMax = per*nwaves; yMax = amp+0.1; nwaves = 2)
-def sinInput(t, per=4, amp=2, dis=0, bas=0):
-    per = 4     # period of sinusoid 
-    amp = 2     # amplitude of signal
-    dis = 0
-    return 0.5*amp*(1-np.cos(np.pi*(t-dis)/(0.5*per)))
-
-# Linear Input Function (xMax = 10; yMax = max(xMax*slp,0.5*xMax))  
-def linInput(t):
-    slp = 1     # slope of line
-    intc = 0    # intercept of signal
+'''
+Sinusoidal Input Function 
+per = period of sinusoid 
+amp = amplitude of signal
+dis = angular displacement to the right
+bas = basal production rate
+'''
+def sinInput(t, per=4, amp=0.8, dis=0, bas=0):
+    return bas + 0.5*amp*(1-np.cos(np.pi*(t-dis)/(0.5*per)))
+    
+'''
+Linear Input Function 
+slp = slope of line
+intc = intercept of signal
+'''
+def linInput(t, slp=0, intc=1):
     return slp * t + intc
     
-def stepInput(t, lo, up): # variation 1
+'''
+Single Step Input Function
+
+'''
+def stepInput(t, lo, up):
     loB = lo    # lower bound
     upB = up    # upper bound
     step = 2    # magnitude of signal

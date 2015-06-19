@@ -23,11 +23,11 @@ n = 1000.              # hill coefficient
 Ky = 1             # activation coefficient
 
 t = np.linspace(0, xMax, itr)   # time grid
-X = inputs.stepInput(t, 1, 2.5)
+X = inputs.stepInput(t, 3, 5)
 
 # solve the system dx/dt = f(x, t)
 def f(y, t):
-        Xi = inputs.stepInput(t, 1, 2.5)
+        Xi = inputs.stepInput(t, 3, 5)
         Yi = y[0]
         Zi = y[1]    
         # Activator Equation
@@ -52,7 +52,7 @@ plt.title('Input: X concentration')
 # Plot of outputs: activity (activator and repressor)
 plt.figure()
 plt.axis([0,xMax,0,2])
-plt.plot(t,Y, label = 'activator')
+#plt.plot(t,Y, label = 'activator')
 plt.plot(t,Z, label = 'repressor')
 plt.xlabel('time')
 plt.ylabel('concentration')

@@ -14,7 +14,7 @@ xMax = 300
 yMin = 0
 yMax = 3
 itr = 1000          # time iterations
-inic = [0,1,0]      # initial conditions
+inic = [0.5,0,0]      # initial conditions
 Bx = 1             # rate of production of X
 ax = 0.1            # degradation rate of X
 Bx0 = 0             # basal production rate of X
@@ -24,7 +24,7 @@ By0 = 0             # basal production rate of Y
 Bz = 1              # rate of production of Z
 az = 0.1            # degradation rate of Z
 Bz0 = 0             # basal production rate of Z
-n = 2.5             # hill coefficient
+n = 250             # hill coefficient
 Kx = 0.5            # repression coefficient of X
 Ky = 0.5            # repression coefficient of Y
 Kz = 0.5            # repression coefficient of Z
@@ -40,7 +40,7 @@ def f(ic, t):
         f0 = Bx/(1+np.power(Zi/Kx,n)) - ax*Xi + Bx0
         f1 = By/(1+np.power(Xi/Ky,n)) - ay*Yi + By0       
         f2 = Bz/(1+np.power(Yi/Kz,n)) - az*Zi + Bz0
-        return [f0 , f1, f2]
+        return [f0, f1, f2]
                 
 # solve the DEs
 soln = odeint(f, inic, t)

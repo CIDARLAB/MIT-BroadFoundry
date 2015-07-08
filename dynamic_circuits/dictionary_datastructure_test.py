@@ -8,7 +8,6 @@ Created on Tue Jun 23 12:37:25 2015
 '''
 STILL IN THE WORKINGS...
 reading paper
-code copied from repressilator_model.py
 '''
 
 import matplotlib.pyplot as plt
@@ -16,10 +15,11 @@ import numpy as np
 from scipy.integrate import odeint
 plt.ion()
 
+# NOTE: Use 'is' (not ==) for boolean expression "if s[4] is None:"
 '''
 Dictionary of parts represented by lists containing characteristics
-{k:[name, ic, B, a, B0, inputs, iType, outputs, oType]}  
-Use [if s[4] is None:] for boolean
+{name:[type, ic, B, a, B0, K, n, input, iType, outputs, oType]}  
+
 '''
 parts = {'p1':['promoter', 0, 5, 0.1, 0, 0.5, 2, 'p3', 'rep', 'p2', 'rep'], 
          'p2':['promoter', 0, 4, 0.1, 0, 0.5, 2, 'p1', 'rep', 'p3', 'rep'],
@@ -39,8 +39,8 @@ def f(init, t):
         inp = ini[:]
         iTyp = ini[:]
         outp = ini[:]
-        oTyp = inic[:]
-        der = inic[:]
+        oTyp = ini[:]
+        der = ini[:]
         
         i = 0
         # Creates parameters of DEs        
@@ -61,12 +61,15 @@ def f(init, t):
         i = 0
         # Differential Equations for Repressor and Activator
         for p in parts:
+            X = parts[inp[i]][1]
             if iTyp[i] == 'rep':
-                der[i] = B[i]/(1+np.power(parts[inp[i]][1]/K[i],n[i])) - a[i]*ini[i] + B0[i]
+                print (parts[inp[i]][1],)
+                der[i] = B[i]/(1+np.power(X/K[i],n[i])) - a[i]*ini[i] + B0[i]
             elif iTyp[i] == 'act':
-                der[i] = B[i]*np.power(parts[inp[i]][1], n[i])/(np.power(parts[inp[i]][1],n[i])+np.power(K[i],n[i])) - a[i]*ini[i] + B0[i]
+                der[i] = B[i]*np.power(X, n[i])/(np.power(X,n[i])+np.power(K[i],n[i])) - a[i]*ini[i] + B0[i]
+            print (i,der[i], iTyp[i])            
             i += 1
-        print der
+            print i
         return der
 
 xMin = 0

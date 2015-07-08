@@ -15,15 +15,15 @@ xMin = 0
 xMax = 10
 yMin = 0
 yMax = 3
-itr = 100           # time iterations
+itr = 1000           # time iterations
 inic = [0,0]        # initial conditions
 By = 1.             # rate of production of Y
 ay = 0.5            # degradation rate of Y
 Bz = 1.             # rate of production of Z
 az = 0.5            # degradation rate of Z
-n = 1.              # hill coefficient
-Ky = 1            # activation coefficient of Y
-Kz = 1            # activation coefficient of Z
+n = 2.              # hill coefficient
+Ky = 0.5            # activation coefficient of Y
+Kz = 0.5            # activation coefficient of Z
 
 t = np.linspace(xMin, xMax, itr)   # time grid
 
@@ -58,14 +58,20 @@ plt.figure()
 plt.axis([xMin,xMax,0,2])
 plt.plot(t,Y, label = 'activator')
 plt.plot(t,Z, label = 'repressor')
-#plt.axhline(y=1, xmin=0, color ='r', ls = '--')
-#plt.axvline(x=1, ymin=0, color ='r', ls = '--')
-#plt.axvline(x=8, ymin=0, color ='r', ls = '--')
-#plt.axvline(x=3, ymin=0, color ='r', ls = '--')
-#plt.axvline(x=4, ymin=0, color ='r', ls = '--')
-#plt.axvline(x=5, ymin=0, color ='r', ls = '--')
 plt.xlabel('time')
 plt.ylabel('concentration')
 plt.title('Output: Activity')
 plt.legend(loc=0)
 
+plt.figure()
+plt.axis([xMin,xMax,yMin,yMax])
+plt.plot(t,X, label = 'input')
+plt.plot(t,Y, label = 'X=activator')
+plt.plot(t,Z, label = 'X=repressor')
+plt.axvline(x=1, ls='--')
+plt.axvline(x=2, ls='--')
+plt.axvline(x=3, ls='--')
+plt.xlabel('time')
+plt.ylabel('concentration')
+plt.title('Input & Output')
+plt.legend(loc=0)

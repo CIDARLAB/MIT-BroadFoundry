@@ -14,7 +14,7 @@ amp = amplitude of signal
 dis = angular displacement to the right
 bas = base of sinusoid wave
 '''
-def sinInput(t, per=4, amp=0.8, dis=0, bas=0):
+def sinInput(t, per=4, amp=1, dis=0, bas=0):
     return bas + 0.5*amp*(1-np.cos(np.pi*(t-dis)/(0.5*per)))
     
 '''

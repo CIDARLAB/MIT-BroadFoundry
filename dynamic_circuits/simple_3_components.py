@@ -11,9 +11,9 @@ from scipy.integrate import odeint
 plt.ion()
 
 #Input
-parts = {'p1':['promoter', 1, 3, 0.1, 0, 0.5, 2, 'p3', 'rep', 'p2', 'rep'], 
-         'p2':['promoter', 0, 3, 0.1, 0, 0.5, 2, 'p1', 'rep', 'p3', 'rep'],
-         'p3':['promoter', 0, 3, 0.1, 0, 0.5, 2, 'p2', 'rep', 'p1', 'rep']}
+parts = {'p1':['promoter', 0.5, 20, 0.02, 0, 0.5, 2, 'p3', 'rep', 'p2', 'rep'], 
+         'p2':['promoter', 0, 20, 0.02, 0, 0.5, 2, 'p1', 'rep', 'p3', 'rep'],
+         'p3':['promoter', 0, 20, 0.02, 0, 0.5, 2, 'p2', 'rep', 'p1', 'rep']}
 
 
 size = len(parts)
@@ -55,16 +55,16 @@ def f(init, t):
         if iTyp[i] == 'rep': # Repressor Equation
             X = parts[inp[i]][1]
             if i == 0:
-                der[i] = B[i]/(1+np.power(X/K[i],n[i])) - a[i]*der[0]
+                f0 = B[i]/(1+np.power(der[i-1]/K[i],n[i])) - a[i]*der[i]
             elif i == 1:
-                der[i] = B[i]/(1+np.power(X/K[i],n[i])) - a[i]*der[1]
+                f1 = B[i]/(1+np.power(der[i-1]/K[i],n[i])) - a[i]*der[i]
             elif i == 2:
-                der[i] = B[i]/(1+np.power(X/K[i],n[i])) - a[i]*der[2]
+                f2 = B[i]/(1+np.power(der[i-1]/K[i],n[i])) - a[i]*der[i]
         elif iTyp[i] == 'act': # Activator Equation
             X = parts[inp[i]][1]
             der[i] = B[i]*(np.power(X,n[i])/(np.power(X,n)+np.power(K[i],n[i]))) - a[i]*Y           
         i+=1
-    return der
+    return [f0,f1,f2]
 
 itr = 1000
 t = np.linspace(0, 1000, itr)   # time grid

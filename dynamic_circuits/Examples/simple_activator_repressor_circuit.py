@@ -13,20 +13,21 @@ import inputs
 from scipy.integrate import odeint
 plt.ion()
 
-#Simple Activator, case where K = 1, n = 1 for Hill Equations
+#Simple cases where K = 1, n = 1 for Hill Equations
 xMax = 200
 yMax = 55
 B = 1                       # rate of production of Y
 a = 0.02                    # rate of degradation/dilution
 Yst = B/a                   # steady state
 Tr = np.log(2)/a            # response time
-init = [0,Yst]                # initial concentrations
+init = [0,Yst]              # initial concentrations
         
 t = np.linspace(0, xMax, 1000)  # time grid (x-axis)
-    
-# solve the system dy/dt = f(y, t)
+
+
+# solve the system of DEs. X is the input signal given by 'inputs' file
 def f(ini, t):
-        Xi = inputs.linInput(t,0,99)
+        Xi = inputs.linInput(t,0,100)
         Yi = ini[0]
         Zi = ini[1]
         # the model equations
@@ -40,7 +41,7 @@ X =inputs.linInput(t,0,10)
 Y = soln[:,0]
 Z = soln[:,1]
 
-
+# Simple Activator, K=1, n=1
 plt.figure()
 plt.axis([0, xMax, 0, yMax])
 plt.plot(t,Y)
@@ -49,17 +50,7 @@ plt.title('Simple Activator')
 plt.xlabel('Time')
 plt.ylabel('Concentration Y')
 
-
-# Simple Repressor, degradation, reduced production
-B = 0                       # rate of production of Y, drops to 0
-a = 0.02                    # rate of degradation/dilution
-Tr = np.log(2)/a          # response time
-Y0 = [Yst, Yst]                  # initial concentration of Y
-        
-# solve the DE
-soln = odeint(f, Y0, t)
-Y = soln[:]
-
+# Simple Repressor, K=1, n=1
 plt.figure()
 plt.axis([0, xMax, 0, yMax])
 plt.plot(t,Z)

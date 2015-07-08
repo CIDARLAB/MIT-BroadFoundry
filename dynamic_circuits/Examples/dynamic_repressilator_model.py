@@ -4,8 +4,8 @@ Created on Tue Jun 23 12:37:25 2015
 
 @author: Alex Lim
 
-Numbers and calculations taken and slightly modified from 
-(Elowitz & Leibler, 2000) 
+mRNA and proteins included in circuit
+Values and equations taken and slightly modified from (Elowitz & Leibler, 2000) 
 """
 
 import matplotlib.pyplot as plt
@@ -23,7 +23,7 @@ xMin = 0                    # plot dimensions
 xMax = 500
 yMin = 0
 itr = 1000                  # number of time iterations
-inic = [0,30,0,0,0,0]       # initial system conditions
+inic = [0,20,0,0,0,0]       # initial system conditions, can't start all equal
 Bx = 20.                    # translation efficiency (20 proteins/transcript)
 By = 20.
 Bz = 20.

@@ -36,13 +36,6 @@ c = np.linspace(0, yMax, 1000)  # concentration grid (y-axis)
 soln = odeint(f, Y0, t)
 Y = soln[:,0]
 
-plt.figure()
-plt.plot(t/Tr,Y/Yst)
-plt.axhline(y=0.5, xmin=0, xmax=1./6, color='r', ls='--')
-plt.axvline(x=1, ymin=0, ymax=0.5, color='r', ls='--')
-plt.xlabel('t/Tr')
-plt.ylabel('Y/Yst')
-plt.title("Activation")
 
 plt.figure()
 plt.axis([0, xMax, 0, yMax])
@@ -68,14 +61,6 @@ soln = odeint(f, Y0, t)
 Y = soln[:]
 
 plt.figure()
-plt.plot(t/Tr,Y/Yst)
-plt.axhline(y=0.5, xmin=0, xmax=1./6, color='r', ls='--')
-plt.axvline(x=1, ymin=0, ymax=0.5, color='r', ls='--')
-plt.xlabel('t/Tr')
-plt.ylabel('Y/Yst')
-plt.title("Repression")
-
-plt.figure()
 plt.axis([0, xMax, 0, yMax])
 plt.plot(t,Y, label = "Yst*e^(-a*t)")
 plt.axhline(y=Yst/2, xmin=0, xmax=Tr/xMax, color='r', ls='--')
@@ -84,3 +69,21 @@ plt.title('Simple Repressor')
 plt.xlabel('Time')
 plt.ylabel('Concentration Y')
 plt.legend(loc=0)
+
+'''
+plt.figure()
+plt.plot(t/Tr,Y/Yst)
+plt.axhline(y=0.5, xmin=0, xmax=1./6, color='r', ls='--')
+plt.axvline(x=1, ymin=0, ymax=0.5, color='r', ls='--')
+plt.xlabel('t/Tr')
+plt.ylabel('Y/Yst')
+plt.title("Activation")
+
+plt.figure()
+plt.plot(t/Tr,Y/Yst)
+plt.axhline(y=0.5, xmin=0, xmax=1./6, color='r', ls='--')
+plt.axvline(x=1, ymin=0, ymax=0.5, color='r', ls='--')
+plt.xlabel('t/Tr')
+plt.ylabel('Y/Yst')
+plt.title("Repression")
+'''

@@ -14,7 +14,7 @@ amp = amplitude of signal
 dis = angular displacement to the right
 bas = base of sinusoid wave
 '''
-def sinInput(t, per=5, amp=10, dis=0, bas=0):
+def sinInput(t, per=4, amp=1, dis=0, bas=0):
     return bas + 0.5*amp*(1-np.cos(np.pi*(t-dis)/(0.5*per)))
     
 '''
@@ -56,11 +56,11 @@ amp = Amplitude of square wave
 per = Period of square wave
 bas = base of wave
 '''
-def squInput(t, amp=3, per=2, bas=0):
-    return bas + 0.5*amp*(1+signal.square(2*np.pi*t/per))        
+def squInput(t, per=2, amp=1, x0=0, bas=0):
+        return bas + 0.5*amp*(1+signal.square(2*np.pi*(t-x0)/per))
 
 '''
-Sawtooth Triangle Wave Input Function
+Sawtooth Wave Input Function
 amp = Amplitude of wave
 per = Period of wave
 bas = base of wave

@@ -56,8 +56,8 @@ amp = Amplitude of square wave
 per = Period of square wave
 bas = base of wave
 '''
-def squInput(t, amp=3, per=2, bas=0):
-    return bas + 0.5*amp*(1+signal.square(2*np.pi*t/per))        
+def squInput(t, per=2, amp=1, dis=0, bas=0):
+        return bas + 0.5*amp*(1+signal.square(2*np.pi*(t-dis)/per))
 
 '''
 Sawtooth Wave Input Function

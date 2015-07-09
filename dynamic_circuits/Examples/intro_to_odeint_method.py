@@ -35,7 +35,7 @@ def f(y, t):
         Zi = y[1]
         Ri = y[2]
         # the model equations (see Munz et al. 2009)
-        #d(living)/dt = Birth - zombie transmit virus to living - natural death of living
+        #d(living)/dt = Birth rate - zombie transmit virus to living - natural death of living
         f0 = P - B*Si*Zi - d*Si
         #d(zombie)/dt = zombie transmit virus to living + resurrected dead as zombie - living rekill zombie 
         f1 = B*Si*Zi + G*Ri - A*Si*Zi
@@ -53,7 +53,7 @@ soln = odeint(f, y0, t)
 S = soln[:, 0]
 Z = soln[:, 1]
 R = soln[:, 2]
-
+print soln
 plt.figure()
 plt.plot(t, S, label='Living')
 plt.plot(t, Z, label='Zombies')
@@ -63,9 +63,9 @@ plt.title('Zombie Apocalypse - No Daily Births')
 plt.legend(loc=0)
 
 # change initial conditions
-R0 = 0.01*S0   # 1% of initial pop is dead
+R0 = 0.0   # 1% of initial pop is dead
 S0 = S0-R0
-P  = 10        # 10 new births daily
+P  = 10        # 1 new births daily
 y0 = [S0, Z0, R0]
 
 # solve the DEs

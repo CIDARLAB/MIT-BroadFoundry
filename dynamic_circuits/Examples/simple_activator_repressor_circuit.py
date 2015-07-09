@@ -27,7 +27,7 @@ t = np.linspace(0, xMax, 1000)  # time grid (x-axis)
 
 # solve the system of DEs. X is the input signal given by 'inputs' file
 def f(ini, t):
-        Xi = inputs.linInput(t,0,100)
+        Xi = inputs.linInput(t,0,1)
         Yi = ini[0]
         Zi = ini[1]
         # the model equations

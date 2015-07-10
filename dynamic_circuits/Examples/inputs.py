@@ -24,9 +24,33 @@ intc = intercept of signal
 '''
 def linInput(t, slp=0, intc=1):
     return slp * t + intc
-    
+
 '''
 Single Step Input Function
+x0 = starting x-position of step signal
+step = magnitude of step signal
+bas = base of step signal
+'''
+def stepFunction(t,x0=3,step=2, bas=0):
+    if isinstance(t,float):
+        if t >= x0:    
+            return bas+step
+        else:
+            return bas
+    else:       # For plotting an array x derived from array t
+        output = [0]*t.size
+        inc=0
+        for i in t:
+            if i >= x0:
+                output[inc] = bas+step
+                inc+=1
+            else:
+                output[inc] = bas
+                inc+=1
+        return output
+    
+'''
+Single Step Up and Down Input Function
 x0 = starting x-position of step signal
 dis = length of step signal
 step = magnitude of step signal

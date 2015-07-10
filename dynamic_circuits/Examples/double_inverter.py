@@ -5,15 +5,16 @@ import numpy as np
 
 xMin = 0
 #yMin = 0
-xMax = 2000
+xMax = 200
 #yMax = 55
 
-mXi = 10
-mYi = 10
-
+mXi = 0
+mYi = 0
+mZi = 0
 Xi = 0
 Yi = 0
-initc = [mXi, Xi, mYi, Yi]
+Zi = 0
+initc = [mXi, Xi, mYi, Yi, mZi, Zi]
 
 M_HALFLIFE = 2.             # half-life of mRNA transcripts
 P_HALFLIFE = 10             # half-life of protein
@@ -22,10 +23,11 @@ My_HALFLIFE = 2.             # half-life of mRNA transcripts
 Py_HALFLIFE = 10             # half-life of protein
 
 amx = np.log(2)/M_HALFLIFE  # degradation rate of mRNA (half-life = 2 min)
-mBx = 30                    # induced rate of transcription (30 transcript/min)
-
 amy = np.log(2)/M_HALFLIFE  # degradation rate of mRNA (half-life = 2 min)
+amz = np.log(2)/M_HALFLIFE  # degradation rate of mRNA (half-life = 2 min)
+mBx = 30                    # induced rate of transcription (30 transcript/min)
 mBy = 30                    # induced rate of transcription (30 transcript/min)
+mBz = 30                    # induced rate of transcription (30 transcript/min)
 
 n = 2                       # hill coefficient
 Km = 40                     # repression threshold of promoters, monomers per cell
@@ -33,11 +35,12 @@ Km = 40                     # repression threshold of promoters, monomers per ce
 itr = 500                  # time iterations
 t = np.linspace(xMin, xMax, itr)   # time grid
 
-Bx = 20.                    # translation efficiency (20 proteins/transcript)
 ax = np.log(2)/P_HALFLIFE   # degradation rate of protein (half-life = 10 min)
-
-By = 20.                    # translation efficiency (20 proteins/transcript)
 ay = np.log(2)/P_HALFLIFE   # degradation rate of protein (half-life = 10 min)
+az = np.log(2)/P_HALFLIFE   # degradation rate of protein (half-life = 10 min)
+Bx = 20.                    # translation efficiency (20 proteins/transcript)
+By = 20.                    # translation efficiency (20 proteins/transcript)
+Bz = 20.                    # translation efficiency (20 proteins/transcript)
 
 # System of DEs and input equation.
 def f(state, t):
@@ -46,23 +49,24 @@ def f(state, t):
         Xi = state[1]
         mY = state[2]
         Yi = state[3]
+        mZ = state[4]
+        Zi = state[5]
         
         #IPTG input        
-        #IPTGi = inputs.linInput(t, 0, 0.5)
-        IPTGi = inputs.stepFunction(t, 500, 100, 0.0)
+        IPTGi = inputs.linInput(t, 0, 6.4)
         
         #mRNA production
         dmX_dt = -amx*mX + mBx*(np.power(IPTGi,n)/(np.power(IPTGi,n)+np.power(Km,n)))
         dmY_dt = -amy*mY + mBy/(1+np.power(Xi/Km,n))
+        dmZ_dt = -amz*mZ + mBz/(1+np.power(Yi/Km,n))
         
         #protein production
         dX_dt = Bx*mX - ax*Xi
-        dY_dt = By*mY - ay*Yi        
+        dY_dt = By*mY - ay*Yi
+        dZ_dt = Bz*mZ - az*Zi
         
-        return [dmX_dt , dX_dt, dmY_dt, dY_dt]
-        
-        
-        
+        return [dmX_dt, dX_dt, dmY_dt, dY_dt, dmZ_dt, dZ_dt]
+                
 soln_f = odeint(f, initc, t)
 #soln_g = odeint(g, initc, t)
 
@@ -70,14 +74,14 @@ Xm_f = soln_f[:,0]
 Xp_f = soln_f[:,1]
 Ym_f = soln_f[:,2]
 Yp_f = soln_f[:,3]
-
-#Xm_g = soln_g[:,0]
-#Xp_g = soln_g[:,1]
+Zm_f = soln_f[:,4]
+Zp_f = soln_f[:,5]
 
 plt.figure()
 #plt.axis([xMin, xMax, yMin, yMax])
 plt.plot(t,Xm_f, 'r--', label = 'Xm_f')
 plt.plot(t,Ym_f, 'b--', label = 'Ym_f')
+plt.plot(t,Zm_f, 'g--', label = 'Zm_f')
 plt.xlabel('Time (min)')
 plt.ylabel('Transcripts per cell')
 plt.title('Example mRNA Data')
@@ -87,6 +91,7 @@ plt.figure()
 #plt.axis([xMin, xMax, 0, 500])
 plt.plot(t,Xp_f, 'r-', label = 'X_f')
 plt.plot(t,Yp_f, 'b-', label = 'Y_f')
+plt.plot(t,Zp_f, 'g-', label = 'Z_f')
 plt.xlabel('Time (min)')
 plt.ylabel('Proteins per cell')
 plt.title('Example Protein Data')

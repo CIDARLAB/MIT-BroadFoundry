@@ -13,7 +13,7 @@ public class ConstantProperties{
 	//Choose which operators you want to include.
 	public static HashSet<String> allowedOps= new HashSet<String>(Arrays.asList("."));
 	//Choose a max cost you want to go up to.
-	public static double maxCost = 8;
+	public static double maxCost = 6;
 	//If you are searching for a specific truth value, enter it here. Otherwise leave it as null.
 	public static String truthValueToFind = null;
 	//Enter the location of where you want to write the Json file.

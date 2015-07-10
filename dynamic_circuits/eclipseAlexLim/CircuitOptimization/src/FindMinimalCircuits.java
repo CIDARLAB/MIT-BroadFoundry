@@ -1,6 +1,0 @@
-public class FindMinimalCircuits{
-	public static void main(String [] args){
-
-		Optimize.optimizer1();
-	}	
-}

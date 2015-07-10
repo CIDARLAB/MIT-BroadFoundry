@@ -40,7 +40,6 @@ amx = np.log(2)/M_HALFLIFE  # degradation rate of mRNA (half-life = 2 min)
 amy = np.log(2)/M_HALFLIFE
 amz = np.log(2)/M_HALFLIFE
 
-
 n = 2                   # hill coefficient
 Km = 40                 # repression threshold of promoters
 

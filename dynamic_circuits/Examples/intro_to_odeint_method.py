@@ -20,7 +20,7 @@ A = 0.0001  # destroy percent  (per day)
 Initialize timescale and initial condition
 '''
 # initial conditions
-t  = np.linspace(0, 6., 1000)   # time grid
+t  = np.linspace(0, 6., 10)   # time grid
 S0 = 500.               # initial population of living
 Z0 = 0                  # initial population of zombies
 R0 = 0                  # initial population of dead
@@ -53,6 +53,7 @@ soln = odeint(f, y0, t)
 S = soln[:, 0]
 Z = soln[:, 1]
 R = soln[:, 2]
+print S
 print soln
 plt.figure()
 plt.plot(t, S, label='Living')

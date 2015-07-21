@@ -1,0 +1,28 @@
+00010110 *a on its own   at most 9 gates * expected 10 gates found 9 gates
+00011110 *b pack leader  8 gates
+00101001 *c pack leader  8 gates
+00110110 *b              8 gates
+00111110 *d pack leader  8 gates
+01001001 *c              8 gates
+01010110 *b              8 gates
+01011110 *d              8 gates
+01100001 *c              8 gates
+01101000 *e on its own   8 gates
+01101001 *f on its own   at most 12 gates
+01101011 *g pack leader  at most 9 gates
+01101101 *g              at most 9 gates
+01110110 *d              8 gates
+01111001 *g              at most 9 gates
+01111110 *h on its own   8 gates
+10000110 *i pack leader  8 gates
+10010010 *i              8 gates
+10010100 *i              8 gates
+10010110 *j on its own   at most 11 gates
+10010111 *k on its own   8 gates
+10011110 *l pack leader  at most 9 gates
+10110110 *l              at most 9 gates
+10111110 *m pack leader  8 gates
+11010110 *l              at most 9 gates
+11011110 *m              8 gates
+11101001 *n on its own   at most 10 gates
+11110110 *m              8 gates

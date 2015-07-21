@@ -1,0 +1,14 @@
+KEY:
+NAME = wire name or input name
+TYPE = type of Gate to use
+INPUTS = inputs
+Mi = initial mRNA concentration
+Pi = initial protein concentration
+m_HALFLIFE = half life of the mRNA
+p_HALFLIFE = half life of the protein
+am = degradation rate of mrna
+mB = induced rate of mrna production
+n = hill coefficient
+Km = binding coefficient
+ap = protein degradation rate
+pB = induced rate of protein production

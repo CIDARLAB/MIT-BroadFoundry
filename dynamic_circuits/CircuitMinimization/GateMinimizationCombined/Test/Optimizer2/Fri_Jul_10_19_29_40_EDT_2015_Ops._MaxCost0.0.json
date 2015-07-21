@@ -1,0 +1,50 @@
+[
+{
+  "number_found": "5",
+  "operation_costs": {
+    ".": 1.0
+  },
+  "max_cost": 0.0,
+  "operations_used": [
+    "."
+  ],
+  "runtime": 0.133,
+  "collection": "run_details",
+  "date_started": "Jul 10, 2015 7:29:40 PM"
+},
+{
+  "cost": 0.0,
+  "truth_value": "00000000",
+  "circuits": [
+    "0"
+  ]
+},
+{
+  "cost": 0.0,
+  "truth_value": "00001111",
+  "circuits": [
+    "a"
+  ]
+},
+{
+  "cost": 0.0,
+  "truth_value": "00110011",
+  "circuits": [
+    "b"
+  ]
+},
+{
+  "cost": 0.0,
+  "truth_value": "01010101",
+  "circuits": [
+    "c"
+  ]
+},
+{
+  "cost": 0.0,
+  "truth_value": "11111111",
+  "circuits": [
+    "1"
+  ]
+}
+]

@@ -1,0 +1,62 @@
+00010110 (((((0.b).(0.a)).(b.a)).(0.c)).(((0.b).(0.a)).c)) 9
+NOT(w1,b)	(0.b)
+NOT(w2,a)	(0.a)
+NOR(w3,w1,w2)	((0.b).(0.a))
+NOR(w4,b,a)	(b.a)
+NOR(w5,w3,w4)	(((0.b).(0.a)).(b.a))
+NOT(w6,c)	(0.c)
+NOR(w7,w5,w6)	((((0.b).(0.a)).(b.a)).(0.c))
+NOR(w8,w3,c)	(((0.b).(0.a)).c)
+NOR(y,w7,w8)	(((((0.b).(0.a)).(b.a)).(0.c)).(((0.b).(0.a)).c))
+
+
+00101001 (((((c.a).c).((c.a).a)).(c.b)).(((c.a).c).b)) 8
+NOR(w1,c,a)	(c.a)
+NOR(w2,w1,c)	((c.a).c)
+NOR(w3,w1,a)	((c.a).a)
+NOR(w4,w2,w3)	(((c.a).c).((c.a).a))
+NOR(w5,c,b)	(c.b)
+NOR(w6,w4,w5)	((((c.a).c).((c.a).a)).(c.b))
+NOR(w7,w2,b)	(((c.a).c).b)
+NOR(y,w6,w7)	(((((c.a).c).((c.a).a)).(c.b)).(((c.a).c).b))
+
+01001001 (((((b.a).b).((b.a).a)).(c.b)).(((b.a).b).c)) 8
+NOR(w1,b,a)	(b.a)
+NOR(w2,w1,b)	((b.a).b)
+NOR(w3,w1,a)	((b.a).a)
+NOR(w4,w2,w3)	(((b.a).b).((b.a).a))
+NOR(w5,c,b)	(c.b)
+NOR(w6,w4,w5)	((((b.a).b).((b.a).a)).(c.b))
+NOR(w7,w2,c)	(((b.a).b).c)
+NOR(y,w6,w7)	(((((b.a).b).((b.a).a)).(c.b)).(((b.a).b).c))
+
+01100001 (((((b.a).b).((b.a).a)).(c.a)).(((b.a).a).c)) 8
+NOR(w1,b,a)	(b.a)
+NOR(w2,w1,b)	((b.a).b)
+NOR(w3,w1,a)	((b.a).a)
+NOR(w4,w2,w3)	(((b.a).b).((b.a).a))
+NOR(w5,c,a)	(c.a)
+NOR(w6,w4,w5)	((((b.a).b).((b.a).a)).(c.a))
+NOR(w7,w3,c)	(((b.a).a).c)
+NOR(y,w6,w7)	(((((b.a).b).((b.a).a)).(c.a)).(((b.a).a).c))
+
+11100101 (((((b.a).a).0).(c.a)).((c.a).c)) 7
+NOR(w1,b,a)	(b.a)
+NOR(w2,w1,a)	((b.a).a)
+NOT(w3,w2)	(((b.a).a).0)
+NOR(w4,c,a)	(c.a)
+NOR(w5,w3,w4)	((((b.a).a).0).(c.a))
+NOR(w6,w4,c)	((c.a).c)
+NOR(y,w5,w6)	(((((b.a).a).0).(c.a)).((c.a).c))
+
+11101001 ((((((0.b).(0.a)).(b.a)).(0.c)).(((0.b).(0.a)).c)).0) 10
+NOT(w1,b)	(0.b)
+NOT(w2,a)	(0.a)
+NOR(w3,w1,w2)	((0.b).(0.a))
+NOR(w4,b,a)	(b.a)
+NOR(w5,w3,w4)	(((0.b).(0.a)).(b.a))
+NOT(w6,c)	(0.c)
+NOR(w7,w5,w6)	((((0.b).(0.a)).(b.a)).(0.c))
+NOR(w8,w3,c)	(((0.b).(0.a)).c)
+NOR(w9,w7,w8)	(((((0.b).(0.a)).(b.a)).(0.c)).(((0.b).(0.a)).c))
+NOT(y,w9)	((((((0.b).(0.a)).(b.a)).(0.c)).(((0.b).(0.a)).c)).0)

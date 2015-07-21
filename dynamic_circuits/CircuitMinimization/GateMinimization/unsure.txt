@@ -1,0 +1,10 @@
+00010110 *a on its own   at most 9 gates
+01101001 *f on its own   at most 12 gates **8
+01101011 *g pack leader  at most 9 gates
+01101101 *g              at most 9 gates
+01111001 *g              at most 9 gates
+10010110 *j on its own   at most 11 gates **8
+10011110 *l pack leader  at most 9 gates
+10110110 *l              at most 9 gates
+11010110 *l              at most 9 gates
+11101001 *n on its own   at most 10 gates

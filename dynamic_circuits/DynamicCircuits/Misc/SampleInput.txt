@@ -1,0 +1,10 @@
+xMin:0	xMax:2000	yMin:NONE	yMax:NONE	itr:500
+NAME:a	TYPE:INPUT	INPUT:[inputs.squInput,1000,100,0,0]
+NAME:b	TYPE:INPUT	INPUT:[inputs.squInput,500,100,0,0]
+NAME:G1	TYPE:NOR	INPUT1:a	INPUT2:b	Mi:10	Pi:0	m_HALFLIFE:2.	p_HALFLIFE:10.	am:NONE	mB1:30.	mB2:30.	n1:2.	n2:2.	Km1:40.	Km2:40.	ap:NONE	pB:20.
+NAME:G2	TYPE:NOT	INPUT:G1	Mi:10	Pi:0	m_HALFLIFE:2.	p_HALFLIFE:10.	am:NONE	mB:30.	n:2.	Km:30000.	ap:NONE	pB:20.
+
+settings = time_axis_params
+everything = input_and_logic_gate_dictionaries
+allItems = input_and_logic_gate_names
+allGates = logic_gate_names

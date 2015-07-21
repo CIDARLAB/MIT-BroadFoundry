@@ -1,0 +1,65 @@
+[
+    {
+        "itr": 500,
+        "xMax": 1000,
+        "xMin": 0,
+        "yMax": "NONE",
+        "yMin": "NONE"
+    },
+    {
+        "INPUT": [
+            "inputs.squInput",
+            1000,
+            100,
+            0,
+            0
+        ],
+        "NAME": "a",
+        "TYPE": "INPUT"
+    },
+    {
+        "INPUT": [
+            "inputs.squInput",
+            500,
+            100,
+            0,
+            0
+        ],
+        "NAME": "b",
+        "TYPE": "INPUT"
+    },
+    {
+        "INPUT1": "a",
+        "INPUT2": "b",
+        "Km1": 40.0,
+        "Km2": 40.0,
+        "Mi": 10,
+        "NAME": "G1",
+        "Pi": 0,
+        "TYPE": "NOR",
+        "am": "NONE",
+        "ap": "NONE",
+        "mB1": 30.0,
+        "mB2": 30.0,
+        "m_HALFLIFE": 2.0,
+        "n1": 2.0,
+        "n2": 2.0,
+        "pB": 20.0,
+        "p_HALFLIFE": 10.0
+    },
+    {
+        "INPUT": "G1",
+        "Km": 30000.0,
+        "Mi": 10,
+        "NAME": "G2",
+        "Pi": 0,
+        "TYPE": "NOT",
+        "am": "NONE",
+        "ap": "NONE",
+        "mB": 30.0,
+        "m_HALFLIFE": 2.0,
+        "n": 2.0,
+        "pB": 20.0,
+        "p_HALFLIFE": 10.0
+    }
+]

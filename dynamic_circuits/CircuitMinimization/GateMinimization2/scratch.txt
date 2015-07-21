@@ -1,0 +1,37 @@
+C:/Users/Arinze/SkyDrive/UROP_Summer_2015/GateMinimization2/from7to10/8gates.txt
+C:/Users/Arinze/SkyDrive/UROP_Summer_2015/GateMinimization2/6to9.txt
+C:/Users/Arinze/SkyDrive/UROP_Summer_2015/GateMinimization2/greedyCombine2Circuits.txt
+
+10111100 8 6 6  2circuits
+10111101 8 7 7  10circuits
+11011010 8 6 6  2circuits
+11011011 8 7 7  10circuits
+11100110 8 6 6  2circuits
+11100111 8 7 7  10circuits
+
+
+x = combine("10111100", askToStop = True)
+
+>>> x = getFromFile("C:/Users/Arinze/SkyDrive/UROP_Summer_2015/GateMinimization2/greedyCombine2Circuits.txt")
+256
+>>> y = getFromFile("C:/Users/Arinze/SkyDrive/UROP_Summer_2015/GateMinimization2/6to9.txt")
+255
+>>> z = getFromFile("C:/Users/Arinze/SkyDrive/UROP_Summer_2015/GateMinimization2/from7to10/8gates.txt")
+250
+
+>>> allBin = []
+>>> for i in range(256):
+	allBin.append(toBinary(i))
+
+>>> for truthValue in allBin:
+	g1 = gateCounter(x[truthValue][0])
+	try:
+		g2 = gateCounter(y[truthValue][0])
+	except:
+		g2 = "x"
+	try:
+		g3 = gateCounter(z[truthValue][0])
+	except:
+		g3 = "x"
+	if g1!=g2 or g1!=g2 or g2!=g3:
+		print truthValue, str(g1),str(g2),str(g3)

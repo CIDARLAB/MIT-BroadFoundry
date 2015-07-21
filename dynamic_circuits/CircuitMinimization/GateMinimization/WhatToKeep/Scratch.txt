@@ -1,0 +1,49 @@
+"NOR(w9,b,c)",
+"NOR(w8,w9,c)",
+"NOR(w7,w9,b)",
+"NOR(w6,w7,w8)",
+"NOR(w4,a,w6)",
+"NOR(w3,w4,w6)",
+"NOR(w2,w4,a)",
+"NOR(y,w2,w3)"
+
+    "NOR(w9,b,c)",
+    "NOR(w8,w9,c)",
+    "NOR(w7,w9,b)",
+    "NOR(w6,w7,w8)",
+    "NOR(w4,a,w6)",
+    "NOR(w3,w4,w6)",
+    "NOR(w2,w4,a)",
+    "NOR(w1,w2,w3)"
+    "NOT(y,w1)"
+
+Total Thrown out by 4: 32
+Total Thrown out by 5: 27
+Total Thrown out by 6: 24
+Total Thrown out by 7: 24
+
+
+Thrown out by 4 kept by 5
+(((b.a).c).(b.a)) (13 from sorted bottom) (1 from unsorted top)
+(((c.a).b).(c.a)) (11 from sorted bottom) (5 from unsorted top)
+(((c.a).b).b) (10 from sorted bottom) (3 from unsorted top)
+(((c.b).a).(c.b)) (6 from sorted bottom) (11 from unsorted top)
+(((c.b).a).a) (5 from sorted bottom) (8 from unsorted top)
+
+
+Thrown out by 4 kept by 6
+(((b.a).c).(b.a)) (13 from sorted bottom) (1 from unsorted top)
+(((c.a).b).(c.a)) (11 from sorted bottom) (5 from unsorted top)
+(((c.a).b).b) (10 from sorted bottom) (3 from unsorted top)
+(((c.a).c).b) (8 from sorted bottom) (6 from unsorted top)
+(((c.b).a).(c.b)) (6 from sorted bottom) (11 from unsorted top)
+(((c.b).a).a) (5 from sorted bottom) (8 from unsorted top)
+(((c.b).b).a) (2 from sorted bottom) (12 from unsorted top)
+(((c.b).c).a) (1 from sorted bottom) (13 from unsorted top)
+
+
+Thrown out by 5 kept by 6
+(((c.a).c).b) (6 from sorted bottom) (3 from unsorted top)
+(((c.b).b).a) (2 from sorted bottom) (7 from unsorted top)
+(((c.b).c).a) (1 from sorted bottom) (8 from unsorted top)
+

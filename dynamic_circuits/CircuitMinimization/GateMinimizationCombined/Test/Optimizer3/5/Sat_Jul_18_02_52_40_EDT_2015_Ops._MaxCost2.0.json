@@ -1,0 +1,159 @@
+[
+{
+  "number_found": "23",
+  "operation_costs": {
+    ".": 1.0
+  },
+  "max_cost": 2.0,
+  "operations_used": [
+    "."
+  ],
+  "runtime": 0.115,
+  "collection": "run_details",
+  "date_started": "Jul 18, 2015 2:52:40 AM"
+},
+{
+  "truthValue": "00000000",
+  "circuits": [
+    "0"
+  ]
+},
+{
+  "truthValue": "00001010",
+  "circuits": [
+    "((a.0).c)",
+    "((a.c).c)"
+  ]
+},
+{
+  "truthValue": "00001100",
+  "circuits": [
+    "((a.0).b)",
+    "((a.b).b)"
+  ]
+},
+{
+  "truthValue": "00001111",
+  "circuits": [
+    "a"
+  ]
+},
+{
+  "truthValue": "00100010",
+  "circuits": [
+    "((b.0).c)",
+    "((b.c).c)"
+  ]
+},
+{
+  "truthValue": "00101010",
+  "circuits": [
+    "((a.b).c)"
+  ]
+},
+{
+  "truthValue": "00110000",
+  "circuits": [
+    "((b.0).a)",
+    "((a.b).a)"
+  ]
+},
+{
+  "truthValue": "00110011",
+  "circuits": [
+    "b"
+  ]
+},
+{
+  "truthValue": "00111111",
+  "circuits": [
+    "((a.b).0)"
+  ]
+},
+{
+  "truthValue": "01000100",
+  "circuits": [
+    "((c.0).b)",
+    "((b.c).b)"
+  ]
+},
+{
+  "truthValue": "01001100",
+  "circuits": [
+    "((a.c).b)"
+  ]
+},
+{
+  "truthValue": "01010000",
+  "circuits": [
+    "((c.0).a)",
+    "((a.c).a)"
+  ]
+},
+{
+  "truthValue": "01010101",
+  "circuits": [
+    "c"
+  ]
+},
+{
+  "truthValue": "01011111",
+  "circuits": [
+    "((a.c).0)"
+  ]
+},
+{
+  "truthValue": "01110000",
+  "circuits": [
+    "((b.c).a)"
+  ]
+},
+{
+  "truthValue": "01110111",
+  "circuits": [
+    "((b.c).0)"
+  ]
+},
+{
+  "truthValue": "10001000",
+  "circuits": [
+    "(b.c)"
+  ]
+},
+{
+  "truthValue": "10100000",
+  "circuits": [
+    "(a.c)"
+  ]
+},
+{
+  "truthValue": "10101010",
+  "circuits": [
+    "(c.0)"
+  ]
+},
+{
+  "truthValue": "11000000",
+  "circuits": [
+    "(a.b)"
+  ]
+},
+{
+  "truthValue": "11001100",
+  "circuits": [
+    "(b.0)"
+  ]
+},
+{
+  "truthValue": "11110000",
+  "circuits": [
+    "(a.0)"
+  ]
+},
+{
+  "truthValue": "11111111",
+  "circuits": [
+    "1"
+  ]
+}
+]

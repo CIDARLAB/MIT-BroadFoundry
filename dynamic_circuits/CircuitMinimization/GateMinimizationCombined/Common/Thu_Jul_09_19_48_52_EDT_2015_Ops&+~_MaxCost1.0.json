@@ -1,0 +1,103 @@
+[
+{
+  "number_found": "14",
+  "operation_costs": {
+    "&": 1.0,
+    "+": 1.0,
+    "~": 1.0
+  },
+  "max_cost": 1.0,
+  "operations_used": [
+    "&",
+    "+",
+    "~"
+  ],
+  "runtime": 0.353,
+  "collection": "run_details",
+  "date_started": "Jul 9, 2015 7:48:52 PM"
+},
+{
+  "truthValue": "00000000",
+  "circuits": [
+    "0"
+  ]
+},
+{
+  "truthValue": "00000011",
+  "circuits": [
+    "(a&b)"
+  ]
+},
+{
+  "truthValue": "00000101",
+  "circuits": [
+    "(a&c)"
+  ]
+},
+{
+  "truthValue": "00001111",
+  "circuits": [
+    "a"
+  ]
+},
+{
+  "truthValue": "00010001",
+  "circuits": [
+    "(b&c)"
+  ]
+},
+{
+  "truthValue": "00110011",
+  "circuits": [
+    "b"
+  ]
+},
+{
+  "truthValue": "00111111",
+  "circuits": [
+    "(a+b)"
+  ]
+},
+{
+  "truthValue": "01010101",
+  "circuits": [
+    "c"
+  ]
+},
+{
+  "truthValue": "01011111",
+  "circuits": [
+    "(a+c)"
+  ]
+},
+{
+  "truthValue": "01110111",
+  "circuits": [
+    "(b+c)"
+  ]
+},
+{
+  "truthValue": "10101010",
+  "circuits": [
+    "(~c)"
+  ]
+},
+{
+  "truthValue": "11001100",
+  "circuits": [
+    "(~b)"
+  ]
+},
+{
+  "truthValue": "11110000",
+  "circuits": [
+    "(~a)"
+  ]
+},
+{
+  "truthValue": "11111111",
+  "circuits": [
+    "1"
+  ]
+}
+]

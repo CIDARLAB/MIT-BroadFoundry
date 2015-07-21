@@ -1,0 +1,76 @@
+[
+    {
+        "itr": 500,
+        "xMax": 2000,
+        "xMin": 0,
+        "yMax": "NONE",
+        "yMin": "NONE"
+    },
+    {
+        "INPUT": [
+            "inputs.squInput",
+            1000.0,
+            100.0,
+            0.0,
+            0.0
+        ],
+        "NAME": "a",
+        "TYPE": "INPUT"
+    },
+    {
+        "INPUT": [
+            "inputs.squInput",
+            500.0,
+            100.0,
+            0.0,
+            0.0
+        ],
+        "NAME": "b",
+        "TYPE": "INPUT"
+    },
+    {
+        "INPUT": "a",
+        "Km": 40.0,
+        "Mi": 0.0,
+        "NAME": "G1",
+        "Pi": 0.0,
+        "TYPE": "NOT",
+        "am": "NONE",
+        "ap": "NONE",
+        "mB": 30.0,
+        "m_HALFLIFE": 2.0,
+        "n": 2.0,
+        "pB": 20.0,
+        "p_HALFLIFE": 10.0
+    },
+    {
+        "INPUT": "G1",
+        "Km": 30000.0,
+        "Mi": 0.0,
+        "NAME": "G2",
+        "Pi": 0.0,
+        "TYPE": "NOT",
+        "am": "NONE",
+        "ap": "NONE",
+        "mB": 30.0,
+        "m_HALFLIFE": 2.0,
+        "n": 2.0,
+        "pB": 20.0,
+        "p_HALFLIFE": 10.0
+    },
+    {
+        "INPUT": "G2",
+        "Km": 30000.0,
+        "Mi": 0.0,
+        "NAME": "y",
+        "Pi": 0.0,
+        "TYPE": "BUFFER",
+        "am": "NONE",
+        "ap": "NONE",
+        "mB": 30.0,
+        "m_HALFLIFE": 2.0,
+        "n": 2.0,
+        "pB": 20.0,
+        "p_HALFLIFE": 10.0
+    }
+]

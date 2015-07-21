@@ -1,0 +1,159 @@
+[
+{
+  "number_found": "23",
+  "operation_costs": {
+    "@": 1.0
+  },
+  "max_cost": 2.0,
+  "operations_used": [
+    "@"
+  ],
+  "runtime": 0.299,
+  "collection": "run_details",
+  "date_started": "Jul 8, 2015 3:15:06 PM"
+},
+{
+  "truthValue": "00000000",
+  "circuits": [
+    "0"
+  ]
+},
+{
+  "truthValue": "00000011",
+  "circuits": [
+    "((a@b)@(a@b))"
+  ]
+},
+{
+  "truthValue": "00000101",
+  "circuits": [
+    "((a@c)@(a@c))"
+  ]
+},
+{
+  "truthValue": "00001111",
+  "circuits": [
+    "a"
+  ]
+},
+{
+  "truthValue": "00010001",
+  "circuits": [
+    "((b@c)@(b@c))"
+  ]
+},
+{
+  "truthValue": "00110011",
+  "circuits": [
+    "b"
+  ]
+},
+{
+  "truthValue": "01010101",
+  "circuits": [
+    "c"
+  ]
+},
+{
+  "truthValue": "10101010",
+  "circuits": [
+    "(c@c)"
+  ]
+},
+{
+  "truthValue": "10101011",
+  "circuits": [
+    "((a@b)@c)"
+  ]
+},
+{
+  "truthValue": "10101111",
+  "circuits": [
+    "((a@a)@c)",
+    "((a@c)@c)"
+  ]
+},
+{
+  "truthValue": "10111011",
+  "circuits": [
+    "((b@b)@c)",
+    "((b@c)@c)"
+  ]
+},
+{
+  "truthValue": "11001100",
+  "circuits": [
+    "(b@b)"
+  ]
+},
+{
+  "truthValue": "11001101",
+  "circuits": [
+    "((a@c)@b)"
+  ]
+},
+{
+  "truthValue": "11001111",
+  "circuits": [
+    "((a@a)@b)",
+    "((a@b)@b)"
+  ]
+},
+{
+  "truthValue": "11011101",
+  "circuits": [
+    "((c@c)@b)",
+    "((b@c)@b)"
+  ]
+},
+{
+  "truthValue": "11101110",
+  "circuits": [
+    "(b@c)"
+  ]
+},
+{
+  "truthValue": "11110000",
+  "circuits": [
+    "(a@a)"
+  ]
+},
+{
+  "truthValue": "11110001",
+  "circuits": [
+    "((b@c)@a)"
+  ]
+},
+{
+  "truthValue": "11110011",
+  "circuits": [
+    "((b@b)@a)",
+    "((a@b)@a)"
+  ]
+},
+{
+  "truthValue": "11110101",
+  "circuits": [
+    "((c@c)@a)",
+    "((a@c)@a)"
+  ]
+},
+{
+  "truthValue": "11111010",
+  "circuits": [
+    "(a@c)"
+  ]
+},
+{
+  "truthValue": "11111100",
+  "circuits": [
+    "(a@b)"
+  ]
+},
+{
+  "truthValue": "11111111",
+  "circuits": [
+    "1"
+  ]
+}
+]

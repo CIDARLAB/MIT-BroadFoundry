@@ -1,0 +1,6 @@
+# Benchmark "blif_file" written by ABC on Fri Jun 26 15:05:10 2015
+INPUT(in1)
+INPUT(in2)
+INPUT(in3)
+OUTPUT(out)
+out         = NOT(in1)

@@ -1,0 +1,13 @@
+# Benchmark "blif_file" written by ABC on Fri Jun 26 15:04:08 2015
+INPUT(in1)
+INPUT(in2)
+INPUT(in3)
+OUTPUT(out)
+n4          = NOT(in3)
+n5          = AND(in1, in2)
+n6          = NOT(n5)
+n7          = AND(in3, n6)
+n8          = NOT(n7)
+n9          = AND(n4, n5)
+n10         = NOT(n9)
+out         = AND(n8, n10)

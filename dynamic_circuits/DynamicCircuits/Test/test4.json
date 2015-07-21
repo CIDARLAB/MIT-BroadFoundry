@@ -1,0 +1,20 @@
+[
+    {
+        "itr": 10000,
+        "xMax": 10000,
+        "xMin": 0,
+        "yMax": "NONE",
+        "yMin": "NONE"
+    },
+    {
+        "INPUT": [
+            "inputs.squInput",
+            10000.0,
+            100.0,
+            0.0,
+            0.0
+        ],
+        "NAME": "IN1",
+        "TYPE": "INPUT"
+    }
+]

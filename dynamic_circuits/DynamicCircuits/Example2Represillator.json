@@ -1,0 +1,54 @@
+[
+    {
+        "itr": 500,
+        "xMax": 1000,
+        "xMin": 0,
+        "yMax": "NONE",
+        "yMin": "NONE"
+    },
+    {
+        "INPUT": "G5",
+        "Km": 200.0,
+        "Mi": 10.0,
+        "NAME": "G3",
+        "Pi": 1100.0,
+        "TYPE": "NOT",
+        "am": "NONE",
+        "ap": "NONE",
+        "mB": 30.0,
+        "m_HALFLIFE": 2.0,
+        "n": 2.0,
+        "pB": 20.0,
+        "p_HALFLIFE": 10.0
+    },
+    {
+        "INPUT": "G3",
+        "Km": 200.0,
+        "Mi": 10.0,
+        "NAME": "G4",
+        "Pi": 1000.0,
+        "TYPE": "NOT",
+        "am": "NONE",
+        "ap": "NONE",
+        "mB": 30.0,
+        "m_HALFLIFE": 2.0,
+        "n": 2.0,
+        "pB": 20.0,
+        "p_HALFLIFE": 10.0
+    },
+    {
+        "INPUT": "G4",
+        "Km": 200.0,
+        "Mi": 10.0,
+        "NAME": "G5",
+        "Pi": 1000.0,
+        "TYPE": "NOT",
+        "am": "NONE",
+        "ap": "NONE",
+        "mB": 30.0,
+        "m_HALFLIFE": 2.0,
+        "n": 2.0,
+        "pB": 20.0,
+        "p_HALFLIFE": 10.0
+    }
+]

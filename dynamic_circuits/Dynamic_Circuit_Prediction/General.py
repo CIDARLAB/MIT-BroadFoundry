@@ -57,18 +57,6 @@ def generateDynamicCircuitGraphs(fileName):
     #Visualizing Inputs
     inputs_f = []
     inputNames = []
-
-#-------------------------------------------------------------------------------
-    numInputs = len(input_and_logic_gate_names)-len(logic_gate_names)
-    proteinListOfListOfValues = []
-    mRNAListOfListOfValues = []
-    for i in range(numGates):
-        proteinListOfListOfValues.append(getListOfConvergingValues(numInputs, time_axis_params['itr'], protein_f[i]))
-        mRNAListOfListOfValues.append(getListOfConvergingValues(numInputs, time_axis_params['itr'], mRNA_f[i]))    
-    
-    print proteinListOfListOfValues[0]
-    print mRNAListOfListOfValues[0]
-#-------------------------------------------------------------------------------
    
     for thing in input_and_logic_gate_names:
         #For each element in input_and_logic_gate_names, if it is not in logic_gate_names, it is an input.
@@ -82,16 +70,19 @@ def generateDynamicCircuitGraphs(fileName):
             inputs_f.append(temp)
     ymax=0
     for i in inputs_f:
-        m = max(i)*1.1
+        m = max(i)*10
         if m>ymax:
             ymax = m
     plt.figure()
-    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymax=ymax, ymin=-10)
+    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymax=ymax, ymin=1)
    
    #Plot each input against time with its name as the label
     for i in range(len(inputNames)):
-        plt.plot(t,inputs_f[i],color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label=inputNames[i])
+        tempInput = list(inputs_f[i])
+        tempInput.reverse()
+        plt.plot(t,tempInput,color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label=inputNames[i])
     plt.xlabel('Time (min)')
+    plt.yscale('log')
     plt.ylabel('Input molecules per cell')
     plt.title('Concentration of Inputs Over Time')
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
@@ -99,26 +90,121 @@ def generateDynamicCircuitGraphs(fileName):
     
     #Visualizing mRNA concentrations
     plt.figure()
-    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'])
+    
     #Plot each mRNA against time with its name as the label
+    ymax = 0
     for i in range(numGates):
-        plt.plot(t,mRNA_f[i],color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label = logic_gate_names[i])
+        tempmRNA = list(mRNA_f[i])
+        tempmRNA.reverse()
+        tempMax = max(tempmRNA)
+        if tempMax>ymax:
+            ymax = tempMax
+        plt.plot(t,tempmRNA,color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label = logic_gate_names[i])
     plt.xlabel('Time (min)')
+    plt.yscale('log')
     plt.ylabel('Transcripts per cell')
     plt.title('Concentration of mRNA Over Time')
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    ymax = ymax *10
+    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymin=1, ymax = ymax)
     plt.show()
     #Visualizing protein concentrations
     plt.figure()
-    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'])
+    
     #Plot each protein against time with its name as the label
+    ymax = 0
     for i in range(numGates):
-        plt.plot(t,protein_f[i],color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label = logic_gate_names[i])
+        tempProtein = list(protein_f[i])
+        tempProtein.reverse()
+        tempMax = max(tempProtein)
+        if tempMax>ymax:
+            ymax = tempMax
+        plt.plot(t,tempProtein,color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label = logic_gate_names[i])
     plt.xlabel('Time (min)')
+    plt.yscale('log')
     plt.ylabel('Proteins per cell')
     plt.title('Concentration of Protein Over Time')
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    ymax = ymax *10
+    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymin=1, ymax = ymax)
     plt.show()
+    
+#-------------------------------------------------------------------------------
+    numInputs = len(input_and_logic_gate_names)-len(logic_gate_names)
+    proteinListOfListOfValues = []
+    mRNAListOfListOfValues = []
+    for i in range(numGates):
+        proteinListOfListOfValues.append(getListOfConvergingValues(numInputs, time_axis_params['itr'], protein_f[i]))
+        mRNAListOfListOfValues.append(getListOfConvergingValues(numInputs, time_axis_params['itr'], mRNA_f[i]))    
+    
+    #print proteinListOfListOfValues[0]
+    #print mRNAListOfListOfValues[0]
+#-------------------------------------------------------------------------------
+    numBinaries = 2**numInputs
+    binVals = getBinaryInReverse(numBinaries)
+    width = 0.425  
+    t = np.arange(numBinaries)
+    binVals.reverse()
+    for i in range(numGates):
+
+        proteinVals = list(proteinListOfListOfValues[i])
+        mRNAVals = list(mRNAListOfListOfValues[i])
+        proteinVals.reverse()
+        mRNAVals.reverse()
+        #Add 10% so the ymax is slightly higher than the highest bar
+        mrnaymax = max(mRNAVals)*10
+        proteinymax = max(proteinVals)*10
+        currGateProperties = input_and_logic_gate_dictionaries[input_and_logic_gate_names.index(logic_gate_names[i])]
+        tv = currGateProperties['EXPECTED_PROTEIN']
+        name = currGateProperties['NAME']
+        tv.reverse()        
+        
+        plt.figure()
+        #Plot each protein against time with its name as the label
+        plt.axis(xmin=0, xmax=numBinaries, ymin=1, ymax=mrnaymax)
+        barlist = plt.bar(t,mRNAVals)
+        for j in range(numBinaries):
+            if tv[j]=="0":
+                barlist[j].set_color('r')
+        plt.xticks(t+width, binVals)  
+        plt.xlabel('TruthValues')
+        plt.yscale('log')
+        plt.ylabel('mRNA per cell')
+        plt.title('mRNA Levels for ' + name)
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.show()
+        
+        plt.figure()
+        #Plot each protein against time with its name as the label
+        plt.axis(xmin=0, xmax=numBinaries, ymin=1, ymax=proteinymax)
+        barlist = plt.bar(t,proteinVals)
+        for j in range(numBinaries):
+            if tv[j]=="0":
+                barlist[j].set_color('r')
+        plt.xticks(t+width, binVals)  
+        plt.xlabel('TruthValues')
+        plt.yscale('log')
+        plt.ylabel('Proteins per cell')
+        plt.title('Protein Levels for ' + name)
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.show()
+        
+    
+def getBinaryInReverse(maxVal):
+    binVals = []
+    decVals = range(maxVal)
+    decVals.reverse()
+    for i in decVals:
+        temp="{0:b}".format(i)
+        if len(binVals) == 0:
+            binVals.append(temp)
+        else:
+            while len(temp)<len(binVals[0]):
+                temp = "0"+temp
+            binVals.append(temp)
+    return binVals
+        
+    
 
 def f(state, t, input_and_logic_gate_dictionaries, input_and_logic_gate_names, logic_gate_names):
     #Concentration of mRNA and protein at this state
@@ -157,7 +243,7 @@ def getListOfConvergingValues(numInputs, numItr, opGraph):
     interval = numItr/2**numInputs
     for i in range(2**numInputs):
         output.append(copy[(i+1)*interval-2])
-    print output
+    #print output
     return output
 '''
 _______________________________________________________________________________

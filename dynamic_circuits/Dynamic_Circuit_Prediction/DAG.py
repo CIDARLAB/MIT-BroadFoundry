@@ -59,6 +59,10 @@ class DAG(object):
         return self.wires
         
     def formatJson(self):
+        self.setGateDist()
+        self.repressors.sort(self.gateCompare)
+        self.outputs.sort(self.gateCompare)
+        self.setGateTruthValues()
         listVals = [self.time_axis_params]
         for gate in self.inputs:
             listVals.append(gate.formatJson())
@@ -130,6 +134,53 @@ class DAG(object):
                 vals.append(wire.getFrom().getDist())
             gate.setDist(max(vals)+1)
             
+    def setGateTruthValues(self):
+        """
+        Assumes you have a fully connected graph and assigns distances from the
+        inputs
+        """
+        #Visited property is to prevent infinite loops with sequential
+        #circuits
+        for gate in self.repressors:
+            gate.setVisited(False)
+        for gate in self.outputs:
+            gate.setVisited(False)
+            
+        for gate in self.repressors:
+            gate.setExpectedProtein(None)
+        for gate in self.outputs:
+            gate.setExpectedProtein(None)
+        for gate in self.outputs:
+            self.recursivelyFindInputsAndSetTruthValues(gate)
+        
+    def recursivelyFindInputsAndSetTruthValues(self,gate):
+        if gate.wasVisited():
+            return
+        elif gate.getExpectedProtein()!=None and gate.getExpectedPromoter()!=None:
+            return
+        else:
+            gate.setVisited(True)
+            vals = []
+            for wire in gate.getFanIn():
+                self.recursivelyFindInputsAndSetTruthValues(wire.getFrom())
+                vals.append(wire.getFrom().getExpectedPromoter())
+            if len(vals) == 1:
+                truthValue = []
+                for i in range(len(vals[0])):
+                    if vals[0][i] == "1":
+                        truthValue.append("1")
+                    else:
+                        truthValue.append("0")
+                gate.setExpectedProtein(truthValue)
+                
+            elif len(vals) == 2:
+                truthValue = []
+                for i in range(len(vals[0])):
+                    if vals[0][i] == "1" or vals[1][i] == "1":
+                        truthValue.append("1")
+                    else:
+                        truthValue.append("0")
+                gate.setExpectedProtein(truthValue)
         
     def __str__(self):
         result = 'Inputs:\n'
@@ -146,6 +197,7 @@ class DAG(object):
         self.setGateDist()
         self.repressors.sort(self.gateCompare)
         self.outputs.sort(self.gateCompare)
+        self.setGateTruthValues()
 #        self.sortGates()
         for gate in self.repressors:
             gateStr = ""

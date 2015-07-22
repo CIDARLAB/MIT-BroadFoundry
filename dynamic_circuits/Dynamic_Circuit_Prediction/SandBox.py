@@ -593,7 +593,7 @@ def func3(values,tv):
     plt.figure()
     #Plot each protein against time with its name as the label
     plt.axis(xmin=0, xmax=6, ymin=0,ymax=6)
-    barlist = plt.bar(range(numBins),values)
+    barlist = plt.bar(t,values)
     for i in range(numBins):
         if tv[i]==0:
             barlist[i].set_color('r')

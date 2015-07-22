@@ -48,7 +48,11 @@ def NOR(t,initmRNAVal,gateProperties,input_and_logic_gate_dictionaries,input_and
     else:
         Inputfunc1 = InputProperties1['INPUT']
         Input1 = Inputfunc1[0](t,*Inputfunc1[1:])
-    secondTerm = repressor(mB1,Km1,n1,Input1)
+#    secondTerm = repressor(mB1,Km1,n1,Input1)
+    if gateProperties['INPUT1_EFFECT']=="REPRESS":
+        secondTerm = repressor(mB1,Km1,n1,Input1)
+    elif gateProperties['INPUT1_EFFECT']=="ACTIVATE":
+        secondTerm = activator(mB1,Km1,n1,Input1)
     
     #Third Term
     #Getting values from the second input
@@ -65,7 +69,10 @@ def NOR(t,initmRNAVal,gateProperties,input_and_logic_gate_dictionaries,input_and
     else:
         Inputfunc2 = InputProperties2['INPUT']
         Input2 = Inputfunc2[0](t,*Inputfunc2[1:])
-    thirdTerm = repressor(mB2,Km2,n2,Input2)
+    if gateProperties['INPUT2_EFFECT']=="REPRESS":
+        thirdTerm = repressor(mB2,Km2,n2,Input2)
+    elif gateProperties['INPUT2_EFFECT']=="ACTIVATE":
+        thirdTerm = activator(mB2,Km2,n2,Input2)
     return firstTerm + secondTerm + thirdTerm
 
 
@@ -91,7 +98,11 @@ def NOT(t,initmRNAVal,gateProperties,input_and_logic_gate_dictionaries,input_and
     else:
         Inputfunc = InputProperties['INPUT']
         Input = Inputfunc[0](t,*Inputfunc[1:])
-    secondTerm = repressor(mB,Km,n,Input)
+#    secondTerm = repressor(mB,Km,n,Input)
+    if gateProperties['INPUT_EFFECT']=="REPRESS":
+        secondTerm = repressor(mB,Km,n,Input)
+    elif gateProperties['INPUT_EFFECT']=="ACTIVATE":
+        secondTerm = activator(mB,Km,n,Input)
     
     return firstTerm + secondTerm
 
@@ -119,7 +130,11 @@ def OR(t,initmRNAVal,gateProperties,input_and_logic_gate_dictionaries,input_and_
     else:
         Inputfunc1 = InputProperties1['INPUT']
         Input1 = Inputfunc1[0](t,*Inputfunc1[1:])
-    secondTerm = activator(mB1,Km1,n1,Input1)
+#    secondTerm = activator(mB1,Km1,n1,Input1)
+    if gateProperties['INPUT1_EFFECT']=="REPRESS":
+        secondTerm = repressor(mB1,Km1,n1,Input1)
+    elif gateProperties['INPUT1_EFFECT']=="ACTIVATE":
+        secondTerm = activator(mB1,Km1,n1,Input1)
     
     #Third Term
     mB2 = gateProperties['mB2']
@@ -135,7 +150,11 @@ def OR(t,initmRNAVal,gateProperties,input_and_logic_gate_dictionaries,input_and_
     else:
         Inputfunc2 = InputProperties2['INPUT']
         Input2 = Inputfunc2[0](t,*Inputfunc2[1:])
-    thirdTerm = activator(mB2,Km2,n2,Input2)
+#    thirdTerm = activator(mB2,Km2,n2,Input2)
+    if gateProperties['INPUT2_EFFECT']=="REPRESS":
+        thirdTerm = repressor(mB2,Km2,n2,Input2)
+    elif gateProperties['INPUT2_EFFECT']=="ACTIVATE":
+        thirdTerm = activator(mB2,Km2,n2,Input2)
     return firstTerm + secondTerm + thirdTerm
 
 def BUFFER(t,initmRNAVal,gateProperties,input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names,initProtein):
@@ -160,7 +179,11 @@ def BUFFER(t,initmRNAVal,gateProperties,input_and_logic_gate_dictionaries,input_
     else:
         Inputfunc = InputProperties['INPUT']
         Input = Inputfunc[0](t,*Inputfunc[1:])
-    secondTerm = activator(mB,Km,n,Input)
+#    secondTerm = activator(mB,Km,n,Input)
+    if gateProperties['INPUT_EFFECT']=="REPRESS":
+        secondTerm = repressor(mB,Km,n,Input)
+    elif gateProperties['INPUT_EFFECT']=="ACTIVATE":
+        secondTerm = activator(mB,Km,n,Input)
     
     return firstTerm + secondTerm
 

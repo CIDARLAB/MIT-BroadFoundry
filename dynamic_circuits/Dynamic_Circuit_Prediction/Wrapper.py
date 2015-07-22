@@ -15,9 +15,7 @@ import GeneralJsonIO
 import inputs
 import update
 import re
-circuitString = "(((((a.0).b).(a.0)).0).(c.0))"
-circuitString2 = "(((((a.0).b).(a.0)).0).(c.0))"
-circuitString3 = "(((((((b.0).a).(b.0)).c).(((b.0).a).(b.0))).((b.0).c)).0)"
+
 
 def makeDAGFromString(circuitString):
     #Given a string representation of a circuit and the Input pattern.
@@ -50,14 +48,16 @@ def makeDAGFromString(circuitString):
     elif inputNames[0] != "0":
         inputNames2 = inputNames[:]
     
-
+    inputBin = makeInputBin(len(inputNames2))
     
     #Make a gate for all but 0
     initPeriod = 500*2**(len(inputNames2))
     period = initPeriod
-    for name in inputNames2:
-        tempInput = Gate.Gate(name,40,2,'Input',30,None,None,None)
-        tempInput.setInputType(['inputs.squInput',period,100,0,0])
+    for i in range(len(inputNames2)):
+        name = inputNames2[i]
+        tempInput = Gate.Gate(name,10,2,'Input',30,None,None,None)
+        tempInput.setInputType(['inputs.squInput',period,100,0,1])
+        tempInput.setExpectedProtein(inputBin[i])
         period /= 2.0 
         Inputs.append(tempInput)
 #    print stringInputs
@@ -217,7 +217,7 @@ def makeDAGFromString(circuitString):
     allRepressorNames = allGatesDictFanIn.keys()
     Repressors = []
     for repressorName in allRepressorNames:
-        tempRepressor = Gate.Gate(repressorName,30000,2,'Repressor',30,20,2,10)
+        tempRepressor = Gate.Gate(repressorName,1000,2,'Repressor',30,20,2,10)
         Repressors.append(tempRepressor)
     allOutputNames = outputDict.keys()
     Outputs = []
@@ -320,6 +320,7 @@ def performSwaps(dag,allGates,Inputs,allGatesr,Inputsr):
             allGatesr[i].setFanIn(allGates[i].getFanIn())
     for i in range(len(Inputsr)):
         Inputsr[i].setInputType(Inputs[i].getInputType())
+        Inputsr[i].setExpectedProtein(Inputs[i].getExpectedProtein())
     #add new gates to dag 
     for gate in allGatesr:
         dag.addGate(gate)
@@ -327,11 +328,21 @@ def performSwaps(dag,allGates,Inputs,allGatesr,Inputsr):
     for gate in allGates:
         dag.removeGate(gate)
 
-circuitString = '((a.b).0)' #00111111
+circuitString1 = '((((a.0).(b.0)).0).(c.0))' #00000001
+circuitString2 = '((((a.b).(a.c)).a).(b.c))' #00010111
+circuitString3 = '(((((a.c).c).0).(b.c)).(((a.c).c).b))' #00111001
+circuitString4 = 'a' #00001111
+circuitString5 = '(a.b)' #11000000
+circuitString6 = '((a.b).0)' #00111111
+circuitString7 = '(a.0)' #11110000
+circuitString8 = '((a.b).c)' #00101010
+circuitString9 = '((a.0).a)' #00000000
+circuitString10 = '((a.0).b)' #00001100
+
 fileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/test.json"
-inputsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/InputLibrary1.json"
-repressorsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/RepressorLibrary1.json"
-outputsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/OutputLibrary1.json"
+inputsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/InputLibrary2.json"
+repressorsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/RepressorLibrary2.json"
+outputsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/OutputLibrary2.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
 def wrapper(circuitString, Libraries, fileLoc):
     #Make DAG from string
@@ -339,7 +350,7 @@ def wrapper(circuitString, Libraries, fileLoc):
     #Get replacements for the gates
     allGatesr, Inputsr, Repressorsr, Outputsr = makeGatesFromLibraries(Libraries,allGates, Inputs, Repressors, Outputs)
     #Perform Swaps
-    #performSwaps(dag, allGates, Inputs, allGatesr, Inputsr)
+#    performSwaps(dag, allGates, Inputs, allGatesr, Inputsr)
 
     print dag
     #Write to Json File
@@ -365,6 +376,7 @@ def findSmallestParentheses(circuit):
                 print "parentheses are not properly matched"
                 return None
     return None
+
 def func(circuitString):
     """
     pausing in between each set of libraries, generates a graph for each 
@@ -377,3 +389,20 @@ def func(circuitString):
          Libraries = [inputsDir, repressorsDir, outputsDir]
          wrapper(circuitString, Libraries, fileLoc)
          pause = raw_input("Finished "+str(i))
+         
+def makeInputBin(numInputs):
+    binSize = 2**numInputs
+    base = "10"
+    allInputBin = []
+    for i in range(numInputs):
+        
+        tempInput = base
+        while len(tempInput)<binSize:
+            tempInput += base
+        nextLen = len(base)*2
+        while len(base)<nextLen:
+            base = "1" + base + "0"
+        allInputBin.append(list(tempInput))
+        #allInputBin.append(tempInput)
+    allInputBin.reverse()
+    return allInputBin

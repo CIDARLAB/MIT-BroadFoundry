@@ -45,6 +45,8 @@ class Gate(object):
         self.inputType = None
         self.dist = 0    
         self.visited = True
+        self.expectedProtein = None
+        self.expectedPromoter = None
         
         if self.gateType != 'Output':
             self.Km = float(Km)
@@ -254,10 +256,38 @@ class Gate(object):
         
     def setDist(self, d):
         self.dist = int(d)
+        
     def setVisited(self, visited):
         assert type(visited)==bool
         self.visited = visited
-    
+
+    def setExpectedProtein(self,tv):
+        assert type(tv) == list or tv == None
+        self.expectedProtein = tv
+        if tv!=None:
+            if self.gateType == "Input":
+                self.setExpectedPromoter(tv)
+            elif self.gateType == "Repressor":
+                self.setExpectedPromoter(self.invertTruth(tv))
+            elif self.gateType == "Output":
+                self.setExpectedPromoter(None)
+        elif tv==None:
+            self.setExpectedPromoter(tv)
+            
+        
+    def setExpectedPromoter(self,tv):
+        assert type(tv) == list or tv == None
+        self.expectedPromoter = tv
+        
+    def invertTruth(self, tv):
+        newTruthValue = []
+        for i in tv:
+            if i == "0":
+                newTruthValue.append("1")
+            elif i == "1":
+                newTruthValue.append("0")
+        return newTruthValue
+        
     def getAllProperties(self):
         '''
         Returns a dictionary of all the properties of the gate
@@ -275,6 +305,9 @@ class Gate(object):
         allProperties['p_halfLife'] = self.p_halfLife
         allProperties['am'] = self.am
         allProperties['ap'] = self.ap
+        allProperties['DIST'] = self.dist
+        allProperties['EXPECTED_PROTEIN'] = self.expectedProtein
+        allProperties['EXPECTED_PROMOTER'] = self.expectedPromoter
         if self.gateType=='Input':
             allProperties['InputType'] = self.inputType
         else:
@@ -316,10 +349,17 @@ class Gate(object):
         return self.dist
     def wasVisited(self):
         return self.visited
+    def getExpectedProtein(self):
+        return self.expectedProtein
+    def getExpectedPromoter(self):
+        return self.expectedPromoter
 
     def formatJson(self):
         gateDescription = {}
         gateDescription['NAME'] = self.name
+        gateDescription['DIST'] = self.dist
+        gateDescription['EXPECTED_PROTEIN'] = self.expectedProtein
+        gateDescription['EXPECTED_PROMOTER'] = self.expectedPromoter
         if self.gateType=='Input':
             gateDescription['TYPE'] = 'INPUT'
             gateDescription['INPUT'] = self.inputType
@@ -338,6 +378,10 @@ class Gate(object):
                 gateDescription['Km'] = self.fanIn[0].getFrom().getKm()
                 gateDescription['ap'] = 'NONE'
                 gateDescription['pB'] = self.pB
+                if self.fanIn[0].getFrom().getGateType()=="Input":
+                    gateDescription['INPUT_EFFECT'] = "ACTIVATE"
+                elif self.fanIn[0].getFrom().getGateType()=="Repressor":
+                    gateDescription['INPUT_EFFECT'] = "REPRESS"
                 
             elif len(self.fanIn)==2:
                 gateDescription['TYPE'] = 'NOR'
@@ -355,7 +399,16 @@ class Gate(object):
                 gateDescription['n2'] = self.fanIn[1].getFrom().getn()
                 gateDescription['Km2'] = self.fanIn[1].getFrom().getKm()
                 gateDescription['ap'] = 'NONE'
-                gateDescription['pB'] = self.pB            
+                gateDescription['pB'] = self.pB   
+                if self.fanIn[0].getFrom().getGateType()=="Input":
+                    gateDescription['INPUT1_EFFECT'] = "ACTIVATE"
+                elif self.fanIn[0].getFrom().getGateType()=="Repressor":
+                    gateDescription['INPUT1_EFFECT'] = "REPRESS"
+                if self.fanIn[1].getFrom().getGateType()=="Input":
+                    gateDescription['INPUT2_EFFECT'] = "ACTIVATE"
+                elif self.fanIn[1].getFrom().getGateType()=="Repressor":
+                    gateDescription['INPUT2_EFFECT'] = "REPRESS"                
+                
         elif self.gateType=='Output':
             if len(self.fanIn)==1:
                 gateDescription['TYPE'] = 'BUFFER'
@@ -370,6 +423,11 @@ class Gate(object):
                 gateDescription['Km'] = self.fanIn[0].getFrom().getKm()
                 gateDescription['ap'] = 'NONE'
                 gateDescription['pB'] = self.pB
+                if self.fanIn[0].getFrom().getGateType()=="Input":
+                    gateDescription['INPUT_EFFECT'] = "ACTIVATE"
+                elif self.fanIn[0].getFrom().getGateType()=="Repressor":
+                    gateDescription['INPUT_EFFECT'] = "REPRESS"
+                
                 
             elif len(self.fanIn)==2:
                 gateDescription['TYPE'] = 'OR'
@@ -388,6 +446,14 @@ class Gate(object):
                 gateDescription['Km2'] = self.fanIn[1].getFrom().getKm()
                 gateDescription['ap'] = 'NONE'
                 gateDescription['pB'] = self.pB
+                if self.fanIn[0].getFrom().getGateType()=="Input":
+                    gateDescription['INPUT1_EFFECT'] = "ACTIVATE"
+                elif self.fanIn[0].getFrom().getGateType()=="Repressor":
+                    gateDescription['INPUT1_EFFECT'] = "REPRESS"
+                if self.fanIn[1].getFrom().getGateType()=="Input":
+                    gateDescription['INPUT2_EFFECT'] = "ACTIVATE"
+                elif self.fanIn[1].getFrom().getGateType()=="Repressor":
+                    gateDescription['INPUT2_EFFECT'] = "REPRESS"
         return gateDescription
         
     def __str__(self):

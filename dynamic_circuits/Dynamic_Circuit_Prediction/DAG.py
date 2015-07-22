@@ -77,24 +77,10 @@ class DAG(object):
         Used to sort gates assuming the name of the gate is a single letter
         followed by the gate number.
         """
-        i = len(gate1.getName())-1
-        while (gate1.getName()[i] in "0123456789"):
-            i-=1
-        i+=1
-        gate1Num = int(gate1.getName()[i:])
-        
-        i = len(gate2.getName())-1
-        while (gate2.getName()[i] in "0123456789"):
-            i-=1
-        i+=1
-        gate2Num = int(gate2.getName()[i:])
                 
-        
-#        gate1Num = int(gate1.getName()[1:])
-#        gate2Num = int(gate2.getName()[1:])
-        if gate1Num>gate2Num:
+        if gate1.getDist()>gate2.getDist():
             return 1
-        elif gate1Num==gate2Num:
+        elif gate1.getDist()==gate2.getDist():
             return 0
         else: #gate1Num<gate2Num
             return -1
@@ -117,7 +103,34 @@ class DAG(object):
                     rep.getFanIn()[0].getFrom().getGateType()=="Input"):
                         sortedRepressors.append(rep)
         self.repressors = sortedRepressors
-    
+    def setGateDist(self):
+        """
+        Assumes you have a fully connected graph and assigns distances from the
+        inputs
+        """
+        #Visited property is to prevent infinite loops with sequential
+        #circuits
+        for gate in self.repressors:
+            gate.setVisited(False)
+        for gate in self.outputs:
+            gate.setVisited(False)
+        for gate in self.outputs:
+            self.recursivelyFindInputs(gate)
+        
+    def recursivelyFindInputs(self,gate):
+        if gate.wasVisited():
+            return
+        elif gate.getGateType()=="Input":
+            return
+        else:
+            gate.setVisited(True)
+            vals = []
+            for wire in gate.getFanIn():
+                self.recursivelyFindInputs(wire.getFrom())
+                vals.append(wire.getFrom().getDist())
+            gate.setDist(max(vals)+1)
+            
+        
     def __str__(self):
         result = 'Inputs:\n'
         for gate in self.inputs:
@@ -130,8 +143,10 @@ class DAG(object):
             result = result + gate.getName() + '\n\n'
             
         result = result + 'NETLIST:\n'
-#        self.repressors.sort(self.gateCompare)
-        self.sortGates()
+        self.setGateDist()
+        self.repressors.sort(self.gateCompare)
+        self.outputs.sort(self.gateCompare)
+#        self.sortGates()
         for gate in self.repressors:
             gateStr = ""
             if len(gate.getFanIn()) == 2:
@@ -141,7 +156,7 @@ class DAG(object):
             gateStr = gateStr + gate.getName() + ","
             for w in gate.getFanIn():
                 gateStr = gateStr + w.getFrom().getName() + ","
-            gateStr = gateStr[:-1] + ");\n"
+            gateStr = gateStr[:-1] + "); distance = "+str(gate.getDist())+"\n"
             result = result + gateStr
         for gate in self.outputs:
             gateStr = ""
@@ -152,6 +167,6 @@ class DAG(object):
             gateStr = gateStr + gate.getName() + ","
             for w in gate.getFanIn():
                 gateStr = gateStr + w.getFrom().getName() + ","
-            gateStr = gateStr[:-1] + ");\n"
+            gateStr = gateStr[:-1] + "); distance = "+str(gate.getDist())+"\n"
             result = result + gateStr
         return result

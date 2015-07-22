@@ -43,6 +43,8 @@ class Gate(object):
         self.Pi = None
         #To adjust the input equation for Inputs
         self.inputType = None
+        self.dist = 0    
+        self.visited = True
         
         if self.gateType != 'Output':
             self.Km = float(Km)
@@ -56,6 +58,8 @@ class Gate(object):
             self.ap = np.log(2)/self.p_halfLife
             self.Mi = 0.0
             self.Pi = 0.0
+            #self.dist = 9999 #arbitrary high value
+            self.visited = False
             
 
         
@@ -248,6 +252,12 @@ class Gate(object):
         assert self.gateType!='Input'
         self.Pi = Pi
         
+    def setDist(self, d):
+        self.dist = int(d)
+    def setVisited(self, visited):
+        assert type(visited)==bool
+        self.visited = visited
+    
     def getAllProperties(self):
         '''
         Returns a dictionary of all the properties of the gate
@@ -302,6 +312,10 @@ class Gate(object):
         return self.Mi
     def getPi(self):
         return self.Pi
+    def getDist(self):
+        return self.dist
+    def wasVisited(self):
+        return self.visited
 
     def formatJson(self):
         gateDescription = {}

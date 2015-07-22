@@ -11,6 +11,8 @@ import GeneralJsonIO
 import inputs
 import update
 import re
+import matplotlib.pyplot as plt
+import numpy as np
 
 def makeDAGFromString(circuitString):
     #Given a string representation of a circuit and the Input pattern.
@@ -552,3 +554,66 @@ def wrapper(circuitString, fileLoc=""):
     dag2.writeToJson(fileLoc)
 #    #Make graphs from JsonFile
     General.generateDynamicCircuitGraphs(fileLoc)
+    
+values = [0.5,5,4,0.8]
+tv = [0,1,1,0] 
+   
+def func3(values,tv):
+#    tzero = [1,4]
+#    yzero = [0.5,0.8]
+#    tone = [2,3]
+#    yone = [5,4]
+#    
+#    zeros = (tzero,yzero)
+#    ones = (tone,yone)
+#        # the width of the bars: can also be len(x) sequence
+#
+#    
+#    combinedOne = [0,5,4,0]
+#    combinedZero = [0.5,0,0,0.8]
+#    width = 0.425  
+#    t = np.arange(4)
+#    plt.figure()
+#    #Plot each protein against time with its name as the label
+#    plt.axis(xmin=0, xmax=6, ymin=0,ymax=6)
+#    
+#    plt.bar(t,combinedOne,color="b",label = "ones")
+#    plt.bar(t,combinedZero,color="r",label = "zeros")
+#    plt.xticks(t+width, ('11', '10', '01', '00') )  
+#    plt.xlabel('Time (min)')
+#    plt.ylabel('Proteins per cell')
+#    plt.title('Concentration of Protein Over Time')
+#    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+#    plt.show()
+    numInputs = 2
+    numBins = 2**numInputs
+    binVals = getBinaryInReverse(numBins)
+    width = 0.425  
+    t = np.arange(numBins)
+    plt.figure()
+    #Plot each protein against time with its name as the label
+    plt.axis(xmin=0, xmax=6, ymin=0,ymax=6)
+    barlist = plt.bar(range(numBins),values)
+    for i in range(numBins):
+        if tv[i]==0:
+            barlist[i].set_color('r')
+    plt.xticks(t+width, binVals )  
+    plt.xlabel('Time (min)')
+    plt.ylabel('Proteins per cell')
+    plt.title('Concentration of Protein Over Time')
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.show()
+    
+def getBinaryInReverse(maxVal):
+    binVals = []
+    decVals = range(maxVal)
+    decVals.reverse()
+    for i in decVals:
+        temp="{0:b}".format(i)
+        if len(binVals) == 0:
+            binVals.append(temp)
+        else:
+            while len(temp)<len(binVals[0]):
+                temp = "0"+temp
+            binVals.append(temp)
+    return binVals

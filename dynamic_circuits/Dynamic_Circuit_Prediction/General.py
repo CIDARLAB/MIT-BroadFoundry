@@ -79,7 +79,7 @@ def generateDynamicCircuitGraphs(fileName):
    #Plot each input against time with its name as the label
     for i in range(len(inputNames)):
         tempInput = list(inputs_f[i])
-        tempInput.reverse()
+        #tempInput.reverse()
         plt.plot(t,tempInput,color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label=inputNames[i])
     plt.xlabel('Time (min)')
     plt.yscale('log')
@@ -95,7 +95,7 @@ def generateDynamicCircuitGraphs(fileName):
     ymax = 0
     for i in range(numGates):
         tempmRNA = list(mRNA_f[i])
-        tempmRNA.reverse()
+        #tempmRNA.reverse()
         tempMax = max(tempmRNA)
         if tempMax>ymax:
             ymax = tempMax
@@ -115,7 +115,7 @@ def generateDynamicCircuitGraphs(fileName):
     ymax = 0
     for i in range(numGates):
         tempProtein = list(protein_f[i])
-        tempProtein.reverse()
+        #tempProtein.reverse()
         tempMax = max(tempProtein)
         if tempMax>ymax:
             ymax = tempMax
@@ -144,20 +144,20 @@ def generateDynamicCircuitGraphs(fileName):
     binVals = getBinaryInReverse(numBinaries)
     width = 0.425  
     t = np.arange(numBinaries)
-    binVals.reverse()
+    scoreDict = {}
     for i in range(numGates):
 
         proteinVals = list(proteinListOfListOfValues[i])
         mRNAVals = list(mRNAListOfListOfValues[i])
-        proteinVals.reverse()
-        mRNAVals.reverse()
+        #proteinVals.reverse()
+        #mRNAVals.reverse()
         #Add 10% so the ymax is slightly higher than the highest bar
         mrnaymax = max(mRNAVals)*10
         proteinymax = max(proteinVals)*10
         currGateProperties = input_and_logic_gate_dictionaries[input_and_logic_gate_names.index(logic_gate_names[i])]
         tv = currGateProperties['EXPECTED_PROTEIN']
-        name = currGateProperties['NAME']
-        tv.reverse()        
+        name = str(currGateProperties['NAME'])
+        tv       
         
         plt.figure()
         #Plot each protein against time with its name as the label
@@ -188,7 +188,19 @@ def generateDynamicCircuitGraphs(fileName):
         plt.title('Protein Levels for ' + name)
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         plt.show()
+        lowestHigh = proteinymax
+        highestLow = 0.0
+        for i in range(numBinaries):
+            tempVal = proteinVals[i]
+            if tv[i] == "1" and tempVal<lowestHigh:
+                lowestHigh = tempVal
+            elif tv[i] == "0" and tempVal>highestLow:
+                highestLow = tempVal
+        gateScore = lowestHigh/highestLow
+        scoreDict[name] = gateScore
         
+    print "Gate scores:"
+    print scoreDict
     
 def getBinaryInReverse(maxVal):
     binVals = []
@@ -202,6 +214,7 @@ def getBinaryInReverse(maxVal):
             while len(temp)<len(binVals[0]):
                 temp = "0"+temp
             binVals.append(temp)
+    binVals.reverse()
     return binVals
         
     

@@ -1,9 +1,9 @@
 import json
 import random
 
-standardNonInput = {"Km":30000,"n":2,"mB":30,"pB":20,"m_halfLife":2,"p_halfLife":10}
-standardInput = {"Km":40,"n":2,"mB":30}
-fileLoc = "C:/Users/Arinze/SkyDrive/UROP_Summer_2015/ODE/Libraries"
+standardNonInput = {"Km":1000,"n":2,"mB":30,"pB":20,"m_halfLife":2,"p_halfLife":10}
+standardInput = {"Km":5,"n":2,"mB":30}
+fileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015"
 numInputs = 4
 numRepressors = 10
 numOutputs = 3

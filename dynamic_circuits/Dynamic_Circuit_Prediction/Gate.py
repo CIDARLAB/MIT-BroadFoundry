@@ -96,6 +96,10 @@ class Gate(object):
         while len(fanIn)!=0:
             wire = fanIn[0]
             wire.setTo(self)
+            try:
+                fanIn.remove(wire)
+            except ValueError:
+                pass
             self.fanIn.append(wire)
         
     def addFanInWire(self,wire):
@@ -163,7 +167,12 @@ class Gate(object):
         #set the values
         self.fanOut = []
         while len(fanOut)!=0:
+            wire = fanOut[0]
             wire.setFrom(self)
+            try:
+                fanOut.remove(wire)
+            except ValueError:
+                pass
             self.fanOut.append(wire)
         
     def setKm(self,Km):

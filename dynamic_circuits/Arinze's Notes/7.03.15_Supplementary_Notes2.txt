@@ -1,0 +1,145 @@
+maxCost = 5 only NOR
+Fri Jul 03 22:25:28 2015    test.profile
+
+         11161570 function calls in 16.876 seconds
+
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+  1200541    5.233    0.000    5.349    0.000 Truths_and_Gates.py:325(findSmallestParentheses)
+    64980    2.479    0.000    5.081    0.000 Truths_and_Gates.py:46(circuitCost)
+   546942    2.383    0.000    2.726    0.000 Truths_and_Gates.py:190(NOR)
+    69166    2.375    0.000   10.598    0.000 Truths_and_Gates.py:6(getTruthValue)
+  3809286    1.467    0.000    1.467    0.000 {method 'find' of 'str' objects}
+  1938725    1.456    0.000    1.456    0.000 {method 'replace' of 'str' objects}
+      504    0.466    0.001    0.466    0.001 {method 'acquire' of 'thread.lock' objects}
+        1    0.389    0.389   16.876   16.876 CircuitOptimizer.py:8(minCircuitFinder1)
+  2841763    0.250    0.000    0.250    0.000 {len}
+   546942    0.210    0.000    0.210    0.000 {method 'index' of 'str' objects}
+     2349    0.066    0.000    0.542    0.000 Truths_and_Gates.py:355(containsEqualSubCircuit)
+    64982    0.028    0.000    0.028    0.000 {method 'keys' of 'dict' objects}
+    67684    0.024    0.000    0.024    0.000 {method 'append' of 'list' objects}
+      126    0.007    0.000    0.007    0.000 {method 'send' of '_socket.socket' objects}
+      126    0.005    0.000    0.478    0.004 rpc.py:295(_getresponse)
+      126    0.003    0.000    0.003    0.000 {cPickle.dumps}
+      126    0.003    0.000    0.517    0.004 PyShell.py:1343(write)
+      126    0.003    0.000    0.017    0.000 rpc.py:321(putmessage)
+      126    0.003    0.000    0.003    0.000 {select.select}
+      126    0.003    0.000    0.025    0.000 rpc.py:218(asynccall)
+      126    0.002    0.000    0.483    0.004 rpc.py:238(asyncreturn)
+      126    0.002    0.000    0.471    0.004 threading.py:309(wait)
+      126    0.002    0.000    0.512    0.004 rpc.py:591(__call__)
+      126    0.002    0.000    0.004    0.000 threading.py:260(__init__)
+      126    0.002    0.000    0.510    0.004 rpc.py:208(remotecall)
+      252    0.001    0.000    0.001    0.000 {thread.allocate_lock}
+      126    0.001    0.000    0.002    0.000 rpc.py:543(__getattr__)
+      126    0.001    0.000    0.008    0.000 threading.py:220(_acquire_restore)
+      126    0.001    0.000    0.001    0.000 threading.py:187(release)
+      882    0.001    0.000    0.001    0.000 rpc.py:149(debug)
+      126    0.001    0.000    0.001    0.000 threading.py:147(acquire)
+      126    0.001    0.000    0.480    0.004 rpc.py:279(getresponse)
+      126    0.001    0.000    0.002    0.000 threading.py:132(__init__)
+      126    0.001    0.000    0.001    0.000 threading.py:228(_release_save)
+      126    0.001    0.000    0.001    0.000 rpc.py:287(_proxify)
+      126    0.001    0.000    0.005    0.000 threading.py:242(Condition)
+      630    0.001    0.000    0.001    0.000 threading.py:64(_note)
+      252    0.000    0.000    0.001    0.000 threading.py:1152(currentThread)
+      252    0.000    0.000    0.000    0.000 {isinstance}
+      126    0.000    0.000    0.002    0.000 threading.py:114(RLock)
+      126    0.000    0.000    0.001    0.000 socket.py:227(meth)
+      362    0.000    0.000    0.000    0.000 {range}
+      252    0.000    0.000    0.000    0.000 threading.py:59(__init__)
+      126    0.000    0.000    0.000    0.000 {_struct.pack}
+      126    0.000    0.000    0.000    0.000 rpc.py:317(newseq)
+      126    0.000    0.000    0.000    0.000 rpc.py:586(__init__)
+      630    0.000    0.000    0.000    0.000 {thread.get_ident}
+        1    0.000    0.000   16.876   16.876 <string>:1(<module>)
+      126    0.000    0.000    0.000    0.000 threading.py:238(_is_owned)
+      126    0.000    0.000    0.000    0.000 {getattr}
+      126    0.000    0.000    0.000    0.000 rpc.py:244(decoderesponse)
+      126    0.000    0.000    0.000    0.000 {method 'get' of 'dict' objects}
+      252    0.000    0.000    0.000    0.000 {method 'release' of 'thread.lock' objects}
+      126    0.000    0.000    0.000    0.000 {method 'fileno' of '_socket.socket' objects}
+        6    0.000    0.000    0.000    0.000 {round}
+        6    0.000    0.000    0.000    0.000 {method 'sort' of 'list' objects}
+        7    0.000    0.000    0.000    0.000 {time.time}
+        6    0.000    0.000    0.000    0.000 {method 'index' of 'list' objects}
+        8    0.000    0.000    0.000    0.000 {method 'pop' of 'dict' objects}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+
+<pstats.Stats instance at 0x00000000028D2B08>
+
+maxCost=6 only NOR
+
+Fri Jul 03 23:19:18 2015    test.profile
+
+         340868517 function calls in 772.139 seconds
+
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+ 36819460  254.054    0.000  259.601    0.000 Truths_and_Gates.py:331(findSmallestParentheses)
+  1658931  119.727    0.000  251.111    0.000 Truths_and_Gates.py:52(circuitCost)
+ 16841292  110.510    0.000  126.521    0.000 Truths_and_Gates.py:196(NOR)
+  1684207  108.443    0.000  500.703    0.000 Truths_and_Gates.py:6(getTruthValue)
+ 58576676   70.271    0.000   70.271    0.000 {method 'replace' of 'str' objects}
+117746934   67.967    0.000   67.967    0.000 {method 'find' of 'str' objects}
+        1   16.015   16.015  772.139  772.139 CircuitOptimizer.py:8(minCircuitFinder1)
+ 87343798   11.776    0.000   11.776    0.000 {len}
+ 16841292    9.782    0.000    9.782    0.000 {method 'index' of 'str' objects}
+  1658933    1.100    0.000    1.100    0.000 {method 'keys' of 'dict' objects}
+  1671258    1.006    0.000    1.006    0.000 {method 'append' of 'list' objects}
+      588    0.828    0.001    0.828    0.001 {method 'acquire' of 'thread.lock' objects}
+    14763    0.583    0.000    4.984    0.000 Truths_and_Gates.py:361(containsEqualSubCircuit)
+      147    0.012    0.000    0.012    0.000 {method 'send' of '_socket.socket' objects}
+      147    0.007    0.000    0.846    0.006 rpc.py:295(_getresponse)
+      147    0.005    0.000    0.005    0.000 {cPickle.dumps}
+      147    0.004    0.000    0.854    0.006 rpc.py:238(asyncreturn)
+      146    0.004    0.000    0.902    0.006 PyShell.py:1343(write)
+      147    0.004    0.000    0.026    0.000 rpc.py:321(putmessage)
+      147    0.004    0.000    0.037    0.000 rpc.py:218(asynccall)
+      147    0.004    0.000    0.004    0.000 {select.select}
+     1823    0.003    0.000    0.003    0.000 {range}
+      147    0.003    0.000    0.835    0.006 threading.py:309(wait)
+      147    0.003    0.000    0.894    0.006 rpc.py:208(remotecall)
+      147    0.003    0.000    0.006    0.000 threading.py:260(__init__)
+      294    0.002    0.000    0.002    0.000 {thread.allocate_lock}
+      146    0.002    0.000    0.827    0.006 rpc.py:591(__call__)
+      147    0.002    0.000    0.008    0.000 threading.py:220(_acquire_restore)
+      146    0.001    0.000    0.071    0.000 rpc.py:543(__getattr__)
+      147    0.001    0.000    0.002    0.000 threading.py:147(acquire)
+      147    0.001    0.000    0.849    0.006 rpc.py:279(getresponse)
+      147    0.001    0.000    0.001    0.000 threading.py:187(release)
+     1029    0.001    0.000    0.001    0.000 rpc.py:149(debug)
+      294    0.001    0.000    0.001    0.000 threading.py:1152(currentThread)
+      735    0.001    0.000    0.001    0.000 threading.py:64(_note)
+      147    0.001    0.000    0.002    0.000 threading.py:132(__init__)
+      147    0.001    0.000    0.001    0.000 threading.py:228(_release_save)
+      147    0.001    0.000    0.007    0.000 threading.py:242(Condition)
+      147    0.001    0.000    0.001    0.000 rpc.py:287(_proxify)
+        1    0.001    0.001  772.139  772.139 <string>:1(<module>)
+      294    0.001    0.000    0.001    0.000 {isinstance}
+      147    0.001    0.000    0.001    0.000 {_struct.pack}
+      147    0.001    0.000    0.003    0.000 threading.py:114(RLock)
+      147    0.000    0.000    0.001    0.000 socket.py:227(meth)
+      294    0.000    0.000    0.000    0.000 threading.py:59(__init__)
+      147    0.000    0.000    0.000    0.000 rpc.py:317(newseq)
+      735    0.000    0.000    0.000    0.000 {thread.get_ident}
+      146    0.000    0.000    0.000    0.000 rpc.py:586(__init__)
+      147    0.000    0.000    0.000    0.000 threading.py:238(_is_owned)
+      147    0.000    0.000    0.000    0.000 {getattr}
+      147    0.000    0.000    0.000    0.000 rpc.py:244(decoderesponse)
+        7    0.000    0.000    0.000    0.000 {round}
+      146    0.000    0.000    0.000    0.000 {method 'get' of 'dict' objects}
+      294    0.000    0.000    0.000    0.000 {method 'release' of 'thread.lock' objects}
+      147    0.000    0.000    0.000    0.000 {method 'fileno' of '_socket.socket' objects}
+        8    0.000    0.000    0.000    0.000 {time.time}
+        7    0.000    0.000    0.000    0.000 {method 'sort' of 'list' objects}
+        7    0.000    0.000    0.000    0.000 {method 'index' of 'list' objects}
+        1    0.000    0.000    0.069    0.069 rpc.py:561(__getmethods)
+        8    0.000    0.000    0.000    0.000 {method 'pop' of 'dict' objects}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+
+<pstats.Stats instance at 0x000000000279FF48>

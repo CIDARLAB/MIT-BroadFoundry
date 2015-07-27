@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-
+"""
+This file is just a scratch paper file for testing out changes to a function 
+before putting them in the actual file.
+"""
 
 import DAG
 import Gate
@@ -11,357 +14,186 @@ import GeneralJsonIO
 import inputs
 import update
 import re
-import matplotlib.pyplot as plt
-import numpy as np
 
-def makeDAGFromString2(circuitString):
-    print circuitString
+    
+def makeDAGFromNetlist(netListFileLoc):
+    """
+    Takes in a circuit in the string form like '((a.b).c)' and returns a dag 
+    created from that string, a list of all the gates in that dag, lists of the
+    inputs, repressors, and outputs individually from all the gates.
+    This assumes all inputs are activators and allows for intermediate genes to
+    be activators. Treats all outputs are buffers or ORs.
+    """
+    
+    myFile = open(netListFileLoc,'r')
+    netlist = json.load(myFile)
+    
+    #Initialize the lists of components
     Inputs = []
-    Repressors = []
+    Intermediates = []
     Outputs = []
     allWires = []
-    wireCount = 1
-    #Remove the zeros because they do not get a wire, but leave the parentheses
-    #so we still know to invert.
-    circuitString = circuitString.replace(".0","")
-    print circuitString
-    #Maps wire names to the gate they come from
     fanOutWireToGateDict = {}
+    allGatesParsed = {}
+    allFanOutNames = []
+    allFanInNames = []
+    allWireNames = []
+    allWires = []
     
-    #Find the number of unique inputs
-    allInputsWithDuplicates = re.findall(r"[\w]", circuitString)
-    allInputLetters = []
-    for i in allInputsWithDuplicates:
-        if i not in allInputLetters:
-            allInputLetters.append(i)
-    allInputLetters.sort()
-    
-    #Get the number of inputs
-    numInputs = len(allInputLetters)
-    #Find the binary values for each input
-    inputBinaries = makeInputBin(numInputs)
-    
-    initPeriod = 500.0*2**(numInputs)
-    period = initPeriod
+    for gateInfo in netlist:
+        gateInfo = gateInfo.replace(")","")
+        gateInfo = gateInfo.replace("(",",")
+        temp = gateInfo.split(",")
+        allGatesParsed[temp[1]] = []
+        allFanOutNames.append(temp[1])
+        allWireNames.append(temp[1])
+        for i in range(len(temp)):
+            if i!=1:
+                allGatesParsed[temp[1]].append(temp[i])
+            if i>1:
+                if temp[i] not in allFanInNames:
+                    allFanInNames.append(temp[i])
+                if temp[i] not in allWireNames:
+                    allWireNames.append(temp[i])
+    givenInputs = []
+    givenOutputs = []
+    givenIntermediates = []
+    for i in allFanInNames:
+        if i not in allFanOutNames:
+            givenInputs.append(i)
+    givenInputs.sort()
+    for i in allFanOutNames:
+        if i not in allFanInNames:
+            givenOutputs.append(i)
+    for i in allWireNames:
+        print i
+        if (i not in givenInputs) and (i not in givenOutputs):
+            givenIntermediates.append(i)
 
     #Make the inputs
-    for i in range(numInputs):
-        gateName = 'IN'+str(i+1)
-        wireName = 'W' + str(wireCount)
-        tempInput = Gate.Gate(gateName,10,2,'Input',30,None,None,None)
-        tempInput.setInputType(['inputs.squInput',period,100,period/2.0,1])
-        tempInput.setExpectedProtein(inputBinaries[i])
-        period /= 2.0 
-        Inputs.append(tempInput)
-        fanOutWireToGateDict[wireName] = tempInput
-        circuitString = circuitString.replace(allInputLetters[i],wireName)
-        wireCount += 1
-    print circuitString
-    
-    #Make the gates
-    gateCount = 1
-    parIndex = findSmallestParentheses(circuitString)
-    while parIndex != None:
-        gateName = "G"+str(gateCount)
-        wireName = "W" + str(wireCount)
-        subCircuit = circuitString[parIndex[0]:parIndex[1]+1]
-        fanIn = subCircuit[1:-1].split(".")
-        tempRepressor = Gate.Gate(gateName,1000,2,'Repressor',30,20,2,10)
-        Repressors.append(tempRepressor)
-        fanOutWireToGateDict[wireName] = tempRepressor
-        circuitString = circuitString.replace(subCircuit,wireName)
-        for fanInWireName in fanIn:
-            wire = Wire.Wire(fanInWireName)
-            tempRepressor.addFanInWire(wire)
-            fanOutWireToGateDict[fanInWireName].addFanOutWire(wire)
-            allWires.append(wire)
-        
-        parIndex = findSmallestParentheses(circuitString)
-        gateCount += 1
-        wireCount += 1
-        print circuitString
-    
-    #Make the Output 
-    tempOut = Gate.Gate("Y",None,None,'Output',None,20,2,10)
-    wire = Wire.Wire(circuitString)
-    tempOut.addFanInWire(wire)
-    fanOutWireToGateDict[circuitString].addFanOutWire(wire)
-    Outputs.append(tempOut)
-    allWires.append(wire)
-
-    allGates = Inputs + Repressors + Outputs
-    
-    #Make the DAG
-    dag = DAG.DAG(0,initPeriod,10*initPeriod)
-    for gate in allGates:
-        dag.addGate(gate)
-    for wire in allWires:
-        dag.addWire(wire) 
-        
-    print dag
-    
-    return dag, allGates, Inputs, Repressors, Outputs
-
-
-def makeDAGFromString(circuitString):
-    #Given a string representation of a circuit and the Input pattern.
-    #Generate the DAG with 0 values for gate properties.
-    
-    #Splt the string up into the inputs and then remove duplicates.
-    print circuitString
-    allInputs = re.findall(r"[\w]", circuitString)
-    stringInputs = []
-    inputNames = []
-    inputCount = 1
-    inputFanOutDict = {}
-    #Replace the input name with IN then a number
-    
-    for i in allInputs:
-        if i not in stringInputs:
-            stringInputs.append(i)
-            inputNames.append("IN"+str(inputCount))
-            inputCount += 1
-    stringInputs.sort()
-
-
-    #Create the list of Input gates
-    Inputs = []
-    if stringInputs[0]=="0":
-        inputNames = inputNames[:-1]
-        inputNames = ["0"]+inputNames
-    if inputNames[0] == "0":
-        inputNames2 = inputNames[1:]
-    elif inputNames[0] != "0":
-        inputNames2 = inputNames[:]
-    
-    inputBin = makeInputBin(len(inputNames2))
-    
-    #Make a gate for all but 0
-    initPeriod = 500.0*2**(len(inputNames2))
+    numInputs = len(givenInputs)
+    inputBinaries = makeInputBin(numInputs)
+    initPeriod = 500.0*2**(numInputs)
     period = initPeriod
-    for i in range(len(inputNames2)):
-        name = inputNames2[i]
-        tempInput = Gate.Gate(name,10,2,'Input',30,None,None,None)
-        tempInput.setInputType(['inputs.squInput',period,100,period/2.0,1])
-        tempInput.setExpectedProtein(inputBin[i])
-        period /= 2.0 
+    for i in range(numInputs):
+        standardGateName = "IN"+str(i+1)
+        #Create the input gate and set the equation to use and its expected protein
+        #and promoter truth values which should be the same for an input.
+        #Gate(name,Km,n,gateType,mB,pB,m_halfLife, p_halfLife)
+        tempInput = Gate.Gate(standardGateName,1,2,'Input',30,None,None,None)
+        tempInput.setInputType(['inputs.squInput',period,10,period/2.0,0])
+        tempInput.setExpectedProtein(inputBinaries[i])
+        #So the period of the next input alternates twice as frequently as this
+        period /= 2.0
+        #Add it to the list of inputs. Note the name of the fanOut wire as being
+        #from that gate and replace all occurences of that letter with the wire
+        #name associated with that gate.
         Inputs.append(tempInput)
-#    print stringInputs
-#    print inputNames
-#    print inputNames2
-#    pause = raw_input("pause1")
-    wireCount = 1
-    inputFanOutDict["0"] = []
-    for i in range(len(inputNames)):
-#        print circuitString
-        inputFanOutDict[inputNames[i]] = []
-        while circuitString.count(stringInputs[i])!=0:
-            circuitString = circuitString.replace(stringInputs[i],"W"+str(wireCount),1)
-            inputFanOutDict[inputNames[i]].append("W"+str(wireCount))
-            wireCount += 1
-#            print circuitString
-#    print circuitString
-#    print "Input fan out"
-#    print inputFanOutDict
-#    pause = raw_input("pause2")
-    similarWires = {}
-    for i in inputFanOutDict.keys():
-        sameWires = inputFanOutDict[i]
-        if len(sameWires)>1:
-            mainWire = sameWires[0]
-            similarWires[mainWire] = sameWires
-            for wire in sameWires[1:]:
-                circuitString = circuitString.replace(wire,mainWire)
+        fanOutWireToGateDict[givenInputs[i]] = tempInput
     
-#    Repressors = []
-#    for repressorName in allRepressorNames:
-#        tempRepressor = Gate.Gate(repressorName,1000,2,'Repressor',30,20,2,10)
-#        Repressors.append(tempRepressor)
-    parIndex = findSmallestParentheses(circuitString)
-    allGatesDictFanIn = {}
-    allGatesFanOut = {}
-    outputDict = {}
+    #Make the intermediate gates
     gateCount = 1
-    while parIndex != None:
-        piece = circuitString[parIndex[0]:parIndex[1]+1]
-        allGatesFanOut["G"+str(gateCount)] = []
-        while circuitString.count(piece)!=0:
-            circuitString = circuitString.replace(piece,"W"+str(wireCount),1)
-            allGatesFanOut["G"+str(gateCount)].append("W"+str(wireCount))
-            wireCount += 1
-            
-        sameWires = allGatesFanOut["G"+str(gateCount)]
-        mainWire = sameWires[0]
-        similarWires[mainWire] = sameWires
-        for wire in sameWires[1:]:
-            circuitString = circuitString.replace(wire,mainWire)
-            
-        
-        parIndex = findSmallestParentheses(circuitString)
-        #A zero as a fan in is the same as a not/a single fan in.
-        fanIn = piece[1:-1].split(".")
-        for wire in inputFanOutDict["0"]:
-            try:
-                fanIn.remove(wire)
-            except ValueError:
-                pass
-        allGatesDictFanIn["G"+str(gateCount)] = fanIn
-        
-#        print circuitString
-#        print allGatesFanOut
-#        print allGatesDictFanIn
-#        print gateCount
-        
+    for i in range(len(givenIntermediates)):
+        standardGateName = "G" + str(gateCount)
+        givenWireName = givenIntermediates[i]
+        if allGatesParsed[givenWireName][0]=="NOR" or allGatesParsed[givenWireName][0]=="NOT": 
+            tempIntermediate = Gate.Gate(standardGateName,1000,2,'Repressor',30,20,2,10)
+        elif allGatesParsed[givenWireName][0]=="OR" or allGatesParsed[givenWireName][0]=="BUF": 
+            tempIntermediate = Gate.Gate(standardGateName,1000,2,'Activator',30,20,2,10)
+        Intermediates.append(tempIntermediate)
+        fanOutWireToGateDict[givenWireName] = tempIntermediate
         gateCount += 1
-        
-#        pause = raw_input("pause4")
-        
-    outputDict["Y"] = [circuitString]
-#    print outputDict
-#    print circuitString
-#    print allGatesFanOut
-#    print allGatesDictFanIn
-#    print gateCount
-#    pause = raw_input("pause5")
-        
-#    print "Repressor fan in"    
-#    print allGatesDictFanIn
-#    print "Repressor fan out"
-#    print allGatesFanOut
-#    print "Output fan in"
-#    print outputDict
-#    print "Wires from the same place"
-#    print similarWires
-#    pause = raw_input("pause6")
-    allWireNames = []
-    whichGaveWhich = []
-    for gate in allGatesDictFanIn:
-        for wire in allGatesDictFanIn[gate]:
-            allWireNames.append(wire)
-            whichGaveWhich.append(gate)
-    for otpt in outputDict:
-        for wire in outputDict[otpt]:
-            allWireNames.append(wire)
-            whichGaveWhich.append(otpt)
-    mapToMainWire = {}
-    for mainWire in similarWires:
-        for wire in similarWires[mainWire]:
-            mapToMainWire[wire] = mainWire
+    
+    #Make outputs
+    numOutputs = 1
+    for i in range(len(givenOutputs)):
+        givenWireName = givenOutputs[i]
+        standardOutName = "Y"+str(numOutputs)
+        if allGatesParsed[givenWireName][0]=="NOR" or allGatesParsed[givenWireName][0]=="NOT": 
+            standardGateName = "G" + str(gateCount)
+            tempIntermediate = Gate.Gate(standardGateName,1000,2,'Repressor',30,20,2,10)
+            Intermediates.append(tempIntermediate)
+            fanOutWireToGateDict[givenWireName] = tempIntermediate
+            allGatesParsed[standardOutName] = ["BUF",givenWireName]      
+            
+            tempOutput = Gate.Gate(standardOutName,None,None,'Output',None,20,2,10)
+            Outputs.append(tempOutput)
+            fanOutWireToGateDict[standardOutName] = tempOutput
+            gateCount += 1
 
-    #Rename wires and in gates' fanIn and fanOut to prevent the same wire having
-    #two destinations. Use alias to rename wires so wire numbers don't skip
-    #Remove ghost wires in the process.
+        elif allGatesParsed[givenWireName][0]=="OR" or allGatesParsed[givenWireName][0]=="BUF": 
+            tempOutput = Gate.Gate(standardOutName,None,None,'Output',None,20,2,10)
+            Outputs.append(tempOutput)
+            fanOutWireToGateDict[givenWireName] = tempOutput
+        else:
+            print "Something isn't right."
+        numOutputs += 1
+        
+    #Make and connect wires
     wireCount = 1
-    allWireNames2 = allWireNames[:]
-    allWireNames = []
-    aliases = {}
-    for i in range(len(allWireNames2)):
-        if allWireNames2[i] not in aliases:
-            allWireNames.append("W"+str(wireCount))
-            aliases[allWireNames2[i]] = "W"+str(wireCount)
-        elif allWireNames2[i] in aliases:
-            oldWireName = allWireNames2[i]
-            mainWire = mapToMainWire[oldWireName]
-            groupOfSim = similarWires[mainWire]
-            newWireName = groupOfSim[groupOfSim.index(oldWireName)+1]
-            while newWireName in aliases:
-                newWireName = groupOfSim[groupOfSim.index(newWireName)+1]
-            allWireNames.append("W"+str(wireCount))
-            aliases[newWireName] = "W"+str(wireCount)
-            print oldWireName,"changed to", newWireName
-            try:
-                allGatesDictFanIn[whichGaveWhich[i]].remove(oldWireName)
-                allGatesDictFanIn[whichGaveWhich[i]].append(newWireName)
-            except KeyError:
-                outputDict[whichGaveWhich[i]].remove(oldWireName)
-                outputDict[whichGaveWhich[i]].append(newWireName)
-        wireCount += 1
+    wireAliases = {}
+    for givenWireName in allGatesParsed.keys():
+        #get the gate associated with that wire
+        tempGate = fanOutWireToGateDict[givenWireName]
+        #Ignore the first element which tells the type of gate
+        fanInWireNames = allGatesParsed[givenWireName][1:]
+        for wireName in fanInWireNames:
+            if wireName not in wireAliases:
+                wireAliases[wireName] = "W"+str(wireCount)
+                wireCount += 1
+            wire = Wire.Wire(wireAliases[wireName])
+            allWires.append(wire)
+            associatedFromGate = fanOutWireToGateDict[wireName]
+            tempGate.addFanInWire(wire)
+            associatedFromGate.addFanOutWire(wire)
+    allGates = Inputs + Intermediates + Outputs
     
-    inputFanOutDict.pop("0")
-    allDicts = [inputFanOutDict,allGatesDictFanIn,allGatesFanOut,outputDict]
-    allDicts2 = []
-    for fanDict in allDicts:
-        tempDict = {}
-        for key in fanDict.keys():
-            gateFan = fanDict[key]
-            tempDict[key] = []
-            for wire in gateFan:
-                try:
-                    tempDict[key].append(aliases[wire])
-                #Skip ghost wires
-                except KeyError:
-                    pass
-        allDicts2.append(tempDict)
-    inputFanOutDict = allDicts2[0]
-    allGatesDictFanIn = allDicts2[1]
-    allGatesFanOut = allDicts2[2]
-    outputDict = allDicts2[3]
-    
-    allWires = []
-    for wireName in allWireNames:
-        tempWire = Wire.Wire(wireName)
-        allWires.append(tempWire)
-    allRepressorNames = allGatesDictFanIn.keys()
-    Repressors = []
-    for repressorName in allRepressorNames:
-        tempRepressor = Gate.Gate(repressorName,1000,2,'Repressor',30,20,2,10)
-        Repressors.append(tempRepressor)
-    allOutputNames = outputDict.keys()
-    Outputs = []
-    for outputName in allOutputNames:
-        tempOut = Gate.Gate(outputName,None,None,'Output',None,20,2,10)
-        Outputs.append(tempOut)
-    allGates = Inputs + Repressors + Outputs
-
-    #Attach wires utilizing the fact that allWires is in same order as allWireNames
-    
-    #Make lists that are the same order as Inputs, Repressors and Outputs but
-    #have the names for easy indexing.
-    inputNames = []
-    for ipt in Inputs:
-        inputNames.append(ipt.getName())
-        
-    repressorNames = []
-    for rep in Repressors:
-        repressorNames.append(rep.getName())
-    outputNames = []
-    for otpt in Outputs:
-        outputNames.append(otpt.getName())
-    #Attach inputs to their fanOut
-    for i in range(len(inputNames)):
-        ipt = Inputs[i]
-        for wireName in inputFanOutDict[inputNames[i]]:
-            wireIndex = allWireNames.index(wireName)
-            ipt.addFanOutWire(allWires[wireIndex])
-    #Attach repressors to their fanIn
-    for i in range(len(repressorNames)):
-        rep = Repressors[i]
-        for wireName in allGatesDictFanIn[repressorNames[i]]:
-            wireIndex = allWireNames.index(wireName)
-            rep.addFanInWire(allWires[wireIndex])
-    #Attach repressors to their fanOut
-    for i in range(len(repressorNames)):
-        rep = Repressors[i]
-        for wireName in allGatesFanOut[repressorNames[i]]:
-            wireIndex = allWireNames.index(wireName)
-            rep.addFanOutWire(allWires[wireIndex])
-    #Attach outputs to their fanIn
-    for i in range(len(outputNames)):
-        otpt = Outputs[i]
-        for wireName in outputDict[outputNames[i]]:
-            wireIndex = allWireNames.index(wireName)
-            otpt.addFanInWire(allWires[wireIndex])
-    #Set input types 
-#    a.setInputType(['inputs.squInput',1000,100,0,0])    
-#    b.setInputType(['inputs.squInput',500,100,0,0])
     dag = DAG.DAG(0,initPeriod,10*initPeriod)
-    for gate in allGates:
-        dag.addGate(gate)
+    
     for wire in allWires:
         dag.addWire(wire)
-#    pause = raw_input("pause7")
-#    print dag
-    return dag, allGates, Inputs, Repressors, Outputs
+    for gate in allGates:
+        dag.addGate(gate)
+
+    return dag, allGates, Inputs, Intermediates, Outputs
+    
+
+circuitString1 = '((((a.0).(b.0)).0).(c.0))' #00000001
+circuitString2 = '((((a.b).(a.c)).a).(b.c))' #00010111
+circuitString3 = '(((((a.c).c).0).(b.c)).(((a.c).c).b))' #00111001
+circuitString4 = 'a' #00001111
+circuitString5 = '(a.b)' #11000000
+circuitString6 = '((a.b).0)' #00111111
+circuitString7 = '(a.0)' #11110000
+circuitString8 = '((a.b).c)' #00101010
+circuitString9 = '((a.0).a)' #00000000
+circuitString10 = '((a.0).b)' #00001100
+
+fileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/test.json"
+inputsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/InputLibrary2.json"
+repressorsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/RepressorLibrary2.json"
+outputsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/OutputLibrary2.json"
+Libraries = [inputsDir, repressorsDir, outputsDir]
+
+
+
+def wrapper(fileLoc):
+    """
+    Takes in a string representation of a circuit, a set of libraries of inputs,
+    repressors, and outputs, and a directory to store the intermediate json file.
+    Prints the graphs generated for mRNA and protein concentrations generated
+    by General.
+    """
+    #Make DAG from string
+    dag, allGates, Inputs, Intermediates, Outputs = makeDAGFromNetlist(fileLoc)
+
+
+    print dag
+    #Write to Json File
+    #fileLoc = 'C:/Users/Arinze/SkyDrive/UROP_Summer_2015/ODE/Example5.json'
+#    dag.writeToJson(fileLoc)
+    #Make graphs from JsonFile
+#    General.generateDynamicCircuitGraphs(fileLoc, makeBarGraph)
     
 def findSmallestParentheses(circuit):
     """
@@ -380,40 +212,7 @@ def findSmallestParentheses(circuit):
                 print "parentheses are not properly matched"
                 return None
     return None
-
-circuitString1 = '((((a.0).(b.0)).0).(c.0))' #00000001
-circuitString2 = '((((a.b).(a.c)).a).(b.c))' #00010111
-circuitString3 = '(((((a.c).c).0).(b.c)).(((a.c).c).b))' #00111001
-circuitString4 = 'a' #00001111
-circuitString5 = '(a.b)' #11000000
-circuitString6 = '((a.b).0)' #00111111
-circuitString7 = '(a.0)' #11110000
-circuitString8 = '((a.b).c)' #00101010
-circuitString9 = '((a.0).a)' #00000000
-circuitString10 = '((a.0).b)' #00001100
-fileLoc1 = "C:/Users/Arinze/SkyDrive/UROP_Summer_2015/test1.json"
-fileLoc2 = "C:/Users/Arinze/SkyDrive/UROP_Summer_2015/test2.json"
-fileLoc3 = "C:/Users/Arinze/SkyDrive/UROP_Summer_2015/test3.json"
-fileLoc4 = "C:/Users/Arinze/SkyDrive/UROP_Summer_2015/test4.json"
-fileLoc5 = "C:/Users/Arinze/SkyDrive/UROP_Summer_2015/test5.json"
-fileLoc6 = "C:/Users/Arinze/SkyDrive/UROP_Summer_2015/test6.json"
-fileLoc7 = "C:/Users/Arinze/SkyDrive/UROP_Summer_2015/test7.json"
-fileLoc8 = "C:/Users/Arinze/SkyDrive/UROP_Summer_2015/test8.json"
-
-def wrapper(circuitString, fileLoc=""):
-    #Make DAG from string
-#    dag, allGates, Inputs, Repressors, Outputs = makeDAGFromString(circuitString)
-#    print dag
-    
-    dag, allGates, Inputs, Repressors, Outputs = makeDAGFromString2(circuitString)
-#    print dag2
-    #Write to Json File
-    #fileLoc = 'C:/Users/Arinze/SkyDrive/UROP_Summer_2015/ODE/Example5.json'
-#    dag.writeToJson(fileLoc)
-    dag.writeToJson(fileLoc)
-#    #Make graphs from JsonFile
-    General.generateDynamicCircuitGraphs(fileLoc)
-    
+         
 def makeInputBin(numInputs):
     binSize = 2**numInputs
     base = "01"

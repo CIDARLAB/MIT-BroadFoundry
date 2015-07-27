@@ -14,7 +14,7 @@ import inputs
 class Gate(object):
     def __init__(self,name,Km,n,gateType,mB,pB,m_halfLife, p_halfLife):
         assert type(name) == str
-        assert gateType == 'Repressor' or gateType == 'Input' or gateType == 'Output'
+        assert gateType == 'Repressor' or gateType == 'Input' or gateType == 'Output' or gateType == 'Activator'
         #Name the gate
         self.name = name
         #Default the fanIn and fanOut to None until they are set
@@ -166,6 +166,9 @@ class Gate(object):
             wire.setFrom(None)
         #set the values
         self.fanOut = []
+        #This format is used in case fanOut is being mutated as we iterate 
+        #through it. Instead of risking possible mutation, we purposefully
+        #mutate it if it isnt being mutated.
         while len(fanOut)!=0:
             wire = fanOut[0]
             wire.setFrom(self)
@@ -271,10 +274,15 @@ class Gate(object):
         self.visited = visited
 
     def setExpectedProtein(self,tv):
+        """
+        Sets the expected protein and promoter truth values. Promoter truth 
+        values are the opposite of the protein truth value if the gene is a
+        repressor. Outputs do not have a promoter.
+        """
         assert type(tv) == list or tv == None
         self.expectedProtein = tv
         if tv!=None:
-            if self.gateType == "Input":
+            if self.gateType == "Input" or self.gateType == "Activator":
                 self.setExpectedPromoter(tv)
             elif self.gateType == "Repressor":
                 self.setExpectedPromoter(self.invertTruth(tv))
@@ -285,10 +293,19 @@ class Gate(object):
             
         
     def setExpectedPromoter(self,tv):
+        """
+        Set the expected setting of the promoter that comes after the gene as 
+        a truth value.
+        """
         assert type(tv) == list or tv == None
         self.expectedPromoter = tv
         
     def invertTruth(self, tv):
+        """
+        Used to invert truth values. Takes in a list of '1' and '0's and 
+        inverts the value at each position. Does not alter any of the 
+        properties of the gate.
+        """
         newTruthValue = []
         for i in tv:
             if i == "0":
@@ -364,6 +381,10 @@ class Gate(object):
         return self.expectedPromoter
 
     def formatJson(self):
+        """
+        creates a dictionary of all important properties necessary for
+        General.py to produce graphs for easier export to a json file
+        """
         gateDescription = {}
         gateDescription['NAME'] = self.name
         gateDescription['DIST'] = self.dist
@@ -372,10 +393,12 @@ class Gate(object):
         if self.gateType=='Input':
             gateDescription['TYPE'] = 'INPUT'
             gateDescription['INPUT'] = self.inputType
-            
-        elif self.gateType=='Repressor':
+        else:
             if len(self.fanIn)==1:
-                gateDescription['TYPE'] = 'NOT'
+                if self.gateType=='Repressor':
+                    gateDescription['TYPE'] = 'NOT'
+                elif self.gateType=='Activator' or self.gateType=='Output':
+                    gateDescription['TYPE'] = 'BUFFER'
                 gateDescription['INPUT'] = self.fanIn[0].getFrom().getName()
                 gateDescription['Mi'] = self.Mi
                 gateDescription['Pi'] = self.Pi
@@ -387,13 +410,15 @@ class Gate(object):
                 gateDescription['Km'] = self.fanIn[0].getFrom().getKm()
                 gateDescription['ap'] = 'NONE'
                 gateDescription['pB'] = self.pB
-                if self.fanIn[0].getFrom().getGateType()=="Input":
+                if self.fanIn[0].getFrom().getGateType()=="Input" or self.fanIn[0].getFrom().getGateType()=="Activator":
                     gateDescription['INPUT_EFFECT'] = "ACTIVATE"
                 elif self.fanIn[0].getFrom().getGateType()=="Repressor":
                     gateDescription['INPUT_EFFECT'] = "REPRESS"
-                
             elif len(self.fanIn)==2:
-                gateDescription['TYPE'] = 'NOR'
+                if self.gateType=='Repressor':
+                    gateDescription['TYPE'] = 'NOR'
+                elif self.gateType=='Activator' or self.gateType=='Output':
+                    gateDescription['TYPE'] = 'OR'
                 gateDescription['INPUT1'] = self.fanIn[0].getFrom().getName()
                 gateDescription['INPUT2'] = self.fanIn[1].getFrom().getName()
                 gateDescription['Mi'] = self.Mi
@@ -409,62 +434,37 @@ class Gate(object):
                 gateDescription['Km2'] = self.fanIn[1].getFrom().getKm()
                 gateDescription['ap'] = 'NONE'
                 gateDescription['pB'] = self.pB   
-                if self.fanIn[0].getFrom().getGateType()=="Input":
+                if self.fanIn[0].getFrom().getGateType()=="Input" or self.fanIn[0].getFrom().getGateType()=="Activator":
                     gateDescription['INPUT1_EFFECT'] = "ACTIVATE"
                 elif self.fanIn[0].getFrom().getGateType()=="Repressor":
                     gateDescription['INPUT1_EFFECT'] = "REPRESS"
-                if self.fanIn[1].getFrom().getGateType()=="Input":
+                if self.fanIn[1].getFrom().getGateType()=="Input" or self.fanIn[1].getFrom().getGateType()=="Activator":
                     gateDescription['INPUT2_EFFECT'] = "ACTIVATE"
                 elif self.fanIn[1].getFrom().getGateType()=="Repressor":
-                    gateDescription['INPUT2_EFFECT'] = "REPRESS"                
-                
-        elif self.gateType=='Output':
-            if len(self.fanIn)==1:
-                gateDescription['TYPE'] = 'BUFFER'
-                gateDescription['INPUT'] = self.fanIn[0].getFrom().getName()
-                gateDescription['Mi'] = self.Mi
-                gateDescription['Pi'] = self.Pi
-                gateDescription['m_HALFLIFE'] = self.m_halfLife
-                gateDescription['p_HALFLIFE'] = self.p_halfLife
-                gateDescription['am'] = 'NONE'
-                gateDescription['mB'] = self.fanIn[0].getFrom().getmB()
-                gateDescription['n'] = self.fanIn[0].getFrom().getn()
-                gateDescription['Km'] = self.fanIn[0].getFrom().getKm()
-                gateDescription['ap'] = 'NONE'
-                gateDescription['pB'] = self.pB
-                if self.fanIn[0].getFrom().getGateType()=="Input":
-                    gateDescription['INPUT_EFFECT'] = "ACTIVATE"
-                elif self.fanIn[0].getFrom().getGateType()=="Repressor":
-                    gateDescription['INPUT_EFFECT'] = "REPRESS"
-                
-                
-            elif len(self.fanIn)==2:
-                gateDescription['TYPE'] = 'OR'
-                gateDescription['INPUT1'] = self.fanIn[0].getFrom().getName()
-                gateDescription['INPUT2'] = self.fanIn[1].getFrom().getName()
-                gateDescription['Mi'] = self.Mi
-                gateDescription['Pi'] = self.Pi
-                gateDescription['m_HALFLIFE'] = self.m_halfLife
-                gateDescription['p_HALFLIFE'] = self.p_halfLife
-                gateDescription['am'] = 'NONE'
-                gateDescription['mB1'] = self.fanIn[0].getFrom().getmB()
-                gateDescription['n1'] = self.fanIn[0].getFrom().getn()
-                gateDescription['Km1'] = self.fanIn[0].getFrom().getKm()
-                gateDescription['mB2'] = self.fanIn[1].getFrom().getmB()
-                gateDescription['n2'] = self.fanIn[1].getFrom().getn()
-                gateDescription['Km2'] = self.fanIn[1].getFrom().getKm()
-                gateDescription['ap'] = 'NONE'
-                gateDescription['pB'] = self.pB
-                if self.fanIn[0].getFrom().getGateType()=="Input":
-                    gateDescription['INPUT1_EFFECT'] = "ACTIVATE"
-                elif self.fanIn[0].getFrom().getGateType()=="Repressor":
-                    gateDescription['INPUT1_EFFECT'] = "REPRESS"
-                if self.fanIn[1].getFrom().getGateType()=="Input":
-                    gateDescription['INPUT2_EFFECT'] = "ACTIVATE"
-                elif self.fanIn[1].getFrom().getGateType()=="Repressor":
-                    gateDescription['INPUT2_EFFECT'] = "REPRESS"
+                    gateDescription['INPUT2_EFFECT'] = "REPRESS"  
         return gateDescription
         
     def __str__(self):
-        return str(self.getAllProperties())
+        """
+        prints the gate in the way it would appear in a netlist
+        """
+        gateStr = ""
+        if len(self.fanIn) == 2 and self.gateType == "Repressor":
+            gateStr = gateStr + "NOR("
+        elif len(self.fanIn) == 1 and self.gateType == "Repressor":
+            gateStr = gateStr + "NOT("
+        elif len(self.fanIn) == 2 and (self.gateType == "Output" or self.gateType == "Activator"):
+            gateStr = gateStr + "OR("
+        elif len(self.fanIn) == 1 and (self.gateType == "Output" or self.gateType == "Acivator"):
+            gateStr = gateStr + "BUF("
+        gateStr = gateStr + self.name + ","
+        for w in self.fanIn:
+            try:
+                gateStr = gateStr + w.getFrom().getName() + ","
+            except TypeError:
+                gateStr = gateStr + "None" + ","
+        #Remove the ending comma"
+        gateStr = gateStr[:-1] + ");" #+ "distance = "+str(self.dist)
+        
+        return gateStr
   

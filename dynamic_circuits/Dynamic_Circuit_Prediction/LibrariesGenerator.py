@@ -28,8 +28,11 @@ def generateLibraries(numInputs,numRepressors, numOutputs, fileLoc, version, var
     repressorList = []
     outputList = []
     
+    #range of values we can multiply the standard by. We want a value, x, that
+    #is standard/variance<x<standard*variance
     varRange = [1/float(variance), float(variance)]
     
+    #make the inputs
     for i in range(numInputs):
         tempInput = {}
         tempInput["NAME"] = inputBaseName+str(i+1)
@@ -41,7 +44,7 @@ def generateLibraries(numInputs,numRepressors, numOutputs, fileLoc, version, var
                 tempInput[prop] = random.uniform(1,4)
         inputList.append(tempInput)
         
-            
+    #make the repressors
     for i in range(numRepressors):
         tempRepressor = {}
         tempRepressor["NAME"] = repressorBaseName+str(i+1)
@@ -53,7 +56,7 @@ def generateLibraries(numInputs,numRepressors, numOutputs, fileLoc, version, var
                 tempRepressor[prop] = random.uniform(1,4)            
         repressorList.append(tempRepressor)
         
-        
+    #make the outputs
     for i in range(numOutputs):
         tempOutput = {}
         tempOutput["NAME"] = outputBaseName+str(i+1)
@@ -62,6 +65,7 @@ def generateLibraries(numInputs,numRepressors, numOutputs, fileLoc, version, var
             tempOutput[prop] = standardNonInput[prop]*random.uniform(varRange[0],varRange[1])
         outputList.append(tempOutput)
     
+    #Create the file name and save the genes to the file.
     if fileLoc[-1]!="/":
         fileLoc += "/"
     inputsFileName = fileLoc + "InputLibrary" + str(version) + ".json"

@@ -23,42 +23,91 @@ class DAG(object):
         self.time_axis_params['yMin'] = 'NONE'
         self.time_axis_params['yMax'] = 'NONE'
         self.time_axis_params['itr'] = itr
+        self.isSequential = False
     
     def addWire(self,wire):
+        """
+        adds a wire to the DAG if it is not already in the DAG.
+        """
         assert type(wire) == Wire.Wire
-        self.wires.append(wire)
+        if wire not in self.wires:
+            self.wires.append(wire)
+        else:
+            print "This wire is already in the DAG"
     
     def removeWire(self,wire):
+        """
+        removes a wire from the DAG if it is in the DAG
+        """
         assert type(wire) == Wire.Wire
-        self.wires.remove(wire)
+        if wire in self.wires:
+            self.wires.remove(wire)
+        else:
+            print "This wire is not in the DAG"
     
     def addGate(self,gate):
+        """
+        adds a gate to the DAG if it is not already in the DAG
+        """
+        #This format is used in case the name of the gate is changed after 
+        #addition to the DAG
         assert type(gate)==Gate.Gate
-        if gate.getGateType() == 'Input':
-            self.inputs.append(gate)
-        elif gate.getGateType() == 'Repressor':
-            self.repressors.append(gate)
-        elif gate.getGateType() == 'Output':
-            self.outputs.append(gate)
-        
+        allGates = self.inputs+self.repressors+self.outputs
+        if gate not in allGates:
+            if gate.getGateType() == 'Input':
+                self.inputs.append(gate)
+            elif gate.getGateType() == 'Repressor':
+                self.repressors.append(gate)
+            elif gate.getGateType() == 'Output':
+                self.outputs.append(gate)
+        else:
+            if gate in self.inputs:
+                print "This gate is already present in the DAG inputs."
+            elif gate in self.repressors:
+                print "This gate is already present in the DAG repressors."
+            elif gate in self.outputs:
+                print "This gate is already present in the DAG outputs."
     
     def removeGate(self,gate):
+        """
+        removes a gate from the DAG if it is in the DAG
+        """
+        #This format is used in case the name of the gate is changed after 
+        #addition to the DAG
         assert type(gate)==Gate.Gate
-        if gate.getGateType() == 'Input':
+        try:
             self.inputs.remove(gate)
-        elif gate.getGateType() == 'Repressor':
-            self.repressors.remove(gate)
-        elif gate.getGateType() == 'Output':
-            self.outputs.remove(gate)
+        except ValueError:
+            try:
+                self.repressors.remove(gate)
+            except ValueError:
+                try:
+                    self.outputs.remove(gate)
+                except ValueError:
+                    print "This gate is not in the DAG"
             
     def getAllGates(self):
+        """
+        Returns a list of all gates in the circuit
+        """
         gates = self.inputs + self.repressors + self.outputs
         return gates
     
     def getAllWires(self):
+        """
+        Returns a list of all wires in the DAG
+        """
         return self.wires
+    def hasLoop(self):
+        """
+        Returns true if the DAG is sequential
+        """
+        return self.isSequential
         
     def formatJson(self):
+        """
+        formats all of the gates so as to be easily exported to a json file
+        """
         self.setGateDist()
         self.repressors.sort(self.gateCompare)
         self.outputs.sort(self.gateCompare)
@@ -71,15 +120,21 @@ class DAG(object):
         for gate in self.outputs:
             listVals.append(gate.formatJson())
         return listVals
+        
     def writeToJson(self,fileLoc):
+        """
+        writes the contents of the dag to a json with pretty print in a format
+        that can be recognized by General.py
+        """
         listVals = self.formatJson()
         myFile = open(fileLoc,'w')
         json.dump(listVals, myFile, sort_keys=True, indent=4, separators=(',', ': '))
         myFile.close()
+        
     def gateCompare(self,gate1,gate2):
         """
-        Used to sort gates assuming the name of the gate is a single letter
-        followed by the gate number.
+        Used to sort gates based on their distance from the furthest input 
+        discounting loops
         """
                 
         if gate1.getDist()>gate2.getDist():
@@ -89,24 +144,6 @@ class DAG(object):
         else: #gate1Num<gate2Num
             return -1
 
-    def sortGates(self):
-        self.repressors
-        sortedRepressors = []
-        while len(sortedRepressors) != len(self.repressors):
-            for rep in self.repressors:
-                if len(rep.getFanIn())==2:
-                    if rep not in sortedRepressors and \
-                    (rep.getFanIn()[0].getFrom() in sortedRepressors \
-                    or rep.getFanIn()[0].getFrom().getGateType()=="Input") and\
-                    (rep.getFanIn()[1].getFrom() in sortedRepressors or \
-                    rep.getFanIn()[1].getFrom().getGateType()=="Input"):
-                        sortedRepressors.append(rep)
-                if len(rep.getFanIn())==1:
-                    if rep not in sortedRepressors and \
-                    (rep.getFanIn()[0].getFrom() in sortedRepressors or \
-                    rep.getFanIn()[0].getFrom().getGateType()=="Input"):
-                        sortedRepressors.append(rep)
-        self.repressors = sortedRepressors
     def setGateDist(self):
         """
         Assumes you have a fully connected graph and assigns distances from the
@@ -122,10 +159,18 @@ class DAG(object):
             self.recursivelyFindInputs(gate)
         
     def recursivelyFindInputs(self,gate):
+        """
+        a helper function that does the actual finding of the distance to the 
+        furthest input discounting loops
+        """
+        #Stops loops
         if gate.wasVisited():
             return
+        #Stops at inputs
         elif gate.getGateType()=="Input":
             return
+        #save the distance from each of the gates going into this
+        #take the max of those values and add 1
         else:
             gate.setVisited(True)
             vals = []
@@ -136,8 +181,9 @@ class DAG(object):
             
     def setGateTruthValues(self):
         """
-        Assumes you have a fully connected graph and assigns distances from the
-        inputs
+        Assumes you have a fully connected graph and assigns truthValues to 
+        the gates in a recursive way similar to finding the distance to the 
+        nearest input
         """
         #Visited property is to prevent infinite loops with sequential
         #circuits
@@ -154,9 +200,15 @@ class DAG(object):
             self.recursivelyFindInputsAndSetTruthValues(gate)
         
     def recursivelyFindInputsAndSetTruthValues(self,gate):
+        """
+        This function is what actually does the truth value assignment
+        """
         if gate.wasVisited():
+            if gate.getExpectedProtein()!=None:
+                self.isSequential = True
             return
         elif gate.getExpectedProtein()!=None and gate.getExpectedPromoter()!=None:
+            gate.setVisited(True)
             return
         else:
             gate.setVisited(True)
@@ -164,24 +216,30 @@ class DAG(object):
             for wire in gate.getFanIn():
                 self.recursivelyFindInputsAndSetTruthValues(wire.getFrom())
                 vals.append(wire.getFrom().getExpectedPromoter())
-            if len(vals) == 1:
-                truthValue = []
-                for i in range(len(vals[0])):
-                    if vals[0][i] == "1":
-                        truthValue.append("1")
-                    else:
-                        truthValue.append("0")
-                gate.setExpectedProtein(truthValue)
-                
-            elif len(vals) == 2:
-                truthValue = []
-                for i in range(len(vals[0])):
-                    if vals[0][i] == "1" or vals[1][i] == "1":
-                        truthValue.append("1")
-                    else:
-                        truthValue.append("0")
-                gate.setExpectedProtein(truthValue)
-        
+            #If there is a loop, set all truth values dependent on that loop 
+            #to None otheriwse find the truthValue for the protein
+            try:
+                if len(vals) == 1:
+                    truthValue = []
+                    for i in range(len(vals[0])):
+                        if vals[0][i] == "1":
+                            truthValue.append("1")
+                        else:
+                            truthValue.append("0")
+                    gate.setExpectedProtein(truthValue)
+                    
+                elif len(vals) == 2:
+                    truthValue = []
+                    for i in range(len(vals[0])):
+                        if vals[0][i] == "1" or vals[1][i] == "1":
+                            truthValue.append("1")
+                        else:
+                            truthValue.append("0")
+                    gate.setExpectedProtein(truthValue)
+            except TypeError:
+                gate.setExpectedProtein(None)
+                self.isSequential = True
+
     def __str__(self):
         result = 'Inputs:\n'
         for gate in self.inputs:
@@ -200,25 +258,7 @@ class DAG(object):
         self.setGateTruthValues()
 #        self.sortGates()
         for gate in self.repressors:
-            gateStr = ""
-            if len(gate.getFanIn()) == 2:
-                gateStr = gateStr + "NOR("
-            if len(gate.getFanIn()) == 1:
-                gateStr = gateStr + "NOT("
-            gateStr = gateStr + gate.getName() + ","
-            for w in gate.getFanIn():
-                gateStr = gateStr + w.getFrom().getName() + ","
-            gateStr = gateStr[:-1] + "); distance = "+str(gate.getDist())+"\n"
-            result = result + gateStr
+            result = result + str(gate) + "\n"
         for gate in self.outputs:
-            gateStr = ""
-            if len(gate.getFanIn()) == 2:
-                gateStr = gateStr + "OR("
-            if len(gate.getFanIn()) == 1:
-                gateStr = gateStr + "BUF("
-            gateStr = gateStr + gate.getName() + ","
-            for w in gate.getFanIn():
-                gateStr = gateStr + w.getFrom().getName() + ","
-            gateStr = gateStr[:-1] + "); distance = "+str(gate.getDist())+"\n"
-            result = result + gateStr
+            result = result + str(gate) + "\n"
         return result

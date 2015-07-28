@@ -10,15 +10,19 @@ import inputs
 import update
 import GeneralJsonIO
 from scipy.integrate import odeint
+from scipy.integrate import ode
 import numpy as np
+import DifferentialSolver
+import time
 
 #input is a json file
 def generateDynamicCircuitGraphs(fileName, makeBarGraphs): 
+    startTime = time.time()
 #---------------------------------------------------------------
     #Get all the values from the given file.
-    print "Loading values from file."
+#    print "Loading values from file."
     time_axis_params,input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names = GeneralJsonIO.getFromJsonFile(fileName)
-    print "Finished loading values from file."
+#    print "Finished loading values from file."
 #---------------------------------------------------------------
 
     #Generate the time grid
@@ -44,9 +48,13 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
     initc = mRNAi + proteini
     #Use odeint to calculate the concentrations over the time steps
     soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names),tcrit=carefult)
-    
+#    soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names))
     #Separate the mRNA and protein concentration vectors. The order they appear
     #in the list should be the same order that they are in in logic_gate_names.
+#    odeIntWasBad = checkodeInt(t,soln_f,numInputs)
+#    print odeIntWasBad
+#    if odeIntWasBad:
+#       soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names))
     mRNA_f = []
     protein_f = []
     numGates = len(logic_gate_names)
@@ -216,6 +224,9 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
         
     print "Gate scores:"
     print scoreDict
+    endTime = time.time()
+    print round(endTime-startTime,2), "seconds"
+    return scoreDict
     
 def getBinaryInOrder(maxVal):
     binVals = []
@@ -285,3 +296,12 @@ def getListOfConvergingValues(numInputs, numItr, opGraph):
 '''
 _______________________________________________________________________________
 '''
+def checkodeInt(numItr, soln, numInputs):
+    interval = numItr/2**numInputs
+    for i in range(len(soln[0])):
+        tempSoln = soln[:,i]
+        for j in range(500):
+            if tempSoln[-j]!=0:
+                return False
+    return True
+            

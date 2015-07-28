@@ -16,7 +16,7 @@ import inputs
 import update
 import re
 
-def makeDAGFromNetlist(netListFileLoc):
+def makeDAGFromNetlist(inputNetlist):
     """
     Takes in a circuit in the string form like '((a.b).c)' and returns a dag 
     created from that string, a list of all the gates in that dag, lists of the
@@ -24,9 +24,12 @@ def makeDAGFromNetlist(netListFileLoc):
     This assumes all inputs are activators and allows for intermediate genes to
     be activators. Treats all outputs are buffers or ORs.
     """
-    
-    myFile = open(netListFileLoc,'r')
-    netlist = json.load(myFile)
+    if type(inputNetlist) == str:
+        myFile = open(inputNetlist,'r')
+        netlist = json.load(myFile)
+        myFile.close()
+    elif type(inputNetlist) == list:
+        netlist = inputNetlist
     
     #Initialize the lists of components
     Inputs = []
@@ -146,7 +149,7 @@ def makeDAGFromNetlist(netListFileLoc):
             associatedFromGate.addFanOutWire(wire)
     allGates = Inputs + Intermediates + Outputs
     
-    if numInputs >0:
+    if numInputs > 0:
         dag = DAG.DAG(0,initPeriod,10*initPeriod)
     else:
         #arbitrary
@@ -467,7 +470,13 @@ def wrapper(circuitString, Libraries, fileLoc, makeBarGraph):
     #Make graphs from JsonFile
     General.generateDynamicCircuitGraphs(fileLoc, makeBarGraph)
     
-def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph):
+repressilatorFileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/repressilator.json"
+placeToSaveRepressilator = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/repressilatorDAG.json"
+#
+truthValueExampleFileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan\SplitByTruthValue_OR/01101001.json" #01101001
+placeToSaveTruthValueExample = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/01101001DAG.json"
+
+def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True):
     """
     Takes in a string representation of a circuit, a set of libraries of inputs,
     repressors, and outputs, and a directory to store the intermediate json file.
@@ -483,7 +492,6 @@ def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph):
         makeBarGraph = False
         #So things do not start at equilibrium.
         Intermediates[0].setInitialProtein(1.0)
-        
     #Write to Json File
     dag.writeToJson(placeToSave)
     #Make graphs from JsonFile
@@ -537,3 +545,5 @@ def makeInputBin(numInputs):
         #allInputBin.append(tempInput)
     allInputBin.reverse()
     return allInputBin
+    
+        

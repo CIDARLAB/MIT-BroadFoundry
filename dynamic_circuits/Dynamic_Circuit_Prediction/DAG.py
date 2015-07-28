@@ -203,8 +203,9 @@ class DAG(object):
         """
         This function is what actually does the truth value assignment
         """
+
         if gate.wasVisited():
-            if gate.getExpectedProtein()!=None:
+            if gate.getExpectedProtein()==None:
                 self.isSequential = True
             return
         elif gate.getExpectedProtein()!=None and gate.getExpectedPromoter()!=None:

@@ -1,0 +1,76 @@
+[
+    {
+        "itr": 1000.0,
+        "xMax": 1000.0,
+        "xMin": 0,
+        "yMax": "NONE",
+        "yMin": "NONE"
+    },
+    {
+        "DIST": 0,
+        "EXPECTED_PROMOTER": [
+            "0",
+            "1"
+        ],
+        "EXPECTED_PROTEIN": [
+            "0",
+            "1"
+        ],
+        "INPUT": [
+            "inputs.squInput",
+            1000.0,
+            10.0,
+            500.0,
+            0.0
+        ],
+        "NAME": "IPTG1",
+        "TYPE": "INPUT"
+    },
+    {
+        "DIST": 1,
+        "EXPECTED_PROMOTER": [
+            "1",
+            "0"
+        ],
+        "EXPECTED_PROTEIN": [
+            "0",
+            "1"
+        ],
+        "INPUT": "IPTG1",
+        "INPUT_EFFECT": "ACTIVATE",
+        "Km": 7.868968947167685,
+        "Mi": 0.0,
+        "NAME": "GENE5",
+        "Pi": 0.0,
+        "TYPE": "NOT",
+        "am": "NONE",
+        "ap": "NONE",
+        "mB": 53.87963084854126,
+        "m_HALFLIFE": 1.196838400569815,
+        "n": 2.4970775936790077,
+        "pB": 17.929576448774455,
+        "p_HALFLIFE": 11.04505875290939
+    },
+    {
+        "DIST": 2,
+        "EXPECTED_PROMOTER": null,
+        "EXPECTED_PROTEIN": [
+            "1",
+            "0"
+        ],
+        "INPUT": "GENE5",
+        "INPUT_EFFECT": "REPRESS",
+        "Km": 1416.197970229583,
+        "Mi": 0.0,
+        "NAME": "FP3",
+        "Pi": 0.0,
+        "TYPE": "BUFFER",
+        "am": "NONE",
+        "ap": "NONE",
+        "mB": 31.715507838380248,
+        "m_HALFLIFE": 2.866926585073972,
+        "n": 2.2783966488807477,
+        "pB": 22.200220950292547,
+        "p_HALFLIFE": 16.960636131356367
+    }
+]

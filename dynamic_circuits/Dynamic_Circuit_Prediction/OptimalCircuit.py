@@ -17,9 +17,9 @@ import update
 import re
 import itertools
 
-inputsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/InputLibrary2.json"
-repressorsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/RepressorLibrary2Edit.json"
-outputsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/OutputLibrary2.json"
+inputsDir = "JsonFiles/Libraries/InputLibrary2.json"
+repressorsDir = "JsonFiles/Libraries/RepressorLibrary2Edit.json"
+outputsDir = "JsonFiles/Libraries/OutputLibrary2.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
     
 repressilatorFileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/repressilator.json"
@@ -27,8 +27,8 @@ placeToSaveRepressilator = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFr
 #
 truthValueExampleFileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan\SplitByTruthValue_OR/01101001.json" #01101001
 placeToSaveTruthValueExample = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/01101001DAG.json"
-netlistLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/standardOR.json"
-intermediateFile = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/intermediateDAG.json"
+netlistLoc = "JsonFiles/standardOR.json"
+intermediateFile = "JsonFiles/intermediateDAG.json"
 
 truthValue = "00010001"
 inputNames = ["IPTG1","IPTG2","IPTG3"]

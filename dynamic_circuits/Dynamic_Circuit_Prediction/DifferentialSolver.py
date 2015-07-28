@@ -32,8 +32,8 @@ def differentialSolver(func,initc,timeArray,args=(),n2=None):
 #                theRange.remove(j+1+i)
                     
         
-        if i%1000 ==0:
-            print 100*float(i)/len(timeArray),"%"
+#        if i%1000 ==0:
+#            print 100*float(i)/len(timeArray),"%"
     return results
     
 def nLastTermsEqual(n,array):

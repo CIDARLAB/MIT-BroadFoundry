@@ -47,14 +47,25 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
     #Combine into one vector of starting concentrations
     initc = mRNAi + proteini
     #Use odeint to calculate the concentrations over the time steps
-#    soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names),tcrit=carefult)
-    soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names),hmax=400)
+    soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names),tcrit=carefult)
+#    soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names),hmax=300)
+#    soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names))
     #Separate the mRNA and protein concentration vectors. The order they appear
     #in the list should be the same order that they are in in logic_gate_names.
 #    odeIntWasBad = checkodeInt(t,soln_f,numInputs)
 #    print odeIntWasBad
 #    if odeIntWasBad:
 #       soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names))
+    
+    odeintIsGood = True
+    for i in range(len(soln_f[0])):
+        if np.isnan(soln_f[:,i]).any():
+            odeintIsGood = False
+            break
+#    print odeintIsGood
+    if not odeintIsGood:
+#        print "ODEINT failed. Using backup method."
+        soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names))
     mRNA_f = []
     protein_f = []
     numGates = len(logic_gate_names)
@@ -85,59 +96,59 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
         m = max(i)*10
         if m>ymax:
             ymax = m
-    plt.figure()
-    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymax=ymax, ymin=0.1)  
-    #Plot each input against time with its name as the label
-    for i in range(len(inputNames)):
-        tempInput = list(inputs_f[i])
-        #tempInput.reverse()
-        plt.plot(t,tempInput,color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label=inputNames[i])
-    plt.xlabel('Time (min)')
-    plt.yscale('log')
-    plt.ylabel('Input molecules per cell')
-    plt.title('Concentration of Inputs Over Time')
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    plt.show()
-    
-    #Visualizing mRNA concentrations
-    plt.figure()
-    #Plot each mRNA against time with its name as the label
-    ymax = 1
-    for i in range(numGates):
-        tempmRNA = list(mRNA_f[i])
-        #tempmRNA.reverse()
-        tempMax = max(tempmRNA)
-        if tempMax>ymax:
-            ymax = tempMax
-        plt.plot(t,tempmRNA,color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label = logic_gate_names[i])
-    plt.xlabel('Time (min)')
-    plt.yscale('log')
-    plt.ylabel('Transcripts per cell')
-    plt.title('Concentration of mRNA Over Time')
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    ymax = ymax *10
-    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymin=0.1, ymax = ymax)
-    plt.show()
-    
-    #Visualizing protein concentrations
-    plt.figure()
-    #Plot each protein against time with its name as the label
-    ymax = 1
-    for i in range(numGates):
-        tempProtein = list(protein_f[i])
-        #tempProtein.reverse()
-        tempMax = max(tempProtein)
-        if tempMax>ymax:
-            ymax = tempMax
-        plt.plot(t,tempProtein,color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label = logic_gate_names[i])
-    plt.xlabel('Time (min)')
-    plt.yscale('log')
-    plt.ylabel('Proteins per cell')
-    plt.title('Concentration of Protein Over Time')
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    ymax = ymax *10
-    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymin=0.1, ymax = ymax)
-    plt.show()
+#    plt.figure()
+#    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymax=ymax, ymin=0.1)  
+#    #Plot each input against time with its name as the label
+#    for i in range(len(inputNames)):
+#        tempInput = list(inputs_f[i])
+#        #tempInput.reverse()
+#        plt.plot(t,tempInput,color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label=inputNames[i])
+#    plt.xlabel('Time (min)')
+#    plt.yscale('log')
+#    plt.ylabel('Input molecules per cell')
+#    plt.title('Concentration of Inputs Over Time')
+#    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+#    plt.show()
+#    
+#    #Visualizing mRNA concentrations
+#    plt.figure()
+#    #Plot each mRNA against time with its name as the label
+#    ymax = 1
+#    for i in range(numGates):
+#        tempmRNA = list(mRNA_f[i])
+#        #tempmRNA.reverse()
+#        tempMax = max(tempmRNA)
+#        if tempMax>ymax:
+#            ymax = tempMax
+#        plt.plot(t,tempmRNA,color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label = logic_gate_names[i])
+#    plt.xlabel('Time (min)')
+#    plt.yscale('log')
+#    plt.ylabel('Transcripts per cell')
+#    plt.title('Concentration of mRNA Over Time')
+#    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+#    ymax = ymax *10
+#    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymin=0.1, ymax = ymax)
+#    plt.show()
+#    
+#    #Visualizing protein concentrations
+#    plt.figure()
+#    #Plot each protein against time with its name as the label
+#    ymax = 1
+#    for i in range(numGates):
+#        tempProtein = list(protein_f[i])
+#        #tempProtein.reverse()
+#        tempMax = max(tempProtein)
+#        if tempMax>ymax:
+#            ymax = tempMax
+#        plt.plot(t,tempProtein,color=color[i%7],linestyle=linestyle[(i/7)%4],marker=marker[((i/7)/4)%17],label = logic_gate_names[i])
+#    plt.xlabel('Time (min)')
+#    plt.yscale('log')
+#    plt.ylabel('Proteins per cell')
+#    plt.title('Concentration of Protein Over Time')
+#    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+#    ymax = ymax *10
+#    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymin=0.1, ymax = ymax)
+#    plt.show()
     
 #-------------------------------------------------------------------------------
     if not makeBarGraphs:
@@ -179,36 +190,36 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
         name = str(currGateProperties['NAME'])
         
         #Make the bar plot for the mRNA
-        plt.figure()
-        plt.axis(xmin=0, xmax=numBinaries, ymin=0.1, ymax=mrnaymax)
-        barlist = plt.bar(t,mRNAVals)
-        #If the expected is low, change the color of the bar to red.
-        for j in range(numBinaries):
-            if tv[j]=="0":
-                barlist[j].set_color('r')
-        #Space the labels properly
-        plt.xticks(t+width, binVals)  
-        plt.xlabel('TruthValues')
-        plt.yscale('log')
-        plt.ylabel('mRNA per cell')
-        plt.title('mRNA Levels for ' + name)
-        plt.show()
-        
-        #Make the bar plot for the protein
-        plt.figure()
-        plt.axis(xmin=0, xmax=numBinaries, ymin=0.1, ymax=proteinymax)
-        barlist = plt.bar(t,proteinVals)
-        #If the expected is low, change the color of the bar to red.
-        for j in range(numBinaries):
-            if tv[j]=="0":
-                barlist[j].set_color('r')
-        #Space the labels properly
-        plt.xticks(t+width, binVals)  
-        plt.xlabel('TruthValues')
-        plt.yscale('log')
-        plt.ylabel('Proteins per cell')
-        plt.title('Protein Levels for ' + name)
-        plt.show()
+#        plt.figure()
+#        plt.axis(xmin=0, xmax=numBinaries, ymin=0.1, ymax=mrnaymax)
+#        barlist = plt.bar(t,mRNAVals)
+#        #If the expected is low, change the color of the bar to red.
+#        for j in range(numBinaries):
+#            if tv[j]=="0":
+#                barlist[j].set_color('r')
+#        #Space the labels properly
+#        plt.xticks(t+width, binVals)  
+#        plt.xlabel('TruthValues')
+#        plt.yscale('log')
+#        plt.ylabel('mRNA per cell')
+#        plt.title('mRNA Levels for ' + name)
+#        plt.show()
+#        
+#        #Make the bar plot for the protein
+#        plt.figure()
+#        plt.axis(xmin=0, xmax=numBinaries, ymin=0.1, ymax=proteinymax)
+#        barlist = plt.bar(t,proteinVals)
+#        #If the expected is low, change the color of the bar to red.
+#        for j in range(numBinaries):
+#            if tv[j]=="0":
+#                barlist[j].set_color('r')
+#        #Space the labels properly
+#        plt.xticks(t+width, binVals)  
+#        plt.xlabel('TruthValues')
+#        plt.yscale('log')
+#        plt.ylabel('Proteins per cell')
+#        plt.title('Protein Levels for ' + name)
+#        plt.show()
         
         #Calculate the gate score
         lowestHigh = proteinymax
@@ -222,10 +233,10 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
         gateScore = lowestHigh/highestLow
         scoreDict[name] = gateScore
         
-    print "Gate scores:"
-    print scoreDict
+#    print "Gate scores:"
+#    print scoreDict
     endTime = time.time()
-    print round(endTime-startTime,2), "seconds"
+#    print round(endTime-startTime,2), "seconds"
     return scoreDict
     
 def getBinaryInOrder(maxVal):

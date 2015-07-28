@@ -22,11 +22,11 @@ repressorsDir = "JsonFiles/Libraries/RepressorLibrary2Edit.json"
 outputsDir = "JsonFiles/Libraries/OutputLibrary2.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
     
-repressilatorFileLoc = "JsonFiles/repressilator.json"
-placeToSaveRepressilator = "JsonFiles/repressilatorDAG.json"
-
-truthValueExampleFileLoc = "JsonFiles/SplitByTruthValue_OR/01101001.json" #01101001
-placeToSaveTruthValueExample = "JsonFiles/01101001DAG.json"
+repressilatorFileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/repressilator.json"
+placeToSaveRepressilator = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/repressilatorDAG.json"
+#
+truthValueExampleFileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan\SplitByTruthValue_OR/01101001.json" #01101001
+placeToSaveTruthValueExample = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/01101001DAG.json"
 netlistLoc = "JsonFiles/standardOR.json"
 intermediateFile = "JsonFiles/intermediateDAG.json"
 
@@ -270,7 +270,7 @@ def findBestForTruthValue(truthValue, inputNames, outputNames, intermediateFile 
         bestScoreForNetlist = bestScore
         dag, allGates, Inputs, Intermediates, Outputs = makeDAGFromNetlist(netlist)
         print dag
-        IntermediatesrList = makeReressorsGroups(Libraries[1],len(Intermediates))
+        IntermediatesrList = makeRepressorsGroups(Libraries[1],len(Intermediates))
         for IntermediatesrTuple in IntermediatesrList:
             #-------------------------------
             dag, allGates, Inputs, Intermediates, Outputs = makeDAGFromNetlist(netlist)
@@ -296,6 +296,7 @@ def findBestForTruthValue(truthValue, inputNames, outputNames, intermediateFile 
             if dag.hasLoop():
                 Intermediatesr[0].setInitialProtein(1.0)
                 makeBarGraph = False
+                print "Problem"
                 
             score = General.generateDynamicCircuitGraphs(intermediateFile, makeBarGraph)
             if score == None:
@@ -323,7 +324,7 @@ def findBestForTruthValue(truthValue, inputNames, outputNames, intermediateFile 
     gateAliases = {}
     for i in range(len(bestIntermediateGateNames)):
         gateAliases[bestIntermediateGateNames[i]] = bestRepressorOrder[i]
-    return bestNetlist, gateAliases
+    return bestNetlist, gateAliases, bestScore
             
 
 #Make gates from libraries
@@ -361,7 +362,7 @@ def makeOutput(outputLibrary,outputNames):
         Outputsr.append(tempGate)
     return Outputsr
     
-def makeReressorsGroups(repressorLibrary,numRepressors):
+def makeRepressorsGroups(repressorLibrary,numRepressors):
     myFile = open(repressorLibrary,'r')
     repressorsFromFile = json.load(myFile)
     myFile.close()

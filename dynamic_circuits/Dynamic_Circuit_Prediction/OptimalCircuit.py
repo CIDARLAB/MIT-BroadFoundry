@@ -24,9 +24,9 @@ Libraries = [inputsDir, repressorsDir, outputsDir]
     
 repressilatorFileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/repressilator.json"
 placeToSaveRepressilator = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/repressilatorDAG.json"
-#
-truthValueExampleFileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan\SplitByTruthValue_OR/01101001.json" #01101001
-placeToSaveTruthValueExample = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/01101001DAG.json"
+
+truthValueExampleFileLoc = "JsonFiles/SplitByTruthValue_OR/01101001.json" #01101001
+placeToSaveTruthValueExample = "JsonFiles/01101001DAG.json"
 netlistLoc = "JsonFiles/standardOR.json"
 intermediateFile = "JsonFiles/intermediateDAG.json"
 

@@ -442,9 +442,9 @@ circuitString9 = '((a.0).a)' #00000000
 circuitString10 = '((a.0).b)' #00001100
 
 fileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/test.json"
-inputsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/InputLibrary2.json"
-repressorsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/RepressorLibrary2.json"
-outputsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/OutputLibrary2.json"
+inputsDir = "JsonFiles/Libraries/InputLibrary2.json"
+repressorsDir = "JsonFiles/Libraries/RepressorLibrary2.json"
+outputsDir = "JsonFiles/Libraries/OutputLibrary2.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
 
 
@@ -459,9 +459,9 @@ def wrapper(circuitString, Libraries, fileLoc, makeBarGraph):
     #Make DAG from string
     dag, allGates, Inputs, Repressors, Outputs = makeDAGFromString(circuitString)
     #Get replacements for the gates
-    allGatesr, Inputsr, Repressorsr, Outputsr = makeGatesFromLibraries(Libraries, Inputs, Repressors, Outputs)
+#    allGatesr, Inputsr, Repressorsr, Outputsr = makeGatesFromLibraries(Libraries, Inputs, Repressors, Outputs)
     #Perform Swaps
-    performSwaps(dag, allGates, Inputs, allGatesr, Inputsr)
+#    performSwaps(dag, allGates, Inputs, allGatesr, Inputsr)
 
     print dag
     #Write to Json File

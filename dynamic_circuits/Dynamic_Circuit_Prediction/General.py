@@ -47,8 +47,8 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
     #Combine into one vector of starting concentrations
     initc = mRNAi + proteini
     #Use odeint to calculate the concentrations over the time steps
-    soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names),tcrit=carefult)
-#    soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names))
+#    soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names),tcrit=carefult)
+    soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names),hmax=400)
     #Separate the mRNA and protein concentration vectors. The order they appear
     #in the list should be the same order that they are in in logic_gate_names.
 #    odeIntWasBad = checkodeInt(t,soln_f,numInputs)
@@ -86,7 +86,7 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
         if m>ymax:
             ymax = m
     plt.figure()
-    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymax=ymax, ymin=1)  
+    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymax=ymax, ymin=0.1)  
     #Plot each input against time with its name as the label
     for i in range(len(inputNames)):
         tempInput = list(inputs_f[i])
@@ -116,7 +116,7 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
     plt.title('Concentration of mRNA Over Time')
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     ymax = ymax *10
-    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymin=1, ymax = ymax)
+    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymin=0.1, ymax = ymax)
     plt.show()
     
     #Visualizing protein concentrations
@@ -136,7 +136,7 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
     plt.title('Concentration of Protein Over Time')
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     ymax = ymax *10
-    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymin=1, ymax = ymax)
+    plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymin=0.1, ymax = ymax)
     plt.show()
     
 #-------------------------------------------------------------------------------
@@ -180,7 +180,7 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
         
         #Make the bar plot for the mRNA
         plt.figure()
-        plt.axis(xmin=0, xmax=numBinaries, ymin=1, ymax=mrnaymax)
+        plt.axis(xmin=0, xmax=numBinaries, ymin=0.1, ymax=mrnaymax)
         barlist = plt.bar(t,mRNAVals)
         #If the expected is low, change the color of the bar to red.
         for j in range(numBinaries):
@@ -196,7 +196,7 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
         
         #Make the bar plot for the protein
         plt.figure()
-        plt.axis(xmin=0, xmax=numBinaries, ymin=1, ymax=proteinymax)
+        plt.axis(xmin=0, xmax=numBinaries, ymin=0.1, ymax=proteinymax)
         barlist = plt.bar(t,proteinVals)
         #If the expected is low, change the color of the bar to red.
         for j in range(numBinaries):

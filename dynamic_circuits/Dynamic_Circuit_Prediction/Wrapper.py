@@ -442,13 +442,11 @@ circuitString9 = '((a.0).a)' #00000000
 circuitString10 = '((a.0).b)' #00001100
 circuitString11 = '((a.0).(b.0))' #00010001
 
-fileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/test.json"
+fileLoc = "JsonFiles/test.json"
 inputsDir = "JsonFiles/Libraries/InputLibrary2.json"
 repressorsDir = "JsonFiles/Libraries/RepressorLibrary2Edit.json"
 outputsDir = "JsonFiles/Libraries/OutputLibrary2.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
-
-
 
 def wrapper(circuitString, Libraries, fileLoc, makeBarGraph):
     """

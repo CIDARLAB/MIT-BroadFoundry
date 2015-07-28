@@ -440,10 +440,11 @@ circuitString7 = '(a.0)' #11110000
 circuitString8 = '((a.b).c)' #00101010
 circuitString9 = '((a.0).a)' #00000000
 circuitString10 = '((a.0).b)' #00001100
+circuitString11 = '((a.0).(b.0))' #00010001
 
 fileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/test.json"
 inputsDir = "JsonFiles/Libraries/InputLibrary2.json"
-repressorsDir = "JsonFiles/Libraries/RepressorLibrary2.json"
+repressorsDir = "JsonFiles/Libraries/RepressorLibrary2Edit.json"
 outputsDir = "JsonFiles/Libraries/OutputLibrary2.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
 
@@ -459,9 +460,9 @@ def wrapper(circuitString, Libraries, fileLoc, makeBarGraph):
     #Make DAG from string
     dag, allGates, Inputs, Repressors, Outputs = makeDAGFromString(circuitString)
     #Get replacements for the gates
-#    allGatesr, Inputsr, Repressorsr, Outputsr = makeGatesFromLibraries(Libraries, Inputs, Repressors, Outputs)
+    allGatesr, Inputsr, Repressorsr, Outputsr = makeGatesFromLibraries(Libraries, Inputs, Repressors, Outputs)
     #Perform Swaps
-#    performSwaps(dag, allGates, Inputs, allGatesr, Inputsr)
+    performSwaps(dag, allGates, Inputs, allGatesr, Inputsr)
 
     print dag
     #Write to Json File

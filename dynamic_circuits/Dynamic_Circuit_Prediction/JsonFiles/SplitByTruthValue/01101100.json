@@ -1,0 +1,7 @@
+[
+    "NOR(n7,a,c)",
+    "NOR(0Wire6721,b,n7)",
+    "NOR(n9,n7,0Wire6721)",
+    "NOR(n11,b,0Wire6721)",
+    "NOR(y,n9,n11)"
+]

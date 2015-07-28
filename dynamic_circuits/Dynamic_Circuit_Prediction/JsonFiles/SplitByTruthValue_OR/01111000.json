@@ -1,0 +1,8 @@
+[
+    "NOT(n4,a)",
+    "NOR(n7,b,c)",
+    "NOT(n8,n7)",
+    "NOR(n9,a,n7)",
+    "NOR(n11,n4,n8)",
+    "OR(y,n9,n11)"
+]

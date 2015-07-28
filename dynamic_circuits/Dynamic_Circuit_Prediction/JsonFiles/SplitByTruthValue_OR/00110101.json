@@ -1,0 +1,6 @@
+[
+    "NOT(n4,a)",
+    "NOR(n7,a,b)",
+    "NOR(n9,n4,c)",
+    "NOR(y,n7,n9)"
+]

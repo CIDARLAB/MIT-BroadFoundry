@@ -27,4 +27,6 @@ The OptimalCircuit program can not be used for sequential circuits that would os
 Score calculated by minimum value when truth value is 1 divided by the maximum value when truth value is 0.
 Could the score be improved (to avoid divide by 0 and extreme logarithmic differences).
 
-Try to searc
+Try to search for realistic values
+
+Finished cleaning up CircuitStringConverter.py, which consisted of several methods used for converting a Json file into Python dictionarys and Netlists.

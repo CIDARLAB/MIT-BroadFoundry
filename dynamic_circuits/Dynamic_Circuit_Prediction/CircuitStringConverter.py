@@ -3,21 +3,22 @@
 Created on Sun Jul 26 15:54:35 2015
 
 @author: Arinze
+Edited by Alex (7.29.2015)
 """
 
 """
 This file was used to do a number of things. Its primary function is to compare
-the netlists given to me by bryan with the circuits we generated. The circuits
-we generated are also simplified by replacing the final NOT with a NOR where
-applicable. This also contains a function that can convert the circuitString
-into a netlist, but it only works for NOR and OR. It is a minor modification to
-make it recognize the other gate types.
+the netlists given to me by Bryan with the circuits we generated. The circuits 
+are simplified by replacing the final NOT with a OR where applicable. This also 
+contains a function that can convert the circuitString into a netlist, but it 
+only works for NOR and OR. Minor modification required to recognize other gate 
+types.
 """
 
 import json
 import Truths_and_Gates as tg
 
-fileName = "JsonFiles/Sat_Jul_18_04_17_55_EDT_2015_Ops._MaxCost9.0.json"
+fileName = "JsonFiles/Circuits_MaxCost9.0_NorOnly.json"
 placeToSaveOR = "JsonFiles/outputs/withOR.json"
 placeToSaveNOR = "JsonFiles/outputs/withNOR.json"
 
@@ -25,13 +26,19 @@ def getCircuitsFromFile(fileName):
     myFile = open(fileName,'r')
     data = json.load(myFile)
     data = data[2:255]
-    #maps truth values to circuits
+    # Maps truth values to circuits
     circuits = {}
-    #add the 0 and 1 circuits
+
+    # Add the 0 and 1 circuits
     circuits['00000000'] = ['0']
     circuits['11111111'] = ['1']
+    
+    # Maps 253 of the remaining 254 truth values between '0' and '1' to corresponding circuit
     for d in data:
         circuits[d["truthValue"]] = d["circuits"]
+
+    # Maps last truth value and append additional circuits to truth values. 11101001 is the 
+    # missing truth value. (Useful for an 'or' simplification in a later step)
     for d in data:
         tv = d["truthValue"]
         newtv = invert(tv)
@@ -47,7 +54,8 @@ def getCircuitsFromFile(fileName):
             circuits[newtv] = tempNewCirc
     myFile.close()
     return circuits
-    
+
+# Function for the inversion of a truth value string    
 def invert(truthValue):
     s = ""
     for char in truthValue:
@@ -57,11 +65,10 @@ def invert(truthValue):
             s+="1"
     return s
 
-def simplify(fileName, placeToSaveOR, freeOR):
-    if freeOR:
-        opcost = {"~":1,"&":1,"@":1,"+":0,"^":1,".":1,"=":1,">":1,"$":1}
-    else:
-        opcost = {"~":1,"&":1,"@":1,"+":1,"^":1,".":1,"=":1,">":1,"$":1}
+# Function returns simplified circuit with an 'or' in place of an ending 'nor' and 'not' 
+def simplify(fileName, placeToSaveOR):
+    # 'or' (+) cost is free because it is just 2 promoters before the FP output
+    opcost = {"~":1,"&":1,"@":1,"+":0,"^":1,".":1,"=":1,">":1,"$":1}
     circuits = getCircuitsFromFile(fileName)
     simplifiedCircuits = {}
     truthValues = circuits.keys()
@@ -70,9 +77,7 @@ def simplify(fileName, placeToSaveOR, freeOR):
     simplifiedCircuits['00000000'] = ['0']
     simplifiedCircuits['11111111'] = ['1']
     
-    
-    
-    #replace final not with or when applicable
+    #replace final 'not' (.0) with 'or' (+) when applicable
     for tv in truthValues:
         currCircuits = circuits[tv]
         tempNewCircuits = []
@@ -98,11 +103,6 @@ def simplify(fileName, placeToSaveOR, freeOR):
         info = {}
         info["circuits"] = simplifiedCircuits[tv]
         info["cost"] = tg.circuitCost(simplifiedCircuits[tv][0],cost=opcost)
-        if tv in ["00111111","01011111","01110111"]:
-            print tv
-            print simplifiedCircuits[tv]
-            print tg.circuitCost(simplifiedCircuits[tv][0],cost=opcost)
-            pause = raw_input("pause")
         finalResults[tv] = info
     myFile = open(placeToSaveOR,'w')
     json.dump(finalResults, myFile, sort_keys=True, indent=4, separators=(',', ': '))
@@ -113,7 +113,7 @@ def convertToORIfPossible(circuitString):
     #ignore circuits like (a.0) but not ((a.b).0)
     if circuitString[-4:] != ").0)":
         return circuitString
-    #remove trailing not
+    #remove trailing 'not' (.0)
     circuitString = circuitString[1:-3]
     count = 0
     for i in range(1,len(circuitString)):
@@ -125,8 +125,7 @@ def convertToORIfPossible(circuitString):
         if count == 0:
             return circuitString[:i+1] + "+" +circuitString[i+2:]
     
- #need to creat a nor for 11101001
-
+# Adds a cost value to a new Json file. 
 def remakeFile(fileName,placeToSaveNOR):
     myFile = open(fileName,'r')
     data = json.load(myFile)
@@ -143,6 +142,7 @@ def remakeFile(fileName,placeToSaveNOR):
     circuits['00000000'] = infoZero
     circuits['11111111'] = infoOne
     
+    # Creates dictionary for circuits with additional cost reference
     for d in data:
         tv = d["truthValue"]
         currCircuits = d["circuits"]
@@ -162,8 +162,7 @@ def remakeFile(fileName,placeToSaveNOR):
     
     myFile = open(placeToSaveNOR,'w')
     json.dump(circuits, myFile, sort_keys=True, indent=4, separators=(',', ': '))
-    myFile.close()
-    
+    myFile.close()  
     return circuits
 
 myFileNameNOR = "JsonFiles/withNOR.json"
@@ -203,8 +202,8 @@ def compare(myFileName, bryanFileName):
     
 def convertToNetlist(circuitString):
     """
-    Takes in a circuitString and converts it to a netlist. The format of
-    the netlist will be a list of strings. Only works for nor, not, or
+    Takes in a circuitString and converts it to a netlist. The format of the 
+    netlist will be a list of strings. Only works for 'nor', 'not', and 'or'.
     """
     wireCount = 0
     netlist = []

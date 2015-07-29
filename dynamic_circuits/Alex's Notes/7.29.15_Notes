@@ -1,0 +1,30 @@
+Agenda for today:
+-Implement code-fixes for odeint function when plotting graph
+	-Arinze found an error was being generated where we negative concentration values would return nan values in the hill equation because the hill coefficient was a decimal (e.g. n=2.5). He resolved this issue by inserting a small line of code to set concentration values to 0 if they were negative (In short, no negative concentration values). 
+	-Problem 2: near points of discontinuity where the input change, he removed the critical t points in order to avoid a specific type of error, Repeated error test failure (internal error) message. This was fixed by the reducing the maxstep (hmax) of the odeint. Lots of troubleshooting done.
+	-Problem 3: for even simple cases, program may run slowly (up to 11 years! for 10! permutations at 20 seconds per test). Think of some ways to optimize the code, remove excess test cases. On hold, until foundation is solid.
+-Think about a cool side project that could use this parts of the optimal circuit project
+	- delegation of works
+-Look into some of the literature of repressilator systems:
+	- lacI-TetR-cI repressilator systems
+	- 2 goals: Readable code and realistic values.
+-Simulation of the SR-latch
+	-stability
+
+
+1) Arinze
+	- Write 2 Tests, combinational and sequential
+	- SR latch
+2) Alex
+	- Cleaning code, localize the file extensions
+	- To understand the code and make it more understandable
+	- Run tests and refactor
+	- Realistic Values Search
+
+Notes: 
+The OptimalCircuit program can not be used for sequential circuits that would oscillate and not reach an equilibrium truth value. Can be used to graph, but not to score. Perference for combinational circuit.
+
+Score calculated by minimum value when truth value is 1 divided by the maximum value when truth value is 0.
+Could the score be improved (to avoid divide by 0 and extreme logarithmic differences).
+
+Try to searc

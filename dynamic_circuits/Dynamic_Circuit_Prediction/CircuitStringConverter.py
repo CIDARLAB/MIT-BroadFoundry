@@ -6,7 +6,7 @@ Created on Sun Jul 26 15:54:35 2015
 """
 
 """
-This file was used to do a number of things. It's primary function is to compare
+This file was used to do a number of things. Its primary function is to compare
 the netlists given to me by bryan with the circuits we generated. The circuits
 we generated are also simplified by replacing the final NOT with a NOR where
 applicable. This also contains a function that can convert the circuitString
@@ -17,9 +17,10 @@ make it recognize the other gate types.
 import json
 import Truths_and_Gates as tg
 
-fileName = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/Sat_Jul_18_04_17_55_EDT_2015_Ops._MaxCost9.0.json"
-placeToSaveOR = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/withOR.json"
-placeToSaveNOR = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/withNOR.json"
+fileName = "JsonFiles/Sat_Jul_18_04_17_55_EDT_2015_Ops._MaxCost9.0.json"
+placeToSaveOR = "JsonFiles/outputs/withOR.json"
+placeToSaveNOR = "JsonFiles/outputs/withNOR.json"
+
 def getCircuitsFromFile(fileName):
     myFile = open(fileName,'r')
     data = json.load(myFile)
@@ -46,7 +47,6 @@ def getCircuitsFromFile(fileName):
             circuits[newtv] = tempNewCirc
     myFile.close()
     return circuits
-    
     
 def invert(truthValue):
     s = ""
@@ -126,6 +126,7 @@ def convertToORIfPossible(circuitString):
             return circuitString[:i+1] + "+" +circuitString[i+2:]
     
  #need to creat a nor for 11101001
+
 def remakeFile(fileName,placeToSaveNOR):
     myFile = open(fileName,'r')
     data = json.load(myFile)
@@ -165,10 +166,10 @@ def remakeFile(fileName,placeToSaveNOR):
     
     return circuits
 
-myFileNameNOR = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/withNOR.json"
-bryanFileNameNOR = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/netlist_in3out1.json"
-myFileNameOR = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/withOR.json"
-bryanFileNameOR = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/netlist_in3out1_OR.json"
+myFileNameNOR = "JsonFiles/withNOR.json"
+bryanFileNameNOR = "JsonFiles/netlist_in3out1.json"
+myFileNameOR = "JsonFiles/withOR.json"
+bryanFileNameOR = "JsonFiles/netlist_in3out1_OR.json"
 
 def compare(myFileName, bryanFileName):
     """
@@ -242,11 +243,10 @@ def convertToNetlist(circuitString):
         netlist.append("BUF(y,"+circuitString+")")
     return netlist
 
-unstandarizedNOR = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/withNOR.json"
-unstandarizedOR = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/withOR.json"
-standarizedNOR = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/standardNOR.json"
-standarizedOR = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/standardOR.json"
-
+unstandarizedNOR = "JsonFiles/withNOR.json"
+unstandarizedOR = "JsonFiles/withOR.json"
+standarizedNOR = "JsonFiles/standardNOR.json"
+standarizedOR = "JsonFiles/standardOR.json"
 
 def standardizeFileWithNetlists(fileName, fileDestination):
     myFile = open(fileName,'r')

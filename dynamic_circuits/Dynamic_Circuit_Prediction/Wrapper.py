@@ -373,7 +373,7 @@ def makeGatesFromLibraries(Libraries,Inputs,Repressors,Outputs):
     print "You must select",str(len(Outputs)),"unique outputs. Remember, order matters."
     while len(selectedOutputs)<len(Outputs):
         print outputOptions
-        index = raw_input("Type the number corresponding to the repressor you want: ")
+        index = raw_input("Type the number corresponding to the output you want: ")
         try:        
             index = int(index)
         except ValueError:
@@ -441,10 +441,12 @@ circuitString8 = '((a.b).c)' #00101010
 circuitString9 = '((a.0).a)' #00000000
 circuitString10 = '((a.0).b)' #00001100
 circuitString11 = '((a.0).(b.0))' #00010001
+circuitString12 = '(((a.0).b).(a.0))' #00010001
+circuitString13 = '(((((((a.b).a).b).((a.b).a)).c).c).(((((a.b).a).b).((a.b).a)).(((((a.b).a).b).((a.b).a)).c)))' #01101001
 
 fileLoc = "JsonFiles/test.json"
 inputsDir = "JsonFiles/Libraries/InputLibrary2.json"
-repressorsDir = "JsonFiles/Libraries/RepressorLibrary2Edit.json"
+repressorsDir = "JsonFiles/Libraries/RepressorLibrary2.json"
 outputsDir = "JsonFiles/Libraries/OutputLibrary2.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
 
@@ -467,7 +469,7 @@ def wrapper(circuitString, Libraries, fileLoc, makeBarGraph):
     #fileLoc = 'C:/Users/Arinze/SkyDrive/UROP_Summer_2015/ODE/Example5.json'
     dag.writeToJson(fileLoc)
     #Make graphs from JsonFile
-    General.generateDynamicCircuitGraphs(fileLoc, makeBarGraph)
+    return General.generateDynamicCircuitGraphs(fileLoc, makeBarGraph)
     
 repressilatorFileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/repressilator.json"
 placeToSaveRepressilator = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015\NetlistsFromBryan/repressilatorDAG.json"

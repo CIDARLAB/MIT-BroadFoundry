@@ -16,9 +16,10 @@ import inputs
 import update
 import re
 import itertools
+import time
 
 inputsDir = "JsonFiles/Libraries/InputLibrary2.json"
-repressorsDir = "JsonFiles/Libraries/RepressorLibrary2Edit.json"
+repressorsDir = "JsonFiles/Libraries/RepressorLibrary2.json"
 outputsDir = "JsonFiles/Libraries/OutputLibrary2.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
     
@@ -250,6 +251,7 @@ def findBestForTruthValue(truthValue, inputNames, outputNames, intermediateFile 
     necessary and the same for outputs. Returns the best circuit repressors and
     netlist for the desired truth value.
     """
+    startTime = time.time()
     myFile = open(netlistLoc,'r')
     data = json.load(myFile)
     myFile.close()
@@ -324,6 +326,8 @@ def findBestForTruthValue(truthValue, inputNames, outputNames, intermediateFile 
     gateAliases = {}
     for i in range(len(bestIntermediateGateNames)):
         gateAliases[bestIntermediateGateNames[i]] = bestRepressorOrder[i]
+    endTime = time.time()
+    print "This took",round(endTime-startTime,2),"seconds."
     return bestNetlist, gateAliases, bestScore
             
 

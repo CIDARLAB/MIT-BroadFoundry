@@ -47,8 +47,8 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
     #Combine into one vector of starting concentrations
     initc = mRNAi + proteini
     #Use odeint to calculate the concentrations over the time steps
-    soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names),tcrit=carefult)
-#    soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names),hmax=300)
+#    soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names),tcrit=carefult)
+    soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names),hmax=350)
 #    soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names))
     #Separate the mRNA and protein concentration vectors. The order they appear
     #in the list should be the same order that they are in in logic_gate_names.
@@ -56,22 +56,26 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
 #    print odeIntWasBad
 #    if odeIntWasBad:
 #       soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names))
-    
+#    return soln_f[1]
     odeintIsGood = True
     for i in range(len(soln_f[0])):
         if np.isnan(soln_f[:,i]).any():
             odeintIsGood = False
             break
-#    print odeintIsGood
-    if not odeintIsGood:
-#        print "ODEINT failed. Using backup method."
-        soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names))
+    print odeintIsGood
+#    if not odeintIsGood:
+##        print "ODEINT failed. Using backup method."
+#        soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names))
     mRNA_f = []
     protein_f = []
     numGates = len(logic_gate_names)
     for i in range(numGates):
+#        print logic_gate_names[i]
         mRNA_f.append(soln_f[:,i])
+#        print soln_f[:,numGates+i][14375:14395]
         protein_f.append(soln_f[:,numGates+i])
+#        print soln_f[:,numGates+i][14375:14395]
+#        pause = raw_input("pause")
         
     #These are the possible graph lines/markers.
     color = ['b','g','r','c','m','y','k']
@@ -189,7 +193,7 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
         tv = currGateProperties['EXPECTED_PROTEIN']
         name = str(currGateProperties['NAME'])
         
-        #Make the bar plot for the mRNA
+#        #Make the bar plot for the mRNA
 #        plt.figure()
 #        plt.axis(xmin=0, xmax=numBinaries, ymin=0.1, ymax=mrnaymax)
 #        barlist = plt.bar(t,mRNAVals)
@@ -266,6 +270,15 @@ def getBinaryInOrder(maxVal):
     
 
 def f(state, t, input_and_logic_gate_dictionaries, input_and_logic_gate_names, logic_gate_names):
+    for i in range(len(state)):
+        if state[i]<0 :
+#            tempName = logic_gate_names[i%len(logic_gate_names)]
+#            if i>logic_gate_names:
+#                tempName+="protein"
+#            print tempName,state[i],t
+            state[i] = 0.0
+#            pause = raw_input("pause1")
+            
     #Concentration of mRNA and protein at this state
     numGates = len(logic_gate_names)
     #Split mRNA values from protein values

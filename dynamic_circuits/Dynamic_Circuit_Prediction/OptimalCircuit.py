@@ -169,7 +169,7 @@ def makeDAGFromNetlist(inputNetlist):
     allGates = Inputs + Intermediates + Outputs
     
     if numInputs > 0:
-        dag = DAG.DAG(0,initPeriod,initPeriod)
+        dag = DAG.DAG(0,initPeriod,10*initPeriod)
     else:
         #arbitrary
         dag = DAG.DAG(0,1000,10000)

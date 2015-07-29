@@ -9,12 +9,12 @@ import DAG
 import Gate
 import Wire
 import inputs
-import json
 import General
 import GeneralJsonIO
 import inputs
 import update
 import re
+import json
 
 def makeDAGFromNetlist(inputNetlist):
     """
@@ -277,7 +277,6 @@ def makeDAGFromString(circuitString):
     
     return dag, allGates, Inputs, Repressors, Outputs
     
-    
 def makeGatesFromLibraries(Libraries,Inputs,Repressors,Outputs):
     """
     Allows you to choose which inputs, repressors and outputs to use from the
@@ -486,7 +485,6 @@ def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True):
     """
     #Make DAG from string
     dag, allGates, Inputs, Intermediates, Outputs = makeDAGFromNetlist(fileLoc)
-
 
     print dag
     if dag.hasLoop():

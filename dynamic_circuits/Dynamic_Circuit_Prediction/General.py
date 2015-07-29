@@ -14,6 +14,7 @@ from scipy.integrate import ode
 import numpy as np
 import DifferentialSolver
 import time
+import json
 
 #input is a json file
 def generateDynamicCircuitGraphs(fileName, makeBarGraphs): 
@@ -57,6 +58,15 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs):
 #    if odeIntWasBad:
 #       soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names))
 #    return soln_f[1]
+    fileLoc = "JsonFiles/TestCases/AZLResults2.json"    
+    soln_f2 = []
+    for ary in soln_f:
+    	soln_f2.append(list(ary))
+    myFile = open(fileLoc,'w')
+    json.dump(soln_f2, myFile, sort_keys=True, indent=4, separators=(',', ': '))
+    myFile.close()
+    return
+
     odeintIsGood = True
     for i in range(len(soln_f[0])):
         if np.isnan(soln_f[:,i]).any():

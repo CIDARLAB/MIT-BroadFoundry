@@ -1,0 +1,17 @@
+Agenda for today:
+-Work on fixing up and understanding DAG, Wire, and Gate programs.
+
+Notes:
+-Gate program is used to connect to wire (wire automatically connects back to itself)
+	-if wire is connected to Gate, gate will not be connected to wire
+
+-Arinze explained to me the REU graphs and the plan of converting them to a system of differential equations.
+	-Start with a graph of constitutive YFP gene expression (cYFP).
+	[IPTG --> pTac --> YFP gene]
+	-Using a graph of IPTG-activated YFP gene expression, calculate REU(YFP) using YFP/cYFP, to 
+	 graph IPTG vs REU(YFP) 
+	IPTG --> pTac --> gene1 --| p1 --> YFP gene
+	-Using graph of IPTG-repressed YFP expression, graph corresponding REU values of IPTG from 
+	 activation graph to IPTG repression graph for REU(IPTG) vs REU(YFP) graph.
+	
+

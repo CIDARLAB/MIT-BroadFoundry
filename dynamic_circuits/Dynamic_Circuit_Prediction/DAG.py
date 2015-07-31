@@ -98,6 +98,7 @@ class DAG(object):
         Returns a list of all wires in the DAG
         """
         return self.wires
+        
     def hasLoop(self):
         """
         Returns true if the DAG is sequential
@@ -146,22 +147,24 @@ class DAG(object):
 
     def setGateDist(self):
         """
-        Assumes you have a fully connected graph and assigns distances from the
+        Assumes a fully connected graph and assigns distances from the
         inputs
         """
         #Visited property is to prevent infinite loops with sequential
         #circuits
         for gate in self.repressors:
             gate.setVisited(False)
+            gate.setDist(0)
         for gate in self.outputs:
             gate.setVisited(False)
+            gate.setDist(0)
         for gate in self.outputs:
             self.recursivelyFindInputs(gate)
         
     def recursivelyFindInputs(self,gate):
         """
-        a helper function that does the actual finding of the distance to the 
-        furthest input discounting loops
+        Helper function that finds of the distance to the furthest input 
+        discounting loops
         """
         #Stops loops
         if gate.wasVisited():
@@ -185,8 +188,7 @@ class DAG(object):
         the gates in a recursive way similar to finding the distance to the 
         nearest input
         """
-        #Visited property is to prevent infinite loops with sequential
-        #circuits
+        #Visited property prevents infinite loops with sequential circuits
         for gate in self.repressors:
             gate.setVisited(False)
         for gate in self.outputs:
@@ -201,16 +203,19 @@ class DAG(object):
         
     def recursivelyFindInputsAndSetTruthValues(self,gate):
         """
-        This function is what actually does the truth value assignment
+        Function that assigns the truthValues to the gates. None if sequential.
         """
 
+        # Case: Complete a cycle
         if gate.wasVisited():
             if gate.getExpectedProtein()==None:
                 self.isSequential = True
             return
+        # Case: Reach an input
         elif gate.getExpectedProtein()!=None and gate.getExpectedPromoter()!=None:
             gate.setVisited(True)
             return
+        # Other cases
         else:
             gate.setVisited(True)
             vals = []
@@ -218,7 +223,7 @@ class DAG(object):
                 self.recursivelyFindInputsAndSetTruthValues(wire.getFrom())
                 vals.append(wire.getFrom().getExpectedPromoter())
             #If there is a loop, set all truth values dependent on that loop 
-            #to None otheriwse find the truthValue for the protein
+            #to None, otherwise find the truthValue for the protein
             try:
                 if len(vals) == 1:
                     truthValue = []
@@ -257,7 +262,7 @@ class DAG(object):
         self.repressors.sort(self.gateCompare)
         self.outputs.sort(self.gateCompare)
         self.setGateTruthValues()
-#        self.sortGates()
+        #self.sortGates()
         for gate in self.repressors:
             result = result + str(gate) + "\n"
         for gate in self.outputs:

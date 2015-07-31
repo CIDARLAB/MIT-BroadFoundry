@@ -90,8 +90,9 @@ class Gate(object):
         #Set the values
         self.fanIn = []
         while len(fanIn)!=0:
-            # Takes the 1st wire from list fanIn and removes its connection to this gate. Upon 
-            # removal from the list, the next wire in the list is placed into index 0 of the list.
+            # Takes the 1st wire from list fanIn and removes its connection 
+            # to this gate. Upon removal from the list, the next wire in the 
+            # list is placed into index 0 of the list.
             wire = fanIn[0]
             wire.setTo(self)
             try:
@@ -199,9 +200,10 @@ class Gate(object):
         '''
         self.pB = float(pB)
         
+        # 0.5 = e^-a*t(1/2) --> t(1/2) = ln(2)/a 
     def setmRNAHalfLife(self,m_halfLife):
         '''
-        set the mRNA half life and update the mRNA degradation rate
+        Sets the mRNA half life and updates the mRNA degradation rate
         '''
         if m_halfLife == None or (type(m_halfLife)!=int and type(m_halfLife)!=float):
             print "This is not a valid half life"
@@ -211,7 +213,7 @@ class Gate(object):
         
     def setProteinHalfLife(self,p_halfLife):
         '''
-        set the protein half life and update the protein degradation rate
+        Sets the protein half life and updates the protein degradation rate
         '''
         if p_halfLife == None or (type(p_halfLife)!=int and type(p_halfLife)!=float):
             print "This is not a valid half life"
@@ -221,7 +223,7 @@ class Gate(object):
         
     def setmRNADegRate(self,am):
         '''
-        set the mRNA degradation rate and update the mRNA half life
+        Sets the mRNA degradation rate and updates the mRNA half life
         '''
         if am == None or (type(am)!=int and type(am)!=float):
             print "This is not a valid protein degradation rate"
@@ -231,7 +233,7 @@ class Gate(object):
         
     def setProteinDegRate(self,ap):
         '''
-        set the protein degradation rate and update the protein half life
+        Sets the protein degradation rate and updates the protein half life
         '''
         if ap == None or (type(ap)!=int and type(ap)!=float):
             print "This is not a valid protein degradation rate"
@@ -241,7 +243,7 @@ class Gate(object):
     
     def setInputType(self, inputType):
         '''
-        Set the input to an equation from inputs
+        Sets the input to an equation from inputs
         '''
         assert self.gateType=='Input' and type(inputType)==list
         self.availableInputTypes = ['inputs.sinInput', 'inputs.linInput','inputs.sawInput','inputs.squInput', 'inputs.stepFunction', 'inputs.stepInput']

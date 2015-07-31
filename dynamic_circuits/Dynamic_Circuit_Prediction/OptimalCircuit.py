@@ -82,17 +82,21 @@ def makeDAGFromNetlist(inputNetlist):
     givenInputs = []
     givenOutputs = []
     givenIntermediates = []
+    #Inputs, gates with fanIn wires with no FanOut origin
     for i in allFanInNames:
         if i not in allFanOutNames:
             givenInputs.append(i)
     givenInputs.sort()
+    #Outputs, gates with fanOut wires with no FanIn destination
     for i in allFanOutNames:
         if i not in allFanInNames:
             givenOutputs.append(i)
+    #Intermediate nodes, middle gates with fanIn and fanOut wires
     for i in allWireNames:
         if (i not in givenInputs) and (i not in givenOutputs):
             givenIntermediates.append(i)
-    #Make the inputs
+            
+    #Creates the logic-input function as a set of square waves
     numInputs = len(givenInputs)
     inputBinaries = makeInputBin(numInputs)
     initPeriod = 500.0*2**(numInputs)
@@ -113,7 +117,7 @@ def makeDAGFromNetlist(inputNetlist):
         Inputs.append(tempInput)
         fanOutWireToGateDict[givenInputs[i]] = tempInput
     
-    #Make the intermediate gates
+    #Makes the intermediate gates
     gateCount = 1
     for i in range(len(givenIntermediates)):
         standardGateName = "G" + str(gateCount)
@@ -126,7 +130,7 @@ def makeDAGFromNetlist(inputNetlist):
         fanOutWireToGateDict[givenWireName] = tempIntermediate
         gateCount += 1
     
-    #Make outputs
+    #Makes outputs
     numOutputs = 1
     for i in range(len(givenOutputs)):
         givenWireName = givenOutputs[i]
@@ -155,9 +159,9 @@ def makeDAGFromNetlist(inputNetlist):
     wireCount = 1
     wireAliases = {}
     for givenWireName in allGatesParsed.keys():
-        #get the gate associated with that wire
+        #Gets the gate associated with that wire
         tempGate = fanOutWireToGateDict[givenWireName]
-        #Ignore the first element which tells the type of gate
+        #Ignores the first element which tells the type of gate
         fanInWireNames = allGatesParsed[givenWireName][1:]
         for wireName in fanInWireNames:
             if wireName not in wireAliases:

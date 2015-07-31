@@ -18,11 +18,11 @@ import json
 
 def makeDAGFromNetlist(inputNetlist):
     """
-    Takes in a circuit in the string form like '((a.b).c)' and returns a dag 
-    created from that string, a list of all the gates in that dag, lists of the
-    inputs, repressors, and outputs individually from all the gates.
-    This assumes all inputs are activators and allows for intermediate genes to
-    be activators. Treats all outputs are buffers or ORs.
+    Takes in a netlist of circuit attributes and returns a dag created from 
+    that string, a list of all the gates in that dag, lists of the inputs,
+    repressors, and outputs individually from all the gates. This assumes 
+    all inputs are activators and allows for intermediate genes to be 
+    activators. Treats all outputs are buffers or ORs.
     """
     if type(inputNetlist) == str:
         myFile = open(inputNetlist,'r')
@@ -31,7 +31,7 @@ def makeDAGFromNetlist(inputNetlist):
     elif type(inputNetlist) == list:
         netlist = inputNetlist
     
-    #Initialize the lists of components
+    #Initializes the lists of components
     Inputs = []
     Intermediates = []
     Outputs = []

@@ -11,7 +11,7 @@ import inputs
 def writeJsonFile(time_axis_params,input_and_logic_gate_dictionaries,fileLoc):
     """
     Writes what was used to a JSON file using pretty print. Saves all information
-    needed to reporoduce the circuit
+    needed to reproduce the circuit
     """
     newList = [time_axis_params]
     newList = newList + input_and_logic_gate_dictionaries

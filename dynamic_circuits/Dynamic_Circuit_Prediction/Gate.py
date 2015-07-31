@@ -3,16 +3,15 @@
 Created on Fri Jul 17 22:30:10 2015
 
 @author: Arinze
+Edited by Alex on 7/30/2015
 """
 import numpy as np
 import Wire
 import DAG
 import inputs
 
-
-
 class Gate(object):
-    def __init__(self,name,Km,n,gateType,mB,pB,m_halfLife, p_halfLife):
+    def __init__(self,name,Km,n,gateType,mB,pB,m_halfLife,p_halfLife):
         assert type(name) == str
         assert gateType == 'Repressor' or gateType == 'Input' or gateType == 'Output' or gateType == 'Activator'
         #Name the gate
@@ -60,11 +59,8 @@ class Gate(object):
             self.ap = np.log(2)/self.p_halfLife
             self.Mi = 0.0
             self.Pi = 0.0
-            #self.dist = 9999 #arbitrary high value
             self.visited = False
-            
-
-        
+                
     #Setter functions
     def setName(self,name):
         '''
@@ -91,9 +87,11 @@ class Gate(object):
         #Reset the To for the wires that were already in the fanIn
         for wire in self.fanIn:
             wire.setTo(None)
-        #set the values
+        #Set the values
         self.fanIn = []
         while len(fanIn)!=0:
+            # Takes the 1st wire from list fanIn and removes its connection to this gate. Upon 
+            # removal from the list, the next wire in the list is placed into index 0 of the list.
             wire = fanIn[0]
             wire.setTo(self)
             try:
@@ -104,10 +102,10 @@ class Gate(object):
         
     def addFanInWire(self,wire):
         '''
-        Add a Wire to the fanIn
+        Adds a Wire to the fanIn
         '''
         if self.gateType == "Input":
-            print "An input gate cannot have a fanIn"
+            print "An Input cannot have a fanIn"
             return
         if len(self.fanIn)==2:
             print "The fanIn already has the maximum number of wires."
@@ -120,7 +118,7 @@ class Gate(object):
     
     def removeFanInWire(self,wire):
         '''
-        removes a wire from fanIn. Not to be used by itself. Only to be called
+        Removes a Wire from fanIn. Not to be used by itself. Only to be called
         by wires.
         '''
         assert type(wire) == Wire.Wire
@@ -142,7 +140,7 @@ class Gate(object):
         
     def removeFanOutWire(self,wire):
         '''
-        removes a wire from fanOut. Not to be used by itself. Only to be called
+        Removes a Wire from fanOut. Not to be used by itself, only to be called
         by wires.
         '''
         assert type(wire) == Wire.Wire
@@ -153,9 +151,8 @@ class Gate(object):
         '''
         Allows you to reset the fanOut to either an empty list or a list of wires
         '''
-        #Inputs cannot have a fanOut
         if self.gateType == "Output":
-            print "An Output gate cannot have a fanOut"
+            print "An Output cannot have a fanOut"
             return
         #Make sure the input type is correct
         assert type(fanOut) == list

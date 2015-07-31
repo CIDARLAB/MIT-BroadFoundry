@@ -3,6 +3,7 @@
 Created on Fri Jul 17 22:31:03 2015
 
 @author: Arinze
+Edited by Alex on 7/30/2015
 """
 import numpy as np
 import Gate
@@ -26,13 +27,13 @@ class Wire(object):
         return self.toGate
 
     def setName(self,name):
-        assert type(name)==name
+        assert type(name)== str
         self.name = name
 
     def setFrom(self, fromGate):
         '''
         Sets the gate at the end of the wire. This should not be used by itself.
-        This is only to be used by the Gate object when we are setting the fanOut.
+        This is only to be used by the Gate object when setting the fanOut.
         '''
         assert type(fromGate)== Gate.Gate or fromGate == None
         if self.fromGate != None:
@@ -60,15 +61,23 @@ class Wire(object):
         self.toGate = toGate
             
     def __eq__(self, wire):
+        '''
+        Determines if another Wire object is the same as the current wire object
+        '''
         if type(wire) != Wire:
             return False
         if (self.toGate == wire.getTo()) and (self.fromGate == wire.getFrom()) and (self.name == wire.getName()):
             return True
         return False
-    def __ne(self,wire):
+
+    def __ne__(self,wire):
         return not(self.__eq__(wire))
         
     def __str__(self):
+        '''
+        String format for wire
+        example: 'g1--w1->g2'
+        '''
         result = ''
         try:
             result = result + self.fromGate.getName()

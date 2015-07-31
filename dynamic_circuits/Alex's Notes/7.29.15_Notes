@@ -9,8 +9,7 @@ Agenda for today:
 	- lacI-TetR-cI repressilator systems
 	- 2 goals: Readable code and realistic values.
 -Simulation of the SR-latch
-	-stability
-
+	-stability, Q and ~Q outputs, illegal (1,1 case)
 
 1) Arinze
 	- Write 2 Tests, combinational and sequential
@@ -30,3 +29,5 @@ Could the score be improved (to avoid divide by 0 and extreme logarithmic differ
 Try to search for realistic values
 
 Finished cleaning up CircuitStringConverter.py, which consisted of several methods used for converting a Json file into Python dictionarys and Netlists.
+
+Work on improving clarity and understanding Arinze's code. I'll work on DAG, Gates, and Wires.

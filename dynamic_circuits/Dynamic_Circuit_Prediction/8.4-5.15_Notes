@@ -1,0 +1,100 @@
+
+Reading a Journal on characterization of Synthetic genetic clocks
+http://deepblue.lib.umich.edu/bitstream/handle/2027.42/86512/nperryp_1.pdf?sequence=1
+
+Synthetic biology is a relatively new field, in which bacteria or other cells are genetically engineered to produce novel cell behaviors.
+
+Ninfa clock
+-positive feedback loop
+	- autoregulation (activator)
+	-NRI~P (phosphorylated by mutant constituent NRII)
+-negative feed back loop
+	- NRI activates LacI repressor of NRI gene promoter
+-reporter
+	- lacZYA operon controlled by repressor and thus also lacZ gene activity (B=galactosidase levels)
+
+NC12 -> NC77 -> NCPR77
+-"governor sequence" mapping between enhancer sites and site of polymerase binding scrambled
+- NC77 reduced damping in clock oscillation
+- NCPR77 - unknown bacteriophage resistant strain of NC77
+
+null mutation of lacI, glnG (NRI), and glnL (NRII)
+
+
+IPTG inhibits lacI gene expression to synchronize cells for maximal level of glnG gene
+
+oscillations with decaying amplitude
+-damping occurs because 
+	-cells individually damped
+	-cells lose synchrony and avg expression looks like dampening
+	-also consider mutation rate
+
+Goal - investigate cause of amplitude damping and seek to decrease damping, also possibly create system of sustained oscillation.
+
+Chapter overview
+chp 2: automated system for clock experiment
+	-cell maintenence and accurate automatic sampling
+
+chp 3: clock dynamic characterization vs environmental factors
+	-cell density, growth temperature, conc. of carbon source
+	-linear correlation between cell growth rate and period
+		-?relationship to cell division and halftime?
+	-amplitude lower at lower cell densities, environmental signaling
+
+chp 4: Synchrony between cell hypothesis
+	- metabolite acetate = environmental signal
+
+chp 5: Clock dynamic sensitivity
+	- cell sequestration sites for activator proteins affect damping of oscillation amplitude
+
+chp 6: Math models of genetic oscillator
+-preferred 3 module oscillator clock
+-2 models of clocks
+	-activilator, leads to oscillation where none before
+
+appendix: toggle switch of lacI and glnL
+
+Chp 2 Notes: 
+-oscillation 10-12 hours, 4-5 oscillations before dampening
+-continuous culture method required, automated process created
+-hardware, software...
+
+Chp 3 Notes:
+-Environmental effects on clock dynamics
+-Condition differences: amplitude of oscillations, number of oscillations, steady state expression level.
+-Different OD lead to differences in amplitude, but not period (range between 0.05 < OD600 < 1)
+
+Chp 4 Notes:
+-Quorum sensing for cell-cell communication
+-possible phosphorylation of NRI by acetyl phosphate for synchrony among cells
+-loss of oscillations when ackA gene deleted (exogenous acetate sensor), but when gene pta (acetone formation pathway) was deleted, oscillation maintained, but under different dynamics (other pathways for acetate formation).
+-small reduction in the level of NRII* do not eliminate oscillations (NCPR101 vs NCPR77, less NRII* expression), but there is reduction of NRI phosphorylation.
+-partial synchronization, not all cells exactly identical
+-plasmid p3y15 used to have constitutive glnL* gene expression 
+-Signal detected as saturation of signal from cells*
+
+as temperature increases from 27 to 42 C, period decreases (faster dynamics)
+as doubling time increases, period increases
+
+Chp 5 Notes:
+-Genetic and reporter variations to clock dynamics
+-operation with very low amounts of activator and repressor proteins (20-200 subunits)
+-effects of alternative sequestration sites on the chromosome
+	-reporter module is wild type lacZYA gene that also sequesters the repressor instead of the activator
+	-leads to different clock dynamics?
+	-modifying reporter module had great impact on observed decay rate
+
+Chp 6 Notes:
+comparison between repressilator and activilator
+Both are negative feedback loops.
+Repressilator: X--|Y--|Z--|X (moderate expression)
+Activilator: X-->Y-->Z--|X (fully activated expression)
+likelihood of oscillations and the secant condition
+-sensitivity of repressilator is not monotone
+-sensitivity of activator is decreasing function
+
+-What makes a good oscillator vs bad oscillator
+	-damping oscillations?
+	-how to control:
+		-a, B, decay rate
+		-environmental/genetic conditions, cell culturing steps?

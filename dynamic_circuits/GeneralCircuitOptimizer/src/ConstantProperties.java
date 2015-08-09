@@ -14,14 +14,15 @@ public class ConstantProperties{
 	//Choose which operators you want to include.
 	public static HashSet<String> allowedOps= new HashSet<String>(Arrays.asList(".","~"));
 	//Choose a max cost you want to go up to.
-	public static double maxCost = 10;
+	public static double maxCost = 9;
 	//Choose the maxFanIn for each gate;
 	public static int maxFanIn = 2;
 	//If you are searching for a specific truth value, enter it here. Otherwise leave it as null.
-	public static String truthValueToFind = "1000111011xxxxxx";
+	public static String truthValueToFind = "1011011010xxxxxx";
 	//Enter the location of where you want to write the Json file.
 	public static String dir = "C:/Users/Arinze/OneDrive/UROP_Summer_2015/NewOptimizer";
-
+	//Set this to true if you want slightly less accurate results that are obtained slightly faster
+	public static boolean shouldSpeedUp = false;
 
 	//Set the cost for each operator as you see fit. Only NOT can have a cost of 0. All must be positive
 	public static void setCostPerOp(){

@@ -45,6 +45,7 @@ public class Optimize{
 		boolean lookingForSomething = false;
 		if (truthValueToFind!=null){
 			if (truthValueToFind.length()==expectedLengthOfTruthValues){
+				System.out.println("Looking for "+truthValueToFind);
 				lookingForSomething = true;
 				oppositeTruthValueToFind = HelperFunctions.invert(truthValueToFind);
 			}
@@ -331,7 +332,9 @@ public class Optimize{
 					tempArrayList.add(circ);
 					Circuit tempCircuit = new Circuit(tempOp,tempArrayList);
 					double tempCircuitCost = tempCircuit.getCost();
-					
+					if(ConstantProperties.shouldSpeedUp && foundTruthValues.containsKey(tempCircuit.getTruthValue())){
+						continue;
+					}
 					if(lookingForSomething){
 						//If we find the truth value we are looking for print it and the cost and readjust the maxCost to be the cost of that circuit.
 						if(tempCircuit.isTruthValue(truthValueToFind) && tempCircuitCost<=maxCost){
@@ -343,18 +346,14 @@ public class Optimize{
 								System.out.println("Changing maxCost to "+maxCost);
 								Set<Double> allCostsFound = sortedByCost.keySet();
 								ArrayList<Double> allCostsFoundDup = new ArrayList<Double> ();
-								for (Double tcost : allCostsFound){
-									allCostsFoundDup.add(tcost);
-								}
+								allCostsFoundDup.addAll(allCostsFound);
 								for(Double tcost : allCostsFoundDup){
 									if(tcost>maxCost && sortedByCost.containsKey(tcost)){
 										sortedByCost.remove(tcost);
 									}
 									else if(tcost==maxCost && sortedByCost.containsKey(tcost)){
 										ArrayList<Circuit> tempCopyList = new ArrayList<Circuit> ();
-										for(Circuit tCircuit : sortedByCost.get(tcost)){
-											tempCopyList.add(tCircuit);
-										}
+										tempCopyList.addAll(sortedByCost.get(tcost));
 										for (Circuit tCircuit : tempCopyList){
 											if(foundTruthValues.containsKey(tCircuit.getTruthValue())){
 												sortedByCost.get(tcost).remove(tCircuit);
@@ -374,18 +373,14 @@ public class Optimize{
 								System.out.println("Changing maxCost to "+maxCost);
 								Set<Double> allCostsFound = sortedByCost.keySet();
 								ArrayList<Double> allCostsFoundDup = new ArrayList<Double> ();
-								for (Double tcost : allCostsFound){
-									allCostsFoundDup.add(tcost);
-								}
+								allCostsFoundDup.addAll(allCostsFound);
 								for(Double tcost : allCostsFoundDup){
 									if(tcost>maxCost && sortedByCost.containsKey(tcost)){
 										sortedByCost.remove(tcost);
 									}
 									else if(tcost==maxCost && sortedByCost.containsKey(tcost)){
 										ArrayList<Circuit> tempCopyList = new ArrayList<Circuit> ();
-										for(Circuit tCircuit : sortedByCost.get(tcost)){
-											tempCopyList.add(tCircuit);
-										}
+										tempCopyList.addAll(sortedByCost.get(tcost));
 										for (Circuit tCircuit : tempCopyList){
 											if(foundTruthValues.containsKey(tCircuit.getTruthValue())){
 												sortedByCost.get(tcost).remove(tCircuit);
@@ -418,7 +413,9 @@ public class Optimize{
 					tempArrayList.add(zero);
 					Circuit tempCircuit = new Circuit(tempOp,tempArrayList);
 					double tempCircuitCost = tempCircuit.getCost();
-					
+					if(ConstantProperties.shouldSpeedUp && foundTruthValues.containsKey(tempCircuit.getTruthValue())){
+						continue;
+					}
 					if(lookingForSomething){
 						if(tempCircuit.isTruthValue(truthValueToFind) && tempCircuitCost<=maxCost){
 							System.out.println("Found something with the truth value we are looking for, "+truthValueToFind);
@@ -429,18 +426,14 @@ public class Optimize{
 								System.out.println("Changing maxCost to "+maxCost);
 								Set<Double> allCostsFound = sortedByCost.keySet();
 								ArrayList<Double> allCostsFoundDup = new ArrayList<Double> ();
-								for (Double tcost : allCostsFound){
-									allCostsFoundDup.add(tcost);
-								}
+								allCostsFoundDup.addAll(allCostsFound);
 								for(Double tcost : allCostsFoundDup){
 									if(tcost>maxCost && sortedByCost.containsKey(tcost)){
 										sortedByCost.remove(tcost);
 									}
 									else if(tcost==maxCost && sortedByCost.containsKey(tcost)){
 										ArrayList<Circuit> tempCopyList = new ArrayList<Circuit> ();
-										for(Circuit tCircuit : sortedByCost.get(tcost)){
-											tempCopyList.add(tCircuit);
-										}
+										tempCopyList.addAll(sortedByCost.get(tcost));
 										for (Circuit tCircuit : tempCopyList){
 											if(foundTruthValues.containsKey(tCircuit.getTruthValue())){
 												sortedByCost.get(tcost).remove(tCircuit);
@@ -460,18 +453,14 @@ public class Optimize{
 								System.out.println("Changing maxCost to "+maxCost);
 								Set<Double> allCostsFound = sortedByCost.keySet();
 								ArrayList<Double> allCostsFoundDup = new ArrayList<Double> ();
-								for (Double tcost : allCostsFound){
-									allCostsFoundDup.add(tcost);
-								}
+								allCostsFoundDup.addAll(allCostsFound);
 								for(Double tcost : allCostsFoundDup){
 									if(tcost>maxCost && sortedByCost.containsKey(tcost)){
 										sortedByCost.remove(tcost);
 									}
 									else if(tcost==maxCost && sortedByCost.containsKey(tcost)){
 										ArrayList<Circuit> tempCopyList = new ArrayList<Circuit> ();
-										for(Circuit tCircuit : sortedByCost.get(tcost)){
-											tempCopyList.add(tCircuit);
-										}
+										tempCopyList.addAll(sortedByCost.get(tcost));
 										for (Circuit tCircuit : tempCopyList){
 											if(foundTruthValues.containsKey(tCircuit.getTruthValue())){
 												sortedByCost.get(tcost).remove(tCircuit);
@@ -504,7 +493,9 @@ public class Optimize{
 					tempArrayList.add(one);
 					Circuit tempCircuit = new Circuit(tempOp,tempArrayList);
 					double tempCircuitCost = tempCircuit.getCost();
-					
+					if(ConstantProperties.shouldSpeedUp && foundTruthValues.containsKey(tempCircuit.getTruthValue())){
+						continue;
+					}
 					if(lookingForSomething){
 						if(tempCircuit.isTruthValue(truthValueToFind) && tempCircuitCost<=maxCost){
 							System.out.println("Found something with the truth value we are looking for, "+truthValueToFind);
@@ -515,18 +506,14 @@ public class Optimize{
 								System.out.println("Changing maxCost to "+maxCost);
 								Set<Double> allCostsFound = sortedByCost.keySet();
 								ArrayList<Double> allCostsFoundDup = new ArrayList<Double> ();
-								for (Double tcost : allCostsFound){
-									allCostsFoundDup.add(tcost);
-								}
+								allCostsFoundDup.addAll(allCostsFound);
 								for(Double tcost : allCostsFoundDup){
 									if(tcost>maxCost && sortedByCost.containsKey(tcost)){
 										sortedByCost.remove(tcost);
 									}
 									else if(tcost==maxCost && sortedByCost.containsKey(tcost)){
 										ArrayList<Circuit> tempCopyList = new ArrayList<Circuit> ();
-										for(Circuit tCircuit : sortedByCost.get(tcost)){
-											tempCopyList.add(tCircuit);
-										}
+										tempCopyList.addAll(sortedByCost.get(tcost));
 										for (Circuit tCircuit : tempCopyList){
 											if(foundTruthValues.containsKey(tCircuit.getTruthValue())){
 												sortedByCost.get(tcost).remove(tCircuit);
@@ -546,18 +533,14 @@ public class Optimize{
 								System.out.println("Changing maxCost to "+maxCost);
 								Set<Double> allCostsFound = sortedByCost.keySet();
 								ArrayList<Double> allCostsFoundDup = new ArrayList<Double> ();
-								for (Double tcost : allCostsFound){
-									allCostsFoundDup.add(tcost);
-								}
+								allCostsFoundDup.addAll(allCostsFound);
 								for(Double tcost : allCostsFoundDup){
 									if(tcost>maxCost && sortedByCost.containsKey(tcost)){
 										sortedByCost.remove(tcost);
 									}
 									else if(tcost==maxCost && sortedByCost.containsKey(tcost)){
 										ArrayList<Circuit> tempCopyList = new ArrayList<Circuit> ();
-										for(Circuit tCircuit : sortedByCost.get(tcost)){
-											tempCopyList.add(tCircuit);
-										}
+										tempCopyList.addAll(sortedByCost.get(tcost));
 										for (Circuit tCircuit : tempCopyList){
 											if(foundTruthValues.containsKey(tCircuit.getTruthValue())){
 												sortedByCost.get(tcost).remove(tCircuit);
@@ -612,7 +595,9 @@ public class Optimize{
 					for(String tempOp : otherOps){
 						Circuit tempCircuit = new Circuit(tempOp,tempArrayOfCircuitsCopy);
 						double tempCircuitCost = tempCircuit.getCost();
-						
+						if(ConstantProperties.shouldSpeedUp && foundTruthValues.containsKey(tempCircuit.getTruthValue())){
+							continue;
+						}
 						if(lookingForSomething){
 							if(tempCircuit.isTruthValue(truthValueToFind) && tempCircuitCost<=maxCost){
 								System.out.println("Found something with the truth value we are looking for, "+truthValueToFind);
@@ -623,18 +608,14 @@ public class Optimize{
 									System.out.println("Changing maxCost to "+maxCost);
 									Set<Double> allCostsFound = sortedByCost.keySet();
 									ArrayList<Double> allCostsFoundDup = new ArrayList<Double> ();
-									for (Double tcost : allCostsFound){
-										allCostsFoundDup.add(tcost);
-									}
+									allCostsFoundDup.addAll(allCostsFound);
 									for(Double tcost : allCostsFoundDup){
 										if(tcost>maxCost && sortedByCost.containsKey(tcost)){
 											sortedByCost.remove(tcost);
 										}
 										else if(tcost==maxCost && sortedByCost.containsKey(tcost)){
 											ArrayList<Circuit> tempCopyList = new ArrayList<Circuit> ();
-											for(Circuit tCircuit : sortedByCost.get(tcost)){
-												tempCopyList.add(tCircuit);
-											}
+											tempCopyList.addAll(sortedByCost.get(tcost));
 											for (Circuit tCircuit : tempCopyList){
 												if(foundTruthValues.containsKey(tCircuit.getTruthValue())){
 													sortedByCost.get(tcost).remove(tCircuit);
@@ -654,18 +635,14 @@ public class Optimize{
 									System.out.println("Changing maxCost to "+maxCost);
 									Set<Double> allCostsFound = sortedByCost.keySet();
 									ArrayList<Double> allCostsFoundDup = new ArrayList<Double> ();
-									for (Double tcost : allCostsFound){
-										allCostsFoundDup.add(tcost);
-									}
+									allCostsFoundDup.addAll(allCostsFound);
 									for(Double tcost : allCostsFoundDup){
 										if(tcost>maxCost && sortedByCost.containsKey(tcost)){
 											sortedByCost.remove(tcost);
 										}
 										else if(tcost==maxCost && sortedByCost.containsKey(tcost)){
 											ArrayList<Circuit> tempCopyList = new ArrayList<Circuit> ();
-											for(Circuit tCircuit : sortedByCost.get(tcost)){
-												tempCopyList.add(tCircuit);
-											}
+											tempCopyList.addAll(sortedByCost.get(tcost));
 											for (Circuit tCircuit : tempCopyList){
 												if(foundTruthValues.containsKey(tCircuit.getTruthValue())){
 													sortedByCost.get(tcost).remove(tCircuit);

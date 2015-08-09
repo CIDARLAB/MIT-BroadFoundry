@@ -225,12 +225,19 @@ public class Circuit{
 	//Determines the cost of the circuit
 	public double calcCost(){
 		double totalCost = 0;
+		/*boolean shouldSubtract = false;
+		if(subcircuits.containsValue(".")){
+			shouldSubtract = true;
+		}*/
 		Set<String> keys = subcircuits.keySet();
 		for (String key:keys){
 			totalCost += ConstantProperties.costPerOp.get(subcircuits.get(key));
 		}
 		totalCost += ConstantProperties.costPerOp.get(operator);
 		totalCost = roundTwoDecimals(totalCost);
+		/*if (shouldSubtract && operator.equals("~")){
+			totalCost-=2;
+		}*/
 		return totalCost;
 	}
 

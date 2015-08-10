@@ -1,0 +1,376 @@
+[
+    {
+        "X": {
+            "B": 599.4,
+            "B0": 0.6,
+            "Km": 40,
+            "a": 0.069314718055994526,
+            "hl": 10,
+            "max": 8656.1702453337803,
+            "n": 2,
+            "name": "X"
+        },
+        "Y": {
+            "B": 599.4,
+            "B0": 0.6,
+            "Km": 40,
+            "a": 0.069314718055994526,
+            "hl": 10,
+            "max": 8656.1702453337803,
+            "n": 2,
+            "name": "Y"
+        }
+    },
+    [
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": -1,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": -1,
+            "from": "Y",
+            "to": "Y"
+        }
+    ],
+    [
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "X"
+        },
+        {
+            "effect": 0,
+            "from": "X",
+            "to": "Y"
+        },
+        {
+            "effect": 0,
+            "from": "Y",
+            "to": "Y"
+        }
+    ]
+]

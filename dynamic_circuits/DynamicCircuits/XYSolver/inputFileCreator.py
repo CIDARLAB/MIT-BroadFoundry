@@ -35,6 +35,9 @@ Ymax = Xmax
 nY = 2
 KmY = 40
 
+iniCond = {'X':10.0**-3, 'Y':0.0}  
+inputObject = [iniCond]
+
 inputD = {'X':{},'Y':{}}
 inputD['X']['name'] = 'X'
 inputD['X']['hl'] = hlX
@@ -53,7 +56,7 @@ inputD['Y']['B'] = BY
 inputD['Y']['max'] = Ymax
 inputD['Y']['n'] = nY
 inputD['Y']['Km'] = KmY
-inputObject = [inputD]
+inputObject.append(inputD)
 
 '''
 # values of -1 = repression, 0 = independent, 1 = activation for autoX/autoY/XtoY/YtoX
@@ -112,7 +115,5 @@ for XtoX in range(-1,1):
 
 
 #Creates the master input file
-fileName = 'masterXYInputFile3.json'
+fileName = 'masterXYInputFile5.json'
 writeToJson(inputObject,fileName)
-
-

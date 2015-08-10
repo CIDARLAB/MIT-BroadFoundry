@@ -15,6 +15,7 @@ public class Optimize{
 		// Starts the timer
 		double startTime = System.currentTimeMillis();
 		double currTime = System.currentTimeMillis();
+		double newStartTime = System.currentTimeMillis();
 		
 		//Set the costs and the operator names
 		ConstantProperties.setCostPerOp();
@@ -35,7 +36,7 @@ public class Optimize{
 		for(int i=0;i<numInputs;i++){
 			expectedLengthOfTruthValues *= 2;
 		}
-		int expectedNumTruths = 1;
+		float expectedNumTruths = 1;
 		for (int i=0;i<expectedLengthOfTruthValues;i++){
 			expectedNumTruths *= 2;
 		}
@@ -51,6 +52,7 @@ public class Optimize{
 			}
 			else{
 				System.out.println("You entered a truth value to search for but the size of the truth value does not match the size of the truth values produced by the given number of inputs.");
+				return null;
 			}
 			
 		}
@@ -106,11 +108,15 @@ public class Optimize{
 		//Adjusts the name of the output file if it is not a text file.
 		Date d = new Date();
 		boolean alterName = false;
+		String dirNotSimple = "";
+		boolean shouldDoNotSimple = false;
 		if (dir.endsWith("/") || !dir.contains(".json")){
 			alterName = true;
 			if (!dir.endsWith("/")){
 				dir += "/";
 			}
+			dirNotSimple = dir+d.toString().replace(' ', '_').replace(':', '_')+"FoundButNotBest.json";
+			shouldDoNotSimple = true;
 			String fileName = d.toString().replace(' ', '_').replace(':', '_')+"_Ops";
 			
 			for (String op:allowedOps){
@@ -118,6 +124,16 @@ public class Optimize{
 			}
 			fileName += "_MaxCost"+maxCost;
 			dir = dir + fileName + ".json";
+			
+		}
+		else if(dir.contains(".json") && dir.contains("/")){
+			int indexOfSlash = dir.lastIndexOf("/");
+			dirNotSimple = dir.substring(0, indexOfSlash+1)+d.toString().replace(' ', '_').replace(':', '_')+"FoundButNotBest.json";
+			shouldDoNotSimple = true;
+		}
+		else if(dir.contains(".json") && !dir.contains("/")){
+			dirNotSimple = d.toString().replace(' ', '_').replace(':', '_')+"FoundButNotBest.json";
+			shouldDoNotSimple = true;
 		}
 		System.out.println(dir);
 		
@@ -170,35 +186,60 @@ public class Optimize{
 				costOfNot = ConstantProperties.costPerOp.get("~");
 			}
 			else {
+				//Every operator that is not ~ gets added here
 				otherOps.add(operator);
+				//These are the operators that when performed with zero invert the circuit. Only add them to the list if they will be an improvement on 
 				if((operator.equals(".")||operator.equals("=")) && (!(ConstantProperties.costPerOp.containsKey("~"))||ConstantProperties.costPerOp.get(operator)<ConstantProperties.costPerOp.get("~"))){
 					specialZeroOps.add(operator);
-					if (ConstantProperties.costPerOp.get(operator)<costOfNot){
+					if (ConstantProperties.costPerOp.get(operator)<costOfNot||costOfNot==-1){
 						costOfNot = ConstantProperties.costPerOp.get(operator);
 					}
 				}
+				//These are the operators that when performed with one invert the circuit. Only add them to the list if they will be an improvement on
 				else if((operator.equals("@")||operator.equals("^")) && (!(ConstantProperties.costPerOp.containsKey("~"))||ConstantProperties.costPerOp.get(operator)<ConstantProperties.costPerOp.get("~"))){
 					specialOneOps.add(operator);
-					if (ConstantProperties.costPerOp.get(operator)<costOfNot){
+					if (ConstantProperties.costPerOp.get(operator)<costOfNot||costOfNot==-1){
 						costOfNot = ConstantProperties.costPerOp.get(operator);
 					}
 				}
 			}
 		}
 		
-		//Initialize the object that stores all the found truth values and the circuits and costs associated with them. Also initialize the object that contains all found circuits sorted by cost.
+		if (costOfNot<0){
+			System.out.println("Something is wrong.");
+			return null;
+		}
+		
+		
+		//These will map truth values to their minimal circuits and their cost
 		HashMap<String, ArrayList<Circuit>> foundTruthValues = new HashMap<String,ArrayList<Circuit>> ();
 		HashMap<String,Double> foundTruthValuesCost = new HashMap<String,Double> ();
+		//These will map truth values to their minimal circuits and their cost found so far, which may not actually be the minimal.
+		HashMap<String, ArrayList<Circuit>> foundTruthValuesNotSimple = new HashMap<String,ArrayList<Circuit>> ();
+		HashMap<String,Double> foundTruthValuesCostNotSimple = new HashMap<String,Double> ();
+		//Maps cost to a list of circuits at that cost.
 		HashMap<Double, ArrayList<Circuit>> sortedByCost = new HashMap<Double,ArrayList<Circuit>> ();
 		
 		//Get the truth values for the one and zero circuit and for all the inputs.
 		ArrayList<String> listOfTV = HelperFunctions.inputTruthValues(numInputs);
+		//Create zero and one circuits
 		String zeroTV = listOfTV.get(0);
 		String oneTV = listOfTV.get(listOfTV.size()-1);
 		Circuit zero = new Circuit("0",zeroTV);
 		Circuit one = new Circuit("1",oneTV);
+		ArrayList<Circuit> oneList = new ArrayList<Circuit>();
+		ArrayList<Circuit> zeroList = new ArrayList<Circuit>();
+		oneList.add(one);
+		zeroList.add(zero);
+		foundTruthValues.put(oneTV,oneList);
+		foundTruthValues.put(zeroTV,zeroList);
 		foundTruthValuesCost.put(oneTV,0.0);
 		foundTruthValuesCost.put(zeroTV,0.0);
+		foundTruthValuesNotSimple.put(oneTV,oneList);
+		foundTruthValuesNotSimple.put(zeroTV,zeroList);
+		foundTruthValuesCostNotSimple.put(oneTV,0.0);
+		foundTruthValuesCostNotSimple.put(zeroTV,0.0);
+		//Create the inputs
 		ArrayList<Circuit> listOfInputs = new ArrayList<Circuit> ();
 		for (int i=0;i<numInputs;i++){
 			ArrayList<Circuit> tempCircList = new ArrayList<Circuit>();
@@ -208,13 +249,17 @@ public class Optimize{
 			tempCircList.add(tempCirc);
 			foundTruthValues.put(tempTV,tempCircList);
 			foundTruthValuesCost.put(tempTV,0.0);
+			foundTruthValuesNotSimple.put(tempTV,tempCircList);
+			foundTruthValuesCostNotSimple.put(tempTV,0.0);
 			listOfInputs.add(tempCirc);
 		}
 		sortedByCost.put(0.0, listOfInputs);
 		
-		//If there is an operation that with a cost of 0, we must check the found truth values at the end 
-		//because we might build a circuit that would have the same cost as the ones we are iterating through.
-		boolean has0Cost = ConstantProperties.costPerOp.containsValue(0.0);
+		//If there is an operation that with a cost of 0 we will run into a problem the way this program works.
+		if (ConstantProperties.costPerOp.containsValue(0.0)){
+			System.out.println("You cannot set the cost of something to be 0.");
+			return null;
+		}
 		
 		//initialize the cost of the first set of circuits.
 		double alphaCost = 0;
@@ -228,119 +273,162 @@ public class Optimize{
 		while(alphaCost <= maxCost && foundTruthValues.size()<expectedNumTruths){
 			//Go through each cost in sortedByCost from 0 to the max. Set the group of alpha circuits.
 			ArrayList<Circuit> alphaCircuits = sortedByCost.get(alphaCost);
-			//If there is no operator with a cost of 0 we can check the alpha circuits for truth values now. Otherwise, we must 
-			//check at the end
-			if (!has0Cost){
-				//Add to the list of not allowed truth values things that have a 0 smallest non-zero cost.
-				if(count<=1){
-					for (Circuit circ:alphaCircuits){
-						notAllowed.add(circ.getTruthValue());
-					}
-					count++;
+			//Add to the list of not allowed truth values things that have a 0 smallest non-zero cost.
+			if(count<=1){
+				for (Circuit circ:alphaCircuits){
+					notAllowed.add(circ.getTruthValue());
 				}
-				//Keeps track of the truth values found this round. We want to save all circuits who give these truth values (because
-				//these will have the same cost as the minimum circuit found for that truth value) or whose truth values we have not
-				//yet found a circuit for.
-				ArrayList<String> foundThisRound = new ArrayList<String> ();
-				for (Circuit circ: alphaCircuits){
-					String tv = circ.getTruthValue();
-					if (!foundTruthValues.containsKey(tv)){
-						ArrayList<Circuit> unique = new ArrayList<Circuit> ();
-						unique.add(circ);
-						foundTruthValues.put(tv, unique);
-						foundThisRound.add(tv);
-						foundTruthValuesCost.put(tv,circ.getCost());
-					}
-					else if(foundTruthValues.containsKey(tv) && foundThisRound.contains(tv)){
-						foundTruthValues.get(tv).add(circ);
-					}
+				count++;
+			}
+			//Keeps track of the truth values found this round. We want to save all circuits who give these truth values (because
+			//these will have the same cost as the minimum circuit found for that truth value) or whose truth values we have not
+			//yet found a circuit for.
+			ArrayList<String> foundThisRound = new ArrayList<String> ();
+			for (Circuit circ: alphaCircuits){
+				String tv = circ.getTruthValue();
+				if (!foundTruthValues.containsKey(tv)){
+					ArrayList<Circuit> unique = new ArrayList<Circuit> ();
+					unique.add(circ);
+					foundTruthValues.put(tv, unique);
+					foundThisRound.add(tv);
+					foundTruthValuesCost.put(tv,circ.getCost());
 				}
-				
-				//Give some status updates.
-				currTime = System.currentTimeMillis();
-				double timeSoFar = (currTime - startTime)/1000;
-				System.out.println(timeSoFar+" seconds");
-				System.out.println("Number of truth values found so far: "+foundTruthValues.size());
-				System.out.println("Dealing with circuits that cost "+alphaCost);
-				System.out.println(alphaCircuits.size()+" circuits in this level");
-				
-				//Write the contents to a file.
-				System.out.println("Saving to a file. Please do not cancel at this point.");
-				String tempdir = dir;
-				if (alterName){
-					tempdir = tempdir.replace(Double.toString(maxCost), Double.toString(alphaCost));
+				else if(foundTruthValues.containsKey(tv) && foundThisRound.contains(tv)){
+					foundTruthValues.get(tv).add(circ);
 				}
-				JsonWriter.writeToJson(foundTruthValues, foundTruthValuesCost, tempdir, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
-				System.out.println("Done saving.");
-				
-				if (lookingForSomething){
-					boolean foundSomething = false;
-					boolean foundOpposites = false;
-					ArrayList<Circuit> working = new ArrayList<Circuit> ();
-					ArrayList<Circuit> oppositesSameCost = new ArrayList<Circuit> ();
-					ArrayList<Circuit> oppositesLess = new ArrayList<Circuit> ();
-					for(String tv1 : foundTruthValues.keySet()){
-						double tempCost = foundTruthValues.get(tv1).get(0).getCost();
-						if (HelperFunctions.truthValuesAreSame(tv1, truthValueToFind)){
-							working.addAll(foundTruthValues.get(tv1));
-							foundSomething = true;
-						}
-						else if (HelperFunctions.truthValuesAreSame(tv1, oppositeTruthValueToFind) && tempCost==alphaCost-costOfNot){
-							oppositesLess.addAll(foundTruthValues.get(tv1));
-							foundOpposites = true;
-						}
-						else if (HelperFunctions.truthValuesAreSame(tv1, oppositeTruthValueToFind) && tempCost==alphaCost){
-							oppositesSameCost.addAll(foundTruthValues.get(tv1));
-							foundOpposites = true;
-						}
-					}
-					if(foundSomething){
-						System.out.println("\nFound "+truthValueToFind+":");
-						System.out.println(working);
-						if(foundOpposites){
-							System.out.println("Also found the opposite, "+oppositeTruthValueToFind+":");
-							if(oppositesLess.size()!=0){
-								System.out.println(oppositesLess);
-							}
-							else{
-								System.out.println(oppositesSameCost);
-							}
-						}
-						System.out.println("---------------------------------------");
-						return foundTruthValues;
-					}
-				}
-				if (foundTruthValues.size() == expectedNumTruths){
-					System.out.println("\nFound all truth values. Finished");
-					System.out.println("---------------------------------------");
-					return foundTruthValues;
-				}
-				if (alphaCost == maxCost){
-					System.out.println("\nReached the maxCost. Finished");
-					System.out.println("---------------------------------------");
-					return foundTruthValues;
-				}
-				System.out.println("---------------------------------------");
 			}
 			
-
+			//Give some status updates.
+			currTime = System.currentTimeMillis();
+			double timeSoFar = (currTime - startTime)/1000;
+			System.out.println(timeSoFar+" seconds");
+			System.out.println("Number of truth values found so far: "+foundTruthValuesNotSimple.size());
+			System.out.println("Number of truth values minimized so far: "+foundTruthValues.size());
+			System.out.println("Potential Max Cost so far: "+Collections.max(foundTruthValuesCostNotSimple.values()));
+			System.out.println("Dealing with circuits that cost "+alphaCost);
+			System.out.println(alphaCircuits.size()+" circuits in this level");
 			
+			//Write the contents to a file.
+			String tempdir = dir;
+			if (alterName){
+				tempdir = tempdir.replace(Double.toString(maxCost), Double.toString(alphaCost));
+			}
+			JsonWriter.writeToJson(foundTruthValues, foundTruthValuesCost, tempdir, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
+			if (shouldDoNotSimple){
+				JsonWriter.writeToJson(foundTruthValuesNotSimple, foundTruthValuesCostNotSimple, dirNotSimple, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
+			}
+			
+			//Check to see if we found the truth value we were looking for if one was entered.
+			if (lookingForSomething){
+				boolean foundSomething = false;
+				boolean foundOpposites = false;
+				ArrayList<Circuit> working = new ArrayList<Circuit> ();
+				ArrayList<Circuit> oppositesSameCost = new ArrayList<Circuit> ();
+				ArrayList<Circuit> oppositesLess = new ArrayList<Circuit> ();
+				for(String tv1 : foundTruthValues.keySet()){
+					double tempCost = foundTruthValues.get(tv1).get(0).getCost();
+					if (HelperFunctions.truthValuesAreSame(tv1, truthValueToFind)){
+						working.addAll(foundTruthValues.get(tv1));
+						foundSomething = true;
+					}
+					else if (HelperFunctions.truthValuesAreSame(tv1, oppositeTruthValueToFind) && tempCost==alphaCost-costOfNot){
+						oppositesLess.addAll(foundTruthValues.get(tv1));
+						foundOpposites = true;
+					}
+					else if (HelperFunctions.truthValuesAreSame(tv1, oppositeTruthValueToFind) && tempCost==alphaCost){
+						oppositesSameCost.addAll(foundTruthValues.get(tv1));
+						foundOpposites = true;
+					}
+				}
+				if(foundSomething){
+					System.out.println("\nFound "+truthValueToFind+":");
+					System.out.println(working);
+					if(foundOpposites){
+						System.out.println("Also found the opposite, "+oppositeTruthValueToFind+":");
+						if(oppositesLess.size()!=0){
+							System.out.println(oppositesLess);
+						}
+						else{
+							System.out.println(oppositesSameCost);
+						}
+					}
+					System.out.println("---------------------------------------");
+					return foundTruthValues;
+				}
+			}
+			if (foundTruthValues.size() == expectedNumTruths){
+				System.out.println("\nFound all truth values. Finished");
+				System.out.println("---------------------------------------");
+				return foundTruthValues;
+			}
+			if (alphaCost == maxCost){
+				System.out.println("\nReached the maxCost. Finished");
+				System.out.println("---------------------------------------");
+				return foundTruthValues;
+			}
+			System.out.println("---------------------------------------");
+			
+			//Do all the operations that would produce the inverted circuit.
 			for (Circuit circ: alphaCircuits){
-				
 				for (String tempOp : notOps){
 					ArrayList<Circuit> tempArrayList = new ArrayList<Circuit> ();
 					tempArrayList.add(circ);
+					//Make the circuit
 					Circuit tempCircuit = new Circuit(tempOp,tempArrayList);
 					double tempCircuitCost = tempCircuit.getCost();
-					if(ConstantProperties.shouldSpeedUp && foundTruthValues.containsKey(tempCircuit.getTruthValue())){
-						continue;
+					String tempCircuitTV = tempCircuit.getTruthValue();
+					if(ConstantProperties.shouldSpeedUp){
+						if (foundTruthValues.containsKey(tempCircuitTV)){
+							continue;
+						}
+					}
+					//Check if this circuit is better than the one currently saved for that in foundTruthValuesNotSimple. If we have found at least one circuit for all truth values then adjust the maxCost if necessary to save space.
+					if(shouldDoNotSimple && tempCircuit.canBeUsed()){
+						//If this is a new truth value or the current cost for this truth value is higher than this new cost.
+						if(!foundTruthValuesCostNotSimple.containsKey(tempCircuitTV)||foundTruthValuesCostNotSimple.get(tempCircuitTV)>tempCircuitCost){
+							ArrayList<Circuit> tempoArrayList = new ArrayList<Circuit>();
+							tempoArrayList.add(tempCircuit);
+							foundTruthValuesNotSimple.put(tempCircuitTV, tempoArrayList);
+							foundTruthValuesCostNotSimple.put(tempCircuitTV,tempCircuitCost);
+							//Adjust maxCost if we found all 256 with less than the previous maxCost.
+							if(foundTruthValuesCostNotSimple.size()==expectedNumTruths && Collections.max(foundTruthValuesCostNotSimple.values())<maxCost){
+								System.out.println("A circuit has been found for all truth values, but it may not be the minimum.");
+								maxCost = Collections.max(foundTruthValuesCostNotSimple.values());
+								System.out.println("Changing maxCost to "+maxCost);
+								Set<Double> allCostsFound = sortedByCost.keySet();
+								ArrayList<Double> allCostsFoundDup = new ArrayList<Double> ();
+								allCostsFoundDup.addAll(allCostsFound);
+								for(Double tcost : allCostsFoundDup){
+									//remove all costs that are above the new max cost
+									if(tcost>maxCost && sortedByCost.containsKey(tcost)){
+										sortedByCost.remove(tcost);
+									}
+									//trim down the circuits from the maxCost to save space.
+									else if(tcost==maxCost && sortedByCost.containsKey(tcost)){
+										ArrayList<Circuit> tempCopyList = new ArrayList<Circuit> ();
+										tempCopyList.addAll(sortedByCost.get(tcost));
+										for (Circuit tCircuit : tempCopyList){
+											if(foundTruthValues.containsKey(tCircuit.getTruthValue())){
+												sortedByCost.get(tcost).remove(tCircuit);
+											}
+										}
+									}
+								}
+							}
+						}
+						//If the cost of this circuit matches the cost for the the ones we already found for the truth value
+						else if(foundTruthValuesCostNotSimple.get(tempCircuitTV)==tempCircuitCost){
+							foundTruthValuesNotSimple.get(tempCircuitTV).add(tempCircuit);
+						}
 					}
 					if(lookingForSomething){
 						//If we find the truth value we are looking for print it and the cost and readjust the maxCost to be the cost of that circuit.
+						//Memory
 						if(tempCircuit.isTruthValue(truthValueToFind) && tempCircuitCost<=maxCost){
 							System.out.println("Found something with the truth value we are looking for, "+truthValueToFind);
 							System.out.println(tempCircuit);
 							System.out.println("Cost: "+tempCircuitCost);
+							//Adjust maxCost if we do not need to go as high to find the desired truth value
 							if(tempCircuitCost<maxCost){
 								maxCost = tempCircuitCost;
 								System.out.println("Changing maxCost to "+maxCost);
@@ -363,6 +451,8 @@ public class Optimize{
 								}
 							}
 						}
+						//if we find the opposite of the truth value we are looking for
+						//Memory
 						else if(tempCircuit.isTruthValue(oppositeTruthValueToFind) && tempCircuitCost+costOfNot<=maxCost){
 							System.out.println("Found something with the OPPOSITE truth value of what we are looking for, "+oppositeTruthValueToFind);
 							System.out.println(tempCircuit);
@@ -393,7 +483,7 @@ public class Optimize{
 					}
 					
 					//Add circuit to sortedByCost if it is acceptable
-					if(tempCircuit.canBeUsed() && !notAllowed.contains(tempCircuit.getTruthValue()) && tempCircuitCost<=maxCost && !(tempCircuitCost==maxCost && foundTruthValues.containsKey(tempCircuit.getTruthValue()) && !has0Cost )){
+					if(tempCircuit.canBeUsed() && !notAllowed.contains(tempCircuitTV) && tempCircuitCost<=maxCost && !(tempCircuitCost==maxCost && foundTruthValues.containsKey(tempCircuitTV))){
 						//if we have circuits with that cost already, add this to the list at that cost
 						 if(sortedByCost.containsKey(tempCircuitCost) && !sortedByCost.get(tempCircuitCost).contains(tempCircuit)){
 							 sortedByCost.get(tempCircuitCost).add(tempCircuit);
@@ -413,10 +503,48 @@ public class Optimize{
 					tempArrayList.add(zero);
 					Circuit tempCircuit = new Circuit(tempOp,tempArrayList);
 					double tempCircuitCost = tempCircuit.getCost();
-					if(ConstantProperties.shouldSpeedUp && foundTruthValues.containsKey(tempCircuit.getTruthValue())){
-						continue;
+					String tempCircuitTV = tempCircuit.getTruthValue();
+					if(ConstantProperties.shouldSpeedUp){
+						if (foundTruthValues.containsKey(tempCircuitTV)){
+							continue;
+						}
+					}
+					if(shouldDoNotSimple&&tempCircuit.canBeUsed()){
+						if(!foundTruthValuesCostNotSimple.containsKey(tempCircuitTV)||foundTruthValuesCostNotSimple.get(tempCircuitTV)>tempCircuitCost){
+							ArrayList<Circuit> tempoArrayList = new ArrayList<Circuit>();
+							tempoArrayList.add(tempCircuit);
+							foundTruthValuesNotSimple.put(tempCircuitTV, tempoArrayList);
+							foundTruthValuesCostNotSimple.put(tempCircuitTV,tempCircuitCost);
+							if(foundTruthValuesCostNotSimple.size()==expectedNumTruths && Collections.max(foundTruthValuesCostNotSimple.values())<maxCost){
+								System.out.println("A circuit has been found for all truth values, but it may not be the minimum.");
+								maxCost = Collections.max(foundTruthValuesCostNotSimple.values());
+								System.out.println("Changing maxCost to "+maxCost);
+								Set<Double> allCostsFound = sortedByCost.keySet();
+								ArrayList<Double> allCostsFoundDup = new ArrayList<Double> ();
+								allCostsFoundDup.addAll(allCostsFound);
+								for(Double tcost : allCostsFoundDup){
+									if(tcost>maxCost && sortedByCost.containsKey(tcost)){
+										sortedByCost.remove(tcost);
+									}
+									else if(tcost==maxCost && sortedByCost.containsKey(tcost)){
+										ArrayList<Circuit> tempCopyList = new ArrayList<Circuit> ();
+										tempCopyList.addAll(sortedByCost.get(tcost));
+										for (Circuit tCircuit : tempCopyList){
+											if(foundTruthValues.containsKey(tCircuit.getTruthValue())){
+												sortedByCost.get(tcost).remove(tCircuit);
+											}
+										}
+									}
+								}
+							}
+							//JsonWriter.writeToJson(foundTruthValuesNotSimple, foundTruthValuesCostNotSimple, dirNotSimple, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
+						}
+						else if(foundTruthValuesCostNotSimple.get(tempCircuitTV)==tempCircuitCost){
+							foundTruthValuesNotSimple.get(tempCircuitTV).add(tempCircuit);
+						}
 					}
 					if(lookingForSomething){
+						//Memory
 						if(tempCircuit.isTruthValue(truthValueToFind) && tempCircuitCost<=maxCost){
 							System.out.println("Found something with the truth value we are looking for, "+truthValueToFind);
 							System.out.println(tempCircuit);
@@ -443,6 +571,7 @@ public class Optimize{
 								}
 							}
 						}
+						//Memory
 						else if(tempCircuit.isTruthValue(oppositeTruthValueToFind) && tempCircuitCost+costOfNot<=maxCost){
 							System.out.println("Found something with the OPPOSITE truth value of what we are looking for, "+oppositeTruthValueToFind);
 							System.out.println(tempCircuit);
@@ -473,7 +602,7 @@ public class Optimize{
 					}
 					
 					//Add circuit to sortedByCost if it is acceptable
-					if(tempCircuit.canBeUsed() && !notAllowed.contains(tempCircuit.getTruthValue()) && tempCircuitCost<=maxCost && !(tempCircuitCost==maxCost && foundTruthValues.containsKey(tempCircuit.getTruthValue()) && !has0Cost )){
+					if(tempCircuit.canBeUsed() && !notAllowed.contains(tempCircuitTV) && tempCircuitCost<=maxCost && !(tempCircuitCost==maxCost && foundTruthValues.containsKey(tempCircuitTV))){
 						//if we have circuits with that cost already, add this to the list at that cost
 						 if(sortedByCost.containsKey(tempCircuitCost) && !sortedByCost.get(tempCircuitCost).contains(tempCircuit)){
 							 sortedByCost.get(tempCircuitCost).add(tempCircuit);
@@ -493,10 +622,48 @@ public class Optimize{
 					tempArrayList.add(one);
 					Circuit tempCircuit = new Circuit(tempOp,tempArrayList);
 					double tempCircuitCost = tempCircuit.getCost();
-					if(ConstantProperties.shouldSpeedUp && foundTruthValues.containsKey(tempCircuit.getTruthValue())){
-						continue;
+					String tempCircuitTV = tempCircuit.getTruthValue();
+					if(ConstantProperties.shouldSpeedUp){
+						if (foundTruthValues.containsKey(tempCircuitTV)){
+							continue;
+						}
+					}
+					if(shouldDoNotSimple&&tempCircuit.canBeUsed()){
+						if(!foundTruthValuesCostNotSimple.containsKey(tempCircuitTV)||foundTruthValuesCostNotSimple.get(tempCircuitTV)>tempCircuitCost){
+							ArrayList<Circuit> tempoArrayList = new ArrayList<Circuit>();
+							tempoArrayList.add(tempCircuit);
+							foundTruthValuesNotSimple.put(tempCircuitTV, tempoArrayList);
+							foundTruthValuesCostNotSimple.put(tempCircuitTV,tempCircuitCost);
+							if(foundTruthValuesCostNotSimple.size()==expectedNumTruths && Collections.max(foundTruthValuesCostNotSimple.values())<maxCost){
+								System.out.println("A circuit has been found for all truth values, but it may not be the minimum.");
+								maxCost = Collections.max(foundTruthValuesCostNotSimple.values());
+								System.out.println("Changing maxCost to "+maxCost);
+								Set<Double> allCostsFound = sortedByCost.keySet();
+								ArrayList<Double> allCostsFoundDup = new ArrayList<Double> ();
+								allCostsFoundDup.addAll(allCostsFound);
+								for(Double tcost : allCostsFoundDup){
+									if(tcost>maxCost && sortedByCost.containsKey(tcost)){
+										sortedByCost.remove(tcost);
+									}
+									else if(tcost==maxCost && sortedByCost.containsKey(tcost)){
+										ArrayList<Circuit> tempCopyList = new ArrayList<Circuit> ();
+										tempCopyList.addAll(sortedByCost.get(tcost));
+										for (Circuit tCircuit : tempCopyList){
+											if(foundTruthValues.containsKey(tCircuit.getTruthValue())){
+												sortedByCost.get(tcost).remove(tCircuit);
+											}
+										}
+									}
+								}
+							}
+							//JsonWriter.writeToJson(foundTruthValuesNotSimple, foundTruthValuesCostNotSimple, dirNotSimple, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
+						}
+						else if(foundTruthValuesCostNotSimple.get(tempCircuitTV)==tempCircuitCost){
+							foundTruthValuesNotSimple.get(tempCircuitTV).add(tempCircuit);
+						}
 					}
 					if(lookingForSomething){
+						//Memory
 						if(tempCircuit.isTruthValue(truthValueToFind) && tempCircuitCost<=maxCost){
 							System.out.println("Found something with the truth value we are looking for, "+truthValueToFind);
 							System.out.println(tempCircuit);
@@ -523,6 +690,7 @@ public class Optimize{
 								}
 							}
 						}
+						//Memory
 						else if(tempCircuit.isTruthValue(oppositeTruthValueToFind) && tempCircuitCost+costOfNot<=maxCost){
 							System.out.println("Found something with the OPPOSITE truth value of what we are looking for, "+oppositeTruthValueToFind);
 							System.out.println(tempCircuit);
@@ -553,7 +721,7 @@ public class Optimize{
 					}
 					
 					//Add circuit to sortedByCost if it is acceptable
-					if(tempCircuit.canBeUsed() && !notAllowed.contains(tempCircuit.getTruthValue()) && tempCircuitCost<=maxCost && !(tempCircuitCost==maxCost && foundTruthValues.containsKey(tempCircuit.getTruthValue()) && !has0Cost )){
+					if(tempCircuit.canBeUsed() && !notAllowed.contains(tempCircuitTV) && tempCircuitCost<=maxCost && !(tempCircuitCost==maxCost && foundTruthValues.containsKey(tempCircuitTV))){
 						//if we have circuits with that cost already, add this to the list at that cost
 						 if(sortedByCost.containsKey(tempCircuitCost) && !sortedByCost.get(tempCircuitCost).contains(tempCircuit)){
 							 sortedByCost.get(tempCircuitCost).add(tempCircuit);
@@ -581,24 +749,74 @@ public class Optimize{
 			for (int i=1;i<maxFanIn;i++){
 				allCombinationsOfCircuits.addAll((Collection<? extends ArrayList<Circuit>>) HelperFunctions.combinations(allCircuitsCombined, i, false));
 			}
-			
+			//Make the circuits from the combinations made
 			for (Circuit circ : alphaCircuits){
 				for(ArrayList<Circuit> tempArrayOfCircuits : allCombinationsOfCircuits){
+					//Print progress every 5 minutes
+					if(((System.currentTimeMillis() - newStartTime)/60000)>=5){
+						newStartTime = System.currentTimeMillis();
+						double totalProgress = ((100.0*alphaCircuits.indexOf(circ))/alphaCircuits.size()) + (100.0*(allCombinationsOfCircuits.indexOf(tempArrayOfCircuits)+1)/alphaCircuits.size())/allCombinationsOfCircuits.size();
+						currTime = System.currentTimeMillis();
+						timeSoFar = (currTime - startTime)/60000;
+						JsonWriter.writeToJson(foundTruthValuesNotSimple, foundTruthValuesCostNotSimple, dirNotSimple, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
+						System.out.println(totalProgress + "% complete with building from "+ alphaCost+" cost gates after "+timeSoFar+" minutes");
+						System.out.println("Number of truth values found so far: "+foundTruthValuesNotSimple.size());
+						System.out.println("Number of truth values minimized so far: "+foundTruthValues.size());
+						System.out.println("Potential Max Cost so far: "+Collections.max(foundTruthValuesCostNotSimple.values()));
+					}
+					//We do not want to perform any operations with a group of circuits if it contains the alpha circuit because we will just get 1,0, or the inverse of the alpha circuit and we already took care of all the inverses.
 					if(tempArrayOfCircuits.contains(circ)){
 						continue;
 					}
+					//Make a copy so we aren't changing the original
 					ArrayList<Circuit> tempArrayOfCircuitsCopy = new ArrayList<Circuit> ();
 					tempArrayOfCircuitsCopy.add(circ);
-					for (Circuit tcircuit:tempArrayOfCircuits){
-						tempArrayOfCircuitsCopy.add(tcircuit);
-					}
+					tempArrayOfCircuitsCopy.addAll(tempArrayOfCircuits);
 					for(String tempOp : otherOps){
 						Circuit tempCircuit = new Circuit(tempOp,tempArrayOfCircuitsCopy);
 						double tempCircuitCost = tempCircuit.getCost();
-						if(ConstantProperties.shouldSpeedUp && foundTruthValues.containsKey(tempCircuit.getTruthValue())){
-							continue;
+						String tempCircuitTV = tempCircuit.getTruthValue();
+						if(ConstantProperties.shouldSpeedUp){
+							if (foundTruthValues.containsKey(tempCircuitTV)){
+								continue;
+							}
+						}
+						if(shouldDoNotSimple && tempCircuit.canBeUsed()){
+							if(!foundTruthValuesCostNotSimple.containsKey(tempCircuitTV)||foundTruthValuesCostNotSimple.get(tempCircuitTV)>tempCircuitCost){
+								ArrayList<Circuit> tempoArrayList = new ArrayList<Circuit>();
+								tempoArrayList.add(tempCircuit);
+								foundTruthValuesNotSimple.put(tempCircuitTV, tempoArrayList);
+								foundTruthValuesCostNotSimple.put(tempCircuitTV,tempCircuitCost);
+								if(foundTruthValuesCostNotSimple.size()==expectedNumTruths && Collections.max(foundTruthValuesCostNotSimple.values())<maxCost){
+									System.out.println("A circuit has been found for all truth values, but it may not be the minimum.");
+									maxCost = Collections.max(foundTruthValuesCostNotSimple.values());
+									System.out.println("Changing maxCost to "+maxCost);
+									Set<Double> allCostsFound = sortedByCost.keySet();
+									ArrayList<Double> allCostsFoundDup = new ArrayList<Double> ();
+									allCostsFoundDup.addAll(allCostsFound);
+									for(Double tcost : allCostsFoundDup){
+										if(tcost>maxCost && sortedByCost.containsKey(tcost)){
+											sortedByCost.remove(tcost);
+										}
+										else if(tcost==maxCost && sortedByCost.containsKey(tcost)){
+											ArrayList<Circuit> tempCopyList = new ArrayList<Circuit> ();
+											tempCopyList.addAll(sortedByCost.get(tcost));
+											for (Circuit tCircuit : tempCopyList){
+												if(foundTruthValues.containsKey(tCircuit.getTruthValue())){
+													sortedByCost.get(tcost).remove(tCircuit);
+												}
+											}
+										}
+									}
+								}
+								//JsonWriter.writeToJson(foundTruthValuesNotSimple, foundTruthValuesCostNotSimple, dirNotSimple, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
+							}
+							else if(foundTruthValuesCostNotSimple.get(tempCircuitTV)==tempCircuitCost){
+								foundTruthValuesNotSimple.get(tempCircuitTV).add(tempCircuit);
+							}
 						}
 						if(lookingForSomething){
+							//Memory
 							if(tempCircuit.isTruthValue(truthValueToFind) && tempCircuitCost<=maxCost){
 								System.out.println("Found something with the truth value we are looking for, "+truthValueToFind);
 								System.out.println(tempCircuit);
@@ -625,6 +843,7 @@ public class Optimize{
 									}
 								}
 							}
+							//Memory
 							else if(tempCircuit.isTruthValue(oppositeTruthValueToFind) && tempCircuitCost+costOfNot<=maxCost){
 								System.out.println("Found something with the OPPOSITE truth value of what we are looking for, "+oppositeTruthValueToFind);
 								System.out.println(tempCircuit);
@@ -655,7 +874,7 @@ public class Optimize{
 						}
 						
 						//Add circuit to sortedByCost if it is acceptable
-						if(tempCircuit.canBeUsed() && !notAllowed.contains(tempCircuit.getTruthValue()) && tempCircuitCost<=maxCost && !(tempCircuitCost==maxCost && foundTruthValues.containsKey(tempCircuit.getTruthValue()) && !has0Cost )){
+						if(tempCircuit.canBeUsed() && !notAllowed.contains(tempCircuitTV) && tempCircuitCost<=maxCost && !(tempCircuitCost==maxCost && foundTruthValues.containsKey(tempCircuitTV))){
 							//if we have circuits with that cost already, add this to the list at that cost
 							 if(sortedByCost.containsKey(tempCircuitCost) && !sortedByCost.get(tempCircuitCost).contains(tempCircuit)){
 								 sortedByCost.get(tempCircuitCost).add(tempCircuit);
@@ -680,9 +899,8 @@ public class Optimize{
 			}
 			alphaCost = allCosts.get(allCosts.indexOf(alphaCost)+1);
 		}
-		
 		System.out.println("Finished");
 		return foundTruthValues;
 	}
-
+	
 }

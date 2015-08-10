@@ -16,6 +16,7 @@ import com.google.gson.GsonBuilder;
 public class JsonWriter{
 	@SuppressWarnings("unchecked")
 	public static void writeToJson(HashMap<String,ArrayList<Circuit>> foundTruthValues, HashMap<String,Double> foundTruthValuesCost, String dir,double runtime,Date d, double currCost, HashSet<String> allowedOps, int maxFanIn){
+		System.out.println("Saving to a file. Please do not cancel at this point.");
 		ArrayList<JSONObject> content = new ArrayList<JSONObject> ();
 		
 		JSONObject details = new JSONObject();
@@ -46,6 +47,7 @@ public class JsonWriter{
 			content.add(tvCircPair);
 		}
 		prettyPrintJSONArray(content,dir, false);
+		System.out.println("Done saving.");
 	}
 	public static void prettyPrintJSONArray(ArrayList<JSONObject> objects, String filepath, boolean append) {
 

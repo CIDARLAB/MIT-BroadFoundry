@@ -94,10 +94,10 @@ public class HelperFunctions{
 			if(circuitString.charAt(i)=='('){
 				openParen = i;
 			}
-			else if(circuitString.charAt(i)=='(' && openParen==-1){
+			else if(circuitString.charAt(i)==')' && openParen==-1){
 				return null;
 			}
-			else if(circuitString.charAt(i)=='(' && openParen!=-1){
+			else if(circuitString.charAt(i)==')' && openParen!=-1){
 				return new Integer [] {openParen,i};
 			}
 		}

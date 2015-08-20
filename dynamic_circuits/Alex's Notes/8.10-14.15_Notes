@@ -1,0 +1,44 @@
+8.10.15
+Got to a point where XYSolver works to graph interactions between nodes X and Y. It can perform activation, repression, or no action according to the hill equation.
+
+8.11.15
+Today, I will be investigating one case of two-node interactions in order to determine if there is a case where oscillations can occur.
+
+Reading a helpful paper suggested by Thomas. A comparative analysis of synthetic genetic oscillators by O. Purcell, et. al.
+
+Goodwin Oscillator (Stricker et al., 2008) 
+-Use of the P(LlacO-1) promoter to drives transcription until repressed by LacI.
+-Formation of negative feedback loop.
+-2 plasmid, one containing LacI gene, other containing yemGFP (reporter gene). 
+-Both genes contain ssrA 'tag' sequences for increased degradation and faster dynamics
+-Introduced into E. coli, deficient in lac operon, minimizes host genome interference.
+-Irregular oscillations with often failing
+-Period was order of 30 minutes and unaffected by IPTG (which binds and prevents LacI repression).
+-percent oscillatory cells not reported, so robustness of system not assessible.
+-LacI is a tetramer, where TetR is dimeric
+
+Repressilator (Elowitz & Leibler, 2000)
+-Can consist of one or more genes repressing its successor
+-3 gene system in vivo used cI from lambda phage, tetR from the Tn10 transposon and lacI
+-even number of genes, found to exhibit multi-stability.
+-6 or more genes possess a quasi-stable periodic solution.
+-Period of 160 +/- 40 minutes, although observation only 10 hours due to hitting a stationary phase (3-4 oscillations).
+-This could be due to sigma(38) transcription initiation factor that occurs in stationary phase that competes with sigma(70) that would prevent RNA polymerase from binding to repressilator promoters that might affect dynamics.
+-lacks robustness, noise contributions not understood, can only accomodate minor asymmetry
+
+Amplified Negative Feedback oscillators 
+-simple 2 gene case where one gene amplifies its own transcription via positive self-feedback and activates the transcription of another gene that represses the transcription of the first gene via negative-feedback.
+-3 topologies for repression
+-repression through transcriptional control
+-repression through sequestration by dimerization
+-repression by proteolysis.
+
+
+-Stochastic coherence
+-randomly determined quality of being consistent?
+
+8.13.2015
+Work on XYMotif program
+Trying to set up a 3 node system would require a 9-part vector XtoX, XtoY, XtoZ, YtoX, YtoY, YtoZ, ZtoX, ZtoY, ZtoZ
+combinations of all 9 is 2^9 = 512 or 3^9 = 19683
+

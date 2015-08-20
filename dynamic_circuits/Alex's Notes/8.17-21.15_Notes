@@ -1,0 +1,15 @@
+
+Repressilator (imagemagick) gif from jpg from png file
+Combinational circuits, 2 input nand
+INP1 --> g1 --| g3 --| output
+INP2 --> g2 --|
+
+waveform of INP1 (0,1,0,1) and INP2 (0,0,1,1)
+
+SR Latch
+INP1 --> g1 --> OUT1
+		 II
+INP2 --> g2 --> OUT2
+
+waveform of INP1 (0,1,0,0,0) and INP2 (0,0,0,1,0)
+initC of g1Out and g2Out

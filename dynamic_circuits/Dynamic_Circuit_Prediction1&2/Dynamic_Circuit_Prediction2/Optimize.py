@@ -12,9 +12,9 @@ import OptimalCircuit
 import General
 import copy
 import random
-inputsDir = "JsonFiles/Libraries/InputLibrary2.json"
-repressorsDir = "JsonFiles/Libraries/RepressorLibrary2.json"
-outputsDir = "JsonFiles/Libraries/OutputLibrary2.json"
+inputsDir = "JsonFiles/Libraries/InputLibrary.json"
+repressorsDir = "JsonFiles/Libraries/RepressorLibrary.json"
+outputsDir = "JsonFiles/Libraries/OutputLibrary.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
 truthValueExampleFileLoc = "JsonFiles/SplitByTruthValue_OR/01101001.json" #01101001
 placeToSaveTruthValueExample = "JsonFiles/01101001Graph.json"
@@ -79,6 +79,7 @@ def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=100,numTra
                     swappablePairs.append(pair)
             random.shuffle(swappablePairs)
             for pair in swappablePairs:
+                #print "On pair",swappablePairs.index(pair)+1,"out of",len(swappablePairs)
                 graph.swapGates(pair[0],pair[1])
                 graph.writeToJson(scratchFile)
                 tempScoreDict = General.generateDynamicCircuitGraphs(scratchFile, False, False, False)
@@ -165,7 +166,7 @@ def makeOutputs(outputLibrary):
     allOutputs = []
     for gateInfo in outputsFromFile:
 #        Gate(name,gateType,Km,n,Pmin,Pmax,halfLife,REUconv=None)
-        tempGate = Gate.Gate(str(gateInfo["NAME"]),"Repressor",gateInfo["Km"],gateInfo["n"],gateInfo["Pmin"],gateInfo["Pmax"],gateInfo["halfLife"],None)
+        tempGate = Gate.Gate(str(gateInfo["NAME"]),"Output",None,None,None,None,gateInfo["halfLife"],None)
         allOutputs.append(tempGate)
     return allOutputs
     
@@ -178,6 +179,6 @@ def makeRepressors(repressorLibrary):
     
     for gateInfo in repressorsFromFile:
 #        Gate(name,gateType,Km,n,Pmin,Pmax,halfLife,REUconv=None)
-        tempGate = Gate.Gate(str(gateInfo["NAME"]),"Output",None,None,None,None,gateInfo["halfLife"],None)
+        tempGate = Gate.Gate(str(gateInfo["NAME"]),"Repressor",gateInfo["Km"],gateInfo["n"],gateInfo["Pmin"],gateInfo["Pmax"],gateInfo["halfLife"],None)
         allRepressors.append(tempGate)
     return allRepressors

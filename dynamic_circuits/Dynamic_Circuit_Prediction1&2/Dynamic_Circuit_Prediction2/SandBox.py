@@ -170,9 +170,9 @@ circuitString9 = '((a.0).a)' #00000000
 circuitString10 = '((a.0).b)' #00001100
 
 fileLoc = "C:\Users\Arinze\SkyDrive\UROP_Summer_2015/test.json"
-inputsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/InputLibrary2.json"
-repressorsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/RepressorLibrary2.json"
-outputsDir = "C:\Users\Arinze\Documents\GitHub\MIT-BroadFoundry\dynamic_circuits\DynamicCircuits\Libraries/OutputLibrary2.json"
+inputsDir = "JsonFiles/Libraries/InputLibrary.json"
+repressorsDir = "JsonFiles/Libraries/RepressorLibrary.json"
+outputsDir = "JsonFiles/Libraries/OutputLibrary.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
 
 

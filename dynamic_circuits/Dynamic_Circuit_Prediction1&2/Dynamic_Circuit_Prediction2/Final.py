@@ -10,9 +10,9 @@ placeToSaveExample = "JsonFiles/temp.json"
 exampleCircuitString = "(((IN1.IN2).IN3).(IN1.IN3.IN4).((IN1.IN2).IN1.IN4))"
 SR_Latch_FileLoc = "JsonFiles/SR_Latches/SRLatch.json"
 SR_Latch_placeToSave = "JsonFiles/SR_Latches/SRLatch_Graph.json"
-inputsDir = "JsonFiles/Libraries/InputLibrary2.json"
-repressorsDir = "JsonFiles/Libraries/RepressorLibrary2.json"
-outputsDir = "JsonFiles/Libraries/OutputLibrary2.json"
+inputsDir = "JsonFiles/Libraries/InputLibrary.json"
+repressorsDir = "JsonFiles/Libraries/RepressorLibrary.json"
+outputsDir = "JsonFiles/Libraries/OutputLibrary.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
 
 def makeGraphFromNetlist(netlist,placeToSave,makeBarGraph=True,makeGraphs=True):
@@ -22,13 +22,13 @@ def makeGraphFromCircuitString(circuitString,placeToSave,makeBarGraph=True,makeG
     netlist = OptimalCircuit.convertCircuitStringToNetlist(circuitString)
     print OptimalCircuit.wrapperForNetlist(netlist,placeToSave,makeBarGraph=makeBarGraph,makeOtherGraphs=makeGraphs)
 
-def optimizeNetlistWithLibraries(netlist, Libraries,smallestScoreAllowed=100,numTraj=20):
+def optimizeNetlistWithLibraries(netlist, Libraries,smallestScoreAllowed=0.5,numTraj=20):
     answer = Optimize.findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed,numTraj)
     print answer[0]
     print "Score =",answer[1]
     return answer
     
-def optimizeCircuitStringWithLibraries(circuitString, Libraries,smallestScoreAllowed=100,numTraj=20):
+def optimizeCircuitStringWithLibraries(circuitString, Libraries,smallestScoreAllowed=0.5,numTraj=20):
     netlist = OptimalCircuit.convertCircuitStringToNetlist(circuitString)
     answer = Optimize.findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed,numTraj)
     print answer[0]
@@ -46,4 +46,4 @@ def examplesForUse():
     pause = raw_input("pause4")
     makeGraphFromCircuitString(exampleCircuitString,placeToSaveExample)
     pause = raw_input("pause5")
-    optimizeNetlistWithLibraries(truthValueExampleFileLoc, Libraries,smallestScoreAllowed=100,numTraj=5)
+    optimizeNetlistWithLibraries(truthValueExampleFileLoc, Libraries,smallestScoreAllowed=0.5,numTraj=5)

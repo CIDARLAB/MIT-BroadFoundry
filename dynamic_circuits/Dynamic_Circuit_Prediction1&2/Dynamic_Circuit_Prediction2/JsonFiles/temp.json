@@ -45,11 +45,11 @@
             "1"
         ],
         "INPUT": [
-            "inputs.specInput",
-            10.0,
-            0.0,
+            "inputs.squInput",
             8000.0,
-            "0000000011111111"
+            10.0,
+            4000.0,
+            0.0
         ],
         "INPUT_EFFECT": "ACTIVATE",
         "Km": 0.05,
@@ -102,11 +102,11 @@
             "1"
         ],
         "INPUT": [
-            "inputs.specInput",
+            "inputs.squInput",
+            4000.0,
             10.0,
-            0.0,
-            8000.0,
-            "0000111100001111"
+            2000.0,
+            0.0
         ],
         "INPUT_EFFECT": "ACTIVATE",
         "Km": 0.05,
@@ -159,11 +159,11 @@
             "1"
         ],
         "INPUT": [
-            "inputs.specInput",
+            "inputs.squInput",
+            2000.0,
             10.0,
-            0.0,
-            8000.0,
-            "0011001100110011"
+            1000.0,
+            0.0
         ],
         "INPUT_EFFECT": "ACTIVATE",
         "Km": 0.05,
@@ -216,11 +216,11 @@
             "1"
         ],
         "INPUT": [
-            "inputs.specInput",
+            "inputs.squInput",
+            1000.0,
             10.0,
-            0.0,
-            8000.0,
-            "0101010101010101"
+            500.0,
+            0.0
         ],
         "INPUT_EFFECT": "ACTIVATE",
         "Km": 0.05,

@@ -1,0 +1,17 @@
+[
+    {
+        "collection": "outputs",
+        "NAME": "BFP",
+        "halfLife": 2.0
+    },
+    {
+        "collection": "outputs",
+        "NAME": "RFP",
+        "halfLife": 2.0
+    },
+    {
+        "collection": "outputs",
+        "NAME": "YFP",
+        "halfLife": 2.0
+    }
+]

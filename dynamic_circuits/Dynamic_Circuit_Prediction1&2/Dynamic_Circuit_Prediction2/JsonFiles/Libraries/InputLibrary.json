@@ -1,0 +1,42 @@
+[
+    {
+        "collection": "INPUT",
+        "equation": "ymin+(ymax-ymin)/(1.0+(K/x)^n)",
+        "Km": 0.18,
+        "NAME": "Ara",
+        "PROMOTER_NAME": "pBAD",
+        "Pmax": 1.83,
+        "Pmin": 0.024,
+        "n": 2.7
+    },
+    {
+        "collection": "INPUT",
+        "equation": "ymin+(ymax-ymin)/(1.0+(K/x)^n)",
+        "Km": 0.18,
+        "NAME": "3OC6SHL",
+        "PROMOTER_NAME": "pLuxStar",
+        "Pmax": 0.91,
+        "Pmin": 0.085,
+        "n": 2.7
+    },
+    {
+        "collection": "INPUT",
+        "equation": "ymin+(ymax-ymin)/(1.0+(K/x)^n)",
+        "Km": 0.18,
+        "NAME": "IPTG",
+        "PROMOTER_NAME": "pTac",
+        "Pmax": 2.39,
+        "Pmin": 0.022,
+        "n": 2.7
+    },
+    {
+        "collection": "INPUT",
+        "equation": "ymin+(ymax-ymin)/(1.0+(K/x)^n)",
+        "Km": 0.18,
+        "NAME": "Ara",
+        "PROMOTER_NAME": "pBAD",
+        "Pmax": 3.71,
+        "Pmin": 0.017,
+        "n": 2.7
+    }
+]

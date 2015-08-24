@@ -18,9 +18,9 @@ import re
 import itertools
 import time
 
-inputsDir = "JsonFiles/Libraries/InputLibrary2.json"
-repressorsDir = "JsonFiles/Libraries/RepressorLibrary2.json"
-outputsDir = "JsonFiles/Libraries/OutputLibrary2.json"
+inputsDir = "JsonFiles/Libraries/InputLibrary.json"
+repressorsDir = "JsonFiles/Libraries/RepressorLibrary.json"
+outputsDir = "JsonFiles/Libraries/OutputLibrary.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
     
 repressilatorFileLoc = "JsonFiles/repressilator.json"
@@ -364,7 +364,8 @@ def makeInputs(inputLibrary,inputNames):
     for name in inputNames:
         inputIndex = inputsFromFileNames.index(name)
         gateInfo = inputsFromFile[inputIndex]
-        tempGate = Gate.Gate(str(gateInfo["NAME"]),gateInfo["Km"],gateInfo["n"],"Input",gateInfo["mB"],None,None,None)
+        #Gate(name,gateType,Km,n,Pmin,Pmax,halfLife,REUconv=None)
+        tempGate = Gate.Gate(str(gateInfo["NAME"]),"Input",gateInfo["Km"],gateInfo["n"],gateInfo["Pmin"],gateInfo["Pmax"],None,None)
         Inputsr.append(tempGate)
     return Inputsr
     
@@ -381,7 +382,8 @@ def makeOutput(outputLibrary,outputNames):
     for name in outputNames:
         outputIndex = outputsFromFileNames.index(name)
         gateInfo = outputsFromFile[outputIndex]
-        tempGate = Gate.Gate(str(gateInfo["NAME"]),None,None,"Output",None,gateInfo["pB"],gateInfo["m_halfLife"],gateInfo["p_halfLife"])
+        #Gate(name,gateType,Km,n,Pmin,Pmax,halfLife,REUconv=None)
+        tempGate = Gate.Gate(str(gateInfo["NAME"]),"Output",None,None,None,None,gateInfo["halfLife"],None)
         Outputsr.append(tempGate)
     return Outputsr
     
@@ -393,7 +395,8 @@ def makeRepressorsGroups(repressorLibrary,numRepressors):
     allRepressors = []
     
     for gateInfo in repressorsFromFile:
-        tempGate = Gate.Gate(str(gateInfo["NAME"]),gateInfo["Km"],gateInfo["n"],"Repressor",gateInfo["mB"],gateInfo["pB"],gateInfo["m_halfLife"],gateInfo["p_halfLife"])
+        #Gate(name,gateType,Km,n,Pmin,Pmax,halfLife,REUconv=None)
+        tempGate = Gate.Gate(str(gateInfo["NAME"]),"Repressor",gateInfo["Km"],gateInfo["n"],gateInfo["Pmin"],gateInfo["Pmax"],gateInfo["halfLife"],None)
         allRepressors.append(tempGate)
     #Make list of permutations
     IntermediatesrList = list(itertools.permutations(allRepressors, numRepressors))

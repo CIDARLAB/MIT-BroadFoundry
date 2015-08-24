@@ -1,0 +1,462 @@
+[
+    {
+        "itr": 40000.0,
+        "xMax": 4000.0,
+        "xMin": 0,
+        "yMax": "NONE",
+        "yMin": "NONE"
+    },
+    {
+        "DIST": 0,
+        "EXPECTED_PROMOTER": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "1",
+            "1",
+            "1",
+            "1"
+        ],
+        "EXPECTED_PROTEIN": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "1",
+            "1",
+            "1",
+            "1"
+        ],
+        "INPUT": [
+            "inputs.squInput",
+            4000.0,
+            10.0,
+            2000.0,
+            0.0
+        ],
+        "INPUT_EFFECT": "ACTIVATE",
+        "Km": 0.18,
+        "NAME": "Ara",
+        "Pmax": 1.83,
+        "Pmin": 0.024,
+        "REUconv": null,
+        "REUi": null,
+        "TYPE": "INPUT",
+        "degRate": null,
+        "halfLife": null,
+        "n": 2.7
+    },
+    {
+        "DIST": 0,
+        "EXPECTED_PROMOTER": [
+            "0",
+            "0",
+            "1",
+            "1",
+            "0",
+            "0",
+            "1",
+            "1"
+        ],
+        "EXPECTED_PROTEIN": [
+            "0",
+            "0",
+            "1",
+            "1",
+            "0",
+            "0",
+            "1",
+            "1"
+        ],
+        "INPUT": [
+            "inputs.squInput",
+            2000.0,
+            10.0,
+            1000.0,
+            0.0
+        ],
+        "INPUT_EFFECT": "ACTIVATE",
+        "Km": 0.18,
+        "NAME": "3OC6SHL",
+        "Pmax": 0.91,
+        "Pmin": 0.085,
+        "REUconv": null,
+        "REUi": null,
+        "TYPE": "INPUT",
+        "degRate": null,
+        "halfLife": null,
+        "n": 2.7
+    },
+    {
+        "DIST": 0,
+        "EXPECTED_PROMOTER": [
+            "0",
+            "1",
+            "0",
+            "1",
+            "0",
+            "1",
+            "0",
+            "1"
+        ],
+        "EXPECTED_PROTEIN": [
+            "0",
+            "1",
+            "0",
+            "1",
+            "0",
+            "1",
+            "0",
+            "1"
+        ],
+        "INPUT": [
+            "inputs.squInput",
+            1000.0,
+            10.0,
+            500.0,
+            0.0
+        ],
+        "INPUT_EFFECT": "ACTIVATE",
+        "Km": 0.18,
+        "NAME": "IPTG",
+        "Pmax": 2.39,
+        "Pmin": 0.022,
+        "REUconv": null,
+        "REUi": null,
+        "TYPE": "INPUT",
+        "degRate": null,
+        "halfLife": null,
+        "n": 2.7
+    },
+    {
+        "DIST": 1,
+        "EXPECTED_PROMOTER": [
+            "1",
+            "0",
+            "0",
+            "0",
+            "1",
+            "0",
+            "0",
+            "0"
+        ],
+        "EXPECTED_PROTEIN": [
+            "0",
+            "1",
+            "1",
+            "1",
+            "0",
+            "1",
+            "1",
+            "1"
+        ],
+        "INPUT": [
+            "IPTG",
+            "3OC6SHL"
+        ],
+        "INPUT_EFFECT": "REPRESS",
+        "Km": 0.19,
+        "NAME": "H1_HlyIIR",
+        "Pmax": 2.5,
+        "Pmin": 0.07,
+        "REUconv": null,
+        "REUi": 0.0,
+        "TYPE": "NOR",
+        "degRate": 0.34657359027997264,
+        "halfLife": 2.0,
+        "n": 2.6
+    },
+    {
+        "DIST": 1,
+        "EXPECTED_PROMOTER": [
+            "1",
+            "1",
+            "1",
+            "1",
+            "0",
+            "0",
+            "0",
+            "0"
+        ],
+        "EXPECTED_PROTEIN": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "1",
+            "1",
+            "1",
+            "1"
+        ],
+        "INPUT": [
+            "Ara"
+        ],
+        "INPUT_EFFECT": "REPRESS",
+        "Km": 0.01,
+        "NAME": "S1_SrpR",
+        "Pmax": 1.3,
+        "Pmin": 0.003,
+        "REUconv": null,
+        "REUi": 0.0,
+        "TYPE": "NOT",
+        "degRate": 0.34657359027997264,
+        "halfLife": 2.0,
+        "n": 2.9
+    },
+    {
+        "DIST": 2,
+        "EXPECTED_PROMOTER": [
+            "0",
+            "1",
+            "0",
+            "0",
+            "0",
+            "1",
+            "0",
+            "0"
+        ],
+        "EXPECTED_PROTEIN": [
+            "1",
+            "0",
+            "1",
+            "1",
+            "1",
+            "0",
+            "1",
+            "1"
+        ],
+        "INPUT": [
+            "3OC6SHL",
+            "H1_HlyIIR"
+        ],
+        "INPUT_EFFECT": "REPRESS",
+        "Km": 0.21,
+        "NAME": "Q2_QacR",
+        "Pmax": 2.8,
+        "Pmin": 0.03,
+        "REUconv": null,
+        "REUi": 0.0,
+        "TYPE": "NOR",
+        "degRate": 0.34657359027997264,
+        "halfLife": 2.0,
+        "n": 2.4
+    },
+    {
+        "DIST": 2,
+        "EXPECTED_PROMOTER": [
+            "0",
+            "0",
+            "1",
+            "0",
+            "0",
+            "0",
+            "1",
+            "0"
+        ],
+        "EXPECTED_PROTEIN": [
+            "1",
+            "1",
+            "0",
+            "1",
+            "1",
+            "1",
+            "0",
+            "1"
+        ],
+        "INPUT": [
+            "IPTG",
+            "H1_HlyIIR"
+        ],
+        "INPUT_EFFECT": "REPRESS",
+        "Km": 0.07,
+        "NAME": "A1_AmtR",
+        "Pmax": 3.8,
+        "Pmin": 0.06,
+        "REUconv": null,
+        "REUi": 0.0,
+        "TYPE": "NOR",
+        "degRate": 0.34657359027997264,
+        "halfLife": 2.0,
+        "n": 1.6
+    },
+    {
+        "DIST": 3,
+        "EXPECTED_PROMOTER": [
+            "1",
+            "0",
+            "0",
+            "1",
+            "1",
+            "0",
+            "0",
+            "1"
+        ],
+        "EXPECTED_PROTEIN": [
+            "0",
+            "1",
+            "1",
+            "0",
+            "0",
+            "1",
+            "1",
+            "0"
+        ],
+        "INPUT": [
+            "Q2_QacR",
+            "A1_AmtR"
+        ],
+        "INPUT_EFFECT": "REPRESS",
+        "Km": 0.23,
+        "NAME": "P3_PhlF",
+        "Pmax": 6.8,
+        "Pmin": 0.02,
+        "REUconv": null,
+        "REUi": 0.0,
+        "TYPE": "NOR",
+        "degRate": 0.34657359027997264,
+        "halfLife": 2.0,
+        "n": 4.2
+    },
+    {
+        "DIST": 4,
+        "EXPECTED_PROMOTER": [
+            "0",
+            "1",
+            "1",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0"
+        ],
+        "EXPECTED_PROTEIN": [
+            "1",
+            "0",
+            "0",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1"
+        ],
+        "INPUT": [
+            "Ara",
+            "P3_PhlF"
+        ],
+        "INPUT_EFFECT": "REPRESS",
+        "Km": 0.13,
+        "NAME": "P2_PhlF",
+        "Pmax": 4.1,
+        "Pmin": 0.02,
+        "REUconv": null,
+        "REUi": 0.0,
+        "TYPE": "NOR",
+        "degRate": 0.34657359027997264,
+        "halfLife": 2.0,
+        "n": 3.9
+    },
+    {
+        "DIST": 4,
+        "EXPECTED_PROMOTER": [
+            "0",
+            "1",
+            "1",
+            "0",
+            "0",
+            "1",
+            "1",
+            "0"
+        ],
+        "EXPECTED_PROTEIN": [
+            "1",
+            "0",
+            "0",
+            "1",
+            "1",
+            "0",
+            "0",
+            "1"
+        ],
+        "INPUT": [
+            "P3_PhlF"
+        ],
+        "INPUT_EFFECT": "REPRESS",
+        "Km": 0.04,
+        "NAME": "S2_SrpR",
+        "Pmax": 2.1,
+        "Pmin": 0.003,
+        "REUconv": null,
+        "REUi": 0.0,
+        "TYPE": "NOT",
+        "degRate": 0.34657359027997264,
+        "halfLife": 2.0,
+        "n": 2.6
+    },
+    {
+        "DIST": 5,
+        "EXPECTED_PROMOTER": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "1",
+            "0",
+            "0",
+            "1"
+        ],
+        "EXPECTED_PROTEIN": [
+            "1",
+            "1",
+            "1",
+            "1",
+            "0",
+            "1",
+            "1",
+            "0"
+        ],
+        "INPUT": [
+            "S1_SrpR",
+            "S2_SrpR"
+        ],
+        "INPUT_EFFECT": "REPRESS",
+        "Km": 0.03,
+        "NAME": "P1_PhlF",
+        "Pmax": 3.9,
+        "Pmin": 0.01,
+        "REUconv": null,
+        "REUi": 0.0,
+        "TYPE": "NOR",
+        "degRate": 0.34657359027997264,
+        "halfLife": 2.0,
+        "n": 4.0
+    },
+    {
+        "DIST": 6,
+        "EXPECTED_PROMOTER": null,
+        "EXPECTED_PROTEIN": [
+            "0",
+            "1",
+            "1",
+            "0",
+            "1",
+            "0",
+            "0",
+            "1"
+        ],
+        "INPUT": [
+            "P1_PhlF",
+            "P2_PhlF"
+        ],
+        "Km": null,
+        "NAME": "BFP",
+        "Pmax": null,
+        "Pmin": null,
+        "REUconv": null,
+        "REUi": 0.0,
+        "TYPE": "OR",
+        "degRate": 0.34657359027997264,
+        "halfLife": 2.0,
+        "n": null
+    }
+]

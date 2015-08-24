@@ -39,6 +39,7 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs, makeOtherGraphs, isSeq
 
     #Use odeint to calculate the concentrations over the time steps
     soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names,numGates),hmax=350)
+#    soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names,numGates))
       
     REU_f = []
     for i in range(numGates):
@@ -184,7 +185,7 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs, makeOtherGraphs, isSeq
 #    print "Gate scores:"
 #    print scoreDict
     endTime = time.time()
-    print round(endTime-startTime,2), "seconds"
+#    print round(endTime-startTime,2), "seconds"
     return scoreDict
     
 def getBinaryInOrder(maxVal):

@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class FindMinimalCircuits{
 	public static void main(String [] args){ 
 		HashMap<String,ArrayList<Circuit>>answer = Optimize.optimizer();
-		System.out.println(answer);
+		//System.out.println(answer);
 	}
 	
 

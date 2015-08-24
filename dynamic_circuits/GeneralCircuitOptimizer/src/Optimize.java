@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,6 +25,7 @@ public class Optimize{
 		//Load values from ConstantProperties
 		HashSet<String> allowedOps = ConstantProperties.allowedOps;
 		double maxCost = ConstantProperties.maxCost;
+		double baseMaxCost = maxCost;
 		String truthValueToFind = ConstantProperties.truthValueToFind;
 		String oppositeTruthValueToFind = null;
 		int maxFanIn = ConstantProperties.maxFanIn;
@@ -269,8 +271,15 @@ public class Optimize{
 		//gate cost have their truth values added to the list.
 		HashSet<String> notAllowed = new HashSet<String> ();
 		int count = 0;
-		 
+		
+		Runtime runtime = Runtime.getRuntime();
+
+		NumberFormat format = NumberFormat.getInstance();
+		
 		while(alphaCost <= maxCost && foundTruthValues.size()<expectedNumTruths){
+			System.gc();
+			System.out.println("used memory: " + format.format((runtime.totalMemory()-runtime.freeMemory()) / 1024) + "<br/>\n");
+			
 			//Go through each cost in sortedByCost from 0 to the max. Set the group of alpha circuits.
 			ArrayList<Circuit> alphaCircuits = sortedByCost.get(alphaCost);
 			//Add to the list of not allowed truth values things that have a 0 smallest non-zero cost.
@@ -311,7 +320,7 @@ public class Optimize{
 			//Write the contents to a file.
 			String tempdir = dir;
 			if (alterName){
-				tempdir = tempdir.replace(Double.toString(maxCost), Double.toString(alphaCost));
+				tempdir = tempdir.replace(Double.toString(baseMaxCost), Double.toString(alphaCost));
 			}
 			JsonWriter.writeToJson(foundTruthValues, foundTruthValuesCost, tempdir, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
 			if (shouldDoNotSimple){
@@ -537,7 +546,6 @@ public class Optimize{
 									}
 								}
 							}
-							//JsonWriter.writeToJson(foundTruthValuesNotSimple, foundTruthValuesCostNotSimple, dirNotSimple, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
 						}
 						else if(foundTruthValuesCostNotSimple.get(tempCircuitTV)==tempCircuitCost){
 							foundTruthValuesNotSimple.get(tempCircuitTV).add(tempCircuit);
@@ -656,7 +664,6 @@ public class Optimize{
 									}
 								}
 							}
-							//JsonWriter.writeToJson(foundTruthValuesNotSimple, foundTruthValuesCostNotSimple, dirNotSimple, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
 						}
 						else if(foundTruthValuesCostNotSimple.get(tempCircuitTV)==tempCircuitCost){
 							foundTruthValuesNotSimple.get(tempCircuitTV).add(tempCircuit);
@@ -754,25 +761,39 @@ public class Optimize{
 				for(ArrayList<Circuit> tempArrayOfCircuits : allCombinationsOfCircuits){
 					//Print progress every 5 minutes
 					if(((System.currentTimeMillis() - newStartTime)/60000)>=5){
+						//System.gc();
+						//System.out.println("\nused memory: " + format.format((runtime.totalMemory()-runtime.freeMemory()) / 1024) + "<br/>\n");
 						newStartTime = System.currentTimeMillis();
 						double totalProgress = ((100.0*alphaCircuits.indexOf(circ))/alphaCircuits.size()) + (100.0*(allCombinationsOfCircuits.indexOf(tempArrayOfCircuits)+1)/alphaCircuits.size())/allCombinationsOfCircuits.size();
 						currTime = System.currentTimeMillis();
 						timeSoFar = (currTime - startTime)/60000;
-						JsonWriter.writeToJson(foundTruthValuesNotSimple, foundTruthValuesCostNotSimple, dirNotSimple, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
 						System.out.println(totalProgress + "% complete with building from "+ alphaCost+" cost gates after "+timeSoFar+" minutes");
+						//Nonsimplified
+						//----------------
+						JsonWriter.writeToJson(foundTruthValuesNotSimple, foundTruthValuesCostNotSimple, dirNotSimple, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
 						System.out.println("Number of truth values found so far: "+foundTruthValuesNotSimple.size());
 						System.out.println("Number of truth values minimized so far: "+foundTruthValues.size());
 						System.out.println("Potential Max Cost so far: "+Collections.max(foundTruthValuesCostNotSimple.values()));
+						//---------------
 					}
 					//We do not want to perform any operations with a group of circuits if it contains the alpha circuit because we will just get 1,0, or the inverse of the alpha circuit and we already took care of all the inverses.
-					if(tempArrayOfCircuits.contains(circ)){
-						continue;
+					String alphaTV = circ.getTruthValue();
+					boolean mightSkip = false;
+					for(Circuit circ2 : tempArrayOfCircuits){
+						if (circ2.getTruthValue().equals(alphaTV)){
+							mightSkip = true;
+							break;
+						}
 					}
+					
 					//Make a copy so we aren't changing the original
 					ArrayList<Circuit> tempArrayOfCircuitsCopy = new ArrayList<Circuit> ();
 					tempArrayOfCircuitsCopy.add(circ);
 					tempArrayOfCircuitsCopy.addAll(tempArrayOfCircuits);
 					for(String tempOp : otherOps){
+						if (mightSkip && !tempOp.equals("^") && !tempOp.equals("=")){
+							continue;
+						}
 						Circuit tempCircuit = new Circuit(tempOp,tempArrayOfCircuitsCopy);
 						double tempCircuitCost = tempCircuit.getCost();
 						String tempCircuitTV = tempCircuit.getTruthValue();
@@ -809,7 +830,6 @@ public class Optimize{
 										}
 									}
 								}
-								//JsonWriter.writeToJson(foundTruthValuesNotSimple, foundTruthValuesCostNotSimple, dirNotSimple, timeSoFar, d, alphaCost, allowedOps, maxFanIn);
 							}
 							else if(foundTruthValuesCostNotSimple.get(tempCircuitTV)==tempCircuitCost){
 								foundTruthValuesNotSimple.get(tempCircuitTV).add(tempCircuit);

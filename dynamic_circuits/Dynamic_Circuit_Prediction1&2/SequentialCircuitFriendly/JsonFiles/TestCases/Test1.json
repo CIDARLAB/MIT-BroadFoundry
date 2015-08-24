@@ -1,0 +1,10 @@
+[
+	"NOT(W0,c)",
+	"NOR(W1,W0,b)",
+	"NOR(W2,W1,a)",
+	"NOR(W3,W2,a)",
+	"NOR(W4,W2,W1)",
+	"NOR(W5,W3,W4)",
+	"NOR(W6,W5,W0)",
+	"OR(W7,W6,W3)"
+]

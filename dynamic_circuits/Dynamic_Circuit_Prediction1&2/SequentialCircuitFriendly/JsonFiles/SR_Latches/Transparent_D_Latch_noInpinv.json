@@ -1,0 +1,8 @@
+[
+    "NOR(w1,D,C)",
+    "NOR(w2,w1,C)",
+    "NOR(w3,w1,w4)",
+    "NOR(w4,w2,w5)",
+    "BUF(Qa,w3)",
+    "BUF(Qb,w4)"
+]

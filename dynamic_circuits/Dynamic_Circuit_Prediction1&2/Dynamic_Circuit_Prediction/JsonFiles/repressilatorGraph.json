@@ -1,0 +1,92 @@
+[
+    {
+        "itr": 10000,
+        "xMax": 1000,
+        "xMin": 0,
+        "yMax": "NONE",
+        "yMin": "NONE"
+    },
+    {
+        "DIST": 2,
+        "EXPECTED_PROMOTER": null,
+        "EXPECTED_PROTEIN": null,
+        "INPUT": [
+            "G3"
+        ],
+        "INPUT_EFFECT": "REPRESS",
+        "Km": 1000.0,
+        "Mi": 0.0,
+        "NAME": "G2",
+        "Pi": 0.0,
+        "TYPE": "NOT",
+        "am": 0.34657359027997264,
+        "ap": 0.069314718055994526,
+        "mB": 30.0,
+        "m_HALFLIFE": 2.0,
+        "n": 2.0,
+        "pB": 20.0,
+        "p_HALFLIFE": 10.0
+    },
+    {
+        "DIST": 3,
+        "EXPECTED_PROMOTER": null,
+        "EXPECTED_PROTEIN": null,
+        "INPUT": [
+            "G2"
+        ],
+        "INPUT_EFFECT": "REPRESS",
+        "Km": 1000.0,
+        "Mi": 0.0,
+        "NAME": "G1",
+        "Pi": 1.0,
+        "TYPE": "NOT",
+        "am": 0.34657359027997264,
+        "ap": 0.069314718055994526,
+        "mB": 30.0,
+        "m_HALFLIFE": 2.0,
+        "n": 2.0,
+        "pB": 20.0,
+        "p_HALFLIFE": 10.0
+    },
+    {
+        "DIST": 4,
+        "EXPECTED_PROMOTER": null,
+        "EXPECTED_PROTEIN": null,
+        "INPUT": [
+            "G1"
+        ],
+        "INPUT_EFFECT": "REPRESS",
+        "Km": 1000.0,
+        "Mi": 0.0,
+        "NAME": "G3",
+        "Pi": 0.0,
+        "TYPE": "NOT",
+        "am": 0.34657359027997264,
+        "ap": 0.069314718055994526,
+        "mB": 30.0,
+        "m_HALFLIFE": 2.0,
+        "n": 2.0,
+        "pB": 20.0,
+        "p_HALFLIFE": 10.0
+    },
+    {
+        "DIST": 3,
+        "EXPECTED_PROMOTER": null,
+        "EXPECTED_PROTEIN": null,
+        "INPUT": [
+            "G2"
+        ],
+        "Km": null,
+        "Mi": 0.0,
+        "NAME": "Y1",
+        "Pi": 0.0,
+        "TYPE": "BUFFER",
+        "am": 0.34657359027997264,
+        "ap": 0.069314718055994526,
+        "mB": null,
+        "m_HALFLIFE": 2.0,
+        "n": null,
+        "pB": 20.0,
+        "p_HALFLIFE": 10.0
+    }
+]

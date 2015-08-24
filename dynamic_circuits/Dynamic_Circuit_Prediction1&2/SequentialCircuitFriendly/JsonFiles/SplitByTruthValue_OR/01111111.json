@@ -1,0 +1,5 @@
+[
+    "NOR(n7,a,b)",
+    "NOT(0Wire8019,n7)",
+    "OR(y,c,0Wire8019)"
+]

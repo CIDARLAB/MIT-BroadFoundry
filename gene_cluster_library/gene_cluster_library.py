@@ -865,7 +865,7 @@ class GeneClusterLibrary:
 			if the_part['dir'] == 'F':
 				return (the_part['seq_idx'], the_part['seq_idx']+the_part['seq_len'])
 			else:
-				return (the_part['seq_idx']+the_part['seq_len'], the_part['seq_idx'])
+				return (the_part['seq_idx']-the_part['seq_len'], the_part['seq_idx'])
 
 	def find_seq_idx_ranges (self, variant_insts):
 		"""Find the start and end index in the sequences for a given set of 

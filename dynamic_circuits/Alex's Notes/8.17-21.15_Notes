@@ -13,3 +13,24 @@ INP2 --> g2 --> OUT2
 
 waveform of INP1 (0,1,0,0,0) and INP2 (0,0,0,1,0)
 initC of g1Out and g2Out
+
+
+Command Prompt usage
+cd - current directory
+
+using the imageM
+convert "*.png" "*.jpg"
+* = wild card, all files ending in '.png'
+
+print subprocess.Popen("echo Hello World", shell=True, stdout=subprocess.PIPE).stdout.read()
+OR
+
+
+OOO
+Add
+Commit - commits local files
+Pull - merge my stuff w/ yours
+Push - your stuff (TODOs)--> Origin
+
+
+inp1 = getSquareWave([0,1.5,0,2.0],maxTime)

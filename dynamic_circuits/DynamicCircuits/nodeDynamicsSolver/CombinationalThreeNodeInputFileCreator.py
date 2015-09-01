@@ -23,7 +23,7 @@ def writeToJson(inputObj,fileLoc):
     json.dump(inputObj, myFile, sort_keys=True, indent=4, separators=(',', ': '))
     myFile.close()
 
-#Initialization of variables for genes
+#Initialization of variables for genes, addition of boolean input value for node
 nodes = ['X','Y','Z']
 iniCond = {}
 inputD = {}

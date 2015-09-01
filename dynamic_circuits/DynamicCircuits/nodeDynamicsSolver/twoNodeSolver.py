@@ -128,8 +128,6 @@ def activator(B,K,n,inputVal):
         except ZeroDivisionError:
             return 0
             
-
-
 # File read should contain json format of initial gene conditions, parameters, and vectors
 fileLoc = 'masterXYInputFile1.json'
 

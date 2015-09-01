@@ -18,7 +18,7 @@ __version__ = '1.0'
 save_to = '../'
 
 # Prefixes for files
-home_prefix = '/home/unix/tgorocho/pool_mapping/'
+home_prefix = '/home/unix/tgorocho/pool_dialout/'
 run_prefix = home_prefix + 'runs/2015-09_nif/'
 fastq_prefix = '/btl/projects/Foundry/Yongjin/Tom/nif_fastq/'
 regex_prefix   = run_prefix + 'data/regex_refs/'

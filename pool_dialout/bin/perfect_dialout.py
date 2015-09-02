@@ -48,12 +48,15 @@ out_prefix = out_prefix.strip()
 # Allow user to specify index starting at 1 (not 0)
 fwd_bc_read = 1
 rev_bc_read = 1
-if int(fwd_bc_idx) < 0:
+fwd_bc_idx = int(fwd_bc_idx)
+rev_bc_idx = int(rev_bc_idx)
+
+if fwd_bc_idx < 0:
 	fwd_bc_read = 2
-	fwd_bc_idx = (-1.0*int(fwd_bc_idx)) - 1
-if int(rev_bc_idx) < 0:
+	fwd_bc_idx = (-1*fwd_bc_idx) - 1
+if rev_bc_idx < 0:
 	rev_bc_read = 2
-	rev_bc_idx = (-1.0*int(rev_bc_idx)) - 1
+	rev_bc_idx = (-1*rev_bc_idx) - 1
 
 fwd_primer_len = int(fwd_primer_len)
 rev_primer_len = int(rev_primer_len)

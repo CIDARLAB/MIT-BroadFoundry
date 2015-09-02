@@ -54,9 +54,13 @@ rev_bc_idx = int(rev_bc_idx)
 if fwd_bc_idx < 0:
 	fwd_bc_read = 2
 	fwd_bc_idx = (-1*fwd_bc_idx) - 1
+else:
+	fwd_bc_idx = fwd_bc_idx - 1
 if rev_bc_idx < 0:
 	rev_bc_read = 2
 	rev_bc_idx = (-1*rev_bc_idx) - 1
+else:
+	rev_bc_idx = rev_bc_idx - 1
 
 fwd_primer_len = int(fwd_primer_len)
 rev_primer_len = int(rev_primer_len)

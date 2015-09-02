@@ -47,8 +47,8 @@ run_data['nifS'] = ['nifS_R1.fastq', 'nifS_R2.fastq', '20', '20', R2_fwd_bc_idx,
 run_data['nifU'] = ['nifU_R1.fastq', 'nifU_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
 run_data['nifV'] = ['nifV_R1.fastq', 'nifV_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
 run_data['nifW'] = ['nifW_R1.fastq', 'nifW_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
-run_data['nifY'] = ['nifY_R1.fastq', 'nifB_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
-run_data['nifZ'] = ['nifZ_R1.fastq', 'nifB_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
+run_data['nifY'] = ['nifY_R1.fastq', 'nifY_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
+run_data['nifZ'] = ['nifZ_R1.fastq', 'nifZ_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
 # These nifW pools we treat differently (read starts with barcode)
 run_data['nifW_old'] = ['nifW_old_R1.fastq', 'nifW_old_R2.fastq', '0', '0', '1', '-1']
 run_data['nifW_new'] = ['nifW_new_R1.fastq', 'nifW_new_R2.fastq', '0', '0', '1', '-1']

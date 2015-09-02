@@ -119,6 +119,16 @@ class Graph(object):
         Returns true if the graph is sequential
         """
         return self.isSequential
+    
+    def hasRepeatedRepressor(self):
+        containedNames = []        
+        for gate in self.intermediates:
+            trueName = gate.getName().split("_")[-1]
+            if trueName in containedNames:
+                return True
+            else:
+                containedNames.append(trueName)
+        return False
         
     def swapGates(self,gate1,gate2):
         """

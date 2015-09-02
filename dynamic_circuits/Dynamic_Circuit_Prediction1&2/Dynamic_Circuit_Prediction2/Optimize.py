@@ -12,6 +12,7 @@ import OptimalCircuit
 import General
 import copy
 import random
+import time
 inputsDir = "JsonFiles/Libraries/InputLibrary.json"
 repressorsDir = "JsonFiles/Libraries/RepressorLibrary.json"
 outputsDir = "JsonFiles/Libraries/OutputLibrary.json"
@@ -21,6 +22,7 @@ placeToSaveTruthValueExample = "JsonFiles/01101001Graph.json"
 exampleNetlist = ['NOR(W1,a,b)','NOR(W2,W1,c)','NOR(W3,a,c,d)','NOR(W4,W1,a,d)','NOR(W5,W2,W3,W4)']
 
 def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=100,numTraj=20):
+    startTime = time.time()
     random.seed(0)
     scratchFile = "JsonFiles/optimizingScratchWork.json"
     graph, allGates, Inputs, Repressors, Outputs = OptimalCircuit.makeGraphFromNetlist(netlist, True)
@@ -45,6 +47,7 @@ def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=100,numTra
     #initialize the global best
     globalBestGraph = None
     globalBestScore = 0
+    globalBestScoreDict = None
     #get all possible swaps
     standardAllRepressorSwappingPairs = list(itertools.combinations(allRepressors,2))
     
@@ -55,10 +58,16 @@ def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=100,numTra
         for j in range(numRepressors):
             graph.swapGates(chosenStartRepressors[j], Repressors[j])
         Repressors = chosenStartRepressors
+        while graph.hasRepeatedRepressor():
+            chosenStartRepressors = selectStartingRepressors(allRepressors,numRepressors)
+            for j in range(numRepressors):
+                graph.swapGates(chosenStartRepressors[j], Repressors[j])
+            Repressors = chosenStartRepressors
 
         #initialize the local best
         localBestGraph = None
         localBestScore = 0
+        localBestScoreDict = None
         #get the score of this starting point
         graph.writeToJson(scratchFile)
         firstScoreDict = General.generateDynamicCircuitGraphs(scratchFile, False, False, False)
@@ -67,6 +76,7 @@ def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=100,numTra
         if firstResults[1]:
             localBestGraph = copy.deepcopy(graph)
             localBestScore = firstResults[0]
+            localBestScoreDict = firstScoreDict
         
         print "trajectory number:",i+1,"out of",numTraj
         done = False
@@ -79,8 +89,11 @@ def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=100,numTra
                     swappablePairs.append(pair)
             random.shuffle(swappablePairs)
             for pair in swappablePairs:
-                #print "On pair",swappablePairs.index(pair)+1,"out of",len(swappablePairs)
+#                print "On pair",swappablePairs.index(pair)+1,"out of",len(swappablePairs)
                 graph.swapGates(pair[0],pair[1])
+                if graph.hasRepeatedRepressor():
+                    graph.swapGates(pair[0],pair[1])
+                    continue
                 graph.writeToJson(scratchFile)
                 tempScoreDict = General.generateDynamicCircuitGraphs(scratchFile, False, False, False)
                 tempResults = getScoreFromDict(outputNames, tempScoreDict, smallestScoreAllowed)
@@ -89,6 +102,8 @@ def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=100,numTra
                 if tempResults[1] and tempResults[0]>localBestScore:
                     localBestGraph = copy.deepcopy(graph)
                     localBestScore = tempResults[0]
+                    localBestScoreDict = tempScoreDict
+                    
                 #if there was an improvement then break the loop whether or
                 #not it passes the criteria for being a valid assignment
                 if tempResults[0]>currScore:
@@ -106,12 +121,14 @@ def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=100,numTra
 #            print "this traj was better"
             globalBestGraph = localBestGraph
             globalBestScore = localBestScore
+            globalBestScoreDict = localBestScoreDict
 #        else:
 #            print "this traj was not better"
-    print globalBestScore
-    print globalBestGraph
-    return globalBestGraph,globalBestScore
-
+#    print globalBestScore
+#    print globalBestGraph
+    endTime = time.time()
+    print "This took",(endTime-startTime),"seconds"
+    return globalBestGraph,globalBestScore,globalBestScoreDict
 
 
 def getScoreFromDict(outputNames, scoreDict, smallestScoreAllowed=100):

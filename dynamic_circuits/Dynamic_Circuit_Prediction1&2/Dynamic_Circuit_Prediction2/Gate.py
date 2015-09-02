@@ -12,6 +12,7 @@ import inputs
 import copy
 
 class Gate(object):
+    #REUconv not in use.  Placeholder to possibly convert REU to protein concentration
     def __init__(self,name,gateType,Km,n,Pmin,Pmax,halfLife,REUconv=None):#,mB,pB,m_halfLife,p_halfLife):
         assert type(name) == str
         assert gateType in ['Repressor','Input','Output','Activator']
@@ -348,6 +349,10 @@ class Gate(object):
         else:
             gateDescription['INPUT'] = []
             for i in range(len(self.fanIn)):
+                
+                #the data structure does not have an explicit list of names, but they are included when writing the graph as a JSON file
+                #General.py reads the JSON file to re-create the same dictionary (historical reasons).
+                #could change General.py to take a graph rather than a JSON file.
                 gateDescription['INPUT'].append(self.fanIn[i].getFrom().getName())
             
             if self.gateType=="Input" or self.gateType=="Activator":

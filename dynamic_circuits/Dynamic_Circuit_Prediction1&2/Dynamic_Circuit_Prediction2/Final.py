@@ -5,7 +5,10 @@ import Optimize
 repressilatorFileLoc = "JsonFiles/repressilator.json"
 placeToSaveRepressilator = "JsonFiles/repressilatorGraph.json"
 truthValueExampleFileLoc = "JsonFiles/SplitByTruthValue_OR/01101001.json" #01101001
-exampleNetlist = ['NOR(W1,IN1,IN2)','NOR(W2,W1,IN3)','NOR(W3,IN1,IN3,IN4)','NOR(W4,W1,IN1,IN4)','NOR(W5,W2,W3,W4)']
+
+#exampleNetlist = ['NOR(W1,IN1,IN2)','NOR(W2,W1,IN3)','NOR(W3,IN1,IN3,IN4)','NOR(W4,W1,IN1,IN4)','NOR(W5,W2,W3,W4)']
+exampleNetlist = ['NOT(W1,IN1)', 'NOT(W2,IN2)', 'NOR(W3,W2,W1)']
+
 placeToSaveExample = "JsonFiles/temp.json"
 exampleCircuitString = "(((IN1.IN2).IN3).(IN1.IN3.IN4).((IN1.IN2).IN1.IN4))"
 SR_Latch_FileLoc = "JsonFiles/SR_Latches/SRLatch.json"
@@ -15,6 +18,8 @@ repressorsDir = "JsonFiles/Libraries/RepressorLibrary.json"
 outputsDir = "JsonFiles/Libraries/OutputLibrary.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
 
+#placeToSave converts a netlist (list of strings) to a JSON file.
+#'General.py' reads the json file and makes a Graph.
 def makeGraphFromNetlist(netlist,placeToSave,makeBarGraph=True,makeGraphs=True):
     print OptimalCircuit.wrapperForNetlist(netlist,placeToSave,makeBarGraph=makeBarGraph,makeOtherGraphs=makeGraphs)
 
@@ -22,12 +27,14 @@ def makeGraphFromCircuitString(circuitString,placeToSave,makeBarGraph=True,makeG
     netlist = OptimalCircuit.convertCircuitStringToNetlist(circuitString)
     print OptimalCircuit.wrapperForNetlist(netlist,placeToSave,makeBarGraph=makeBarGraph,makeOtherGraphs=makeGraphs)
 
+#combinational only, not sequential
 def optimizeNetlistWithLibraries(netlist, Libraries,smallestScoreAllowed=0.5,numTraj=20):
     answer = Optimize.findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed,numTraj)
     print answer[0]
     print "Score =",answer[1]
     return answer
-    
+
+#combinational only, not sequential    
 def optimizeCircuitStringWithLibraries(circuitString, Libraries,smallestScoreAllowed=0.5,numTraj=20):
     netlist = OptimalCircuit.convertCircuitStringToNetlist(circuitString)
     answer = Optimize.findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed,numTraj)

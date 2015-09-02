@@ -24,16 +24,32 @@ def getFromJsonFile(fileLoc):
     Take in a file location and return the values necessary to generate a graph
     '''
     myFile = open(fileLoc,'r')
+    
+    #data is a JSON array of JSON objects
+    #first item is time-axis params (xmin, xmax, #iterations)
+    #other elements are dictionaries for genes specifying all properties.
+    #supposed to be inputs, repressors, outputs.
     data = json.load(myFile)
+
     time_axis_params = data[0]
+    
+    #see also Gate.py:formatJson (could have taken dictionaries directly)
     input_and_logic_gate_dictionaries = data[1:]
+
+    #order is same as dictionary, order matters!    
     input_and_logic_gate_names = []
+
+    
     logic_gate_names = []
+    
     for item in input_and_logic_gate_dictionaries:
         input_and_logic_gate_names.append(item['NAME'])
         if item['TYPE']!='INPUT':
             logic_gate_names.append(item['NAME'])
         if item['TYPE']=='INPUT':
+            
+            #for example: sinInput(t, per=4, amp=1, dis=0, bas=0): ['INPUT'][0] is the function name, [1] is per, [2] is amp, etc.
+            #convert function name to actual function
             x = item['INPUT'][0]
             if x =='inputs.sinInput' or x == 'sinInput':
                 item['INPUT'][0] = inputs.sinInput

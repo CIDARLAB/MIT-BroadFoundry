@@ -1,7 +1,7 @@
 [
     {
-        "itr": 40000.0,
-        "xMax": 4000.0,
+        "itr": 20000.0,
+        "xMax": 2000.0,
         "xMin": 0,
         "yMax": "NONE",
         "yMin": "NONE"
@@ -11,28 +11,20 @@
         "EXPECTED_PROMOTER": [
             "0",
             "0",
-            "0",
-            "0",
-            "1",
-            "1",
             "1",
             "1"
         ],
         "EXPECTED_PROTEIN": [
             "0",
             "0",
-            "0",
-            "0",
-            "1",
-            "1",
             "1",
             "1"
         ],
         "INPUT": [
             "inputs.squInput",
-            4000.0,
-            10.0,
             2000.0,
+            10.0,
+            1000.0,
             0.0
         ],
         "INPUT_EFFECT": "ACTIVATE",
@@ -51,29 +43,21 @@
         "DIST": 0,
         "EXPECTED_PROMOTER": [
             "0",
-            "0",
-            "1",
             "1",
             "0",
-            "0",
-            "1",
             "1"
         ],
         "EXPECTED_PROTEIN": [
             "0",
-            "0",
-            "1",
             "1",
             "0",
-            "0",
-            "1",
             "1"
         ],
         "INPUT": [
             "inputs.squInput",
-            2000.0,
-            10.0,
             1000.0,
+            10.0,
+            500.0,
             0.0
         ],
         "INPUT_EFFECT": "ACTIVATE",
@@ -89,65 +73,16 @@
         "n": 2.0
     },
     {
-        "DIST": 0,
-        "EXPECTED_PROMOTER": [
-            "0",
-            "1",
-            "0",
-            "1",
-            "0",
-            "1",
-            "0",
-            "1"
-        ],
-        "EXPECTED_PROTEIN": [
-            "0",
-            "1",
-            "0",
-            "1",
-            "0",
-            "1",
-            "0",
-            "1"
-        ],
-        "INPUT": [
-            "inputs.squInput",
-            1000.0,
-            10.0,
-            500.0,
-            0.0
-        ],
-        "INPUT_EFFECT": "ACTIVATE",
-        "Km": 0.05,
-        "NAME": "IN3",
-        "Pmax": 13.0,
-        "Pmin": 0.1,
-        "REUconv": null,
-        "REUi": null,
-        "TYPE": "INPUT",
-        "degRate": null,
-        "halfLife": null,
-        "n": 2.0
-    },
-    {
         "DIST": 1,
         "EXPECTED_PROMOTER": [
             "1",
             "1",
-            "1",
-            "1",
-            "0",
-            "0",
             "0",
             "0"
         ],
         "EXPECTED_PROTEIN": [
             "0",
             "0",
-            "0",
-            "0",
-            "1",
-            "1",
             "1",
             "1"
         ],
@@ -171,25 +106,16 @@
         "EXPECTED_PROMOTER": [
             "1",
             "0",
-            "0",
-            "0",
             "1",
-            "0",
-            "0",
             "0"
         ],
         "EXPECTED_PROTEIN": [
             "0",
             "1",
-            "1",
-            "1",
             "0",
-            "1",
-            "1",
             "1"
         ],
         "INPUT": [
-            "IN3",
             "IN2"
         ],
         "INPUT_EFFECT": "REPRESS",
@@ -199,7 +125,7 @@
         "Pmin": 0.1,
         "REUconv": null,
         "REUi": 0.0,
-        "TYPE": "NOR",
+        "TYPE": "NOT",
         "degRate": 0.13862943611198905,
         "halfLife": 5.0,
         "n": 2.0
@@ -208,27 +134,19 @@
         "DIST": 2,
         "EXPECTED_PROMOTER": [
             "0",
-            "1",
             "0",
             "0",
-            "0",
-            "1",
-            "0",
-            "0"
+            "1"
         ],
         "EXPECTED_PROTEIN": [
             "1",
-            "0",
             "1",
             "1",
-            "1",
-            "0",
-            "1",
-            "1"
+            "0"
         ],
         "INPUT": [
-            "IN2",
-            "G2"
+            "G2",
+            "G1"
         ],
         "INPUT_EFFECT": "REPRESS",
         "Km": 0.05,
@@ -243,210 +161,16 @@
         "n": 2.0
     },
     {
-        "DIST": 2,
-        "EXPECTED_PROMOTER": [
-            "0",
-            "0",
-            "1",
-            "0",
-            "0",
-            "0",
-            "1",
-            "0"
-        ],
-        "EXPECTED_PROTEIN": [
-            "1",
-            "1",
-            "0",
-            "1",
-            "1",
-            "1",
-            "0",
-            "1"
-        ],
-        "INPUT": [
-            "IN3",
-            "G2"
-        ],
-        "INPUT_EFFECT": "REPRESS",
-        "Km": 0.05,
-        "NAME": "G4",
-        "Pmax": 13.0,
-        "Pmin": 0.1,
-        "REUconv": null,
-        "REUi": 0.0,
-        "TYPE": "NOR",
-        "degRate": 0.13862943611198905,
-        "halfLife": 5.0,
-        "n": 2.0
-    },
-    {
         "DIST": 3,
-        "EXPECTED_PROMOTER": [
-            "1",
-            "0",
-            "0",
-            "1",
-            "1",
-            "0",
-            "0",
-            "1"
-        ],
-        "EXPECTED_PROTEIN": [
-            "0",
-            "1",
-            "1",
-            "0",
-            "0",
-            "1",
-            "1",
-            "0"
-        ],
-        "INPUT": [
-            "G3",
-            "G4"
-        ],
-        "INPUT_EFFECT": "REPRESS",
-        "Km": 0.05,
-        "NAME": "G5",
-        "Pmax": 13.0,
-        "Pmin": 0.1,
-        "REUconv": null,
-        "REUi": 0.0,
-        "TYPE": "NOR",
-        "degRate": 0.13862943611198905,
-        "halfLife": 5.0,
-        "n": 2.0
-    },
-    {
-        "DIST": 4,
-        "EXPECTED_PROMOTER": [
-            "0",
-            "1",
-            "1",
-            "0",
-            "0",
-            "1",
-            "1",
-            "0"
-        ],
-        "EXPECTED_PROTEIN": [
-            "1",
-            "0",
-            "0",
-            "1",
-            "1",
-            "0",
-            "0",
-            "1"
-        ],
-        "INPUT": [
-            "G5"
-        ],
-        "INPUT_EFFECT": "REPRESS",
-        "Km": 0.05,
-        "NAME": "G6",
-        "Pmax": 13.0,
-        "Pmin": 0.1,
-        "REUconv": null,
-        "REUi": 0.0,
-        "TYPE": "NOT",
-        "degRate": 0.13862943611198905,
-        "halfLife": 5.0,
-        "n": 2.0
-    },
-    {
-        "DIST": 4,
-        "EXPECTED_PROMOTER": [
-            "0",
-            "1",
-            "1",
-            "0",
-            "0",
-            "0",
-            "0",
-            "0"
-        ],
-        "EXPECTED_PROTEIN": [
-            "1",
-            "0",
-            "0",
-            "1",
-            "1",
-            "1",
-            "1",
-            "1"
-        ],
-        "INPUT": [
-            "IN1",
-            "G5"
-        ],
-        "INPUT_EFFECT": "REPRESS",
-        "Km": 0.05,
-        "NAME": "G8",
-        "Pmax": 13.0,
-        "Pmin": 0.1,
-        "REUconv": null,
-        "REUi": 0.0,
-        "TYPE": "NOR",
-        "degRate": 0.13862943611198905,
-        "halfLife": 5.0,
-        "n": 2.0
-    },
-    {
-        "DIST": 5,
-        "EXPECTED_PROMOTER": [
-            "0",
-            "0",
-            "0",
-            "0",
-            "1",
-            "0",
-            "0",
-            "1"
-        ],
-        "EXPECTED_PROTEIN": [
-            "1",
-            "1",
-            "1",
-            "1",
-            "0",
-            "1",
-            "1",
-            "0"
-        ],
-        "INPUT": [
-            "G1",
-            "G6"
-        ],
-        "INPUT_EFFECT": "REPRESS",
-        "Km": 0.05,
-        "NAME": "G7",
-        "Pmax": 13.0,
-        "Pmin": 0.1,
-        "REUconv": null,
-        "REUi": 0.0,
-        "TYPE": "NOR",
-        "degRate": 0.13862943611198905,
-        "halfLife": 5.0,
-        "n": 2.0
-    },
-    {
-        "DIST": 6,
         "EXPECTED_PROMOTER": null,
         "EXPECTED_PROTEIN": [
             "0",
-            "1",
-            "1",
-            "0",
-            "1",
             "0",
             "0",
             "1"
         ],
         "INPUT": [
-            "G7",
-            "G8"
+            "G3"
         ],
         "Km": null,
         "NAME": "Y1",
@@ -454,7 +178,7 @@
         "Pmin": null,
         "REUconv": null,
         "REUi": 0.0,
-        "TYPE": "OR",
+        "TYPE": "BUFFER",
         "degRate": 0.13862943611198905,
         "halfLife": 5.0,
         "n": null

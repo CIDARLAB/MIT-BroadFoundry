@@ -24,11 +24,15 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs, makeOtherGraphs, isSeq
     startTime = time.time()
 #---------------------------------------------------------------
     #Get all the values from the given file.
+    #input_and_logic_gate_dictionaries: dictionary for each gate with all properties
+    #properties: 
     time_axis_params,input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names = GeneralJsonIO.getFromJsonFile(fileName)
 #---------------------------------------------------------------
 
     #Generate the time grid
     numInputs = len(input_and_logic_gate_names)-len(logic_gate_names)
+    
+    #for example: 0, 500, 10,000: [0,....500] (9,998 points in between)
     t = np.linspace(0, time_axis_params['xMax'], time_axis_params['itr'])
     numGates = len(logic_gate_names)
 
@@ -38,8 +42,15 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs, makeOtherGraphs, isSeq
         initc.append(input_and_logic_gate_dictionaries[input_and_logic_gate_names.index(logic_gate_names[i])]['REUi'])
 
     #Use odeint to calculate the concentrations over the time steps
+
+    #arguments:
+    #f: function.  takes state and a time point, returns the delta of each value.  First 'state' is equal to initc.
+    #... adds deltas to state to calculate the next state values.
+    #initc: the true initial condition for the very beginning.
+    #t: coarse, odeint breaks it into finer timepoints.
+    #args: every other input that f takes that is not state or t
     soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names,numGates),hmax=350)
-#    soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names,numGates))
+    #soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names,numGates))
       
     REU_f = []
     for i in range(numGates):
@@ -59,16 +70,25 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs, makeOtherGraphs, isSeq
             if thing not in logic_gate_names:
                 #Save the name and a list of its values for each time step.
                 inputNames.append(thing)
+                
+                #see also GeneralJSONIO.py... gets the input function and params
+                #func[0] is the input function
                 func = input_and_logic_gate_dictionaries[input_and_logic_gate_names.index(thing)]['INPUT']
                 temp = []
+                
+                #calculate what the input value is for each timepoint
                 for timepos in t:
                     temp.append(func[0](timepos,*func[1:]))
                 inputs_f.append(temp)
+
+        #set plot ranges
         ymax=1
         for i in inputs_f:
             m = max(i)*10
             if m>ymax:
                 ymax = m
+                
+        #make one plot that has all the input values (may be overlapping)
         plt.figure()
         plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymax=ymax, ymin=0.1)  
         #Plot each input against time with its name as the label
@@ -83,7 +103,7 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs, makeOtherGraphs, isSeq
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         plt.show()
             
-        #Visualizing REU
+        #Visualizing REU (each gate on one graph, except inputs/outputs)
         plt.figure()
         #Plot each REU against time with its name as the label
         ymax = 1
@@ -127,7 +147,7 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs, makeOtherGraphs, isSeq
 
 #-------------------------------------------------------------------------------
     if isSequential:
-        return
+        return # don't bother making bar-graphs or getting scores
     """    
     Make bar graphs for each genes mRNA and protein. It will show its mRNA(or protein)
     at each truth value. Bars that are expected to be high are blue. Bars that
@@ -216,14 +236,22 @@ def f(state, t, input_and_logic_gate_dictionaries, input_and_logic_gate_names, l
     for i in range(len(state)):
         if state[i]<0 :
             state[i] = 0.0
+            
+    #results.length equals the number of gates (including outputs, excluding inputs)
+    #values in results are dX/dt, dY/dt, etc...
     results = []
+    
     #For each gate we want to calculate the change in its REU
     for i in range(numGates):
+        
         #Retrieve some current Properties
         gateProperties = input_and_logic_gate_dictionaries[input_and_logic_gate_names.index(logic_gate_names[i])]
         initREUVal = state[i]
         #Get the changes and add it to the list holding the changes
         results.append(update.getREUChange(t,initREUVal,gateProperties,input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names,state))
+        
+        #return an array of slopes
+        #odeint will multiply the slope by the time step to get the delta
     return results
 
 '''

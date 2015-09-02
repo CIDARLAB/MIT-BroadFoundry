@@ -35,6 +35,8 @@ truthValue = "00010001"
 inputNames = ["IPTG1","IPTG2","IPTG3"]
 outputNames = ["FP1"]
 
+#useDefaultInput creates a combinational truth table.
+#might not want to use default for sequential, a user-defined waveform might be desired instead.
 def makeGraphFromNetlist(inputNetlist, useDefaultInput=True):
     """
     Takes in a circuit in the string form like '((a.b).c)' and returns a graph 
@@ -43,11 +45,11 @@ def makeGraphFromNetlist(inputNetlist, useDefaultInput=True):
     This assumes all inputs are activators and allows for intermediate genes to
     be activators. Treats all outputs are buffers or ORs.
     """
-    if type(inputNetlist) == str:
+    if type(inputNetlist) == str: #file path, read netlist from file
         myFile = open(inputNetlist,'r')
         netlist = json.load(myFile)
         myFile.close()
-    elif type(inputNetlist) == list:
+    elif type(inputNetlist) == list: #netlis = list of strings
         netlist = inputNetlist
     
     #Initialize the lists of components
@@ -224,23 +226,28 @@ def performSwaps(graph,allGates,Inputs,allGatesr,Inputsr):
     for gate in allGates:
         graph.removeGate(gate)
 
+
+#netlist --> graph --> JSON --> General.py opens JSON --> 
 def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True,makeOtherGraphs=True,useDefaultInput=True):
     """
     Takes in a netlist of a circuit, and a directory to store the intermediate json file.
     Returns the score, if possible, for the arrangement of gates.
     """
-    #Make Graph from string
+    #Make Graph from string (or filepath... checks if fileLoc is a list of strings or single string)
     graph, allGates, Inputs, Intermediates, Outputs = makeGraphFromNetlist(fileLoc,useDefaultInput)
 
+    #don't want to score the circuit if it's sequential
     isSequential = False
     print graph
     if graph.hasLoop():
         isSequential = True
         #So things do not start at equilibrium.
         Intermediates[0].setREUi(1.0)
+
     #Write to Json File
     graph.writeToJson(placeToSave)
-    #Make graphs from JsonFile
+
+    #Make graphs from JsonFile    
     scores = General.generateDynamicCircuitGraphs(placeToSave, makeBarGraph, makeOtherGraphs, isSequential)
     return scores
 

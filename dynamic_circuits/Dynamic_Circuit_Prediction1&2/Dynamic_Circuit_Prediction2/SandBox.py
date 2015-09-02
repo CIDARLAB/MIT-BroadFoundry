@@ -20,10 +20,11 @@ repressorsDir = "JsonFiles/Libraries/RepressorLibrary.json"
 outputsDir = "JsonFiles/Libraries/OutputLibrary.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
 truthValueExampleFileLoc = "JsonFiles/SplitByTruthValue_OR/01101001.json" #01101001
+truthValueExampleFileLoc2 = "JsonFiles/SplitByTruthValue_OR/11110010.json"
 placeToSaveTruthValueExample = "JsonFiles/01101001Graph.json"
 exampleNetlist = ['NOR(W1,a,b)','NOR(W2,W1,c)','NOR(W3,a,c,d)','NOR(W4,W1,a,d)','NOR(W5,W2,W3,W4)']
 
-def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=100,numTraj=20):
+def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=10,numTraj=5):
     startTime = time.time()
     random.seed(0)
     scratchFile = "JsonFiles/optimizingScratchWork.json"
@@ -132,7 +133,9 @@ def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=100,numTra
     print "This took",(endTime-startTime),"seconds"
     return globalBestGraph,globalBestScore,globalBestScoreDict
 
-def findOptimalAssortmentHillTimed(netlist,Libraries, smallestScoreAllowed=100,numTraj=20,maxTime=300):
+def findOptimalAssortmentHillTimed(netlist,Libraries, smallestScoreAllowed=10,numTraj=5,maxTime=300):
+    xvals = [0]
+    yvals = [0]
     startTime = time.time()
     random.seed(0)
     scratchFile = "JsonFiles/optimizingScratchWork.json"
@@ -164,6 +167,8 @@ def findOptimalAssortmentHillTimed(netlist,Libraries, smallestScoreAllowed=100,n
     
     #start the trajectory
     for i in range(numTraj):
+        if (time.time()-startTime >= maxTime):
+            break
         #randomly assign the starting point
         chosenStartRepressors = selectStartingRepressors(allRepressors,numRepressors)
         for j in range(numRepressors):
@@ -188,6 +193,9 @@ def findOptimalAssortmentHillTimed(netlist,Libraries, smallestScoreAllowed=100,n
             localBestGraph = copy.deepcopy(graph)
             localBestScore = firstResults[0]
             localBestScoreDict = firstScoreDict
+            if localBestScore>globalBestScore:
+                yvals.append(localBestScore)
+                xvals.append(time.time()-startTime)
         
         print "trajectory number:",i+1,"out of",numTraj
         done = False
@@ -200,7 +208,10 @@ def findOptimalAssortmentHillTimed(netlist,Libraries, smallestScoreAllowed=100,n
                     swappablePairs.append(pair)
             random.shuffle(swappablePairs)
             for pair in swappablePairs:
-                #print "On pair",swappablePairs.index(pair)+1,"out of",len(swappablePairs)
+                if (time.time()-startTime >= maxTime):
+                    done = True
+                    break
+#                print "On pair",swappablePairs.index(pair)+1,"out of",len(swappablePairs)
                 graph.swapGates(pair[0],pair[1])
                 if graph.hasRepeatedRepressor():
                     graph.swapGates(pair[0],pair[1])
@@ -214,6 +225,10 @@ def findOptimalAssortmentHillTimed(netlist,Libraries, smallestScoreAllowed=100,n
                     localBestGraph = copy.deepcopy(graph)
                     localBestScore = tempResults[0]
                     localBestScoreDict = tempScoreDict
+                    if localBestScore>globalBestScore:
+                        yvals.append(localBestScore)
+                        xvals.append(time.time()-startTime)
+                    
                 #if there was an improvement then break the loop whether or
                 #not it passes the criteria for being a valid assignment
                 if tempResults[0]>currScore:
@@ -236,14 +251,16 @@ def findOptimalAssortmentHillTimed(netlist,Libraries, smallestScoreAllowed=100,n
 #            print "this traj was not better"
 #    print globalBestScore
 #    print globalBestGraph
+    xvals.append((time.time()-startTime))
+    yvals.append(globalBestScore)
     endTime = time.time()
     print "This took",(endTime-startTime),"seconds"
-    return globalBestGraph,globalBestScore,globalBestScoreDict
+    return globalBestGraph,globalBestScore,globalBestScoreDict,xvals,yvals
 
-def findOptimalAssortmentRandTimed(netlist,Libraries, smallestScoreAllowed=100,maxTime=300):
+def findOptimalAssortmentRandTimed(netlist,Libraries, smallestScoreAllowed=10,maxTime=300):
     startTime = time.time()
     random.seed(0)
-    scratchFile = "JsonFiles/optimizingScratchWork.json"
+    scratchFile = "JsonFiles/optimizingScratchWorkRandTime.json"
     graph, allGates, Inputs, Repressors, Outputs = OptimalCircuit.makeGraphFromNetlist(netlist, True)
     if graph.hasLoop():
         print "This circuit is sequential and cannot be scored."
@@ -295,6 +312,8 @@ def findOptimalAssortmentRandTimed(netlist,Libraries, smallestScoreAllowed=100,m
             globalBestScoreDict = tempScoreDict
             xvals.append((time.time()-startTime))
             yvals.append(globalBestScore)
+    xvals.append((time.time()-startTime))
+    yvals.append(globalBestScore)
     return globalBestGraph,globalBestScore,globalBestScoreDict,xvals,yvals
 
 
@@ -373,6 +392,25 @@ def graphResults(xvals,yvals):
     ymax = max(yvals)*1.1
     xmax = max(xvals)*1.1
     plt.plot(xvals,yvals,color="blue",linestyle="-",marker="o")
+    plt.xlabel('Time (sec)')
+    plt.ylabel('Score')
+    plt.title('Random Score Progression')
+#    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.axis(xmin=0, xmax=xmax, ymin=0, ymax = ymax)
+    plt.show()
+def compareHillClimbToRandom(netlist,Libraries=Libraries, smallestScoreAllowed=3,numTraj=5,maxTime=300):
+    a = findOptimalAssortmentHillTimed(netlist,Libraries, smallestScoreAllowed=smallestScoreAllowed,numTraj=numTraj,maxTime=maxTime)
+    b = findOptimalAssortmentRandTimed(netlist,Libraries, smallestScoreAllowed=smallestScoreAllowed,maxTime=maxTime)
+    x1vals = a[3]
+    y1vals = a[4]
+    x2vals = b[3]
+    y2vals = b[4]
+    plt.figure()
+    #Plot each output REU against time with its name as the label
+    ymax = max([max(y1vals),max(y2vals)])*1.1
+    xmax = max([max(x1vals),max(x2vals)])*1.1
+    plt.plot(x1vals,y1vals,color="blue",linestyle="-",marker="o",label="HillClimbing")
+    plt.plot(x2vals,y2vals,color="red",linestyle="-",marker="o",label="Random")
     plt.xlabel('Time (sec)')
     plt.ylabel('Score')
     plt.title('Random Score Progression')

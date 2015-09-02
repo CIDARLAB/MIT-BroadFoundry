@@ -54,7 +54,7 @@ def getREUChange(t,initREUVal,gateProperties,input_and_logic_gate_dictionaries,i
         
         #return array of [dX/dt, dY/dt, etc.]
     return answer
-
+    
 #Repressor and Activator Hill Equations
 def repressor(mB,Km,n,Input):
     '''

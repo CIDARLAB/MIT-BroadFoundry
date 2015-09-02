@@ -24,7 +24,7 @@ def getFromJsonFile(fileLoc):
     Take in a file location and return the values necessary to generate a graph
     '''
     myFile = open(fileLoc,'r')
-    
+  
     #data is a JSON array of JSON objects
     #first item is time-axis params (xmin, xmax, #iterations)
     #other elements are dictionaries for genes specifying all properties.

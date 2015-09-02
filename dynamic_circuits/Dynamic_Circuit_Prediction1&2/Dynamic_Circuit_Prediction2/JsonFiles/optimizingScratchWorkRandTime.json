@@ -155,16 +155,16 @@
             "3OC6SHL"
         ],
         "INPUT_EFFECT": "REPRESS",
-        "Km": 0.26,
-        "NAME": "B3_BM3R1",
-        "Pmax": 0.8,
-        "Pmin": 0.01,
+        "Km": 0.13,
+        "NAME": "P2_PhlF",
+        "Pmax": 4.1,
+        "Pmin": 0.02,
         "REUconv": null,
         "REUi": 0.0,
         "TYPE": "NOT",
         "degRate": 0.34657359027997264,
         "halfLife": 2.0,
-        "n": 3.4
+        "n": 3.9
     },
     {
         "DIST": 1,
@@ -192,16 +192,16 @@
             "Ara"
         ],
         "INPUT_EFFECT": "REPRESS",
-        "Km": 0.03,
-        "NAME": "P1_PhlF",
-        "Pmax": 3.9,
-        "Pmin": 0.01,
+        "Km": 0.09,
+        "NAME": "F1_AmeR",
+        "Pmax": 3.8,
+        "Pmin": 0.2,
         "REUconv": null,
         "REUi": 0.0,
         "TYPE": "NOT",
         "degRate": 0.34657359027997264,
         "halfLife": 2.0,
-        "n": 4.0
+        "n": 1.4
     },
     {
         "DIST": 2,
@@ -226,20 +226,20 @@
             "1"
         ],
         "INPUT": [
-            "B3_BM3R1",
+            "P2_PhlF",
             "IPTG"
         ],
         "INPUT_EFFECT": "REPRESS",
-        "Km": 0.21,
-        "NAME": "Q2_QacR",
-        "Pmax": 2.8,
-        "Pmin": 0.03,
+        "Km": 0.06,
+        "NAME": "S3_SrpR",
+        "Pmax": 2.1,
+        "Pmin": 0.004,
         "REUconv": null,
         "REUi": 0.0,
         "TYPE": "NOR",
         "degRate": 0.34657359027997264,
         "halfLife": 2.0,
-        "n": 2.4
+        "n": 2.8
     },
     {
         "DIST": 3,
@@ -255,8 +255,8 @@
             "0"
         ],
         "INPUT": [
-            "P1_PhlF",
-            "Q2_QacR"
+            "F1_AmeR",
+            "S3_SrpR"
         ],
         "Km": null,
         "NAME": "BFP",

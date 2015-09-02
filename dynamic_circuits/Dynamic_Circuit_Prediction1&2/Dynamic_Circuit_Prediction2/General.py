@@ -250,8 +250,8 @@ def f(state, t, input_and_logic_gate_dictionaries, input_and_logic_gate_names, l
         #Get the changes and add it to the list holding the changes
         results.append(update.getREUChange(t,initREUVal,gateProperties,input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names,state))
         
-        #return an array of slopes
-        #odeint will multiply the slope by the time step to get the delta
+    #return an array of slopes
+    #odeint will multiply the slope by the time step to get the delta
     return results
 
 '''

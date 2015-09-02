@@ -20,12 +20,12 @@ Libraries = [inputsDir, repressorsDir, outputsDir]
 
 #placeToSave converts a netlist (list of strings) to a JSON file.
 #'General.py' reads the json file and makes a Graph.
-def makeGraphFromNetlist(netlist,placeToSave,makeBarGraph=True,makeGraphs=True):
-    print OptimalCircuit.wrapperForNetlist(netlist,placeToSave,makeBarGraph=makeBarGraph,makeOtherGraphs=makeGraphs)
+def makeGraphFromNetlist(netlist,placeToSave,makeBarGraph=True,makeGraphs=True,useDefaultWaveForm=True):
+    print OptimalCircuit.wrapperForNetlist(netlist,placeToSave,makeBarGraph=makeBarGraph,makeOtherGraphs=makeGraphs,useDefaultInput=useDefaultWaveForm)
 
-def makeGraphFromCircuitString(circuitString,placeToSave,makeBarGraph=True,makeGraphs=True):
+def makeGraphFromCircuitString(circuitString,placeToSave,makeBarGraph=True,makeGraphs=True,useDefaultWaveForm=True):
     netlist = OptimalCircuit.convertCircuitStringToNetlist(circuitString)
-    print OptimalCircuit.wrapperForNetlist(netlist,placeToSave,makeBarGraph=makeBarGraph,makeOtherGraphs=makeGraphs)
+    print OptimalCircuit.wrapperForNetlist(netlist,placeToSave,makeBarGraph=makeBarGraph,makeOtherGraphs=makeGraphs,useDefaultInput=useDefaultWaveForm)
 
 #combinational only, not sequential
 def optimizeNetlistWithLibraries(netlist, Libraries,smallestScoreAllowed=0.5,numTraj=20):
@@ -33,8 +33,8 @@ def optimizeNetlistWithLibraries(netlist, Libraries,smallestScoreAllowed=0.5,num
     print answer[0]
     print "Score =",answer[1]
     return answer
-
-#combinational only, not sequential    
+    
+#combinational only, not sequential
 def optimizeCircuitStringWithLibraries(circuitString, Libraries,smallestScoreAllowed=0.5,numTraj=20):
     netlist = OptimalCircuit.convertCircuitStringToNetlist(circuitString)
     answer = Optimize.findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed,numTraj)

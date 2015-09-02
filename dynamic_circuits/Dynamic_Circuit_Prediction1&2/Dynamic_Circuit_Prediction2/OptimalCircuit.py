@@ -235,7 +235,7 @@ def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True,makeOtherGraphs=Tr
     """
     #Make Graph from string (or filepath... checks if fileLoc is a list of strings or single string)
     graph, allGates, Inputs, Intermediates, Outputs = makeGraphFromNetlist(fileLoc,useDefaultInput)
-
+    
     #don't want to score the circuit if it's sequential
     isSequential = False
     print graph
@@ -243,11 +243,11 @@ def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True,makeOtherGraphs=Tr
         isSequential = True
         #So things do not start at equilibrium.
         Intermediates[0].setREUi(1.0)
-
+    
     #Write to Json File
     graph.writeToJson(placeToSave)
-
-    #Make graphs from JsonFile    
+    
+    #Make graphs from JsonFile
     scores = General.generateDynamicCircuitGraphs(placeToSave, makeBarGraph, makeOtherGraphs, isSequential)
     return scores
 

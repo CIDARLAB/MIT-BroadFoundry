@@ -349,7 +349,6 @@ class Gate(object):
         else:
             gateDescription['INPUT'] = []
             for i in range(len(self.fanIn)):
-                
                 #the data structure does not have an explicit list of names, but they are included when writing the graph as a JSON file
                 #General.py reads the JSON file to re-create the same dictionary (historical reasons).
                 #could change General.py to take a graph rather than a JSON file.

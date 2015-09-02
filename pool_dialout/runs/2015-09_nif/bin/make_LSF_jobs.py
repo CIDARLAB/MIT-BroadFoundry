@@ -26,29 +26,32 @@ results_prefix = run_prefix + 'results/'
 bin_path       = home_prefix + 'bin/'
 
 # The indexes to use for the extraction barcodes (normally 1 and 2, unless other tracking barcodes included)
-fwd_barcode_idx = -2
-rev_barcode_idx = -1
+R1_fwd_bc_idx = '1'
+R1_rev_bc_idx = '2'
+R2_fwd_bc_idx = '-2'
+R2_rev_bc_idx = '-1'
 
 # The names of the raw read files and the length of the forward and reverse primer.
 run_data = {}
-run_data['nifB'] = ['nifB_R1.fastq', 'nifB_R2.fastq', '20', '20']
-run_data['nifD'] = ['nifD_R1.fastq', 'nifD_R2.fastq', '20', '20']
-run_data['nifE'] = ['nifE_R1.fastq', 'nifE_R2.fastq', '20', '20']
-run_data['nifF'] = ['nifF_R1.fastq', 'nifF_R2.fastq', '20', '20']
-run_data['nifH'] = ['nifH_R1.fastq', 'nifH_R2.fastq', '20', '20']
-run_data['nifJ'] = ['nifJ_R1.fastq', 'nifJ_R2.fastq', '20', '20']
-run_data['nifK'] = ['nifK_R1.fastq', 'nifK_R2.fastq', '20', '20']
-run_data['nifM'] = ['nifM_R1.fastq', 'nifM_R2.fastq', '20', '20']
-run_data['nifN'] = ['nifN_R1.fastq', 'nifN_R2.fastq', '20', '20']
-run_data['nifQ'] = ['nifQ_R1.fastq', 'nifQ_R2.fastq', '20', '20']
-run_data['nifS'] = ['nifS_R1.fastq', 'nifS_R2.fastq', '20', '20']
-run_data['nifU'] = ['nifU_R1.fastq', 'nifU_R2.fastq', '20', '20']
-run_data['nifV'] = ['nifV_R1.fastq', 'nifV_R2.fastq', '20', '20']
-run_data['nifW_old'] = ['nifW_old_R1.fastq', 'nifW_old_R2.fastq', '20', '20']
-run_data['nifW_new'] = ['nifW_new_R1.fastq', 'nifW_new_R2.fastq', '20', '20']
-run_data['nifW'] = ['nifW_R1.fastq', 'nifW_R2.fastq', '20', '20']
-run_data['nifY'] = ['nifY_R1.fastq', 'nifB_R2.fastq', '20', '20']
-run_data['nifZ'] = ['nifZ_R1.fastq', 'nifB_R2.fastq', '20', '20']
+run_data['nifB'] = ['nifB_R1.fastq', 'nifB_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
+run_data['nifD'] = ['nifD_R1.fastq', 'nifD_R2.fastq', '20', '20', R2_fwd_bc_idx, R2_rev_bc_idx]
+run_data['nifE'] = ['nifE_R1.fastq', 'nifE_R2.fastq', '20', '20', R2_fwd_bc_idx, R2_rev_bc_idx]
+run_data['nifF'] = ['nifF_R1.fastq', 'nifF_R2.fastq', '20', '20', R2_fwd_bc_idx, R2_rev_bc_idx]
+run_data['nifH'] = ['nifH_R1.fastq', 'nifH_R2.fastq', '20', '20', R2_fwd_bc_idx, R2_rev_bc_idx]
+run_data['nifJ'] = ['nifJ_R1.fastq', 'nifJ_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
+run_data['nifK'] = ['nifK_R1.fastq', 'nifK_R2.fastq', '20', '20', R2_fwd_bc_idx, R2_rev_bc_idx]
+run_data['nifM'] = ['nifM_R1.fastq', 'nifM_R2.fastq', '20', '20', R2_fwd_bc_idx, R2_rev_bc_idx]
+run_data['nifN'] = ['nifN_R1.fastq', 'nifN_R2.fastq', '20', '20', R2_fwd_bc_idx, R2_rev_bc_idx]
+run_data['nifQ'] = ['nifQ_R1.fastq', 'nifQ_R2.fastq', '20', '20', R2_fwd_bc_idx, R2_rev_bc_idx]
+run_data['nifS'] = ['nifS_R1.fastq', 'nifS_R2.fastq', '20', '20', R2_fwd_bc_idx, R2_rev_bc_idx]
+run_data['nifU'] = ['nifU_R1.fastq', 'nifU_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
+run_data['nifV'] = ['nifV_R1.fastq', 'nifV_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
+run_data['nifW'] = ['nifW_R1.fastq', 'nifW_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
+run_data['nifY'] = ['nifY_R1.fastq', 'nifB_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
+run_data['nifZ'] = ['nifZ_R1.fastq', 'nifB_R2.fastq', '20', '20', R1_fwd_bc_idx, R1_rev_bc_idx]
+# These nifW pools we treat differently (read starts with barcode)
+run_data['nifW_old'] = ['nifW_old_R1.fastq', 'nifW_old_R2.fastq', '0', '0', '1', '-1']
+run_data['nifW_new'] = ['nifW_new_R1.fastq', 'nifW_new_R2.fastq', '0', '0', '1', '-1']
 
 # Build the part analysis script iteratively
 part_analysis_cmd = ''
@@ -71,8 +74,8 @@ for name in run_data.keys():
 	cmd += ' ' + fastq_prefix + run_data[name][1]
 	cmd += ' ' + run_data[name][2]
 	cmd += ' ' + run_data[name][3]
-	cmd += ' ' + str(fwd_barcode_idx)
-	cmd += ' ' + str(rev_barcode_idx)
+	cmd += ' ' + run_data[name][4]
+	cmd += ' ' + run_data[name][5]
 	cmd += ' ' + results_prefix + name + '_"'
 	# Save the script file
 	f_out = open(save_to + 'run_'+name+'.sh', 'w')

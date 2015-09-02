@@ -125,15 +125,17 @@ while line_idx < max_line_idx:
 	read_name1, read_name2 = header1.split()[0][1:], header2.split()[0][1:]
 	assert read_name1 == read_name2
 	n_reads += 1
-	# Flip reads if the reverse primer is seen read first
-	if (seq1.startswith(rev_primer) and
-		seq2.startswith(fwd_primer)):
-		seq1, seq2 = seq2, seq1
-		qual1, qual2 = qual2, qual1
-	# Reject reads if we don't see perfect primer matches
-	if not (seq1.startswith(fwd_primer) and
-			seq2.startswith(rev_primer)):
-		continue
+	
+	if fwd_primer_len != 0 and rev_primer_len != 0:
+		# Flip reads if the reverse primer is seen read first
+		if (seq1.startswith(rev_primer) and
+			seq2.startswith(fwd_primer)):
+			seq1, seq2 = seq2, seq1
+			qual1, qual2 = qual2, qual1
+		# Reject reads if we don't see perfect primer matches
+		if not (seq1.startswith(fwd_primer) and
+				seq2.startswith(rev_primer)):
+			continue
 	n_accepted += 1
 
 	# Attempt to match to regexs

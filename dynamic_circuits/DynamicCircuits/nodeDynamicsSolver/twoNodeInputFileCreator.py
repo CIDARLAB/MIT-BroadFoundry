@@ -17,7 +17,6 @@ Leibler, 2000).
 import json
 import numpy as np
 
-
 def writeToJson(inputObj,fileLoc):
     """
     Writes the object, preferably a list composed of lists or dictionaries, to a json file with pretty print

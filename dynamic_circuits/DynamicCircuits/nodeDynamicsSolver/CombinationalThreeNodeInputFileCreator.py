@@ -25,59 +25,88 @@ def writeToJson(inputObj,fileLoc):
 
 #Initialization of variables for genes, addition of boolean input value for node
 nodes = ['X','Y','Z']
+inputs = ['A','B']
 iniCond = {}
-inputD = {}
+nodeParams = {}
+inputParams = {}
 
+#Creates random parameters for the genes
 for node in nodes:
 	iniCond[node] = random.uniform(0.0,300.0)			#initial condition of gene
-	inputD[node] = {}
-	inputD[node]['name']= node
-	inputD[node]['hl'] = random.uniform(0.75,1.25)*10.0 	# half-life (minutes)
-	inputD[node]['a'] = np.log(2)/inputD[node]['hl']		# degradation rate
-	inputD[node]['B0'] = random.uniform(0.75,1.25)*0.6		# basal production rate
-	inputD[node]['B'] = random.uniform(0.75,1.25)*300.0 	# induced production rate
-	inputD[node]['n'] = random.uniform(0.75,1.25)*2.0 		# hill coefficient
-	inputD[node]['Km'] = random.uniform(0.75,1.25)*40.0 	# coefficient for activation or repression
-'''
-for node in nodes:
-	iniCond[node] = random.uniform(0.0,10.0)				#initial condition of gene
-	inputD[node] = {}
-	inputD[node]['name']= node
-	inputD[node]['hl'] = 10.0 	# half-life (minutes)
-	inputD[node]['a'] = np.log(2)/inputD[node]['hl']		# degradation rate
-	inputD[node]['B0'] = 0.6		# basal production rate
-	inputD[node]['B'] = 300.0 	# induced production rate
-	inputD[node]['n'] = 2.0 		# hill coefficient
-	inputD[node]['Km'] = 40.0 	# coefficient for activation or repression
-'''
-inputObject = [iniCond, inputD]
+	nodeParams[node] = {}
+	nodeParams[node]['name']= node
+	nodeParams[node]['hl'] = random.uniform(0.75,1.25)*10.0 	# half-life (minutes)
+	nodeParams[node]['a'] = np.log(2)/nodeParams[node]['hl']		# degradation rate
+	nodeParams[node]['B0'] = random.uniform(0.75,1.25)*0.6		# basal production rate
+	nodeParams[node]['B'] = random.uniform(0.75,1.25)*300.0 	# induced production rate
+	nodeParams[node]['n'] = random.uniform(0.75,1.25)*2.0 		# hill coefficient
+	nodeParams[node]['Km'] = random.uniform(0.75,1.25)*40.0 	# coefficient for activation or repression
 
-'''
-Think about metrics/characteristics such as dampening coefficient, amplitude, period
-for X,Y, and Z.
-Script that runs through n metrics, and then convert to jpeg, gif
-'''
+for inp in inputs:
+	inputParams[inp] = {}
+	inputParams[inp]['name'] = inp
+	inputParams[inp]['B'] = random.uniform(0.75,1.25)*300.0 	# induced production rate
+	inputParams[inp]['n'] = random.uniform(0.75,1.25)*2.0 		# hill coefficient
+	inputParams[inp]['Km'] = random.uniform(0.75,1.25)*40.0 	# coefficient for activation
+	inputParams[inp]['signal'] = [random.random(),random.uniform(1.0,10.0),random.random(),random.uniform(1.0,10.0),random.random()]
+inputObject = [iniCond, nodeParams, inputParams]
 
-addOn = []
+
+# Creates an individual case of all node interactions. 
+# In this case, a combinational circuit 	Xi-->A-->C
+#											Yi-->B--7
+inputToNode = []
+nodeToNode = []
+
 '''
 #Random node vector assignment
-for nodeFrom in var:
-	for nodeTo in var:
-		current = {}
-		current['from'] = nodeFrom
-		current['to'] = nodeTo
-		current['effect'] = random.randint(-1,1)
-		addOn.append(current) 
+for inputFrom in inputs:
+	for nodeTo in nodes:
+		inputToNode = {}
+		inputToNode['from'] = inputFrom
+		inputToNode['to'] = nodeTo
+		current['effect'] = random.randint(0,1)  # On or Off
+		nodeToNode.append(current)
 '''
-# Creates an individual case of all node interactions. 
-# In this case it is a repressilator (X-|Y-|Z-|X)
+
+#input to node interactions
+AtoX = 1
+AtoY = 0
+BtoX = 0
+BtoY = 1
+
+current = {}
+current['from'] = 'A'
+current['to'] = 'X'
+current['effect'] = AtoX
+inputToNode.append(current)
+
+current = {}
+current['from'] = 'A'
+current['to'] = 'Y'
+current['effect'] = AtoY
+inputToNode.append(current)
+
+current = {}
+current['from'] = 'B'
+current['to'] = 'X'
+current['effect'] = BtoX
+inputToNode.append(current)
+
+current = {}
+current['from'] = 'B'
+current['to'] = 'Y'
+current['effect'] = BtoY
+inputToNode.append(current)
+
+#node to node interactions
 XtoX = 0
-XtoY = -1
-XtoZ = 0
+XtoY = 0
+XtoZ = 1
 YtoX = 0
 YtoY = 0
-YtoZ = -1
-ZtoX = -1
+YtoZ = 1
+ZtoX = 0
 ZtoY = 0
 ZtoZ = 0
 
@@ -85,57 +114,60 @@ current = {}
 current['from'] = 'X'
 current['to'] = 'X'
 current['effect'] = XtoX
-addOn.append(current)
+nodeToNode.append(current)
 
 current = {}
 current['from'] = 'X'
 current['to'] = 'Y'
 current['effect'] = XtoY
-addOn.append(current)
+nodeToNode.append(current)
 
 current = {}
 current['from'] = 'X'
 current['to'] = 'Z'
 current['effect'] = XtoZ
-addOn.append(current)
+nodeToNode.append(current)
 
 current = {}
 current['from'] = 'Y'
 current['to'] = 'X'
 current['effect'] = YtoX
-addOn.append(current)
+nodeToNode.append(current)
 
 current = {}
 current['from'] = 'Y'
 current['to'] = 'Y'
 current['effect'] = YtoY
-addOn.append(current)
+nodeToNode.append(current)
 
 current = {}
 current['from'] = 'Y'
 current['to'] = 'Z'
 current['effect'] = YtoZ
-addOn.append(current)
+nodeToNode.append(current)
 
 current = {}
 current['from'] = 'Z'
 current['to'] = 'X'
 current['effect'] = ZtoX
-addOn.append(current)
+nodeToNode.append(current)
 
 current = {}
 current['from'] = 'Z'
 current['to'] = 'Y'
 current['effect'] = ZtoY
-addOn.append(current)
+nodeToNode.append(current)
 
 current = {}
 current['from'] = 'Z'
 current['to'] = 'Z'
 current['effect'] = ZtoZ
-addOn.append(current)
-inputObject.append(addOn)
+nodeToNode.append(current)
 
-#Creates the master input file
-fileName = 'masterNodeInputFile'+str(len(inputObject)-2)+'.json'
+inputObject.append(inputToNode)
+inputObject.append(nodeToNode)
+
+#Creates the master input file consisting of initial conditions, node then input parameters, 
+# and then input to node then node to node vectors
+fileName = 'masterCombiNodeInputFile.json'
 writeToJson(inputObject,fileName)

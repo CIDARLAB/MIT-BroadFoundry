@@ -26,8 +26,8 @@ results_prefix = run_prefix + 'results/'
 bin_path       = home_prefix + 'bin/'
 
 # The indexes to use for the extraction barcodes (normally 1 and 2, unless other tracking barcodes included)
-fwd_barcode_idx = 1
-rev_barcode_idx = 2
+fwd_barcode_idx = -2
+rev_barcode_idx = -1
 
 # The names of the raw read files and the length of the forward and reverse primer.
 run_data = {}

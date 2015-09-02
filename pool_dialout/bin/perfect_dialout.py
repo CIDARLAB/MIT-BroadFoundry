@@ -11,6 +11,9 @@ Dialout barcodes from pool
 
 	Important to consider that barcodes are given as found starting from the 
 	forward primer 0...n (barcodes on the paired reads are therefore reversed).
+
+	Also, barcodes to extract for fwd and rev primers are given as 1..n for 
+	those found on read 1, whereas -1..-n for read 2.
 """
 from __future__ import print_function, division
 import itertools
@@ -43,8 +46,15 @@ design_filename, r1_filename, r2_filename, fwd_primer_len, rev_primer_len, fwd_b
 out_prefix = out_prefix.strip()
 
 # Allow user to specify index starting at 1 (not 0)
-fwd_bc_idx = int(fwd_bc_idx) - 1
-rev_bc_idx = int(rev_bc_idx) - 1
+fwd_bc_read = 1
+rev_bc_read = 1
+if int(fwd_bc_idx) < 0:
+	fwd_bc_read = 2
+	fwd_bc_idx = (-1.0*int(fwd_bc_idx)) - 1
+if int(rev_bc_idx) < 0:
+	rev_bc_read = 2
+	rev_bc_idx = (-1.0*int(rev_bc_idx)) - 1
+
 fwd_primer_len = int(fwd_primer_len)
 rev_primer_len = int(rev_primer_len)
 
@@ -86,6 +96,9 @@ barcodes_to_check_set_0 = set()
 barcodes_to_check_set_1 = set()
 found_barcodes_set = set()
 found_designs_set = set()
+
+fwd_barcode = ''
+rev_barcode = ''
 
 while line_idx < max_line_idx:
 	# Give indication of progress
@@ -129,24 +142,36 @@ while line_idx < max_line_idx:
 		# Assumes paired matches are unique
 		if (m1 != None) and (m2 != None):
 			found_design = design
-			found_barcode = list(m1.groups()) + [revcomp(x) for x in m2.groups()]
+			found_fwd_barcodes = list(m1.groups())
+			found_rev_barcodes = [revcomp(x) for x in m2.groups()]
+			found_barcode = found_fwd_barcodes + found_rev_barcodes
 			barcode_key = "-".join(found_barcode)
+
+			# Select the correct barcode
+			if fwd_bc_read == 1:
+				fwd_barcode = found_fwd_barcodes[fwd_bc_idx]
+			else:
+				fwd_barcode = found_rev_barcodes[fwd_bc_idx]
+			if rev_bc_read == 1:
+				rev_barcode = found_fwd_barcodes[rev_bc_idx]
+			else:
+				rev_barcode = found_rev_barcodes[rev_bc_idx]
 			
 			# CHECK BARCODES ##################################################
-			if found_barcode[fwd_bc_idx] not in barcodes_to_check_set_0:
-				barcodes_to_check[0][found_barcode[fwd_bc_idx]] = [found_design]
-				barcodes_to_check_set_0.add(found_barcode[fwd_bc_idx])
+			if fwd_barcode not in barcodes_to_check_set_0:
+				barcodes_to_check[0][fwd_barcode] = [found_design]
+				barcodes_to_check_set_0.add(fwd_barcode)
 			else:
-				if found_design not in barcodes_to_check[0][found_barcode[fwd_bc_idx]]:
-					barcodes_to_check[0][found_barcode[fwd_bc_idx]].append(found_design)
-					barcodes_to_check_set_0.add(found_barcode[fwd_bc_idx])
-			if found_barcode[rev_bc_idx] not in barcodes_to_check_set_1:
-				barcodes_to_check[1][found_barcode[rev_bc_idx]] = [found_design]
-				barcodes_to_check_set_1.add(found_barcode[rev_bc_idx])
+				if found_design not in barcodes_to_check[0][fwd_barcode]:
+					barcodes_to_check[0][fwd_barcode].append(found_design)
+					barcodes_to_check_set_0.add(fwd_barcode)
+			if rev_barcode not in barcodes_to_check_set_1:
+				barcodes_to_check[1][rev_barcode] = [found_design]
+				barcodes_to_check_set_1.add(rev_barcode)
 			else:
-				if found_design not in barcodes_to_check[1][found_barcode[rev_bc_idx]]:
-					barcodes_to_check[1][found_barcode[rev_bc_idx]].append(found_design)
-					barcodes_to_check_set_1.add(found_barcode[rev_bc_idx])
+				if found_design not in barcodes_to_check[1][rev_barcode]:
+					barcodes_to_check[1][rev_barcode].append(found_design)
+					barcodes_to_check_set_1.add(rev_barcode)
 			###############################################################
 
 			if barcode_key not in found_barcodes_set:

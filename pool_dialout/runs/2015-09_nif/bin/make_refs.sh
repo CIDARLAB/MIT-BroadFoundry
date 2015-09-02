@@ -1,7 +1,7 @@
 python ../../../bin/regex_from_seq.py ../data/pcr_seqs/nifB.invfa 200 ../data/regex_refs/nifB_regexs.txt
 python ../../../bin/regex_from_seq.py ../data/pcr_seqs/nifD.invfa 200 ../data/regex_refs/nifD_regexs.txt
 python ../../../bin/regex_from_seq.py ../data/pcr_seqs/nifE.invfa 200 ../data/regex_refs/nifE_regexs.txt
-python ../../../bin/regex_from_seq.py ../data/pcr_seqs/nifF.invfa 200 ../data/regex_refs/nifF_regexs.txt
+python ../../../bin/regex_from_seq.py ../data/pcr_seqs/nifF.invfa 210 ../data/regex_refs/nifF_regexs.txt
 python ../../../bin/regex_from_seq.py ../data/pcr_seqs/nifH.invfa 200 ../data/regex_refs/nifH_regexs.txt
 python ../../../bin/regex_from_seq.py ../data/pcr_seqs/nifJ.invfa 200 ../data/regex_refs/nifJ_regexs.txt
 python ../../../bin/regex_from_seq.py ../data/pcr_seqs/nifK.invfa 200 ../data/regex_refs/nifK_regexs.txt

@@ -17,6 +17,7 @@ import update
 import re
 import itertools
 import time
+import Optimize
 
 inputsDir = "JsonFiles/Libraries/InputLibrary.json"
 repressorsDir = "JsonFiles/Libraries/RepressorLibrary.json"
@@ -228,13 +229,56 @@ def performSwaps(graph,allGates,Inputs,allGatesr,Inputsr):
 
 
 #netlist --> graph --> JSON --> General.py opens JSON --> 
-def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True,makeOtherGraphs=True,useDefaultInput=True):
+def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True,makeOtherGraphs=True,useDefaultInput=True,genesToUse=None,Libraries=Libraries):
     """
     Takes in a netlist of a circuit, and a directory to store the intermediate json file.
     Returns the score, if possible, for the arrangement of gates.
     """
     #Make Graph from string (or filepath... checks if fileLoc is a list of strings or single string)
     graph, allGates, Inputs, Intermediates, Outputs = makeGraphFromNetlist(fileLoc,useDefaultInput)
+
+    if genesToUse!=None:
+        if len(genesToUse[0])!=len(Inputs):
+            raise IndexError, "Wrong number of input genes. Please try again."
+        elif len(genesToUse[1])!=len(Intermediates):
+            raise IndexError, "Wrong number of intermediate genes. Please try again."
+        elif len(genesToUse[2])!=len(Outputs):
+            raise IndexError, "Wrong number of output genes. Please try again."
+        
+        allInputs = Optimize.makeInputs(Libraries[0])
+        allRepressors = Optimize.makeRepressors(Libraries[1])
+        allOutputs = Optimize.makeOutputs(Libraries[2])
+        inputsToUse = []
+        repressorsToUse = []
+        outputsToUse=[]
+        for geneName in genesToUse[0]:
+            for gene in allInputs:
+                if gene.getName()==geneName:
+                    inputsToUse.append(gene)
+                    break
+        for geneName in genesToUse[1]:
+            for gene in allRepressors:
+                if gene.getName()==geneName:
+                    repressorsToUse.append(gene)
+                    break
+        for geneName in genesToUse[2]:
+            for gene in allOutputs:
+                if gene.getName()==geneName:
+                    outputsToUse.append(gene)
+                    break
+        for i in range(len(Inputs)):
+            graph.swapGates(Inputs[i],inputsToUse[i])
+        for i in range(len(Intermediates)):
+            graph.swapGates(Intermediates[i],repressorsToUse[i])
+        for i in range(len(Outputs)):
+            graph.swapGates(Outputs[i],outputsToUse[i])
+        Inputs = inputsToUse
+        Intermediates = repressorsToUse
+        Outputs = outputsToUse
+        
+        if graph.hasRepeatedRepressor():
+            raise TypeError, "You cannot use the same gene twice. Please try again."
+        
     
     #don't want to score the circuit if it's sequential
     isSequential = False

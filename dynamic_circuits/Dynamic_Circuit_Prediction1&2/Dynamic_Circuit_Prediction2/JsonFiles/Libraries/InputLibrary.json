@@ -33,8 +33,8 @@
         "collection": "INPUT",
         "equation": "ymin+(ymax-ymin)/(1.0+(K/x)^n)",
         "Km": 0.18,
-        "NAME": "Ara",
-        "PROMOTER_NAME": "pBAD",
+        "NAME": "aTc",
+        "PROMOTER_NAME": "pTet",
         "Pmax": 3.71,
         "Pmin": 0.017,
         "n": 2.7

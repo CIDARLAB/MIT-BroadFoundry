@@ -29,7 +29,7 @@ def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=10,numTraj
     yvals = [0]
     startTime = time.time()
     random.seed(0)
-    scratchFile = "JsonFiles/optimizingScratchWork.json"
+    scratchFile = "JsonFiles/optimizingScratchWorkHill.json"
     graph, allGates, Inputs, Repressors, Outputs = OptimalCircuit.makeGraphFromNetlist(netlist, True)
     if graph.hasLoop():
         print "This circuit is sequential and cannot be scored."
@@ -139,7 +139,7 @@ def findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed=10,numTraj
     yvals.append(globalBestScore)
     endTime = time.time()
     print "This took",(endTime-startTime),"seconds"
-    print globalBestGraph
+#    print globalBestGraph
     graphResults(xvals,yvals)    
     
     return globalBestGraph,globalBestScore,globalBestScoreDict
@@ -149,7 +149,7 @@ def findOptimalAssortmentHillTimed(netlist,Libraries, smallestScoreAllowed=10,nu
     yvals = [0]
     startTime = time.time()
     random.seed(0)
-    scratchFile = "JsonFiles/optimizingScratchWork.json"
+    scratchFile = "JsonFiles/optimizingScratchWorkHillTimed.json"
     graph, allGates, Inputs, Repressors, Outputs = OptimalCircuit.makeGraphFromNetlist(netlist, True)
     if graph.hasLoop():
         print "This circuit is sequential and cannot be scored."
@@ -266,14 +266,14 @@ def findOptimalAssortmentHillTimed(netlist,Libraries, smallestScoreAllowed=10,nu
     yvals.append(globalBestScore)
     endTime = time.time()
     print "This took",(endTime-startTime),"seconds"
-    print globalBestGraph
+#    print globalBestGraph
     graphResults(xvals,yvals)
     return globalBestGraph,globalBestScore,globalBestScoreDict,xvals,yvals
 
 def findOptimalAssortmentRandTimed(netlist,Libraries, smallestScoreAllowed=10,maxTime=300):
     startTime = time.time()
     random.seed(0)
-    scratchFile = "JsonFiles/optimizingScratchWorkRandTime.json"
+    scratchFile = "JsonFiles/optimizingScratchWorkRandTimed.json"
     graph, allGates, Inputs, Repressors, Outputs = OptimalCircuit.makeGraphFromNetlist(netlist, True)
     if graph.hasLoop():
         print "This circuit is sequential and cannot be scored."
@@ -420,6 +420,7 @@ def compareHillClimbToRandom(netlist,Libraries=Libraries, smallestScoreAllowed=3
     plt.title('Random Score Progression')
 #    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.axis(xmin=0, xmax=xmax, ymin=0, ymax = ymax)
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.show()
     
 def graphResults(xvals,yvals):

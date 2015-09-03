@@ -8,15 +8,8 @@ Created on Mon Jul 27 12:09:16 2015
 import Graph
 import Gate
 import Wire
-import inputs
 import json
 import General
-import GeneralJsonIO
-import inputs
-import update
-import re
-import itertools
-import time
 import Optimize
 
 inputsDir = "JsonFiles/Libraries/InputLibrary.json"
@@ -203,30 +196,6 @@ def makeGraphFromNetlist(inputNetlist, useDefaultInput=True):
 
     return graph, allGates, Inputs, Intermediates, Outputs
 
-    
-def performSwaps(graph,allGates,Inputs,allGatesr,Inputsr):
-    """
-    Given a graph, a set of gates in the graph and a new set of gates, it will swap
-    in the new gates for the old gates. The number of each type of gate must be
-    the same.
-    """
-    
-    #Make swaps in graph
-    for i in range(len(allGates)):
-        if allGatesr[i].getGateType() != "Output":
-            allGatesr[i].setFanOut(allGates[i].getFanOut())
-        if allGatesr[i].getGateType() != "Input":
-            allGatesr[i].setFanIn(allGates[i].getFanIn())
-    for i in range(len(Inputsr)):
-        Inputsr[i].setInputType(Inputs[i].getInputType())
-        Inputsr[i].setExpectedProtein(Inputs[i].getExpectedProtein())
-    #add new gates to graph 
-    for gate in allGatesr:
-        graph.addGate(gate)
-    #remove old gates from graph
-    for gate in allGates:
-        graph.removeGate(gate)
-
 
 #netlist --> graph --> JSON --> General.py opens JSON --> 
 def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True,makeOtherGraphs=True,useDefaultInput=True,genesToUse=None,Libraries=Libraries):
@@ -236,8 +205,10 @@ def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True,makeOtherGraphs=Tr
     """
     #Make Graph from string (or filepath... checks if fileLoc is a list of strings or single string)
     graph, allGates, Inputs, Intermediates, Outputs = makeGraphFromNetlist(fileLoc,useDefaultInput)
-
+    
+    #If we are given gene names to use
     if genesToUse!=None:
+        #Throw an error if we are not given the correct number of genes
         if len(genesToUse[0])!=len(Inputs):
             raise IndexError, "Wrong number of input genes. Please try again."
         elif len(genesToUse[1])!=len(Intermediates):
@@ -245,12 +216,14 @@ def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True,makeOtherGraphs=Tr
         elif len(genesToUse[2])!=len(Outputs):
             raise IndexError, "Wrong number of output genes. Please try again."
         
+        #Make the lists containing all the geners from the libraries
         allInputs = Optimize.makeInputs(Libraries[0])
         allRepressors = Optimize.makeRepressors(Libraries[1])
         allOutputs = Optimize.makeOutputs(Libraries[2])
         inputsToUse = []
         repressorsToUse = []
         outputsToUse=[]
+        #find the genes that were requested
         for geneName in genesToUse[0]:
             for gene in allInputs:
                 if gene.getName()==geneName:
@@ -266,6 +239,15 @@ def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True,makeOtherGraphs=Tr
                 if gene.getName()==geneName:
                     outputsToUse.append(gene)
                     break
+        #The numbers will no longer be the same if one of the genes did not exist in the library
+        if len(inputsToUse)!=len(Inputs):
+            raise NameError, "One of the inputs did not exist in the library. Please try again."
+        elif len(repressorsToUse)!=len(Intermediates):
+            raise NameError, "One of the repressors did not exist in the library. Please try again."
+        elif len(outputsToUse)!=len(Outputs):
+            raise NameError, "One of the outputs did not exist in the library. Please try again."
+        
+        #swap in the requested genes
         for i in range(len(Inputs)):
             graph.swapGates(Inputs[i],inputsToUse[i])
         for i in range(len(Intermediates)):
@@ -276,10 +258,10 @@ def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True,makeOtherGraphs=Tr
         Intermediates = repressorsToUse
         Outputs = outputsToUse
         
+        #check to make sure that no gene was repeated
         if graph.hasRepeatedRepressor():
             raise TypeError, "You cannot use the same gene twice. Please try again."
-        
-    
+   
     #don't want to score the circuit if it's sequential
     isSequential = False
     print graph
@@ -288,7 +270,7 @@ def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True,makeOtherGraphs=Tr
         #So things do not start at equilibrium.
         Intermediates[0].setREUi(1.0)
     
-    #Write to Json File
+    #Write to Json File (the middleman)
     graph.writeToJson(placeToSave)
     
     #Make graphs from JsonFile
@@ -297,6 +279,11 @@ def wrapperForNetlist(fileLoc, placeToSave, makeBarGraph=True,makeOtherGraphs=Tr
 
         
 def makeInputBin(numInputs):
+    """
+    makes the binary values that will be the default truth values for the inputs
+    if the user does not want to specify a wave form.
+    """
+    
     binSize = 2**numInputs
     base = "01"
     allInputBin = []
@@ -309,149 +296,8 @@ def makeInputBin(numInputs):
         while len(base)<nextLen:
             base = "0" + base + "1"
         allInputBin.append(list(tempInput))
-        #allInputBin.append(tempInput)
     allInputBin.reverse()
     return allInputBin
-
-
-def findBestForTruthValue(truthValue, inputNames, outputNames, intermediateFile = intermediateFile, netlistLoc = netlistLoc, Libraries = Libraries, minAllowedScore = 100, makeBarGraph = True):
-    """
-    Assumes the length of the inputNames is the same as the number of inputs 
-    necessary and the same for outputs. Returns the best circuit repressors and
-    netlist for the desired truth value.
-    """
-    startTime = time.time()
-    myFile = open(netlistLoc,'r')
-    data = json.load(myFile)
-    myFile.close()
-    
-    bestNetlist = None
-    bestRepressorOrder = None
-    bestIntermediateGateNames = None
-    bestScore = 0
-    bestScoreForNetlist = bestScore
-    
-    allNetlists = data[truthValue]["netlists"]
-    initInputsr = makeInputs(Libraries[0],inputNames)
-    initOutputsr = makeOutput(Libraries[2],outputNames)
-    for netlist in allNetlists:
-        print "best so far:", bestScoreForNetlist
-        if bestScoreForNetlist!=0 and bestScoreForNetlist<bestScore:
-            print "Beat last netlist"
-        bestScoreForNetlist = bestScore
-        graph, allGates, Inputs, Intermediates, Outputs = makeGraphFromNetlist(netlist,True)
-        print graph
-        IntermediatesrList = makeRepressorsGroups(Libraries[1],len(Intermediates))
-        for IntermediatesrTuple in IntermediatesrList:
-            #-------------------------------
-            graph, allGates, Inputs, Intermediates, Outputs = makeGraphFromNetlist(netlist,True)
-            #This will tell how the repressor name order corresponds to gate number
-            #from the netlist
-            IntermediateGateNames = []
-            for gate in Intermediates:
-                IntermediateGateNames.append(gate.getName())
-            #These two lines should not affect anything if the correct number of
-            #names are specified        
-            Inputsr = initInputsr[0:len(Inputs)]
-            Outputsr = initOutputsr[0:len(Outputs)]
-            #---------------------------------
-            Intermediatesr = list(IntermediatesrTuple)
-            IntermediatesrNames = []
-            for gate in Intermediatesr:
-                IntermediatesrNames.append(gate.getName())
-            print IntermediatesrNames
-            allGatesr = Inputsr + Intermediatesr + Outputsr
-            performSwaps(graph, allGates, Inputs, allGatesr, Inputsr)
-#            print graph
-            graph.writeToJson(intermediateFile)
-            if graph.hasLoop():
-                Intermediatesr[0].setInitialProtein(1.0)
-                makeBarGraph = False
-                print "Problem"
-                
-            score = General.generateDynamicCircuitGraphs(intermediateFile, makeBarGraph)
-            if score == None:
-                print "Problem"
-                score = {None:-1}
-            allGates = score.keys()
-            isGood = True
-            for gate in allGates:
-                if score[gate]<minAllowedScore:
-                    isGood = False
-                    break
-            totScore = 0
-            if isGood:
-                for name in outputNames:
-                    totScore += score[name]
-            if totScore>bestScore:
-                bestScore = totScore
-                bestNetlist = netlist
-                bestRepressorOrder = IntermediatesrNames
-                bestIntermediateGateNames = IntermediateGateNames
-
-#            print totScore
-#            print bestScore
-#            pause = raw_input("pause")
-    gateAliases = {}
-    for i in range(len(bestIntermediateGateNames)):
-        gateAliases[bestIntermediateGateNames[i]] = bestRepressorOrder[i]
-    endTime = time.time()
-    print "This took",round(endTime-startTime,2),"seconds."
-    return bestNetlist, gateAliases, bestScore
-            
-
-#Make gates from libraries
-#Must be adjusted for the new libraries.
-def makeInputs(inputLibrary,inputNames):
-    myFile = open(inputLibrary,'r')
-    inputsFromFile = json.load(myFile)
-    myFile.close()
-    
-    inputsFromFileNames = []
-    for gateInfo in inputsFromFile:
-        inputsFromFileNames.append(gateInfo["NAME"])
-    
-    Inputsr = []
-    for name in inputNames:
-        inputIndex = inputsFromFileNames.index(name)
-        gateInfo = inputsFromFile[inputIndex]
-        #Gate(name,gateType,Km,n,Pmin,Pmax,halfLife,REUconv=None)
-        tempGate = Gate.Gate(str(gateInfo["NAME"]),"Input",gateInfo["Km"],gateInfo["n"],gateInfo["Pmin"],gateInfo["Pmax"],None,None)
-        Inputsr.append(tempGate)
-    return Inputsr
-    
-def makeOutput(outputLibrary,outputNames):
-    myFile = open(outputLibrary,'r')
-    outputsFromFile = json.load(myFile)
-    myFile.close()
-    
-    outputsFromFileNames = []
-    for gateInfo in outputsFromFile:
-        outputsFromFileNames.append(gateInfo["NAME"])
-        
-    Outputsr = []
-    for name in outputNames:
-        outputIndex = outputsFromFileNames.index(name)
-        gateInfo = outputsFromFile[outputIndex]
-        #Gate(name,gateType,Km,n,Pmin,Pmax,halfLife,REUconv=None)
-        tempGate = Gate.Gate(str(gateInfo["NAME"]),"Output",None,None,None,None,gateInfo["halfLife"],None)
-        Outputsr.append(tempGate)
-    return Outputsr
-    
-def makeRepressorsGroups(repressorLibrary,numRepressors):
-    myFile = open(repressorLibrary,'r')
-    repressorsFromFile = json.load(myFile)
-    myFile.close()
-    
-    allRepressors = []
-    
-    for gateInfo in repressorsFromFile:
-        #Gate(name,gateType,Km,n,Pmin,Pmax,halfLife,REUconv=None)
-        tempGate = Gate.Gate(str(gateInfo["NAME"]),"Repressor",gateInfo["Km"],gateInfo["n"],gateInfo["Pmin"],gateInfo["Pmax"],gateInfo["halfLife"],None)
-        allRepressors.append(tempGate)
-    #Make list of permutations
-    IntermediatesrList = list(itertools.permutations(allRepressors, numRepressors))
-    return IntermediatesrList
 
 def findSmallestParentheses(circuit):
     """

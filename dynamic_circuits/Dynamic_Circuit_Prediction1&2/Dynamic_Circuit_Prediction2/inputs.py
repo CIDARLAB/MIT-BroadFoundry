@@ -7,6 +7,7 @@ Created on Thu Jun 18 11:56:25 2015
 
 import numpy as np
 from scipy import signal
+
 '''
 Sinusoidal Input Function 
 per = period of sinusoid 

@@ -1,5 +1,5 @@
 Dynamic_Circuit_Prediction
-Takes into account mRNA concentration, transcription and translation rates separately.
+Takes into account mRNA concentration, transcription and translation rates separately. The optimizing algorithm for Dynamic_Circuit_Prediction may be incomplete compared to Dynamic_Circuit_Prediction2
 
 
 Dynamic_Circuit_Prediction2
@@ -31,3 +31,8 @@ The last two do the same thing as the first two except you can set a time limit 
 example: optimizeNetlistWithLibraries(truthValueExampleFileLoc2,smallestScoreAllowed=3)
 
 Look at examplesForUse() for more examples.
+
+If odeint is creating problems go to General.py and comment out
+soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names,numGates),hmax=350)
+and uncomment out
+soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names,numGates))

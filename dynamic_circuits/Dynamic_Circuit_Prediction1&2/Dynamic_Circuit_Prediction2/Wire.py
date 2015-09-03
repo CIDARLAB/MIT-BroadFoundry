@@ -6,9 +6,8 @@ Created on Fri Jul 17 22:31:03 2015
 @author: Arinze
 Edited by Alex on 7/30/2015
 """
-import numpy as np
+
 import Gate
-import Graph
 
 class Wire(object):
     
@@ -18,6 +17,7 @@ class Wire(object):
         self.fromGate = None
         self.toGate = None
         
+    #getters
     def getName(self):
         return self.name
         
@@ -26,7 +26,8 @@ class Wire(object):
         
     def getTo(self):
         return self.toGate
-
+        
+    #setters
     def setName(self,name):
         assert type(name)== str
         self.name = name
@@ -61,18 +62,6 @@ class Wire(object):
         #its own fanIn
         self.toGate = toGate
             
-#    def __eq__(self, wire):
-#        '''
-#        Determines if another Wire object is the same as the current wire object
-#        '''
-#        if type(wire) != Wire:
-#            return False
-#        if (self.toGate == wire.getTo()) and (self.fromGate == wire.getFrom()) and (self.name == wire.getName()):
-#            return True
-#        return False
-#
-#    def __ne__(self,wire):
-#        return not(self.__eq__(wire))
         
     def __repr__(self,wire):
         return self.name

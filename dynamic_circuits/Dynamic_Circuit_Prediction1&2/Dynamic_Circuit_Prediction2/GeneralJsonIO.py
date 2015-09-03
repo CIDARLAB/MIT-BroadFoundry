@@ -10,8 +10,9 @@ import inputs
 
 def writeJsonFile(time_axis_params,input_and_logic_gate_dictionaries,fileLoc):
     """
-    Writes what was used to a JSON file using pretty print. Saves all information
-    needed to reproduce the circuit
+    Writes what was used to a JSON file using pretty print. Saves all
+    information needed to reproduce the circuit. Does the opposite process 
+    of getFromJsonFile(fileLoc)
     """
     newList = [time_axis_params]
     newList = newList + input_and_logic_gate_dictionaries
@@ -49,6 +50,7 @@ def getFromJsonFile(fileLoc):
         if item['TYPE']=='INPUT':
             
             #for example: sinInput(t, per=4, amp=1, dis=0, bas=0): ['INPUT'][0] is the function name, [1] is per, [2] is amp, etc.
+            #             item['INPUT'] = [inputs.sinInput,4,1,0,0]
             #convert function name to actual function
             x = item['INPUT'][0]
             if x =='inputs.sinInput' or x == 'sinInput':

@@ -5,7 +5,6 @@ Created on Fri Jul 17 21:24:01 2015
 @author: Arinze
 """
 
-import numpy as np
 import Gate
 import Wire
 import json
@@ -321,14 +320,14 @@ class Graph(object):
         result = 'Inputs:\n'
         for gate in self.inputs:
             result = result + gate.getName() + '\n'
-        result = result + 'Intermediates:\n'
+        result = result + '\nIntermediates:\n'
         for gate in self.intermediates:
             result = result + gate.getName() + '\n'
-        result = result + 'Outputs:\n'
+        result = result + '\nOutputs:\n'
         for gate in self.outputs:
-            result = result + gate.getName() + '\n\n'
+            result = result + gate.getName() + '\n'
             
-        result = result + 'NETLIST:\n'
+        result = result + '\nNETLIST:\n'
         self.setGateDist()
         self.intermediates.sort(self.gateCompare)
         self.outputs.sort(self.gateCompare)

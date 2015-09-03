@@ -24,20 +24,29 @@ repressorsDir = "JsonFiles/Libraries/RepressorLibrary.json"
 outputsDir = "JsonFiles/Libraries/OutputLibrary.json"
 Libraries = [inputsDir, repressorsDir, outputsDir]
 
-#placeToSave converts a netlist (list of strings) to a JSON file.
+
 #'General.py' reads the json file and makes a Graph.
+#Given a netlist and a set of gene names, will create a graph that predicts
+#the concentration of the genes overtime and will determine the score of the 
+#circuit if it is not a sequential circuit. The netlist can either be a list
+#of strings or an absolute path that leads to a json file with the list of strings.
 def makeGraphFromNetlist(netlist,makeBarGraph=True,makeGraphs=True,useDefaultWaveForm=True,genesToUse=None):
+    #placeToSave is where the netlist that was converted to a graph is saved
     placeToSave = "JsonFiles/singleGraphTempFile1.json"
     print OptimalCircuit.wrapperForNetlist(netlist,placeToSave,makeBarGraph=makeBarGraph,makeOtherGraphs=makeGraphs,useDefaultInput=useDefaultWaveForm,genesToUse=genesToUse)
 
 def makeGraphFromCircuitString(circuitString,makeBarGraph=True,makeGraphs=True,useDefaultWaveForm=True,genesToUse=None):
+    #first convert this circuit string to a netlist
     netlist = OptimalCircuit.convertCircuitStringToNetlist(circuitString)
+    #give this placeToSave a different name so that there won't be any overlap 
+    #of files if you try to run this and makeGraphFromNetlist at the same time.
     placeToSave = "JsonFiles/singleGraphTempFile2.json"
     print OptimalCircuit.wrapperForNetlist(netlist,placeToSave,makeBarGraph=makeBarGraph,makeOtherGraphs=makeGraphs,useDefaultInput=useDefaultWaveForm,genesToUse=genesToUse)
 
 #combinational only, not sequential
 def optimizeNetlistWithLibraries(netlist,Libraries=Libraries,smallestScoreAllowed=10,numTraj=5):
     answer = Optimize.findOptimalAssortmentHill(netlist,Libraries, smallestScoreAllowed,numTraj)
+    #print the best graph and its score
     print answer[0]
     print "Score =",answer[1]
     return answer
@@ -51,7 +60,7 @@ def optimizeCircuitStringWithLibraries(circuitString,Libraries=Libraries,smalles
     return answer
 
 #combinational only, not sequential
-def optimizeNetlistWithLibrariesTimed(netlist,Libraries=Libraries,smallestScoreAllowed=10,numTraj=5,maxTime=300):
+def optimizeNetlistWithLibrariesTimed(netlist,Libraries=Libraries,smallestScoreAllowed=10,numTraj=5,maxTime=500):
     answer = Optimize.findOptimalAssortmentHillTimed(netlist,Libraries, smallestScoreAllowed,numTraj,maxTime)
     print answer[0]
     print "Score =",answer[1]
@@ -65,6 +74,7 @@ def optimizeCircuitStringWithLibrariesTimed(circuitString,Libraries=Libraries,sm
     print "Score =",answer[1]
     return answer    
     
+#examples for how to call the functions.
 def examplesForUse():
     makeGraphFromNetlist(repressilatorFileLoc)
     pause = raw_input("pause1")
@@ -76,6 +86,6 @@ def examplesForUse():
     pause = raw_input("pause4")
     makeGraphFromNetlist(exampleNetlist)
     pause = raw_input("pause5")
-    makeGraphFromNetlist(exampleNetlist,genesToUse=genesToUse)
+    makeGraphFromNetlist(exampleNetlist,genesToUse=genesList)
     pause = raw_input("pause6")
     optimizeNetlistWithLibraries(truthValueExampleFileLoc2,smallestScoreAllowed=3)

@@ -7,8 +7,6 @@ Edited by Alex on 7/30/2015
 """
 import numpy as np
 import Wire
-import Graph
-import inputs
 import copy
 
 class Gate(object):
@@ -42,18 +40,20 @@ class Gate(object):
         self.REUi = None
         #To adjust the input equation for Inputs
         self.inputType = None
-        #Properties to be manipulated by Graph
+        #Properties to be manipulated by Graph.py
         self.dist = 0    
         self.visited = True
         self.expectedProtein = None
         self.expectedPromoter = None
         
+        #The output fluorescent protein genes do not have these properties
         if self.gateType != 'Output':
             self.Km = float(Km)
             self.n = float(n)
             self.Pmin = float(Pmin)
             self.Pmax = float(Pmax)
-#            self.mB = None
+            
+        #the input proteins and promoters do not have these properties
         if self.gateType != 'Input':
             self.degRate = np.log(2)/self.halfLife
             self.REUi = 0.0
@@ -388,6 +388,7 @@ class Gate(object):
             gateStr = gateStr + "OR("
         elif len(self.fanIn) == 1 and (self.gateType == "Output" or self.gateType == "Activator"):
             gateStr = gateStr + "BUF("
+        #For unrecognized gates. In case something goes wrong.
         else:
             gateStr = gateStr + "???("
         gateStr = gateStr + self.name + ","

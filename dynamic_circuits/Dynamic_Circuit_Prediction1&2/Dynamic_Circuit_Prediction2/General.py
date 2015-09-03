@@ -9,15 +9,12 @@ values and ignores mRNA, only focusing on protein actions.
 """
 
 import matplotlib.pyplot as plt
-import inputs
 import update
 import GeneralJsonIO
 from scipy.integrate import odeint
-from scipy.integrate import ode
 import numpy as np
 import DifferentialSolver
 import time
-import json
 
 #input is a json file
 def generateDynamicCircuitGraphs(fileName, makeBarGraphs, makeOtherGraphs, isSequential): 
@@ -51,18 +48,27 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs, makeOtherGraphs, isSeq
     #args: every other input that f takes that is not state or t
     soln_f = odeint(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names,numGates),hmax=350)
     #soln_f = DifferentialSolver.differentialSolver(f, initc, t, args=(input_and_logic_gate_dictionaries,input_and_logic_gate_names,logic_gate_names,numGates))
-      
+    
+    #soln_f is a list of length len(t) containing lists of length len(initc).
+    #The ith index of soln_f corresponds to the protein concentration at the
+    #time of the ith index of t.
+    
     REU_f = []
     for i in range(numGates):
         REU_f.append(soln_f[:,i])
+    #REU_f is a list of length len(initc) where each list is of length len(t)
+    #and each list contains the concentrations of the proteins for a gate at
+    #a given time
         
-    #These are the possible graph lines/markers.
+    #These are the possible graph lines/markers. This is used to make sure each
+    #line on a graph is unique.
     color = ['b','g','r','c','m','y','k']
     linestyle = ['--','-','-.',':']
     marker = ['','.',',','o','v','^','<','>','s','p','*','h','+','x','D','|','_']
     
     if makeOtherGraphs:
         #Visualizing Inputs
+        #Make the graphs for the inputs
         inputs_f = []
         inputNames = []
         for thing in input_and_logic_gate_names:
@@ -122,7 +128,7 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs, makeOtherGraphs, isSeq
         plt.axis(xmin=time_axis_params['xMin'], xmax=time_axis_params['xMax'], ymin=0.1, ymax = ymax)
         plt.show()
     
-        #For only outputs
+        #Makes a graph that only contains the outputs.
         print "Everything but outputs stripped from graph."
         #Visualizing REU
         plt.figure()
@@ -167,7 +173,7 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs, makeOtherGraphs, isSeq
 
     scoreDict = {}
     
-    #Make two bar graphs for each gene. One for mRNA and one for protein
+    #Make a bar graph for each gene
     for i in range(numGates):
         REUVals = list(REUListOfListOfValues[i])
         REUymax = max(REUVals)*10
@@ -209,6 +215,11 @@ def generateDynamicCircuitGraphs(fileName, makeBarGraphs, makeOtherGraphs, isSeq
     return scoreDict
     
 def getBinaryInOrder(maxVal):
+    """
+    returns a list of binary numbers (as strings) from 0 to maxVal with
+    the length of each binary number equal to the length of maxVal as a binary.
+    this is done by adding leading zeros to the binary
+    """
     binVals = []
     #get a list of the numbers in decimal
     decVals = range(maxVal)
@@ -233,6 +244,10 @@ def getBinaryInOrder(maxVal):
     return binVals
 
 def f(state, t, input_and_logic_gate_dictionaries, input_and_logic_gate_names, logic_gate_names, numGates):
+    """
+    takes in a current state and a time point (along with other arguments)
+    and returns the slope of the time vs state graph at the given time point.
+    """
     for i in range(len(state)):
         if state[i]<0 :
             state[i] = 0.0

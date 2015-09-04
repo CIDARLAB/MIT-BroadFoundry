@@ -39,10 +39,10 @@ def revcomp(seq, trans=string.maketrans("ACGT", "TGCA")):
 start_time = timeit.default_timer()
 
 # Parse command line parameters
-if len(sys.argv) != 9:
-	print("Usage: python {} <design regexs> <R1 fastq> <R2 fastq> <fwd primer length> <rev primer length> <fwd barcode index> <rev barcode index> <output prefix>".format(sys.argv[0]), file=sys.stderr)
+if len(sys.argv) != 10:
+	print("Usage: python {} <design regexs> <R1 fastq> <R2 fastq> <fwd primer length> <rev primer length> <fwd barcode index> <rev barcode index> <other barcode indexes> <output prefix>".format(sys.argv[0]), file=sys.stderr)
 	sys.exit()
-design_filename, r1_filename, r2_filename, fwd_primer_len, rev_primer_len, fwd_bc_idx, rev_bc_idx, out_prefix = sys.argv[1:]
+design_filename, r1_filename, r2_filename, fwd_primer_len, rev_primer_len, fwd_bc_idx, rev_bc_idx, other_bc_idxs, out_prefix = sys.argv[1:]
 out_prefix = out_prefix.strip()
 
 # Allow user to specify index starting at 1 (not 0)
@@ -61,6 +61,19 @@ if rev_bc_idx < 0:
 	rev_bc_idx = (-1*rev_bc_idx) - 1
 else:
 	rev_bc_idx = rev_bc_idx - 1
+
+# Allow for other variable regions (not used for extraction) 
+# to be included in composite barcode
+other_bc_idxs = [int(x) for x in other_bc_idxs.split(',')]
+other_fwd_bc_idxs = []
+other_rev_bc_idxs = []
+for bc_idx in other_bc_idxs:
+	if bc_idx < 0:
+		other_rev_bc_idxs.append((-1*bc_idx)-1)
+	elif bc_idx > 0:
+		other_fwd_bc_idxs.append(bc_idx-1)
+	else:
+		continue
 
 fwd_primer_len = int(fwd_primer_len)
 rev_primer_len = int(rev_primer_len)
@@ -153,8 +166,6 @@ while line_idx < max_line_idx:
 			found_design = design
 			found_fwd_barcodes = list(m1.groups())
 			found_rev_barcodes = [revcomp(x) for x in m2.groups()]
-			found_barcode = found_fwd_barcodes + found_rev_barcodes
-			barcode_key = "-".join(found_barcode)
 
 			# Select the correct barcode
 			if fwd_bc_read == 1:
@@ -165,6 +176,16 @@ while line_idx < max_line_idx:
 				rev_barcode = found_fwd_barcodes[rev_bc_idx]
 			else:
 				rev_barcode = found_rev_barcodes[rev_bc_idx]
+
+			other_bcs = []
+			for other_bc_idx in other_fwd_bc_idxs:
+				other_bcs.append(found_fwd_barcodes[other_bc_idx])
+			for other_bc_idx in other_rev_bc_idxs:
+				other_bcs.append(found_rev_barcodes[other_bc_idx])
+
+			# Create the barcode fwd,rev (primers), then all others
+			found_barcode = [fwd_barcode, rev_barcode] + other_bcs
+			barcode_key = "-".join(found_barcode)
 			
 			# CHECK BARCODES ##################################################
 			if fwd_barcode not in barcodes_to_check_set_0:
@@ -227,14 +248,14 @@ for design in sorted(found_designs.keys()):
 	unique_for_design = False
 	for bc in found_designs[design]:
 		# Check to see where barcode is used (if unique for design)
-		if ( (len(barcodes_to_check[0][bc[fwd_bc_idx]]) == 1) and
-		     (revcomp(bc[fwd_bc_idx]) not in barcodes_to_check_set_0) and
-		     (bc[fwd_bc_idx] not in barcodes_to_check_set_1) and
-		     (revcomp(bc[fwd_bc_idx]) not in barcodes_to_check_set_1) and
-		     (len(barcodes_to_check[1][bc[rev_bc_idx]]) == 1) and
-		     (revcomp(bc[rev_bc_idx]) not in barcodes_to_check_set_1) and
-		     (bc[rev_bc_idx] not in barcodes_to_check_set_0) and
-		     (revcomp(bc[rev_bc_idx]) not in barcodes_to_check_set_0) ):
+		if ( (len(barcodes_to_check[0][bc[0]]) == 1) and
+		     (revcomp(bc[0]) not in barcodes_to_check_set_0) and
+		     (bc[0] not in barcodes_to_check_set_1) and
+		     (revcomp(bc[0]) not in barcodes_to_check_set_1) and
+		     (len(barcodes_to_check[1][bc[1]]) == 1) and
+		     (revcomp(bc[1]) not in barcodes_to_check_set_1) and
+		     (bc[1] not in barcodes_to_check_set_0) and
+		     (revcomp(bc[1]) not in barcodes_to_check_set_0) ):
 			unique_barcodes.append(bc)
 			n_unique_bc += 1
 			unique_for_design = True

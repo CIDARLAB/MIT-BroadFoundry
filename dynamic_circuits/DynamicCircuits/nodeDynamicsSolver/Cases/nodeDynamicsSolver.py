@@ -15,7 +15,6 @@ NOTE:
 import matplotlib.pyplot as plt
 import numpy as np
 import json
-import inputs
 from scipy.integrate import odeint
 plt.ion()
 
@@ -28,27 +27,20 @@ def getFromJsonFile(fileLoc):
     data = json.load(myFile)
     node_inic = data[0] # a dictionary of initial conditions
     node_params = data[1] # a dictionary containing 2 dictionaries of protein parameters
-    input_params = data[2]    
-    input_vectors = data[3]    
-    node_vectors = data[4:] # a list of arrays containing objects defining regulation motifs
-    return node_inic, node_params, input_params, input_vectors, node_vectors
+    node_vectors = data[2:] # a list of arrays containing objects defining regulation motifs
+    return node_inic, node_params, node_vectors
 
 # state: the initial condition at which the differential would be determined
-# t: a single time point from the list of time values
-# nodeParameter: a dictionary of gene nodeParameters where the keys are the gene names
+# t: the list of time values
+# parameter: a dictionary of gene parameters where the keys are the gene names
 #   -For example, 'X' would be a key to a dictionary of parameters (see masterNodeInputFile.json)
-# inputParameter: a dictionary of gene inputParameter where the keys are the input names
-#   -For example, 'A' would be a key to a dictionary of parameters (see masterNodeInputFile.json)
-# nodeVector: an array of objects with each specifying a regulation motif
-# inputVector: an array of objects with each specifying a regulation motif
-# maxTime: maximum value for time
-# signal: an array of floats representing different signals over time
-def f(state, t, nodeParameter, inputParameter, nodeVector, inputVector, maxTime = 0):
+# vectors: an array of objects with each specifying a regulation motif  
+def f(state, t, parameter, vectors):
     '''
     Function passed through odeint() that represents the system of differential 
     equations of the rate of change of each protein.
     '''
-    proteinNames = nodeParameter.keys()
+    proteinNames = parameter.keys()
     proteinNames.sort()
     initProtein = {}
     
@@ -65,56 +57,38 @@ def f(state, t, nodeParameter, inputParameter, nodeVector, inputVector, maxTime 
     # For each protein we want to calculate the change in its levels
     for name in proteinNames:
         # Gets the changes and adds it to the list holding the changes
-        dinitProtein_dt.append(getProteinChange(name,initProtein,nodeParameter,inputParameter,nodeVector,inputVector,t,maxTime))
+        dinitProtein_dt.append(getProteinChange(name,initProtein,parameter,vectors))
     return dinitProtein_dt
-
 
 # proteinName: a string of the variable that rate of change is being measured
 # initProtein: a dictionary of the initial conditions, 
-# nodeParameter: a dictionary of gene nodeParameter where the keys are the gene names
-#   -For example, 'X' would be a key to a dictionary of parameters (see masterNodeInputFile.json)
-# inputParameter: a dictionary of gene inputParameter where the keys are the input names
-#   -For example, 'A' would be a key to a dictionary of parameters (see masterNodeInputFile.json)
-# nodeVector: a single array of objects representing regulation motifs.
-# inputVector: a single array of objects representing input regulation
-# t: the time point of interest
-# maxTime: the maximum time point of the system
-def getProteinChange(proteinName,initProtein,nodeParameter,inputParameter,nodeVector,inputVector,t,maxTime=0):
-    param = nodeParameter[proteinName]
+# parameter: a dictionary of 2 dictionaries of protein parameters, 
+# vectors: a single array of objects representing regulation motifs.
+def getProteinChange(proteinName, initProtein, parameters, vectors):
+    param = parameters[proteinName]
 
-    # Degradation term and basal rate terms
     a = param['a']
     B0 = param['B0']
+    # Degradation term and basal rate terms
     firstTerm = -a*initProtein[proteinName] + B0
     # Regulation term calculation determined by repression or activation hill equations
     addTerm = 0   
-    vectors = nodeVector+inputVector
-    parameter = nodeParameter.copy()
-    parameter.update(inputParameter)
     
-    for vec in vectors:
+    for vec in vectors:     
         # Cycles through all vectors finding those that affect the node
         if vec['to'] == proteinName:
-            # Sets up terms for the calculation of the hill equation
-            param = parameter[vec['from']] 
-            
-            # Differentiates between node or input effects
-            if vec['from'] in initProtein.keys():
-                inputVal = initProtein[vec['from']]
-            else:
-                inputVal = inputs.getSquareWavePoint(t,param['signal'],maxTime)
-
+            # Sets up terms for the calculation of the hill equation                                
+            inputVal = initProtein[vec['from']]
+            param = parameters[vec['from']] 
             B = param['B']
             Km = param['Km']
             n =  param['n']
-
             if vec['effect'] == -1:
                 addTerm += repressor(B,Km,n,inputVal)
             elif vec['effect'] == 1:
                 addTerm += activator(B,Km,n,inputVal)
             else:
                 addTerm += 0
-    
     answer = firstTerm+addTerm
     return answer
 
@@ -157,54 +131,44 @@ def activator(B,K,n,inputVal):
             return 0
             
 
-# json file should be created from CombinationThreeNodeInputFileCreator.py
-jsonLoc = 'masterCombi4NodeInputFile.json'
+# json file should contain an array of 2 objects and an array representing
+# initial gene conditions, parameters, and vectors, respectively.
+jsonLoc = 'repressilator.json'
 # png file name & location where png will be saved
-pngLoc = 'Examples/combinational.png'
+pngLoc = 'repressilator.png'
 
-'''
-Code for plotting configurations of input/node interactions
-'''
-# Creates a list of time points after initializing max time and iterations
-tMax = 500
-itr = 5*tMax
-t = np.linspace(0, tMax, itr)
-
-# Pulls variables from json file using the getFromJsonFile function
-node_initCond, node_params, input_params, input_vectors, node_vectors = getFromJsonFile(jsonLoc)
-
-# Gets a list of the names of each node protein
-proteinNames = node_initCond.keys()
-proteinNames.sort()
-
-# The initial conditions should correspond to the sorted keys
+# Code for plotting configurations of X/Y nodes interactions
+xMax = 1000
+itr = 5*xMax
+t = np.linspace(0, xMax, itr)
+node_initCond, node_params, node_vectors = getFromJsonFile(jsonLoc)
 firstState = []
-for name in proteinNames:
-    firstState.append(node_initCond[name])
-
+proteinNames = node_initCond.keys()
 numProteins = len(proteinNames)
-numNodeVectors = len(node_vectors)
-for i in range(numNodeVectors):
+proteinNames.sort()
+# The initial conditions should correspond to the sorted keys
+for key in proteinNames:
+    firstState.append(node_initCond[key])
+    
+for i in range(len(node_vectors)):
     # firstState maps to state when function f is called in the odeint function
     # index i for node_vectors gets us an individual array of objects
-    # args needed for updating the state of the different genes
-    soln_f = odeint(f, firstState, t, args = (node_params, input_params, node_vectors[i], input_vectors, tMax))
+    soln_f = odeint(f, firstState, t, args = (node_params, node_vectors[i]))
 
     # Plots the transcriptional dynamics
     plt.figure()
-    plt.axis([0,500,0,1000])
     for j in range(numProteins): 
         plt.plot(t,soln_f[:,j], label = proteinNames[j])
     plt.xlabel('Time (min)')
     plt.ylabel('Proteins per cell')
-    plt.title('Combinational Circuit')
+    plt.title('Repressilator')
     plt.legend(loc=0)
     #Saves file as png file
     plt.savefig(pngLoc)
-
-
-
-
+    
+    
+    
+    
     
     
     

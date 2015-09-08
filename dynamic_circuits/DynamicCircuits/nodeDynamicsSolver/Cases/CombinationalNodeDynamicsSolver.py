@@ -160,13 +160,13 @@ def activator(B,K,n,inputVal):
 # json file should be created from CombinationThreeNodeInputFileCreator.py
 jsonLoc = 'masterCombi4NodeInputFile.json'
 # png file name & location where png will be saved
-pngLoc = 'Examples/combinational.png'
+pngLoc = 'combinational.png'
 
 '''
 Code for plotting configurations of input/node interactions
 '''
 # Creates a list of time points after initializing max time and iterations
-tMax = 500
+tMax = 1000
 itr = 5*tMax
 t = np.linspace(0, tMax, itr)
 
@@ -192,9 +192,10 @@ for i in range(numNodeVectors):
 
     # Plots the transcriptional dynamics
     plt.figure()
-    plt.axis([0,500,0,1000])
-    for j in range(numProteins): 
-        plt.plot(t,soln_f[:,j], label = proteinNames[j])
+    #plt.axis([0,500,0,1000])
+    plt.plot(t,soln_f[:,0], label = proteinNames[0])
+    #for j in range(numProteins): 
+    #    plt.plot(t,soln_f[:,j], label = proteinNames[j])
     plt.xlabel('Time (min)')
     plt.ylabel('Proteins per cell')
     plt.title('Combinational Circuit')

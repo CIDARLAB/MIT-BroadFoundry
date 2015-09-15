@@ -98,6 +98,7 @@ sys.stdout.flush()
 n_reads = 0
 n_accepted = 0
 n_matched = 0
+n_barcoded_designs = 0
 found_designs = {}
 found_barcodes = {}
 found_barcode_reads = {}

@@ -1,9 +1,10 @@
-LOCUS       pAAKN_0x58v50          11115 bp ds-DNA     linear       23-JUL-2014
+LOCUS       pAAKN_0x58v50          11115 bp ds-DNA     linear       15-SEP-2015
 DEFINITION  .
 ACCESSION   
 VERSION     
 SOURCE      .
   ORGANISM  .
+COMMENT     
 COMMENT     
 COMMENT     ApEinfo:methylated:1
 FEATURES             Location/Qualifiers

@@ -25,6 +25,7 @@ def main():
 	for s in samples:
 		pc.count_reads(settings, s, feature=f, attribute=a)
 		pc.gene_lengths(settings, s, feature=f, attribute=a)
+		pc.mapped_reads(settings, s)
 
 if __name__ == "__main__":
 	main()

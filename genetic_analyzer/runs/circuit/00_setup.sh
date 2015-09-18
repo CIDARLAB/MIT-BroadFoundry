@@ -28,20 +28,20 @@ mkdir ./results/flask_6
 mkdir ./results/flask_7
 mkdir ./results/flask_8
 
-mkdir /broad/hptmp/tgorocho/circuit_1_1/
-mkdir /broad/hptmp/tgorocho/circuit_2_1/
-mkdir /broad/hptmp/tgorocho/circuit_3_1/
-mkdir /broad/hptmp/tgorocho/circuit_4_1/
-mkdir /broad/hptmp/tgorocho/circuit_5_1/
-mkdir /broad/hptmp/tgorocho/circuit_6_1/
-mkdir /broad/hptmp/tgorocho/circuit_7_1/
-mkdir /broad/hptmp/tgorocho/circuit_8_1/
+mkdir /broad/hptmp/tgorocho/circuit_tube_1/
+mkdir /broad/hptmp/tgorocho/circuit_tube_2/
+mkdir /broad/hptmp/tgorocho/circuit_tube_3/
+mkdir /broad/hptmp/tgorocho/circuit_tube_4/
+mkdir /broad/hptmp/tgorocho/circuit_tube_5/
+mkdir /broad/hptmp/tgorocho/circuit_tube_6/
+mkdir /broad/hptmp/tgorocho/circuit_tube_7/
+mkdir /broad/hptmp/tgorocho/circuit_tube_8/
 
-mkdir /broad/hptmp/tgorocho/circuit_1_2/
-mkdir /broad/hptmp/tgorocho/circuit_2_2/
-mkdir /broad/hptmp/tgorocho/circuit_3_2/
-mkdir /broad/hptmp/tgorocho/circuit_4_2/
-mkdir /broad/hptmp/tgorocho/circuit_5_2/
-mkdir /broad/hptmp/tgorocho/circuit_6_2/
-mkdir /broad/hptmp/tgorocho/circuit_7_2/
-mkdir /broad/hptmp/tgorocho/circuit_8_2/
+mkdir /broad/hptmp/tgorocho/circuit_flask_1/
+mkdir /broad/hptmp/tgorocho/circuit_flask_2/
+mkdir /broad/hptmp/tgorocho/circuit_flask_3/
+mkdir /broad/hptmp/tgorocho/circuit_flask_4/
+mkdir /broad/hptmp/tgorocho/circuit_flask_5/
+mkdir /broad/hptmp/tgorocho/circuit_flask_6/
+mkdir /broad/hptmp/tgorocho/circuit_flask_7/
+mkdir /broad/hptmp/tgorocho/circuit_flask_8/

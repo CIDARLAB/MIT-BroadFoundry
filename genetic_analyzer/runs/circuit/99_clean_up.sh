@@ -5,40 +5,40 @@
 
 # Clean up temp files
 
-rm /broad/hptmp/tgorocho/circuit_1_1/*.*
-rm /broad/hptmp/tgorocho/circuit_2_1/*.*
-rm /broad/hptmp/tgorocho/circuit_3_1/*.*
-rm /broad/hptmp/tgorocho/circuit_4_1/*.*
-rm /broad/hptmp/tgorocho/circuit_5_1/*.*
-rm /broad/hptmp/tgorocho/circuit_6_1/*.*
-rm /broad/hptmp/tgorocho/circuit_7_1/*.*
-rm /broad/hptmp/tgorocho/circuit_8_1/*.*
+rm /broad/hptmp/tgorocho/circuit_tube_1/*.*
+rm /broad/hptmp/tgorocho/circuit_tube_2/*.*
+rm /broad/hptmp/tgorocho/circuit_tube_3/*.*
+rm /broad/hptmp/tgorocho/circuit_tube_4/*.*
+rm /broad/hptmp/tgorocho/circuit_tube_5/*.*
+rm /broad/hptmp/tgorocho/circuit_tube_6/*.*
+rm /broad/hptmp/tgorocho/circuit_tube_7/*.*
+rm /broad/hptmp/tgorocho/circuit_tube_8/*.*
 
-rm /broad/hptmp/tgorocho/circuit_1_2/*.*
-rm /broad/hptmp/tgorocho/circuit_2_2/*.*
-rm /broad/hptmp/tgorocho/circuit_3_2/*.*
-rm /broad/hptmp/tgorocho/circuit_4_2/*.*
-rm /broad/hptmp/tgorocho/circuit_5_2/*.*
-rm /broad/hptmp/tgorocho/circuit_6_2/*.*
-rm /broad/hptmp/tgorocho/circuit_7_2/*.*
-rm /broad/hptmp/tgorocho/circuit_8_2/*.*
+rm /broad/hptmp/tgorocho/circuit_flask_1/*.*
+rm /broad/hptmp/tgorocho/circuit_flask_2/*.*
+rm /broad/hptmp/tgorocho/circuit_flask_3/*.*
+rm /broad/hptmp/tgorocho/circuit_flask_4/*.*
+rm /broad/hptmp/tgorocho/circuit_flask_5/*.*
+rm /broad/hptmp/tgorocho/circuit_flask_6/*.*
+rm /broad/hptmp/tgorocho/circuit_flask_7/*.*
+rm /broad/hptmp/tgorocho/circuit_flask_8/*.*
 
-rmdir /broad/hptmp/tgorocho/circuit_1_1
-rmdir /broad/hptmp/tgorocho/circuit_2_1
-rmdir /broad/hptmp/tgorocho/circuit_3_1
-rmdir /broad/hptmp/tgorocho/circuit_4_1
-rmdir /broad/hptmp/tgorocho/circuit_5_1
-rmdir /broad/hptmp/tgorocho/circuit_6_1
-rmdir /broad/hptmp/tgorocho/circuit_7_1
-rmdir /broad/hptmp/tgorocho/circuit_8_1
+rmdir /broad/hptmp/tgorocho/circuit_tube_1
+rmdir /broad/hptmp/tgorocho/circuit_tube_2
+rmdir /broad/hptmp/tgorocho/circuit_tube_3
+rmdir /broad/hptmp/tgorocho/circuit_tube_4
+rmdir /broad/hptmp/tgorocho/circuit_tube_5
+rmdir /broad/hptmp/tgorocho/circuit_tube_6
+rmdir /broad/hptmp/tgorocho/circuit_tube_7
+rmdir /broad/hptmp/tgorocho/circuit_tube_8
 
-rmdir /broad/hptmp/tgorocho/circuit_1_2
-rmdir /broad/hptmp/tgorocho/circuit_2_2
-rmdir /broad/hptmp/tgorocho/circuit_3_2
-rmdir /broad/hptmp/tgorocho/circuit_4_2
-rmdir /broad/hptmp/tgorocho/circuit_5_2
-rmdir /broad/hptmp/tgorocho/circuit_6_2
-rmdir /broad/hptmp/tgorocho/circuit_7_2
-rmdir /broad/hptmp/tgorocho/circuit_8_2
+rmdir /broad/hptmp/tgorocho/circuit_flask_1
+rmdir /broad/hptmp/tgorocho/circuit_flask_2
+rmdir /broad/hptmp/tgorocho/circuit_flask_3
+rmdir /broad/hptmp/tgorocho/circuit_flask_4
+rmdir /broad/hptmp/tgorocho/circuit_flask_5
+rmdir /broad/hptmp/tgorocho/circuit_flask_6
+rmdir /broad/hptmp/tgorocho/circuit_flask_7
+rmdir /broad/hptmp/tgorocho/circuit_flask_8
 
 rm ./logs/*.*

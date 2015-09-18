@@ -4,8 +4,6 @@
 # 	All rights reserved.
 #	OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
 
-# Differential gene analysis
-
 BIN_PATH=/home/unix/tgorocho/genetic_analyzer/bin
 
 # A number of DE studies can be performed by varying the groups used (these are the sample column indexes from the matrix)

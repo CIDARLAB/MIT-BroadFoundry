@@ -23,9 +23,9 @@ def main():
 	cur_group1 = args.group1
 	cur_group2 = args.group2
 	cur_output_prefix = args.output_prefix
-	cur_bin_path = ga.load_settings(args.bin_path)
+	cur_bin_path = args.bin_path
 	# Run the DE analysis
-	de_analysis(settings, cur_group1, cur_group2, cur_output_prefix, bin_path=cur_bin_path)
+	ga.de_analysis(settings, cur_group1, cur_group2, cur_output_prefix, bin_path=cur_bin_path)
 
 if __name__ == "__main__":
 	main()

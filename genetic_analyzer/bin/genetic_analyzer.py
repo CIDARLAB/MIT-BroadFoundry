@@ -289,6 +289,6 @@ def de_analysis (settings, group1, group2, output_prefix, bin_path=''):
 	           ' ' + group1 + \
 	           ' ' + group2 + \
 	           ' ' + mapped_reads_matrix_filename(settings) + \
-	           ' ' + settings['None']['output_path'] + '/' + output_prefix
+	           ' ' + settings['None']['output_path'] + output_prefix
 	print("Generating normalised RPKM/FPKMs: "+cmd_deg)
 	subprocess.call(cmd_deg, shell=True)

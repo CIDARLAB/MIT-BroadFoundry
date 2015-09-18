@@ -7,7 +7,7 @@
 
 # Supporting modules
 import argparse
-import part_characterizer as pc
+import genetic_analyzer as ga
 
 def main():
 	# Parse the command line inputs
@@ -16,16 +16,18 @@ def main():
 	parser.add_argument("-samples",  dest="samples",  required=True,  help="1,2", metavar="string")
 	parser.add_argument("-feature",  dest="feature",  required=True,  help="gene", metavar="string")
 	parser.add_argument("-attribute",  dest="attribute",  required=True,  help="Name", metavar="string")
+	parser.add_argument("-strand_opt",  dest="strand_opt",  required=True,  help="no/yes/reverse", metavar="string")
 	args = parser.parse_args()
 	# Run the command
 	samples = args.samples.split(',')
-	settings = pc.load_settings(args.settings)
+	settings = ga.load_settings(args.settings)
 	f = args.feature
 	a = args.attribute
+	s_opt = args.strand_opt
 	for s in samples:
-		pc.count_reads(settings, s, feature=f, attribute=a)
-		pc.gene_lengths(settings, s, feature=f, attribute=a)
-		pc.mapped_reads(settings, s)
+		ga.count_reads(settings, s, feature=f, attribute=a, strand_opt=s_opt)
+		ga.gene_lengths(settings, s, feature=f, attribute=a)
+		ga.mapped_reads(settings, s)
 
 if __name__ == "__main__":
 	main()

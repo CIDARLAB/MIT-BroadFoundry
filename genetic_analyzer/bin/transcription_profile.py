@@ -7,7 +7,7 @@
 
 # Supporting modules
 import argparse
-import part_characterizer as pc
+import genetic_analyzer as ga
 
 def main():
 	# Parse the command line inputs
@@ -17,9 +17,9 @@ def main():
 	args = parser.parse_args()
 	# Run the command
 	samples = args.samples.split(',')
-	settings = pc.load_settings(args.settings)
+	settings = ga.load_settings(args.settings)
 	for s in samples:
-		pc.make_profile(settings, s)
+		ga.make_profile(settings, s)
 
 if __name__ == "__main__":
 	main()

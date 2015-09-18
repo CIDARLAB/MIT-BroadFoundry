@@ -1,3 +1,21 @@
 
-# Generate the transcription profile for each sample
+#	Copyright (C) 2015 by
+#	Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT
+# 	All rights reserved.
+#	OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
 
+# Differential gene analysis
+
+BIN_PATH=/home/unix/tgorocho/genetic_analyzer/bin
+
+# A number of DE studies can be performed by varying the groups used (these are the sample column indexes from the matrix)
+bsub -q forest -o ./logs/05_de_analysis.out.log -e ./logs/05_de_analysis.err.log "python $BIN_PATH/de_analysis.py -settings ./data/settings.txt -group1 1,3,5,7,9,11,13,15 -group2 2,4,6,8,10,12,14,16 -output_prefix tube_vs_flask -bin_path $BIN_PATH/"
+
+bsub -q forest -o ./logs/05_de_analysis.out.log -e ./logs/05_de_analysis.err.log "python $BIN_PATH/de_analysis.py -settings ./data/settings.txt -group1 9,11,13,15 -group2 1,3,5,7 -output_prefix ara_comp_tube -bin_path $BIN_PATH/"
+bsub -q forest -o ./logs/05_de_analysis.out.log -e ./logs/05_de_analysis.err.log "python $BIN_PATH/de_analysis.py -settings ./data/settings.txt -group1 10,12,14,16 -group2 2,4,6,8 -output_prefix ara_comp_flask -bin_path $BIN_PATH/"
+
+bsub -q forest -o ./logs/05_de_analysis.out.log -e ./logs/05_de_analysis.err.log "python $BIN_PATH/de_analysis.py -settings ./data/settings.txt -group1 3,7,11,15 -group2 1,5,9,13 -output_prefix iptg_comp_tube -bin_path $BIN_PATH/"
+bsub -q forest -o ./logs/05_de_analysis.out.log -e ./logs/05_de_analysis.err.log "python $BIN_PATH/de_analysis.py -settings ./data/settings.txt -group1 4,8,12,16 -group2 2,6,10,14 -output_prefix iptg_comp_flask -bin_path $BIN_PATH/"
+
+bsub -q forest -o ./logs/05_de_analysis.out.log -e ./logs/05_de_analysis.err.log "python $BIN_PATH/de_analysis.py -settings ./data/settings.txt -group1 5,7,13,15, -group2 1,3,9,11 -output_prefix atc_comp_tube -bin_path $BIN_PATH/"
+bsub -q forest -o ./logs/05_de_analysis.out.log -e ./logs/05_de_analysis.err.log "python $BIN_PATH/de_analysis.py -settings ./data/settings.txt -group1 6,8,14,16 -group2 2,4,10,12 -output_prefix atc_comp_flask -bin_path $BIN_PATH/"

@@ -13,19 +13,21 @@ def main():
 	# Parse the command line inputs
 	parser = argparse.ArgumentParser(description="read_analysis")
 	parser.add_argument("-settings",  dest="settings",  required=True,  help="settings.txt", metavar="string")
-	parser.add_argument("-group1",  dest="group1",  required=True,  help="1,2,6,7", metavar="string")
-	parser.add_argument("-group2",  dest="group2",  required=True,  help="3,4,8,9", metavar="string")
-	parser.add_argument("-output_prefix",  dest="output_prefix",  required=True,  help="WT_vs_Sample", metavar="string")
-	parser.add_argument("-bin_path",  dest="bin_path",  required=True,  help="/usr/bin/", metavar="string")
 	args = parser.parse_args()
-	# Run the command
 	settings = ga.load_settings(args.settings)
-	cur_group1 = args.group1
-	cur_group2 = args.group2
-	cur_output_prefix = args.output_prefix
-	cur_bin_path = ga.load_settings(args.bin_path)
-	# Run the DE analysis
-	de_analysis(settings, cur_group1, cur_group2, cur_output_prefix, bin_path=cur_bin_path)
+	samples = []
+	for s in settings.keys():
+		if s != 'None':
+			samples.append(s)
+			chr_promoters = ga.characterize_promoters(settings, s, upstream_bp=50, downstream_bp=200)
+			ga.save_characterization_data(settings, s, chr_promoters, part_type='promoter')
+			chr_terminators =  ga.characterize_terminators(settings, s, upstream_bp=200, downstream_bp=50)
+			ga.save_characterization_data(settings, s, chr_terminators, part_type='terminator')
+			chr_ribozymes = ga.characterize_ribozymes(settings, s, upstream_bp=100, downstream_bp=100)
+			ga.save_characterization_data(settings, s, chr_ribozymes, part_type='ribozyme')
+	ga.combine_promoter_characterizations(settings, samples)
+	ga.combine_terminator_characterizations(settings, samples)
+	ga.combine_ribozyme_characterizations(settings, samples)
 
 if __name__ == "__main__":
 	main()

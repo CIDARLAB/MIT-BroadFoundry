@@ -1,0 +1,13 @@
+sample	chromosome	part_name	reads_us	reads_ds	reads_strength
+tube_6	0x58v50	pSrpR	16.0	1214.0	1198.0
+tube_6	0x58v50	pDNA2.0	688.0	446.0	-242.0
+tube_6	0x58v50	pLitR	16.0	3278.0	3262.0
+tube_6	0x58v50	pJ23105	0.0	2635.0	2635.0
+tube_6	0x58v50	pPhlF	0.0	2551.5	2551.5
+tube_6	0x58v50	pBM3R1	10.0	71.0	61.0
+tube_6	0x58v50	pBAD2	3614.0	403.0	-3211.0
+tube_6	0x58v50	pBAD1	1308.0	972.0	-336.0
+tube_6	0x58v50	pTet1	0.0	976.5	976.5
+tube_6	0x58v50	pTet2	157.0	4288.5	4131.5
+tube_6	0x58v50	pAmtR	0.0	376.0	376.0
+tube_6	0x58v50	pTac	0.0	178.0	178.0

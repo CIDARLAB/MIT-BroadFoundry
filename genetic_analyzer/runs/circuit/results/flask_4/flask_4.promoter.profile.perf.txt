@@ -1,0 +1,13 @@
+sample	chromosome	part_name	reads_us	reads_ds	reads_strength
+flask_4	0x58v50	pSrpR	23.0	603.0	580.0
+flask_4	0x58v50	pDNA2.0	1457.5	656.5	-801.0
+flask_4	0x58v50	pLitR	23.0	1701.0	1678.0
+flask_4	0x58v50	pJ23105	390.0	6241.5	5851.5
+flask_4	0x58v50	pPhlF	0.0	135765.5	135765.5
+flask_4	0x58v50	pBM3R1	22.0	499.0	477.0
+flask_4	0x58v50	pBAD2	19984.0	247.0	-19737.0
+flask_4	0x58v50	pBAD1	6091.0	6521.5	430.5
+flask_4	0x58v50	pTet1	0.0	7576.5	7576.5
+flask_4	0x58v50	pTet2	150.5	32783.5	32633.0
+flask_4	0x58v50	pAmtR	17.0	1558.5	1541.5
+flask_4	0x58v50	pTac	0.0	1137.5	1137.5

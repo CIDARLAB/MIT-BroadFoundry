@@ -1,0 +1,7 @@
+sample	chromosome	part_name	reads_us	reads_ds	c_e	max_cut	cut_site
+flask_2	0x58v50	RiboJ	54.76	592.82	0.907627947775	N	7
+flask_2	0x58v50	SarJ	93.93	7.94	0.0	N	8
+flask_2	0x58v50	PlmJ	522.85	160.5	0.0	N	11
+flask_2	0x58v50	BydvJ	1.37	3101.12	0.999558224125	N	8
+flask_2	0x58v50	RiboJ53	103.98	10464.35	0.990063405754	N	7
+flask_2	0x58v50	RiboJ10	12.84	1376.36	0.990671045366	N	7

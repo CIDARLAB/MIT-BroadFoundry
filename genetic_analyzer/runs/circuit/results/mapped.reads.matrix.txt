@@ -1,0 +1,17 @@
+sample	total_mapped_reads
+flask_1	7697400
+flask_2	24104567
+flask_3	6480505
+flask_4	10481771
+flask_5	5172160
+flask_6	41242411
+flask_7	6647216
+flask_8	16700828
+tube_1	4266411
+tube_2	5465574
+tube_3	4491220
+tube_4	18636072
+tube_5	2744419
+tube_6	4931229
+tube_7	205553
+tube_8	178360

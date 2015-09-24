@@ -125,8 +125,9 @@ def load_de_genes (filename_in, p_val=0.01, fdr=0.05):
 					cur_gene = (row[0].split('_locusTag_'))[0]
 					cur_p_val = float(row[3])
 					cur_fdr = float(row[4])
+					cur_fc = float(row[1])
 					if cur_p_val <= p_val and cur_fdr <= fdr:
-						de_genes[cur_gene] = [cur_p_val, cur_fdr]
+						de_genes[cur_gene] = [cur_p_val, cur_fdr, cur_fc]
 	return de_genes
 
 def avg_sd_exp (gene_data, states):
@@ -208,6 +209,34 @@ Ara_R_sq = plot_inducer_scatter(gene_data, circuit_data, no_ind_states['Ara'], i
 IPTG_R_sq = plot_inducer_scatter(gene_data, circuit_data, no_ind_states['IPTG'], ind_states['IPTG'], de_genes_IPTG, OUT_PREFIX+'scatter_IPTG.pdf')
 aTc_R_sq = plot_inducer_scatter(gene_data, circuit_data, no_ind_states['aTc'], ind_states['aTc'], de_genes_aTc, OUT_PREFIX+'scatter_aTc.pdf')
 print('R-squared: Ara='+str(Ara_R_sq)+', IPTG='+str(IPTG_R_sq)+', aTc='+str(aTc_R_sq))
+
+# Compare the all and broken (6,7,8) states
+de_genes_flask_vs_tube_all = load_de_genes (DEG_PREFIX+'flask_vs_tube.de.analysis.txt', p_val=0.01, fdr=1.0)
+de_genes_flask_vs_tube_678 = load_de_genes (DEG_PREFIX+'broken_flask_vs_tube.de.analysis.txt', p_val=0.01, fdr=1.0)
+
+def split_de_gene_up_down (de_genes):
+	up_genes = []
+	down_genes = []
+	for g in de_genes.keys():
+		if de_genes[g][2] < 0:
+			down_genes.append(g)
+		else:
+			up_genes.append(g)
+	return set(up_genes), set(down_genes)
+
+de_genes_flask_vs_tube_all_up, de_genes_flask_vs_tube_all_down = split_de_gene_up_down(de_genes_flask_vs_tube_all)
+de_genes_flask_vs_tube_678_up, de_genes_flask_vs_tube_678_down = split_de_gene_up_down(de_genes_flask_vs_tube_678)
+
+print('UP REGULATED:')
+print('Only All: '+str(len(de_genes_flask_vs_tube_all_up.difference(de_genes_flask_vs_tube_678_up))))
+print('Shared: '+str(len(de_genes_flask_vs_tube_all_up.intersection(de_genes_flask_vs_tube_678_up))))
+print('Only 6,7,8: '+str(len(de_genes_flask_vs_tube_678_up.difference(de_genes_flask_vs_tube_all_up))))
+
+print('\nDOWN REGULATED:')
+print('Only All: '+str(len(de_genes_flask_vs_tube_all_down.difference(de_genes_flask_vs_tube_678_down))))
+print('Shared: '+str(len(de_genes_flask_vs_tube_all_down.intersection(de_genes_flask_vs_tube_678_down))))
+print('Only 6,7,8: '+str(len(de_genes_flask_vs_tube_678_down.difference(de_genes_flask_vs_tube_all_down))))
+
 
 ########################################################
 # FOLD-CHANGE MATRIX FOR TRNASPORTERS

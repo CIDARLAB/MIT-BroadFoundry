@@ -229,3 +229,28 @@ for r in ribozymes:
 	plot_ribozyme_transfer(ribozyme_data['0x58v50'][r], flask_samples, ribo_flask_fpkms_out[r], OUTPUT_PREFIX+'/ribo_'+r+'_flask.pdf', point_shape='x', min_downstream_read=MIN_READS_RIBO)
 
 
+########### ROBUSTNESS DATA ###########
+
+gene_to_term = {}
+gene_to_term['AmtR'] = 'L3S2P55'
+gene_to_term['LitR'] = 'L3S2P24'
+gene_to_term['BM3R1'] = 'L3S2P11'
+gene_to_term['SrpR'] = 'ECK120029600'
+gene_to_term['PhlF'] = 'ECK120033737'
+gene_to_term['YFP'] = 'L3S2P21'
+
+f_out_1 = open(OUTPUT_PREFIX+'/term_data_1.txt', 'w')
+f_out_2 = open(OUTPUT_PREFIX+'/term_data_2.txt', 'w')
+for g in gene_to_term.keys():
+	t_e_list = terminator_data['0x58v50'][gene_to_term[g]]
+	for el in t_e_list:
+		t_e = str(1.0-float(el[3]))
+		if el[0] in tube_samples:
+			f_out_1.write(' '.join([g,'t',t_e]) + '\n')
+		else:
+			f_out_2.write(' '.join([g,'t',t_e]) + '\n')
+f_out_1.close()
+f_out_2.close()
+
+
+

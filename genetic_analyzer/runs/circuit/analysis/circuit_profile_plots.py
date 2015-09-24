@@ -346,7 +346,7 @@ def gff_to_dnaplotlib (gff, chrom):
 			design.append(new_part)
 	return sorted(design, key=lambda k: k['start']) 
 
-def plot_tube_vs_flask_traces (tube_traces, flask_traces, dna_design, x_range, out_filename):
+def plot_tube_vs_flask_traces (tube_traces, flask_traces, dna_design, x_range, out_filename, text_size=8):
 	fig = plt.figure(figsize=(5.0,3.6)) # 5,5 for SI 5.8,5.0
 	gs = gridspec.GridSpec(9, 1, height_ratios=[1,1,1,1,1,1,1,1,0.8])
 	# Plot the DNA
@@ -369,17 +369,14 @@ def plot_tube_vs_flask_traces (tube_traces, flask_traces, dna_design, x_range, o
 		ax.set_xlim([x_range[0],x_range[1]])
 		ax.set_xticks([])
 		ax.set_yscale('symlog', linthreshx=10000)
-		ax.set_ylim([5, 8.0*10e5])
-		ax.set_yticks([10e1, 10e3, 10e5])
-		ax.tick_params(axis='y', which='major', labelsize=8, pad=1, length=2, width=0.5)
+		ax.set_ylim([5, 10e5])
+		ax.set_yticks([10e1, 10e3])
+		ax.tick_params(axis='y', which='major', labelsize=text_size, pad=1, length=2, width=0.5)
 		for axis in ['top','bottom','left','right']:
 			ax.spines[axis].set_linewidth(0.8)
 	plt.subplots_adjust(hspace=.00, wspace=.00, left=.07, right=.99, top=.99, bottom=.01)
 	fig.savefig(out_filename, transparent=True)
 	plt.close('all')
-
-
-
 
 # Load design information and transcription profiles
 gff = load_gff(DATA_PREFIX+'/gff/0x58v50.gff')
@@ -420,5 +417,13 @@ x_range = [0, gff['0x58v50']['L3S2P21'][3]]
 
 # Plot the two figures
 plot_act_vs_pred_traces(tube_traces, pred_traces_on, pred_traces_off, dna_design, x_range, OUTPUT_PREFIX+'/circuit_profile_tube.pdf')
-plot_tube_vs_flask_traces(tube_traces, flask_traces, dna_design, x_range, OUTPUT_PREFIX+'/circuit_profile_flask_vs_tube.pdf')
+
+
+#Make text bigger
+for part in dna_design:
+	if part['type'] == 'CDS':
+		part['opts']['label_y_offset'] = -7.3
+		part['opts']['label_size'] = 9.5
+
+plot_tube_vs_flask_traces(tube_traces, flask_traces, dna_design, x_range, OUTPUT_PREFIX+'/circuit_profile_flask_vs_tube.pdf', text_size=9.5)
 

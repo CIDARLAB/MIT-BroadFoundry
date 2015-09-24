@@ -23,7 +23,7 @@ def main():
 			ga.save_characterization_data(settings, s, chr_promoters, part_type='promoter')
 			chr_terminators =  ga.characterize_terminators(settings, s, upstream_bp=200, downstream_bp=50)
 			ga.save_characterization_data(settings, s, chr_terminators, part_type='terminator')
-			chr_ribozymes = ga.characterize_ribozymes(settings, s, upstream_bp=100, downstream_bp=100)
+			chr_ribozymes = ga.characterize_ribozymes(settings, s, upstream_bp=50, downstream_bp=50)
 			ga.save_characterization_data(settings, s, chr_ribozymes, part_type='ribozyme')
 	ga.combine_promoter_characterizations(settings, samples)
 	ga.combine_terminator_characterizations(settings, samples)

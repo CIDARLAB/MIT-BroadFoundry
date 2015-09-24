@@ -495,7 +495,7 @@ def characterize_terminators (settings, sample, upstream_bp=200, downstream_bp=5
 				char_data.append([chrom, part_name, avg_us, avg_ds, t_e, t_s, max_term])
 	return char_data
 
-def characterize_ribozymes (settings, sample, upstream_bp=25, downstream_bp=25):
+def characterize_ribozymes (settings, sample, upstream_bp=50, downstream_bp=50):
 	profiles = load_profiles(settings, sample)
 	char_data = []
 	raw_region = None

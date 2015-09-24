@@ -24,7 +24,7 @@ library(edgeR)
 # Load the data file
 count_matrix <- read.table(arg_count_matrix, header=T, row.names=1, com='')
 
-# TO CHANGE col_ordering <- c(3,4,1,2)
+# Extract those columns we are interested in
 col_ordering <- c(arg_group1, arg_group2)
 count_matrix <- count_matrix[,col_ordering]
 conditions <- factor(c(rep("group_1", length(arg_group1)), rep("group_2", length(arg_group2))))
@@ -33,7 +33,7 @@ conditions <- factor(c(rep("group_1", length(arg_group1)), rep("group_2", length
 library_size_matrix <- read.table(arg_library_size_matrix, header=T, row.names=1, com='')
 
 # Get the library sizes (total counts in annotated genes)
-lib_sizes <- as.vector(library_size_matrix[, "total_mapped_reads"])[col_ordering]
+lib_sizes <- as.vector(library_size_matrix$total_mapped_reads)[col_ordering]
 
 # Calculate normalisation factors using TMM
 expr <- DGEList(counts=count_matrix, group=conditions, lib.size=lib_sizes)

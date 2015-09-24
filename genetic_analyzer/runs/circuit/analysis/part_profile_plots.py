@@ -250,7 +250,7 @@ for t in terminators:
 ########### RIBOZYMES ###########
 ribozymes = ['BydvJ', 'PlmJ', 'SarJ', 'RiboJ10', 'RiboJ53', 'RiboJ']
 for r in ribozymes:
-	trace_region = ['0x58v50', (gff['0x58v50'][r][2]+int(gff['0x58v50'][r][4]['cut_site']))-25, (gff['0x58v50'][r][2]+int(gff['0x58v50'][r][4]['cut_site']))+25]
+	trace_region = ['0x58v50', (gff['0x58v50'][r][2]+int(gff['0x58v50'][r][4]['cut_site']))-50, (gff['0x58v50'][r][2]+int(gff['0x58v50'][r][4]['cut_site']))+50]
 	part_region = ['0x58v50', gff['0x58v50'][r][2], gff['0x58v50'][r][3]]
 	plot_ribozyme_profile(tube_profiles, trace_region, part_region, gff['0x58v50'][r][2]+int(gff['0x58v50'][r][4]['cut_site'])-1, OUTPUT_PREFIX+'/ribo_profile_'+r+'_tube.pdf')
 	plot_ribozyme_profile(flask_profiles, trace_region, part_region, gff['0x58v50'][r][2]+int(gff['0x58v50'][r][4]['cut_site'])-1, OUTPUT_PREFIX+'/ribo_profile_'+r+'_flask.pdf')

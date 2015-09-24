@@ -53,4 +53,10 @@ de_genes_flask_vs_tube_678 = load_de_genes(DEG_PREFIX+'broken_flask_vs_tube.de.a
 save_study(de_genes_flask_vs_tube_all, OUT_PREFIX+'flask_vs_tube.up.txt', OUT_PREFIX+'flask_vs_tube.down.txt')
 save_study(de_genes_flask_vs_tube_678, OUT_PREFIX+'broken_flask_vs_tube.up.txt', OUT_PREFIX+'broken_flask_vs_tube.down.txt')
 
+de_genes_tube_ara = load_de_genes(DEG_PREFIX+'ara_comp_tube.de.analysis.txt', p_val=0.01, fdr=0.01)
+de_genes_tube_iptg = load_de_genes(DEG_PREFIX+'iptg_comp_tube.de.analysis.txt', p_val=0.01, fdr=0.01)
+de_genes_tube_atc = load_de_genes(DEG_PREFIX+'atc_comp_tube.de.analysis.txt', p_val=0.01, fdr=0.01)
 
+save_study(de_genes_tube_ara, OUT_PREFIX+'ara_comp_tube.up.txt', OUT_PREFIX+'ara_comp_tube.down.txt')
+save_study(de_genes_tube_iptg, OUT_PREFIX+'iptg_comp_tube.up.txt', OUT_PREFIX+'iptg_comp_tube.down.txt')
+save_study(de_genes_tube_atc, OUT_PREFIX+'atc_comp_tube.up.txt', OUT_PREFIX+'atc_comp_tube.down.txt')

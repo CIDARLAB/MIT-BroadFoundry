@@ -48,7 +48,7 @@ fmt_label_size = 8.0
 # PLOTTING FUNCTIONS
 ###############################################################################
 
-def load_gene_fpkms (filename_in, data_cols):
+def load_gene_fpkms (filename_in, data_cols, inc_all=False):
 	gene_data = []
 	circuit_data = []
 	for idx in range(len(data_cols)):
@@ -61,12 +61,16 @@ def load_gene_fpkms (filename_in, data_cols):
 		next(reader)
 		for row in reader:
 			# Classify gene
-			if row[0].split('_')[0] == 'SYNTHETIC':
-				for idx in range(len(data_cols)):
-					circuit_data[idx][row[1]] = float(row[data_cols[idx]])
+			if inc_all == False:
+				if row[0].split('_')[0] == 'SYNTHETIC':
+					for idx in range(len(data_cols)):
+						circuit_data[idx][row[1]] = float(row[data_cols[idx]])
+				else:
+					for idx in range(len(data_cols)):
+						gene_data[idx][row[1]] = float(row[data_cols[idx]])
 			else:
 				for idx in range(len(data_cols)):
-					gene_data[idx][row[1]] = float(row[data_cols[idx]])
+						gene_data[idx][row[1]] = float(row[data_cols[idx]])
 		return gene_data, circuit_data
 
 def plot_gene_scatter (gene_data, circuit_data, unind_state, ind_states, filename_out):
@@ -86,7 +90,7 @@ def plot_gene_scatter (gene_data, circuit_data, unind_state, ind_states, filenam
 		for lab_idx in range(len(x_data)):
 			ax.annotate(labs[lab_idx], (x_data[lab_idx],y_data[lab_idx]), fontsize=6.0, zorder=110)
 
-		x_y_line = [0, 1000000]
+		x_y_line = [0, 10000000]
 		ax.plot(x_y_line, x_y_line, color=(0,0,0), linestyle='-', linewidth=0.5, zorder=100)
 
 		line_thres_low = [1, 100000]
@@ -95,9 +99,9 @@ def plot_gene_scatter (gene_data, circuit_data, unind_state, ind_states, filenam
 		ax.plot(line_thres_high, line_thres_low, color=(0,0,0), linestyle='--', linewidth=0.5, zorder=100)
 
 		# Plot formatting
-		ax.set_ylim([1,100000])
+		ax.set_ylim([10,1000000])
 		ax.set_yscale('log', linthreshy=1)
-		ax.set_xlim([1,100000])
+		ax.set_xlim([10,1000000])
 		ax.set_xscale('log', linthreshy=1)
 		ax.tick_params(axis='x', labelsize=fmt_label_size)
 		ax.tick_params(axis='y', labelsize=fmt_label_size)
@@ -204,3 +208,53 @@ Ara_R_sq = plot_inducer_scatter(gene_data, circuit_data, no_ind_states['Ara'], i
 IPTG_R_sq = plot_inducer_scatter(gene_data, circuit_data, no_ind_states['IPTG'], ind_states['IPTG'], de_genes_IPTG, OUT_PREFIX+'scatter_IPTG.pdf')
 aTc_R_sq = plot_inducer_scatter(gene_data, circuit_data, no_ind_states['aTc'], ind_states['aTc'], de_genes_aTc, OUT_PREFIX+'scatter_aTc.pdf')
 print('R-squared: Ara='+str(Ara_R_sq)+', IPTG='+str(IPTG_R_sq)+', aTc='+str(aTc_R_sq))
+
+########################################################
+# FOLD-CHANGE MATRIX FOR TRNASPORTERS
+########################################################
+
+def fc_matrix (fpkm_data_1, fpkm_data_2, genes):
+	fc_data = np.zeros( (len(fpkm_data_1), len(genes)) )
+	for s in range(len(fpkm_data_1)):
+		for g_idx in range(len(genes)):
+			g = genes[g_idx]
+			data_1 = fpkm_data_1[s][g]
+			data_2 = fpkm_data_2[s][g]
+			fc = 0.0
+			if data_1 != 0.0 :
+				fc = np.log2(data_2/data_1)
+			else:
+				fc = 100.0
+			fc_data[s,g_idx] = fc
+	return np.array(fc_data)
+
+genes_to_inc = ['AraC', 'araE', 'araF', 'araG', 'araH', 'malE', 'malF', 'malG', 'malK', 'xylA', 'xylB', 'xylF', 'xylG', 'xylH', 'xylR']
+gene_data_1, circuit_data_1 = load_gene_fpkms(DATA_PREFIX + 'fpkm_data.txt', [2,3,4,5,6,7,8,9], inc_all=True)
+gene_data_2, circuit_data_2 = load_gene_fpkms(DATA_PREFIX + 'fpkm_data.txt', [10,11,12,13,14,15,16,17], inc_all=True)
+fc_matrix_data = fc_matrix (gene_data_1, gene_data_2, genes_to_inc)
+
+input_states = [[0,0,0],[1,0,0],[0,1,0],[1,1,0],
+                [0,0,1],[1,0,1],[0,1,1],[1,1,1]]
+
+fig = plt.figure(figsize=(3.5,1.3))
+ax_input = fig.add_axes([0.02,0.02,0.13,0.96])
+ax_input.matshow(input_states, aspect='auto', cmap=plt.cm.Greys)
+ax = fig.add_axes([0.15,0.02,0.7,0.96])
+im = ax.matshow(fc_matrix_data, aspect='auto', origin='upper', cmap=plt.cm.RdBu_r, vmin=-4.0, vmax=4.0)
+
+pcolor = fig.add_axes([0.88,0.02,0.015,0.96])
+cbar = plt.colorbar(im, cax=pcolor)
+cbar.locator = matplotlib.ticker.FixedLocator([])
+cbar.update_ticks()
+
+for axis in ['top','right', 'left', 'bottom']:
+	ax_input.spines[axis].set_linewidth(0.8)
+	ax.spines[axis].set_linewidth(0.8)
+cbar.ax.get_children()[2].set_linewidth(0.8)
+ax_input.set_yticks([])
+ax_input.set_xticks([])
+ax.set_yticks([])
+ax.set_xticks([])
+
+fig.savefig(OUT_PREFIX+'transporter_fc_heatmap.pdf', transparent=True)
+plt.close('all')

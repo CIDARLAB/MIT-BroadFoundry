@@ -1,0 +1,28 @@
+id	enrichment	description	ratio_in_study	ratio_in_pop	p_uncorrected	p_bonferroni	p_holm	p_sidak	p_fdr
+....GO:0046377	e	colanic acid metabolic process	5/7	13/3770	4.25e-12	7.15e-10	7.15e-10	6.97e-10	n.a.
+.....GO:0009242	e	colanic acid biosynthetic process	5/7	13/3770	4.25e-12	7.15e-10	7.15e-10	6.97e-10	n.a.
+....GO:0033692	e	cellular polysaccharide biosynthetic process	7/7	111/3770	1.59e-11	2.67e-09	2.64e-09	2.6e-09	n.a.
+.....GO:0000271	e	polysaccharide biosynthetic process	7/7	113/3770	1.81e-11	3.04e-09	2.98e-09	2.96e-09	n.a.
+...GO:0034637	e	cellular carbohydrate biosynthetic process	7/7	115/3770	2.05e-11	3.45e-09	3.36e-09	3.36e-09	n.a.
+....GO:0044264	e	cellular polysaccharide metabolic process	7/7	120/3770	2.79e-11	4.68e-09	4.54e-09	4.56e-09	n.a.
+....GO:0005976	e	polysaccharide metabolic process	7/7	125/3770	3.73e-11	6.27e-09	6.05e-09	6.12e-09	n.a.
+....GO:0016051	e	carbohydrate biosynthetic process	7/7	141/3770	8.85e-11	1.49e-08	1.42e-08	1.45e-08	n.a.
+...GO:0044262	e	cellular carbohydrate metabolic process	7/7	201/3770	1.11e-09	1.86e-07	1.77e-07	1.81e-07	n.a.
+....GO:1901137	e	carbohydrate derivative biosynthetic process	7/7	243/3770	4.26e-09	7.16e-07	6.77e-07	6.98e-07	n.a.
+...GO:0044723	e	single-organism carbohydrate metabolic process	7/7	319/3770	2.92e-08	4.91e-06	4.62e-06	4.79e-06	n.a.
+.....GO:0009226	e	nucleotide-sugar biosynthetic process	4/7	22/3770	3.01e-08	5.06e-06	4.73e-06	4.93e-06	n.a.
+...GO:1901135	e	carbohydrate derivative metabolic process	7/7	336/3770	4.22e-08	7.09e-06	6.58e-06	6.91e-06	n.a.
+....GO:0009225	e	nucleotide-sugar metabolic process	4/7	27/3770	7.2e-08	1.21e-05	1.12e-05	1.18e-05	n.a.
+...GO:0005975	e	carbohydrate metabolic process	7/7	382/3770	1.04e-07	1.75e-05	1.61e-05	1.71e-05	n.a.
+...GO:0044711	e	single-organism biosynthetic process	7/7	614/3770	2.95e-06	0.000496	0.000452	0.000484	n.a.
+.....GO:0046368	e	GDP-L-fucose metabolic process	2/7	2/3770	2.96e-06	0.000497	0.000449	0.000484	n.a.
+......GO:0042350	e	GDP-L-fucose biosynthetic process	2/7	2/3770	2.96e-06	0.000497	0.000449	0.000484	n.a.
+.......GO:0042351	e	'de novo' GDP-L-fucose biosynthetic process	2/7	2/3770	2.96e-06	0.000497	0.000449	0.000484	n.a.
+....GO:0034645	e	cellular macromolecule biosynthetic process	7/7	662/3770	5.01e-06	0.000842	0.000747	0.000821	n.a.
+.....GO:0009103	e	lipopolysaccharide biosynthetic process	4/7	76/3770	5.1e-06	0.000857	0.000755	0.000836	n.a.
+....GO:0009059	e	macromolecule biosynthetic process	7/7	669/3770	5.4e-06	0.000907	0.000794	0.000884	n.a.
+....GO:0008653	e	lipopolysaccharide metabolic process	4/7	79/3770	5.96e-06	0.001	0.000871	0.000977	n.a.
+....GO:0070401	e	NADP+ binding	2/7	3/3770	8.86e-06	0.00149	0.00128	0.00145	n.a.
+.....GO:0019673	e	GDP-mannose metabolic process	2/7	4/3770	1.77e-05	0.00297	0.00255	0.0029	n.a.
+.....GO:0009165	e	nucleotide biosynthetic process	4/7	128/3770	4.1e-05	0.00689	0.00587	0.00672	n.a.
+....GO:1901293	e	nucleoside phosphate biosynthetic process	4/7	128/3770	4.1e-05	0.00689	0.00587	0.00672	n.a.

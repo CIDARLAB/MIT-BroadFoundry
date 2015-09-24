@@ -1,0 +1,5 @@
+id	enrichment	description	ratio_in_study	ratio_in_pop	p_uncorrected	p_bonferroni	p_holm	p_sidak	p_fdr
+....GO:0045333	e	cellular respiration	5/15	60/3770	2.29e-06	0.000479	0.000479	0.000467	n.a.
+...GO:0015980	e	energy derivation by oxidation of organic compounds	5/15	70/3770	4.97e-06	0.00104	0.00103	0.00101	n.a.
+.....GO:0009061	e	anaerobic respiration	4/15	35/3770	7.91e-06	0.00165	0.00164	0.00161	n.a.
+....GO:0009389	e	dimethyl sulfoxide reductase activity	2/15	3/3770	4.42e-05	0.00925	0.00911	0.00901	n.a.

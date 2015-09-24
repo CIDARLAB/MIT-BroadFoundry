@@ -1,0 +1,3 @@
+id	enrichment	description	ratio_in_study	ratio_in_pop	p_uncorrected	p_bonferroni	p_holm	p_sidak	p_fdr
+...GO:0009266	e	response to temperature stimulus	7/37	79/3770	8.42e-06	0.00382	0.00382	0.00373	n.a.
+...GO:0009408	e	response to heat	6/37	57/3770	1.48e-05	0.00671	0.0067	0.00655	n.a.

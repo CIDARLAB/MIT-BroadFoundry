@@ -1,0 +1,17 @@
+id	enrichment	description	ratio_in_study	ratio_in_pop	p_uncorrected	p_bonferroni	p_holm	p_sidak	p_fdr
+.....GO:0015750	e	pentose transport	8/184	10/3770	1.15e-09	1.14e-06	1.14e-06	1.11e-06	n.a.
+GO:0008150	p	biological_process	135/184	3343/3770	2.87e-09	2.84e-06	2.84e-06	2.77e-06	n.a.
+...GO:0008643	e	carbohydrate transport	22/184	122/3770	5.37e-08	5.31e-05	5.3e-05	5.18e-05	n.a.
+.....GO:0015608	e	carbohydrate-importing ATPase activity	5/184	5/3770	2.63e-07	0.00026	0.000259	0.000253	n.a.
+.....GO:0042956	e	maltodextrin transport	5/184	5/3770	2.63e-07	0.00026	0.000259	0.000253	n.a.
+GO:0003674	p	molecular_function	128/184	3160/3770	8.78e-07	0.000869	0.000864	0.000847	n.a.
+......GO:0015768	e	maltose transport	5/184	6/3770	1.51e-06	0.0015	0.00149	0.00146	n.a.
+......GO:0005363	e	maltose transmembrane transporter activity	5/184	6/3770	1.51e-06	0.0015	0.00149	0.00146	n.a.
+.GO:0009987	p	cellular process	94/184	2552/3770	2.18e-06	0.00215	0.00213	0.0021	n.a.
+....GO:0043211	e	carbohydrate-transporting ATPase activity	6/184	10/3770	2.22e-06	0.0022	0.00218	0.00214	n.a.
+GO:0005575	p	cellular_component	88/184	2428/3770	2.66e-06	0.00263	0.0026	0.00256	n.a.
+......GO:0015146	e	pentose transmembrane transporter activity	5/184	7/3770	5.09e-06	0.00504	0.00498	0.00491	n.a.
+......GO:0015753	e	D-xylose transport	4/184	4/3770	5.5e-06	0.00544	0.00537	0.0053	n.a.
+.GO:0044464	p	cell part	85/184	2347/3770	7.4e-06	0.00732	0.00723	0.00714	n.a.
+...GO:0044249	p	cellular biosynthetic process	28/184	1103/3770	8.78e-06	0.00869	0.00856	0.00847	n.a.
+...GO:0043170	p	macromolecule metabolic process	32/184	1194/3770	9.78e-06	0.00967	0.00953	0.00943	n.a.

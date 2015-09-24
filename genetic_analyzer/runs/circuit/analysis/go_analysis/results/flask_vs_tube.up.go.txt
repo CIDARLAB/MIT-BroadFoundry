@@ -1,0 +1,7 @@
+id	enrichment	description	ratio_in_study	ratio_in_pop	p_uncorrected	p_bonferroni	p_holm	p_sidak	p_fdr
+......GO:0015753	e	D-xylose transport	4/59	4/3770	5.42e-08	2.91e-05	2.91e-05	2.84e-05	n.a.
+.....GO:0015750	e	pentose transport	5/59	10/3770	1.88e-07	0.000101	0.000101	9.83e-05	n.a.
+....GO:0015774	e	polysaccharide transport	4/59	8/3770	3.62e-06	0.00194	0.00194	0.00189	n.a.
+......GO:0015752	e	D-ribose transport	3/59	3/3770	3.64e-06	0.00196	0.00195	0.00191	n.a.
+.......GO:0015148	e	D-xylose transmembrane transporter activity	3/59	3/3770	3.64e-06	0.00196	0.00195	0.00191	n.a.
+....GO:0043211	e	carbohydrate-transporting ATPase activity	4/59	10/3770	1.06e-05	0.00569	0.00564	0.00555	n.a.

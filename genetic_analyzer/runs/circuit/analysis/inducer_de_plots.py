@@ -26,14 +26,6 @@ matplotlib.rcParams['lines.solid_capstyle']  = 'projecting'
 # Make text editable in Adobe Illustrator
 matplotlib.rcParams['pdf.fonttype']          = 42 
 
-cmap = {}
-cmap['AmtR'] = (1.0,0.75,0.17) # 255, 193, 43
-cmap['LitR'] = (0.38,0.82,0.32) # 98, 209, 83
-cmap['BM3R1'] = (0.95,0.30,0.25) # 242, 78, 65
-cmap['SrpR'] = (0.38,0.65,0.87) # 97, 165, 223
-cmap['PhlF'] = (0.55,0.35,0.64) # 141, 89, 163
-cmap['YFP'] = (0.98,0.97,0.35) # 250, 248, 89
-
 all_states = [0,1,2,3,4,5,6,7]
 
 ind_states = {}
@@ -124,11 +116,13 @@ def load_de_genes (filename_in, p_val=0.01, fdr=0.05):
 		next(reader)
 		for row in reader:
 			if len(row) == 5:
-				cur_gene = (row[0].split('_locusTag_'))[0]
-				cur_p_val = float(row[3])
-				cur_fdr = float(row[4])
-				if cur_p_val <= p_val and cur_fdr <= fdr:
-					de_genes[cur_gene] = [cur_p_val, cur_fdr]
+				gene_parts = row[0].split('_locusTag_')
+				if len(gene_parts) == 2:
+					cur_gene = (row[0].split('_locusTag_'))[0]
+					cur_p_val = float(row[3])
+					cur_fdr = float(row[4])
+					if cur_p_val <= p_val and cur_fdr <= fdr:
+						de_genes[cur_gene] = [cur_p_val, cur_fdr]
 	return de_genes
 
 def avg_sd_exp (gene_data, states):
@@ -200,19 +194,13 @@ def plot_inducer_scatter (gene_data, circuit_data, unind_states, ind_states, de_
 	return np.power(r_value, 2.0)
 
 # Working
+fdr_to_use = 0.01
 gene_data, circuit_data = load_gene_fpkms(DATA_PREFIX + 'fpkm_data.txt', [2,3,4,5,6,7,8,9])
-de_genes_Ara = load_de_genes (DEG_PREFIX+'ara_comp_tube.de.analysis.txt', p_val=0.01, fdr=0.01)
-de_genes_IPTG = load_de_genes (DEG_PREFIX+'iptg_comp_tube.de.analysis.txt', p_val=0.01, fdr=0.01)
-de_genes_aTc = load_de_genes (DEG_PREFIX+'atc_comp_tube.de.analysis.txt', p_val=0.01, fdr=0.01)
+de_genes_Ara = load_de_genes (DEG_PREFIX+'ara_comp_tube.de.analysis.txt', p_val=0.01, fdr=fdr_to_use)
+de_genes_IPTG = load_de_genes (DEG_PREFIX+'iptg_comp_tube.de.analysis.txt', p_val=0.01, fdr=fdr_to_use)
+de_genes_aTc = load_de_genes (DEG_PREFIX+'atc_comp_tube.de.analysis.txt', p_val=0.01, fdr=fdr_to_use)
 
 Ara_R_sq = plot_inducer_scatter(gene_data, circuit_data, no_ind_states['Ara'], ind_states['Ara'], de_genes_Ara, OUT_PREFIX+'scatter_Ara.pdf')
 IPTG_R_sq = plot_inducer_scatter(gene_data, circuit_data, no_ind_states['IPTG'], ind_states['IPTG'], de_genes_IPTG, OUT_PREFIX+'scatter_IPTG.pdf')
 aTc_R_sq = plot_inducer_scatter(gene_data, circuit_data, no_ind_states['aTc'], ind_states['aTc'], de_genes_aTc, OUT_PREFIX+'scatter_aTc.pdf')
 print('R-squared: Ara='+str(Ara_R_sq)+', IPTG='+str(IPTG_R_sq)+', aTc='+str(aTc_R_sq))
-
-# Broken
-#gene_data, circuit_data = load_gene_fpkms(DATA_PREFIX + 'fpkm_data.txt', [10,11,12,13,14,15,16,17])
-# Plot scatters
-#plot_gene_scatter(gene_data, circuit_data, 0, ind_states['IPTG'], OUT_PREFIX+'IPTG.pdf')
-#plot_gene_scatter(gene_data, circuit_data, 0, ind_states['aTc'], OUT_PREFIX+'aTc.pdf')
-#plot_gene_scatter(gene_data, circuit_data, 0, ind_states['Ara'], OUT_PREFIX+'Ara.pdf')

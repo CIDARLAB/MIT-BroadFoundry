@@ -1,0 +1,3 @@
+id	enrichment	description	ratio_in_study	ratio_in_pop	p_uncorrected	p_bonferroni	p_holm	p_sidak	p_fdr
+....GO:0046377	e	colanic acid metabolic process	5/41	13/3770	1.43e-07	6.39e-05	6.39e-05	6.23e-05	n.a.
+.....GO:0009242	e	colanic acid biosynthetic process	5/41	13/3770	1.43e-07	6.39e-05	6.39e-05	6.23e-05	n.a.

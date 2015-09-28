@@ -80,3 +80,13 @@ fpkm_data = load_fpkm_matrix(RESULTS_PREFIX+'/fpkm.normed.matrix.txt')
 # Reformat FPKMs
 sample_order = tube_samples+flask_samples
 save_reformatted_fpkms(fpkm_data, sample_order, OUTPUT_PREFIX+'/fpkm_data.txt')
+
+# Reformat the counts too
+# Load the original data
+count_data = load_fpkm_matrix(RESULTS_PREFIX+'/counts.matrix.txt')
+
+# Reformat FPKMs
+sample_order = tube_samples+flask_samples
+save_reformatted_fpkms(count_data, sample_order, OUTPUT_PREFIX+'/count_data.txt')
+
+

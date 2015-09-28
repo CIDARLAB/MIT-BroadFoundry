@@ -5,9 +5,18 @@
 
 # Clean up temp files
 
+
+rm /broad/hptmp/tgorocho/nif_EcoliMG1655_LBWB_1/*.*
+rm /broad/hptmp/tgorocho/nif_EcoliMG1655_LBWB_2/*.*
+rm /broad/hptmp/tgorocho/nif_EcoliMG1655_synnifI4_1/*.*
+rm /broad/hptmp/tgorocho/nif_EcoliMG1655_synnifI4_2/*.*
 rm /broad/hptmp/tgorocho/nif_N1/*.*
 rm /broad/hptmp/tgorocho/nif_N2/*.*
 
+rmdir /broad/hptmp/tgorocho/nif_EcoliMG1655_LBWB_1
+rmdir /broad/hptmp/tgorocho/nif_EcoliMG1655_LBWB_2
+rmdir /broad/hptmp/tgorocho/nif_EcoliMG1655_synnifI4_1
+rmdir /broad/hptmp/tgorocho/nif_EcoliMG1655_synnifI4_2
 rmdir /broad/hptmp/tgorocho/nif_N1
 rmdir /broad/hptmp/tgorocho/nif_N2
 

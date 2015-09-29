@@ -10,8 +10,12 @@ mkdir ./logs
 
 mkdir ./results
 
-mkdir ./results/N1
-mkdir ./results/N2
+mkdir ./results/Koxym5a1_1
+mkdir ./results/Koxym5a1_2
+mkdir ./results/Koxym5a1_synnifI4_1
+mkdir ./results/Koxym5a1_synnifI4_2
 
-mkdir /broad/hptmp/tgorocho/nif_N1
-mkdir /broad/hptmp/tgorocho/nif_N2
+mkdir /broad/hptmp/tgorocho/nif_Koxym5a1_1
+mkdir /broad/hptmp/tgorocho/nif_Koxym5a1_2
+mkdir /broad/hptmp/tgorocho/nif_Koxym5a1_synnifI4_1
+mkdir /broad/hptmp/tgorocho/nif_Koxym5a1_synnifI4_2

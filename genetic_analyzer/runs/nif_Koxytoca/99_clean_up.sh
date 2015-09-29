@@ -5,11 +5,15 @@
 
 # Clean up temp files
 
-rm /broad/hptmp/tgorocho/nif_N1/*.*
-rm /broad/hptmp/tgorocho/nif_N2/*.*
+rm /broad/hptmp/tgorocho/nif_Koxym5a1_1/*.*
+rm /broad/hptmp/tgorocho/nif_Koxym5a1_2/*.*
+rm /broad/hptmp/tgorocho/nif_Koxym5a1_synnifI4_1/*.*
+rm /broad/hptmp/tgorocho/nif_Koxym5a1_synnifI4_2/*.*
 
-rmdir /broad/hptmp/tgorocho/nif_N1
-rmdir /broad/hptmp/tgorocho/nif_N2
+rmdir /broad/hptmp/tgorocho/nif_Koxym5a1_1
+rmdir /broad/hptmp/tgorocho/nif_Koxym5a1_2
+rmdir /broad/hptmp/tgorocho/nif_Koxym5a1_synnifI4_1
+rmdir /broad/hptmp/tgorocho/nif_Koxym5a1_synnifI4_2
 
 rm ./logs/*.*
 rmdir ./logs

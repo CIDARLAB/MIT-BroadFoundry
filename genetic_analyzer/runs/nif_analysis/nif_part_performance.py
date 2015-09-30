@@ -23,7 +23,7 @@ matplotlib.rcParams['pdf.fonttype']          = 42
 
 OUTPUT_PREFIX = './plots/'
 
-plt.rcParams['ytick.major.pad']='5'
+plt.rcParams['ytick.major.pad']='0.5'
 plt.rcParams['xtick.major.pad']='5'
 fmt_label_size = 8
 fmt_edge_width = 2.5
@@ -378,10 +378,122 @@ plt.close('all')
 # FIG 6. Terminator performance
 #############################################################################
 
+def add_terminator_profile (ax, profiles, profile_cols):
+	fmt_char_data_linewidth = 1.0
+	fmt_axis_outline_width = 1.2
+	fmt_char_line_width = 3.0
+	fmt_label_size = 9
+	annot_line_col = (0,0,0)
+	for s_idx in range(len(profiles)):
+		ax.plot(range(len(profiles[s_idx])), profiles[s_idx], color=profile_cols[s_idx], alpha=1, linewidth=1.5)
+		#ax.plot(range(len(profiles[s_idx])), profiles[s_idx], color=(0,0,0), alpha=1, linewidth=1.5)
+	plt.axvspan(20, len(profiles[0])-20, facecolor=(0.8,0.8,0.8), linewidth=0, zorder=-10)
+	ax.tick_params(axis='x', labelsize=fmt_label_size)
+	ax.tick_params(axis='y', labelsize=fmt_label_size)
+	ax.set_xlim([0,len(profiles[0])])
+	ax.set_xscale('linear')
+	ax.set_ylim([0,100000])
+	ax.set_yscale('symlog', linthreshy=10)
+	for axis in ['top','bottom','left','right']:
+		ax.spines[axis].set_linewidth(fmt_axis_outline_width)
+		ax.spines[axis].set_linewidth(fmt_axis_outline_width)
+		ax.spines[axis].set_linewidth(fmt_axis_outline_width)
+	plt.subplots_adjust(left=0.18, right=0.90, top=0.90, bottom=0.18)
+	ax.tick_params(axis='x', labelsize=fmt_label_size)
+	ax.tick_params(axis='y', labelsize=fmt_label_size)
+	ax.set_xticks([])
+	ax.set_xticklabels([], visible=False)
 
+def get_part_profile (profiles, gff, sample, chrom, part_name, us_pad=20, ds_pad=20):
+	start_bp = gff[sample][chrom][part_name][2]-us_pad
+	end_bp = gff[sample][chrom][part_name][3]+ds_pad
+	return extract_profile_region(profiles[sample], chrom, start_bp, end_bp)
 
+fig = plt.figure(figsize=(6.5,1.2))
+gs = gridspec.GridSpec(1, 5)
+pcols = [col_light_blue, col_light_blue, col_mid_green, col_mid_green]
+ax = plt.subplot(gs[0])
+Pf5_terms = []
+Pf5_terms.append(get_part_profile(pf5_profiles, pf5_gffs, 'N19', 'pPf_nif60', 'T7')[0])
+Pf5_terms.append(get_part_profile(pf5_profiles, pf5_gffs, 'N21', 'pPf_nif60', 'T7')[0])
+add_terminator_profile(ax, Pf5_terms, pcols)
+for t_idx, t in enumerate(['T4', 'T6_1', 'T6_2', 'Twt']):
+	ax = plt.subplot(gs[t_idx+1])	
+	Pf5_terms = []
+	Pf5_terms.append(get_part_profile(pf5_profiles, pf5_gffs, 'N19', 'pPf_nif60', t)[0])
+	Pf5_terms.append(get_part_profile(pf5_profiles, pf5_gffs, 'N21', 'pPf_nif60', t)[0])
+	Pf5_terms.append(get_part_profile(pf5_profiles, pf5_gffs, 'N18', 'pPf_MB', t)[0])
+	Pf5_terms.append(get_part_profile(pf5_profiles, pf5_gffs, 'N20', 'pPf_MB', t)[0])
+	add_terminator_profile(ax, Pf5_terms, pcols)
+plt.subplots_adjust(hspace=.00, wspace=.32, left=.05, right=.99, top=.90, bottom=.10)
+plt.savefig(OUTPUT_PREFIX+'fig_06_term_traces_Pf-5.pdf', transparent=True)
+plt.close('all')
 
+fig = plt.figure(figsize=(6.5,1.2))
+gs = gridspec.GridSpec(1, 5)
+pcols = [col_light_blue, col_light_blue, col_mid_green, col_mid_green, col_red]
+ax = plt.subplot(gs[0])
+rizo_terms = []
+rizo_terms.append(get_part_profile(rizo_profiles, rizo_gffs, 'N17', 'pBBRnif60percent_with_par', 'T7')[0])
+add_terminator_profile(ax, rizo_terms, pcols)
+for t_idx, t in enumerate(['T4', 'T6_1', 'T6_2', 'Twt']):
+	ax = plt.subplot(gs[t_idx+1])	
+	rizo_terms = []
+	rizo_terms.append(get_part_profile(rizo_profiles, rizo_gffs, 'N17', 'pBBRnif60percent_with_par', t)[0])
+	rizo_terms.append(get_part_profile(rizo_profiles, rizo_gffs, 'N13', 'pBBR_OR', t)[0])
+	rizo_terms.append(get_part_profile(rizo_profiles, rizo_gffs, 'N15', 'pBBR_OR', t)[0])
+	rizo_terms.append(get_part_profile(rizo_profiles, rizo_gffs, 'N14', 'pBBG_MB', t)[0])
+	rizo_terms.append(get_part_profile(rizo_profiles, rizo_gffs, 'N16', 'pBBG_MB', t)[0])
+	add_terminator_profile(ax, rizo_terms, pcols)
+plt.subplots_adjust(hspace=.00, wspace=.32, left=.05, right=.99, top=.90, bottom=.10)
+plt.savefig(OUTPUT_PREFIX+'fig_06_term_traces_rizo.pdf', transparent=True)
+plt.close('all')
 
+#############################################################################
+# FIG 7. Promoter performance
+#############################################################################
+
+def add_promoter_profile (ax, profiles, profile_cols):
+	fmt_char_data_linewidth = 1.0
+	fmt_axis_outline_width = 1.2
+	fmt_char_line_width = 3.0
+	fmt_label_size = 9
+	annot_line_col = (0,0,0)
+	for s_idx in range(len(profiles)):
+		ax.plot(range(len(profiles[s_idx])), profiles[s_idx], color=profile_cols[s_idx], alpha=1, linewidth=1.5)
+		#ax.plot(range(len(profiles[s_idx])), profiles[s_idx], color=(0,0,0), alpha=1, linewidth=1.5)
+	plt.axvspan(20, len(profiles[0])-20, facecolor=(0.8,0.8,0.8), linewidth=0, zorder=-10)
+	ax.tick_params(axis='x', labelsize=fmt_label_size)
+	ax.tick_params(axis='y', labelsize=fmt_label_size)
+	ax.set_xlim([0,len(profiles[0])])
+	ax.set_xscale('linear')
+	ax.set_ylim([0,100000])
+	ax.set_yscale('symlog', linthreshy=10)
+	for axis in ['top','bottom','left','right']:
+		ax.spines[axis].set_linewidth(fmt_axis_outline_width)
+		ax.spines[axis].set_linewidth(fmt_axis_outline_width)
+		ax.spines[axis].set_linewidth(fmt_axis_outline_width)
+	plt.subplots_adjust(left=0.18, right=0.90, top=0.90, bottom=0.18)
+	ax.tick_params(axis='x', labelsize=fmt_label_size)
+	ax.tick_params(axis='y', labelsize=fmt_label_size)
+	ax.set_xticks([])
+	ax.set_xticklabels([], visible=False)
+
+def load_norm_factors (filename):
+	data = {}
+	data_reader = csv.reader(open(filename, 'rU'), delimiter='\t')
+	# Ignore header
+	header = next(data_reader)
+	# Process each line
+	for row in data_reader:
+		if len(row) == 3:
+			chrom = row[0]
+			norm_fac = float(row[1])
+			lib_size = float(row[2])
+			data[chrom] = [lib_size*norm_fac, norm_fac, lib_size]
+	return data
+
+Pf5_norm_facs = load_norm_factors(../nif_IRBG74_NH/results/)
 
 
 

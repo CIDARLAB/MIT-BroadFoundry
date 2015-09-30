@@ -1,0 +1,5 @@
+sample	total_mapped_reads
+Koxym5a1_1	3612736
+Koxym5a1_2	4415921
+Koxym5a1_synnifI4_1	15976474
+Koxym5a1_synnifI4_2	4527355

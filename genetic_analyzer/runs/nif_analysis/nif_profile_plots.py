@@ -38,6 +38,7 @@ col_dark_green  = (0.0,0.392,0.196)
 col_mid_green   = (0.584,0.749,0.180)
 col_light_green = (0.243,0.659,0.227)
 col_red         = (0.890,0.184,0.200)
+col_black       = (0,0,0)
 
 cmap = {}
 cmap['J'] = col_yellow
@@ -60,6 +61,14 @@ cmap['L'] = col_red
 cmap['A'] = col_red
 cmap['B'] = col_light_green
 cmap['Q'] = col_light_green
+
+cmap['P7'] = col_black
+cmap['P7.2'] = col_black
+cmap['P7.2_1'] = col_black
+cmap['P7.2_2'] = col_black
+cmap['P7.3.1'] = col_black
+cmap['P7.4.1'] = col_black
+cmap['P7.4.2'] = col_black
 
 col_sense = (0.5,0.5,0.5)
 col_antisense = (0.5,0.5,0.5)
@@ -228,8 +237,15 @@ def gff_to_dnaplotlib (gff, chrom):
 			#p_opts['label_style'] = 'italic'
 		if part_data[0] == 'promoter':
 			p_type = 'Promoter'
+			p_opts['x_extent'] = 140
+			p_opts['y_extent'] = 3.5
+			p_opts['arrowhead_length'] = 50
+			p_opts['linewidth'] = 1.0
 		if part_data[0] == 'terminator':
 			p_type = 'Terminator'
+			p_opts['x_extent'] = 40
+			p_opts['y_extent'] = 2.0
+			p_opts['linewidth'] = 1.0
 		if p_type != None:
 			p_start_bp = int(part_data[2])
 			p_end_bp = int(part_data[3])

@@ -5594,12 +5594,6 @@ rplA_locusTag_BN877_I2062	696
 asd_locusTag_BN877_I2571	1035
 BN877_I2605_locusTag_BN877_I2605	255
 BN877_II1464_locusTag_BN877_II1464	1098
-cdsnifV	1143
-cdsnifW	258
-cdsnifU	825
-cdsnifS	1203
-cdsnifZ	447
-cdsnifM	801
 CEN6	514
 nifX	471
 nifL	1488

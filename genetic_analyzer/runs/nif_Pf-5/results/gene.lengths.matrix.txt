@@ -671,7 +671,7 @@ None_locusTag_PFL_0622	9636
 None_locusTag_PFL_0997	828
 None_locusTag_PFL_0996	1050
 None_locusTag_PFL_0995	2436
-None_locusTag_PFL_0994	1704
+None_locusTag_PFL_0626	1011
 None_locusTag_PFL_0629	303
 None_locusTag_PFL_0999	876
 None_locusTag_PFL_0998	1275
@@ -1008,6 +1008,7 @@ None_locusTag_PFL_1946	558
 None_locusTag_PFL_1945	852
 None_locusTag_PFL_1944	1035
 ribD_1_locusTag_PFL_1032	1107
+peaC_locusTag_PFL_4118	324
 None_locusTag_PFL_1806	603
 None_locusTag_PFL_1807	564
 None_locusTag_PFL_1804	639
@@ -1228,7 +1229,6 @@ miaE_locusTag_PFL_2636	606
 aspS_locusTag_PFL_4767	1776
 None_locusTag_PFL_4349	954
 dksA_locusTag_PFL_5270	441
-nifU 	825
 ompR_locusTag_PFL_0276	741
 iolE_locusTag_PFL_2587	909
 batA_locusTag_PFL_2846	999
@@ -1429,7 +1429,6 @@ None_locusTag_PFL_4364	1350
 None_locusTag_PFL_4323	1821
 None_locusTag_PFL_4366	927
 gyrB_locusTag_PFL_0004	2418
-nifW 	261
 bkdA1_locusTag_PFL_2534	1236
 tssE_locusTag_PFL_6090	516
 moaC_2_locusTag_PFL_3727	489
@@ -1645,7 +1644,6 @@ hisB_locusTag_PFL_0361	594
 aroE_locusTag_PFL_5382	855
 rluB_locusTag_PFL_1602	1191
 pap_locusTag_PFL_4331	1515
-nifQ 	504
 higB-2_locusTag_PFL_3910	351
 quiA_locusTag_PFL_5668	2376
 lptB_locusTag_PFL_0916	726
@@ -1762,7 +1760,6 @@ hemD_locusTag_PFL_6001	768
 pltK_locusTag_PFL_2797	1149
 pspA_locusTag_PFL_3204	2979
 psd_locusTag_PFL_0552	867
-None_locusTag_PFL_4244	462
 prs_locusTag_PFL_5165	942
 clpV_locusTag_PFL_6093	2676
 pstC_locusTag_PFL_6118	2286
@@ -1800,7 +1797,6 @@ None_locusTag_PFL_2244	753
 None_locusTag_PFL_2247	855
 None_locusTag_PFL_2246	645
 None_locusTag_PFL_4240	2949
-nifL 	1488
 glyQ_locusTag_PFL_0014	954
 None_locusTag_PFL_4046	816
 ansB_locusTag_PFL_2099	1089
@@ -1895,7 +1891,6 @@ None_locusTag_PFL_2492	375
 None_locusTag_PFL_2493	1041
 rzxF_locusTag_PFL_2994	7626
 mvaT_locusTag_PFL_4787	375
-nifS 	1203
 None_locusTag_PFL_5947	1608
 None_locusTag_PFL_5946	1779
 None_locusTag_PFL_5945	318
@@ -2014,7 +2009,6 @@ None_locusTag_PFL_2266	408
 None_locusTag_PFL_2265	453
 None_locusTag_PFL_2264	504
 None_locusTag_PFL_5614	921
-nifN 	1386
 None_locusTag_PFL_2043	234
 None_locusTag_PFL_2042	76
 None_locusTag_PFL_2737	495
@@ -2197,7 +2191,6 @@ None_locusTag_PFL_2281	777
 acnB_locusTag_PFL_2633	2610
 None_locusTag_PFL_2283	657
 None_locusTag_PFL_2282	771
-nifH 	882
 betI_locusTag_PFL_5766	594
 metW_locusTag_PFL_5843	621
 scpB_locusTag_PFL_1600	1032
@@ -2336,6 +2329,7 @@ None_locusTag_PFL_2540	1662
 None_locusTag_PFL_2541	1125
 None_locusTag_PFL_2549	1488
 cycL_locusTag_PFL_1687	471
+None_locusTag_PFL_4716	411
 ccoS_locusTag_PFL_1914	231
 cah_locusTag_PFL_0058	735
 thiL_locusTag_PFL_5517	966
@@ -2445,7 +2439,6 @@ None_locusTag_PFL_4955	1017
 aprF_locusTag_PFL_3206	1362
 mutS_locusTag_PFL_1209	2580
 hmgA_locusTag_PFL_0967	1305
-nifJ 	3516
 None_locusTag_PFL_3842	1221
 rpsA_locusTag_PFL_4308	1695
 styD_locusTag_PFL_3217	1488
@@ -2636,7 +2629,7 @@ None_locusTag_PFL_4718	930
 None_locusTag_PFL_4715	1584
 None_locusTag_PFL_4714	867
 None_locusTag_PFL_4245	486
-None_locusTag_PFL_4716	411
+None_locusTag_PFL_4244	462
 None_locusTag_PFL_4711	1353
 None_locusTag_PFL_4242	891
 None_locusTag_PFL_4713	279
@@ -2927,7 +2920,6 @@ astA_locusTag_PFL_3055	1035
 ttuD_locusTag_PFL_1698	1281
 None_locusTag_PFL_2999	882
 None_locusTag_PFL_2998	1251
-nifF 	531
 aroB_locusTag_PFL_0451	1101
 lamB_locusTag_PFL_4932	1224
 pilP_1_locusTag_PFL_0448	531
@@ -3345,10 +3337,26 @@ glgB_locusTag_PFL_2874	2232
 fadD_3_locusTag_PFL_4599	1689
 sufE_locusTag_PFL_1168	411
 gcp_locusTag_PFL_5660	1026
+nifH	882
+nifK	1563
+nifJ	3516
+nifM	801
+nifL	1488
+nifN	1386
+nifA	1573
+nifB	1407
+nifE	1506
 nifD	1452
+nifF	531
 nifY	663
+nifX	471
 nifZ	447
-peaC_locusTag_PFL_4118	324
+nifQ	504
+nifS	1203
+nifU	825
+nifT	219
+nifW	261
+nifV	1143
 argF_1_locusTag_PFL_4636	1011
 madL_locusTag_PFL_5813	432
 rsuA_locusTag_PFL_1430	693
@@ -3373,8 +3381,7 @@ potI_locusTag_PFL_5922	891
 fadB_locusTag_PFL_1940	2148
 add_locusTag_PFL_0719	954
 dsbB_2_locusTag_PFL_5998	522
-nifB 	1407
-None_locusTag_PFL_0630	1134
+None_locusTag_PFL_0986	1584
 ilvA_2_locusTag_PFL_5905	1515
 None_locusTag_PFL_5830	570
 selD_locusTag_PFL_2278	1035
@@ -3716,7 +3723,7 @@ choV_locusTag_PFL_5764	1179
 sdhA_locusTag_PFL_1716	1773
 rrlB_locusTag_PFL_0738	2901
 None_locusTag_PFL_0985	306
-None_locusTag_PFL_0986	1584
+None_locusTag_PFL_0630	1134
 None_locusTag_PFL_0987	327
 None_locusTag_PFL_0980	948
 None_locusTag_PFL_0981	408
@@ -4032,7 +4039,6 @@ None_locusTag_PFL_2133	918
 aroQ_1_locusTag_PFL_5381	450
 None_locusTag_PFL_2131	105
 None_locusTag_PFL_2130	939
-nifX 	471
 None_locusTag_PFL_2139	831
 None_locusTag_PFL_2138	1230
 None_locusTag_PFL_0620	300
@@ -4042,7 +4048,7 @@ mazG_locusTag_PFL_4445	834
 None_locusTag_PFL_0624	462
 glcD_locusTag_PFL_2269	1500
 None_locusTag_PFL_0627	1266
-None_locusTag_PFL_0626	1011
+None_locusTag_PFL_0994	1704
 fbpB_locusTag_PFL_0573	1566
 mdcD_locusTag_PFL_5817	852
 maf_2_locusTag_PFL_1791	579
@@ -4475,7 +4481,6 @@ None_locusTag_PFL_4359	1296
 None_locusTag_PFL_4358	1359
 pltB_locusTag_PFL_2788	7377
 xdhA_locusTag_PFL_1889	1455
-nifT 	219
 pvdN_locusTag_PFL_4088	1296
 rfaF_locusTag_PFL_0511	1035
 dxs_locusTag_PFL_5510	1902
@@ -4670,7 +4675,6 @@ None_locusTag_PFL_4371	1359
 None_locusTag_PFL_4370	1323
 astA_locusTag_PFL_2241	1074
 ihfA_locusTag_PFL_2117	303
-nifV 	1143
 rhlE_1_locusTag_PFL_5407	1335
 puuA_locusTag_PFL_5930	1377
 fliC_locusTag_PFL_1629	852
@@ -4803,7 +4807,6 @@ None_locusTag_PFL_2255	717
 ppsA_locusTag_PFL_1869	2376
 tonB5_locusTag_PFL_0991	768
 hisC_1_locusTag_PFL_0930	1053
-nifM 	801
 cupB5_locusTag_PFL_1467	3036
 glcF_locusTag_PFL_2267	1218
 None_locusTag_PFL_3078	1353
@@ -5437,7 +5440,6 @@ paaB_locusTag_PFL_3130	792
 lhgO_locusTag_PFL_2432	1194
 aguB_locusTag_PFL_0307	879
 ureB_locusTag_PFL_0632	306
-nifK 	1563
 None_locusTag_PFL_3238	1290
 None_locusTag_PFL_3232	1023
 None_locusTag_PFL_3895	423
@@ -5682,7 +5684,6 @@ acpP_locusTag_PFL_1797	237
 prbB_locusTag_PFL_5626	960
 nuoG_locusTag_PFL_3902	2715
 paaN_locusTag_PFL_3140	2055
-nifE 	1506
 rplE_locusTag_PFL_5570	540
 dppC_locusTag_PFL_0876	912
 None_locusTag_PFL_2964	1656
@@ -6125,7 +6126,6 @@ None_locusTag_PFL_3830	879
 None_locusTag_PFL_3833	1242
 None_locusTag_PFL_3832	1494
 liuR_locusTag_PFL_3933	405
-nifA 	1573
 rpoD_locusTag_PFL_5663	1848
 cysS_locusTag_PFL_3912	1383
 aat_locusTag_PFL_3882	681
@@ -6292,24 +6292,7 @@ None_locusTag_PFL_3481	1008
 None_locusTag_PFL_3482	972
 None_locusTag_PFL_3483	510
 None_locusTag_PFL_5075	579
-nifH	882
-nifK	1563
-nifJ	3504
-nifM	801
-nifN	1386
-nifB	1407
-nifE	1374
-nifF	531
-nifQ	504
-nifS	1203
-nifU	825
-nifW	258
-nifV	1143
 T7RNAP_locusTag_T7RNAP	2652
 TetA_locusTag_TetA	1120
 araC_locusTag_araC	930
 araE_locusTag_araE	1420
-nifL	1488
-nifA	1573
-nifX	471
-nifT	219

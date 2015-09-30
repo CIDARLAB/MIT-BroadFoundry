@@ -1,3 +1,11 @@
+pBBR_OR	Manual	promoter	7200	7222	.	+	.	Name=Pwt
+pBBR_OR	Manual	promoter	18549	18571	.	+	.	Name=P2_1
+pBBR_OR	Manual	promoter	20670	20692	.	+	.	Name=P3.1
+pBBR_OR	Manual	promoter	21308	21330	.	+	.	Name=P2_2
+pBBR_OR	Manual	terminator	18482	18518	.	+	.	Name=T4
+pBBR_OR	Manual	terminator	20623	20651	.	+	.	Name=T6_1
+pBBR_OR	Manual	terminator	21261	21289	.	+	.	Name=T6_2
+pBBR_OR	Manual	terminator	26463	26510	.	+	.	Name=Twt
 pBBR_OR	Manual	gene	2130	2924	.	+	.	Name=aphA3
 pBBR_OR	Manual	gene	747	1550	.	+	.	Name=URA3
 pBBR_OR	Manual	gene	4245	4535	.	-	.	Name=parC

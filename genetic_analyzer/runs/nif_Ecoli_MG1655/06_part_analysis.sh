@@ -7,4 +7,4 @@
 BIN_PATH=/home/unix/tgorocho/genetic_analyzer/bin
 
 # Perform part analysis for all promoters, terminators and ribozymes in GFF for given chromosomes
-bsub -q forest -o ./logs/06_part_analysis.out.log -e ./logs/06_part_analysis.err.log "python $BIN_PATH/part_profile_analysis.py -settings ./data/settings.txt"
+bsub -q forest -o ./logs/06_part_analysis.out.log -e ./logs/06_part_analysis.err.log "python $BIN_PATH/part_profile_analysis_T7.py -settings ./data/settings.txt"

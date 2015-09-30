@@ -1,0 +1,11 @@
+design	factor	lib_size
+N13	NA	765868
+N14	NA	812740
+N15	NA	13630805
+N16	NA	29890466
+N17	NA	5471713
+N5	NA	1117055
+Rhizobium_1	NA	4396712
+Rhizobium_2	NA	10819852
+Rhizobium_synnifI4_1	NA	3140474
+Rhizobium_synnifI4_2	NA	8922157

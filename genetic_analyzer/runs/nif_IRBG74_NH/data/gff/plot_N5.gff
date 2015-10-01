@@ -1,4 +1,3 @@
-pBBR7017	Manual	gene	2130	2924	.	+	.	Name=aphA3
 pBBR7017	Manual	gene	20916	22488	.	-	.	Name=A
 pBBR7017	Manual	gene	24817	26223	.	-	.	Name=B
 pBBR7017	Manual	gene	13356	14807	.	+	.	Name=D
@@ -19,8 +18,3 @@ pBBR7017	Manual	gene	10627	10887	.	+	.	Name=W
 pBBR7017	Manual	gene	20373	20843	.	+	.	Name=X
 pBBR7017	Manual	gene	16694	17356	.	+	.	Name=Y
 pBBR7017	Manual	gene	10884	11330	.	+	.	Name=Z
-pBBR7017	Manual	gene	3095	3751	.	-	.	Name=parA
-pBBR7017	Manual	gene	3715	4557	.	-	.	Name=parB
-pBBR7017	Manual	gene	4245	4535	.	-	.	Name=parC
-pBBR7017	Manual	gene	4686	4934	.	+	.	Name=parD
-pBBR7017	Manual	gene	4934	5242	.	+	.	Name=parE

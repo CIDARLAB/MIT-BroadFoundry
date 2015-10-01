@@ -282,16 +282,14 @@ def load_plotting_gffs (samples, file_prefix):
 # Load all the profiles for each organism (specified in BED files)
 ###############################################################################
 
-#ecoli_samples = ['N1','N2', 'EcoliMG1655_LBWB_1', 'EcoliMG1655_LBWB_2', 
-#                 'EcoliMG1655_synnifI4_1', 'EcoliMG1655_synnifI4_2']
-ecoli_samples = ['N2', 'EcoliMG1655_LBWB_2', 'EcoliMG1655_synnifI4_1']            
+ecoli_samples = ['N1','N2', 'EcoliMG1655_LBWB_1', 'EcoliMG1655_LBWB_2', 
+                 'EcoliMG1655_synnifI4_1', 'EcoliMG1655_synnifI4_2']
+#ecoli_samples = ['N2', 'EcoliMG1655_LBWB_2', 'EcoliMG1655_synnifI4_1']            
 ecoli_file_prefix = '../nif_Ecoli_MG1655/results/'
 ecoli_gff_prefix = '../nif_Ecoli_MG1655/data/gff/'
 ecoli_profiles = load_profile_set(ecoli_samples, ecoli_file_prefix)
 ecoli_gffs = load_plotting_gffs(ecoli_samples, ecoli_gff_prefix)
 
-#rizo_samples = ['N5','N13','N14','N15','N16','N17', 'Rhizobium_1', 'Rhizobium_2', 
-#                 'Rhizobium_synnifI4_1', 'Rhizobium_synnifI4_2']
 rizo_samples = ['N5','N13','N14','N15','N16','N17', 'Rhizobium_1', 'Rhizobium_2', 
                  'Rhizobium_synnifI4_1', 'Rhizobium_synnifI4_2']
 rizo_file_prefix = '../nif_IRBG74_NH/results/'
@@ -319,7 +317,7 @@ pf5_gffs = load_plotting_gffs(pf5_samples, pf5_gff_prefix)
 
 plot_reversed = True
 pad = 100
-out_filename = 'fig_01_Koxy5a1-WT.pdf'
+out_filename = 'fig_01_Koxy5a1-WT.png'
 chrom = 'AMPJ01000097.1'
 start_bp = (170939-pad)
 end_bp = (194229+pad)
@@ -368,15 +366,15 @@ for axis in ['top','bottom','left','right']:
 	ax.spines[axis].set_linewidth(0.8)
 ax.axis('off')
 plt.subplots_adjust(hspace=.00, wspace=.00, left=.01, right=.99, top=.99, bottom=.01)
-fig.savefig(OUTPUT_PREFIX+out_filename, transparent=True)
+fig.savefig(OUTPUT_PREFIX+out_filename, transparent=True, dpi=600)
 plt.close('all')
 
 #############################################################################
-# FIG 2. Comparison of 7017 WT cluster across hosts
+# FIG 2a. Comparison of 7017 WT cluster across hosts
 #############################################################################
 
 pad = 100
-out_filename = 'fig_02_WT7017_comp.pdf'
+out_filename = 'fig_02a_WT7017_comp.png'
 ecoli_chrom = 'pKU7017'
 ecoli_norm = 23016036.0
 ecoli_start_bp = 2140-pad
@@ -420,6 +418,7 @@ ax.axis('off')
 ax.set_xticks([])
 ax.set_xlim([ecoli_start_bp, ecoli_end_bp])
 ax.set_ylim([-max_y_minus/2.0, max_y_plus])
+ax.set_yscale('symlog', linthreshx=10)
 
 ax = plt.subplot(gs[1])
 ax.fill_between(range(rizo_start_bp, rizo_end_bp), rizo_profile_data[0]/rizo_norm, np.zeros(rizo_end_bp-rizo_start_bp), facecolor=col_sense, color=col_sense, linewidth=1)
@@ -429,6 +428,7 @@ ax.axis('off')
 ax.set_xticks([])
 ax.set_xlim([rizo_start_bp, rizo_end_bp])
 ax.set_ylim([-max_y_minus/60.0, max_y_plus/60.0])
+ax.set_yscale('symlog', linthreshx=10)
 
 ax = plt.subplot(gs[2])
 ax.fill_between(range(pf5_start_bp, pf5_end_bp), pf5_profile_data[0]/pf5_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_sense, color=col_sense, linewidth=1)
@@ -438,10 +438,148 @@ ax.axis('off')
 ax.set_xticks([])
 ax.set_xlim([pf5_start_bp, pf5_end_bp])
 ax.set_ylim([-max_y_minus/10.0, (max_y_plus/2)/10.0])
+ax.set_yscale('symlog', linthreshx=10)
 
 # Format the axes and save
 plt.subplots_adjust(hspace=.00, wspace=.00, left=.01, right=.99, top=.99, bottom=.01)
-fig.savefig(OUTPUT_PREFIX+out_filename, transparent=True)
+fig.savefig(OUTPUT_PREFIX+out_filename, transparent=True, dpi=600)
+plt.close('all')
+
+#############################################################################
+# FIG 2b. Comparison of 7017 WT cluster across hosts (REORDERED!)
+#############################################################################
+
+pad = 100
+out_filename = 'fig_02b_WT7017_comp.png'
+
+lin_cutoff = 100.0
+
+koxy_chrom = 'AMPJ01000097.1'
+koxy_start_bp = 170939
+koxy_end_bp = 194229
+koxy_norm = 3612736.0/(20.0*1000000.0)
+ecoli_chrom = 'pKU7017'
+ecoli_norm = 23016036.0/1000000.0
+ecoli_start_bp = 2140
+ecoli_end_bp = 25614
+rizo_chrom = 'pBBR7017'
+rizo_norm = 1117055.0/1000000.0
+rizo_start_bp = 7413
+rizo_end_bp = 30887
+pf5_chrom = 'pPf7017'
+pf5_norm = 5430681.0/1000000.0
+pf5_start_bp = 7205
+pf5_end_bp = 30679
+koxy_profile_data = extract_profile_region(koxy_profiles['Koxym5a1_1'], koxy_chrom, koxy_start_bp, koxy_end_bp)
+ecoli_profile_data = extract_profile_region(ecoli_profiles['N2'], ecoli_chrom, ecoli_start_bp, ecoli_end_bp)
+rizo_profile_data = extract_profile_region(rizo_profiles['N5'], rizo_chrom, rizo_start_bp, rizo_end_bp)
+pf5_profile_data = extract_profile_region(pf5_profiles['N3'], pf5_chrom, pf5_start_bp, pf5_end_bp)
+
+reordered_gff_filename = '../nif_Ecoli_MG1655/data/gff/plot_N1_reordered.gff'
+reordered_gff = load_gff(reordered_gff_filename)
+dna_design = gff_to_dnaplotlib(reordered_gff, 'pKU7017')
+
+max_y_plus = 100000.0 #0.045
+max_y_minus = 100000.0 #0.045 #12
+
+reordered_parts = []
+reordered_parts.append([[5048, 13430], [0, 8382]])
+reordered_parts.append([[22567, 19052], [8632, 12147]])
+reordered_parts.append([[18810, 16901], [12397, 14306]])
+reordered_parts.append([[23474, 22944], [14556, 15086]])
+reordered_parts.append([[0, 4714], [15336, 20050]])
+reordered_parts.append([[16559, 13503], [20300, 23356]])
+
+reordered_parts_wt = []
+reordered_parts_wt.append([[19370, 10988], [0, 8382]])
+reordered_parts_wt.append([[19775, 23290], [8632, 12147]])
+reordered_parts_wt.append([[1909, 0], [12397, 14306]])
+reordered_parts_wt.append([[5456, 5986], [14556, 15086]])
+reordered_parts_wt.append([[10724, 6010], [15336, 20050]])
+reordered_parts_wt.append([[5132, 2076], [20300, 23356]])
+
+# Create the figure
+fig = plt.figure(figsize=(6.0,4.0))
+gs = gridspec.GridSpec(5, 1, height_ratios=[1,1,1,1,0.48])
+
+# Plot the DNA
+dr = dpl.DNARenderer(scale=2.0, linewidth=0.8)
+ax = plt.subplot(gs[4])
+start, end = dr.renderDNA(ax, dna_design, dr.trace_part_renderers())
+ax.set_xlim([start-50, end+50])
+ax.set_ylim([-8,5])
+ax.plot([start-(pad*10.0),end+(pad*10.0)], [0,0], color=(0,0,0), linewidth=1.2, zorder=1)
+ax.set_xticks([])
+ax.set_yticks([])
+ax.axis('off')
+
+# Corrections are distance from ecoli plasmid start
+def plot_reordered_parts (ax, profile_data, norm_fac, reordered_parts):
+	part_add = 0
+	for part in reordered_parts:
+		if part[0][0] < part[0][1]:
+			# Forward part 
+			org_start_bp = part[0][0]
+			org_end_bp = part[0][1]
+			profile_part_fwd = profile_data[0][org_start_bp:org_end_bp]/norm_fac
+			profile_part_rev = (profile_data[1][org_start_bp:org_end_bp]*-1.0)/norm_fac
+			new_start_bp = part[1][0]
+			new_end_bp = part[1][1]
+			#print len(profile_part_fwd), new_start_bp, new_end_bp, new_end_bp-new_start_bp, org_start_bp, org_end_bp, org_end_bp-org_start_bp
+			ax.fill_between(range(new_start_bp, new_end_bp), profile_part_fwd, np.zeros(new_end_bp-new_start_bp), facecolor=col_sense, color=col_sense, linewidth=1)
+			ax.fill_between(range(new_start_bp, new_end_bp), profile_part_rev, np.zeros(new_end_bp-new_start_bp), facecolor=col_antisense, color=col_antisense, linewidth=1)
+			ax.plot([new_start_bp, new_end_bp], [0,0], linewidth=1.0, color=(0,0,0))
+		else:
+			# Reverse part 
+			org_start_bp = part[0][1]
+			org_end_bp = part[0][0]
+			profile_part_fwd = profile_data[1][org_start_bp:org_end_bp]/norm_fac
+			profile_part_rev = (profile_data[0][org_start_bp:org_end_bp]*-1.0)/norm_fac
+			new_start_bp = part[1][0]
+			new_end_bp = part[1][1]
+			#print len(profile_part_fwd), len(ecoli_profile_data[1]), org_start_bp, org_end_bp, org_end_bp-org_start_bp
+			ax.fill_between(range(new_start_bp, new_end_bp), profile_part_fwd[::-1], np.zeros(new_end_bp-new_start_bp), facecolor=col_sense, color=col_sense, linewidth=1)
+			ax.fill_between(range(new_start_bp, new_end_bp), profile_part_rev[::-1], np.zeros(new_end_bp-new_start_bp), facecolor=col_antisense, color=col_antisense, linewidth=1)
+			ax.plot([new_start_bp, new_end_bp], [0,0], linewidth=1.0, color=(0,0,0))
+		part_add += 250
+	ax.set_xlim([reordered_parts[0][1][0], reordered_parts[-1][1][1]])
+
+# Plot the profile
+ax = plt.subplot(gs[0])
+plot_reordered_parts (ax, koxy_profile_data, koxy_norm, reordered_parts_wt)
+# reformat y axis
+ax.axis('off')
+ax.set_xticks([])
+ax.set_ylim([-max_y_minus, max_y_plus])
+ax.set_yscale('symlog', linthreshy=lin_cutoff, linscaley=0.1)
+
+ax = plt.subplot(gs[1])
+plot_reordered_parts (ax, ecoli_profile_data, ecoli_norm, reordered_parts)
+# reformat y axis
+ax.axis('off')
+ax.set_xticks([])
+ax.set_ylim([-max_y_minus, max_y_plus])
+ax.set_yscale('symlog', linthreshy=lin_cutoff, linscaley=0.1)
+
+ax = plt.subplot(gs[2])
+plot_reordered_parts (ax, rizo_profile_data, rizo_norm, reordered_parts)
+# reformat y axis
+ax.axis('off')
+ax.set_xticks([])
+ax.set_ylim([-max_y_minus, max_y_plus])
+ax.set_yscale('symlog', linthreshy=lin_cutoff, linscaley=0.1)
+
+ax = plt.subplot(gs[3])
+plot_reordered_parts (ax, pf5_profile_data, pf5_norm, reordered_parts)
+# reformat y axis
+ax.axis('off')
+ax.set_xticks([])
+ax.set_ylim([-max_y_minus, max_y_plus])
+ax.set_yscale('symlog', linthreshy=lin_cutoff, linscaley=0.1)
+
+# Format the axes and save
+plt.subplots_adjust(hspace=.00, wspace=.00, left=.01, right=.99, top=.99, bottom=.01)
+fig.savefig(OUTPUT_PREFIX+out_filename, transparent=True, dpi=600)
 plt.close('all')
 
 #############################################################################
@@ -449,7 +587,14 @@ plt.close('all')
 #############################################################################
 
 pad = 100
-out_filename = 'fig_03_MB1.1_comp.pdf'
+out_filename = 'fig_03_MB1.1_comp.png'
+
+ecoli_chrom = 'LBWB'
+ecoli_norm = 58111237.0 #1
+#ecoli_norm = 19471992.0 #2
+ecoli_start_bp = 1060-pad
+ecoli_end_bp = 20639+pad
+
 rizo_chrom = 'pBBG_MB'
 rizo_lowT7_norm = 812740.0
 rizo_highT7_norm = 29890466.0
@@ -460,6 +605,8 @@ pf5_lowT7_norm = 5480126.0
 pf5_highT7_norm = 1966434.0
 pf5_start_bp = 5626-pad
 pf5_end_bp = 25172+pad
+
+ecoli_profile_data = extract_profile_region(ecoli_profiles['EcoliMG1655_LBWB_1'], ecoli_chrom, ecoli_start_bp, ecoli_end_bp)
 rizo_profile_data_lowT7 = extract_profile_region(rizo_profiles['N14'], rizo_chrom, rizo_start_bp, rizo_end_bp)
 rizo_profile_data_highT7 = extract_profile_region(rizo_profiles['N16'], rizo_chrom, rizo_start_bp, rizo_end_bp)
 pf5_profile_data_lowT7 = extract_profile_region(pf5_profiles['N18'], pf5_chrom, pf5_start_bp, pf5_end_bp)
@@ -469,12 +616,12 @@ max_y_plus = 0.040
 max_y_minus = 0.007
 
 # Create the figure
-fig = plt.figure(figsize=(6.0,3.0))
-gs = gridspec.GridSpec(3, 1, height_ratios=[1, 1, 0.38])
+fig = plt.figure(figsize=(6.0,4.0))
+gs = gridspec.GridSpec(5, 1, height_ratios=[1,1,1,1,0.48])
 
 # Plot the DNA
 dr = dpl.DNARenderer(scale=2.0, linewidth=0.8)
-ax = plt.subplot(gs[2])
+ax = plt.subplot(gs[4])
 start, end = dr.renderDNA(ax, dna_design, dr.trace_part_renderers())
 ax.set_xlim([rizo_start_bp, rizo_end_bp])
 ax.set_ylim([-8,5])
@@ -484,9 +631,20 @@ ax.set_yticks([])
 ax.axis('off')
 
 # Plot the profile
-ax = plt.subplot(gs[0])
-ax.fill_between(range(rizo_start_bp, rizo_end_bp), rizo_profile_data_lowT7[0]/rizo_lowT7_norm, np.zeros(rizo_end_bp-rizo_start_bp), facecolor=col_sense_low, color=col_sense_low, linewidth=0, zorder=-1)
-ax.fill_between(range(rizo_start_bp, rizo_end_bp), (rizo_profile_data_lowT7[1]*-1.0)/rizo_lowT7_norm, np.zeros(rizo_end_bp-rizo_start_bp), facecolor=col_antisense_low, color=col_antisense_low, linewidth=0, zorder=-1)
+ax = plt.subplot(gs[1])
+ax.fill_between(range(ecoli_start_bp, ecoli_end_bp), ecoli_profile_data[0]/ecoli_norm, np.zeros(ecoli_end_bp-ecoli_start_bp), facecolor=col_sense_high, color=col_sense_high, linewidth=1, zorder=-2)
+ax.fill_between(range(ecoli_start_bp, ecoli_end_bp), (ecoli_profile_data[1]*-1.0)/ecoli_norm, np.zeros(ecoli_end_bp-ecoli_start_bp), facecolor=col_antisense_high, color=col_antisense_high, linewidth=1, zorder=-2)
+ax.plot([ecoli_start_bp, ecoli_end_bp], [0,0], linewidth=1.0, color=(0,0,0))
+ax.axis('off')
+ax.set_xticks([])
+ax.set_xlim([ecoli_start_bp, ecoli_end_bp])
+#ax.set_yscale('symlog', linthreshx=10)
+ax.set_ylim([-max_y_minus, max_y_plus])
+ax.tick_params(axis='y', which='major', labelsize=fmt_label_size, pad=1, length=2, width=0.5)
+
+ax = plt.subplot(gs[2])
+#ax.fill_between(range(rizo_start_bp, rizo_end_bp), rizo_profile_data_lowT7[0]/rizo_lowT7_norm, np.zeros(rizo_end_bp-rizo_start_bp), facecolor=col_sense_low, color=col_sense_low, linewidth=0, zorder=-1)
+#ax.fill_between(range(rizo_start_bp, rizo_end_bp), (rizo_profile_data_lowT7[1]*-1.0)/rizo_lowT7_norm, np.zeros(rizo_end_bp-rizo_start_bp), facecolor=col_antisense_low, color=col_antisense_low, linewidth=0, zorder=-1)
 ax.fill_between(range(rizo_start_bp, rizo_end_bp), rizo_profile_data_highT7[0]/rizo_highT7_norm, np.zeros(rizo_end_bp-rizo_start_bp), facecolor=col_sense_high, color=col_sense_high, linewidth=1, zorder=-2)
 ax.fill_between(range(rizo_start_bp, rizo_end_bp), (rizo_profile_data_highT7[1]*-1.0)/rizo_highT7_norm, np.zeros(rizo_end_bp-rizo_start_bp), facecolor=col_antisense_high, color=col_antisense_high, linewidth=1, zorder=-2)
 ax.plot([rizo_start_bp, rizo_end_bp], [0,0], linewidth=1.0, color=(0,0,0))
@@ -497,9 +655,9 @@ ax.set_xlim([rizo_start_bp, rizo_end_bp])
 ax.set_ylim([-max_y_minus, max_y_plus])
 ax.tick_params(axis='y', which='major', labelsize=fmt_label_size, pad=1, length=2, width=0.5)
 
-ax = plt.subplot(gs[1])
-ax.fill_between(range(pf5_start_bp, pf5_end_bp), pf5_profile_data_lowT7[0]/pf5_lowT7_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_sense_low, color=col_sense_low, linewidth=0, zorder=-1)
-ax.fill_between(range(pf5_start_bp, pf5_end_bp), (pf5_profile_data_lowT7[1]*-1.0)/pf5_lowT7_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_antisense_low, color=col_antisense_low, linewidth=0, zorder=-1)
+ax = plt.subplot(gs[3])
+#ax.fill_between(range(pf5_start_bp, pf5_end_bp), pf5_profile_data_lowT7[0]/pf5_lowT7_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_sense_low, color=col_sense_low, linewidth=0, zorder=-1)
+#ax.fill_between(range(pf5_start_bp, pf5_end_bp), (pf5_profile_data_lowT7[1]*-1.0)/pf5_lowT7_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_antisense_low, color=col_antisense_low, linewidth=0, zorder=-1)
 ax.fill_between(range(pf5_start_bp, pf5_end_bp), pf5_profile_data_highT7[0]/pf5_highT7_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_sense_high, color=col_sense_high, linewidth=1, zorder=-2)
 ax.fill_between(range(pf5_start_bp, pf5_end_bp), (pf5_profile_data_highT7[1]*-1.0)/pf5_highT7_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_antisense_high, color=col_antisense_high, linewidth=1, zorder=-2)
 ax.plot([pf5_start_bp, pf5_end_bp], [0,0], linewidth=1.0, color=(0,0,0))
@@ -511,7 +669,7 @@ ax.set_ylim([-max_y_minus/25.0, max_y_plus/25.0])
 ax.tick_params(axis='y', which='major', labelsize=fmt_label_size, pad=1, length=2, width=0.5)
 
 plt.subplots_adjust(hspace=.00, wspace=.00, left=.01, right=.99, top=.99, bottom=.01)
-fig.savefig(OUTPUT_PREFIX+out_filename, transparent=True)
+fig.savefig(OUTPUT_PREFIX+out_filename, transparent=True, dpi=600)
 plt.close('all')
 
 #############################################################################
@@ -519,30 +677,46 @@ plt.close('all')
 #############################################################################
 
 pad = 100
-out_filename = 'fig_04_nif60-2.1_comp.pdf'
+out_filename = 'fig_04_nif60-2.1_comp.png'
+
+koxy_chrom = 'synnifI4'
+#koxy_norm = 15976474.0/1000000.0 #1
+koxy_norm = 4527355.0/1000000.0 #2
+koxy_start_bp = 1767-pad
+koxy_end_bp = 21415+pad
+
+ecoli_chrom = 'synnifI4'
+ecoli_norm = 19676265.0/1000000.0
+ecoli_start_bp = 1767-pad
+ecoli_end_bp = 21415+pad
+
 rizo_chrom = 'pBBRnif60percent_with_par'
-rizo_highT7_norm = 5471713.0
+rizo_highT7_norm = 5471713.0/1000000.0
 rizo_start_bp = 7262-pad
 rizo_end_bp = 26910+pad
 pf5_chrom = 'pPf_nif60'
-pf5_lowT7_norm = 4746901.0
-pf5_highT7_norm = 2032892.0
+pf5_lowT7_norm = 4746901.0/1000000.0
+pf5_highT7_norm = 2032892.0/1000000.0
 pf5_start_bp = 5633-pad
 pf5_end_bp = 25281+pad
+
+koxy_profile_data = extract_profile_region(koxy_profiles['Koxym5a1_synnifI4_2'], koxy_chrom, koxy_start_bp, koxy_end_bp)
+ecoli_profile_data = extract_profile_region(ecoli_profiles['EcoliMG1655_synnifI4_1'], ecoli_chrom, ecoli_start_bp, ecoli_end_bp)
 rizo_profile_data_highT7 = extract_profile_region(rizo_profiles['N17'], rizo_chrom, rizo_start_bp, rizo_end_bp)
-pf5_profile_data_lowT7 = extract_profile_region(pf5_profiles['N19'], pf5_chrom, pf5_start_bp, pf5_end_bp)
+#pf5_profile_data_lowT7 = extract_profile_region(pf5_profiles['N19'], pf5_chrom, pf5_start_bp, pf5_end_bp)
 pf5_profile_data_highT7 = extract_profile_region(pf5_profiles['N21'], pf5_chrom, pf5_start_bp, pf5_end_bp)
 dna_design = gff_to_dnaplotlib(rizo_gffs['N17'], rizo_chrom, refactored=False)
-max_y_plus = 0.01
-max_y_minus = 0.01
+
+max_y_plus = 10000.0 #0.045
+max_y_minus = 10000.0 #0.045 #12
 
 # Create the figure
-fig = plt.figure(figsize=(6.0,3.0))
-gs = gridspec.GridSpec(3, 1, height_ratios=[1, 1, 0.38])
+fig = plt.figure(figsize=(6.0,4.0))
+gs = gridspec.GridSpec(5, 1, height_ratios=[1,1,1,1,0.48])
 
 # Plot the DNA
 dr = dpl.DNARenderer(scale=2.0, linewidth=0.8)
-ax = plt.subplot(gs[2])
+ax = plt.subplot(gs[4])
 start, end = dr.renderDNA(ax, dna_design, dr.trace_part_renderers())
 ax.set_xlim([rizo_start_bp, rizo_end_bp])
 ax.set_ylim([-8,5])
@@ -553,6 +727,29 @@ ax.axis('off')
 
 # Plot the profile
 ax = plt.subplot(gs[0])
+ax.fill_between(range(koxy_start_bp, koxy_end_bp), koxy_profile_data[0]/koxy_norm, np.zeros(koxy_end_bp-koxy_start_bp), facecolor=col_sense_high, color=col_sense_high, linewidth=1, zorder=-2)
+ax.fill_between(range(koxy_start_bp, koxy_end_bp), (koxy_profile_data[1]*-1.0)/koxy_norm, np.zeros(koxy_end_bp-koxy_start_bp), facecolor=col_antisense_high, color=col_antisense_high, linewidth=1, zorder=-2)
+ax.plot([koxy_start_bp, koxy_end_bp], [0,0], linewidth=1.0, color=(0,0,0))
+ax.axis('off')
+ax.set_xticks([])
+ax.set_xlim([koxy_start_bp, koxy_end_bp])
+#ax.set_yscale('symlog', linthreshx=10)
+ax.set_ylim([-max_y_minus, max_y_plus])
+ax.set_yscale('symlog', linthreshy=lin_cutoff, linscaley=0.1)
+
+
+ax = plt.subplot(gs[1])
+ax.fill_between(range(ecoli_start_bp, ecoli_end_bp), ecoli_profile_data[0]/ecoli_norm, np.zeros(ecoli_end_bp-ecoli_start_bp), facecolor=col_sense_high, color=col_sense_high, linewidth=1, zorder=-2)
+ax.fill_between(range(ecoli_start_bp, ecoli_end_bp), (ecoli_profile_data[1]*-1.0)/ecoli_norm, np.zeros(ecoli_end_bp-ecoli_start_bp), facecolor=col_antisense_high, color=col_antisense_high, linewidth=1, zorder=-2)
+ax.plot([ecoli_start_bp, ecoli_end_bp], [0,0], linewidth=1.0, color=(0,0,0))
+ax.axis('off')
+ax.set_xticks([])
+ax.set_xlim([ecoli_start_bp, ecoli_end_bp])
+#ax.set_yscale('symlog', linthreshx=10)
+ax.set_ylim([-max_y_minus, max_y_plus])
+ax.set_yscale('symlog', linthreshy=lin_cutoff, linscaley=0.1)
+
+ax = plt.subplot(gs[2])
 ax.fill_between(range(rizo_start_bp, rizo_end_bp), rizo_profile_data_highT7[0]/rizo_highT7_norm, np.zeros(rizo_end_bp-rizo_start_bp), facecolor=col_sense_high, color=col_sense_high, linewidth=1, zorder=-2)
 ax.fill_between(range(rizo_start_bp, rizo_end_bp), (rizo_profile_data_highT7[1]*-1.0)/rizo_highT7_norm, np.zeros(rizo_end_bp-rizo_start_bp), facecolor=col_antisense_high, color=col_antisense_high, linewidth=1, zorder=-2)
 ax.plot([rizo_start_bp, rizo_end_bp], [0,0], linewidth=1.0, color=(0,0,0))
@@ -561,11 +758,11 @@ ax.set_xticks([])
 ax.set_xlim([rizo_start_bp, rizo_end_bp])
 #ax.set_yscale('symlog', linthreshx=10)
 ax.set_ylim([-max_y_minus, max_y_plus])
-ax.tick_params(axis='y', which='major', labelsize=fmt_label_size, pad=1, length=2, width=0.5)
+ax.set_yscale('symlog', linthreshy=lin_cutoff, linscaley=0.1)
 
-ax = plt.subplot(gs[1])
-ax.fill_between(range(pf5_start_bp, pf5_end_bp), pf5_profile_data_lowT7[0]/pf5_lowT7_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_sense_low, color=col_sense_low, linewidth=0, zorder=-1)
-ax.fill_between(range(pf5_start_bp, pf5_end_bp), (pf5_profile_data_lowT7[1]*-1.0)/pf5_lowT7_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_antisense_low, color=col_antisense_low, linewidth=0, zorder=-1)
+ax = plt.subplot(gs[3])
+#ax.fill_between(range(pf5_start_bp, pf5_end_bp), pf5_profile_data_lowT7[0]/pf5_lowT7_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_sense_low, color=col_sense_low, linewidth=0, zorder=-1)
+#ax.fill_between(range(pf5_start_bp, pf5_end_bp), (pf5_profile_data_lowT7[1]*-1.0)/pf5_lowT7_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_antisense_low, color=col_antisense_low, linewidth=0, zorder=-1)
 ax.fill_between(range(pf5_start_bp, pf5_end_bp), pf5_profile_data_highT7[0]/pf5_highT7_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_sense_high, color=col_sense_high, linewidth=1, zorder=-2)
 ax.fill_between(range(pf5_start_bp, pf5_end_bp), (pf5_profile_data_highT7[1]*-1.0)/pf5_highT7_norm, np.zeros(pf5_end_bp-pf5_start_bp), facecolor=col_antisense_high, color=col_antisense_high, linewidth=1, zorder=-2)
 ax.plot([pf5_start_bp, pf5_end_bp], [0,0], linewidth=1.0, color=(0,0,0))
@@ -573,11 +770,11 @@ ax.axis('off')
 ax.set_xticks([])
 ax.set_xlim([pf5_start_bp, pf5_end_bp])
 #ax.set_yscale('symlog', linthreshx=10)
-ax.set_ylim([-max_y_minus/25.0, max_y_plus/25.0])
-ax.tick_params(axis='y', which='major', labelsize=fmt_label_size, pad=1, length=2, width=0.5)
+ax.set_ylim([-max_y_minus/1.0, max_y_plus/1.0])
+ax.set_yscale('symlog', linthreshy=lin_cutoff, linscaley=0.1)
 
 plt.subplots_adjust(hspace=.00, wspace=.00, left=.01, right=.99, top=.99, bottom=.01)
-fig.savefig(OUTPUT_PREFIX+out_filename, transparent=True)
+fig.savefig(OUTPUT_PREFIX+out_filename, transparent=True, dpi=600)
 plt.close('all')
 
 

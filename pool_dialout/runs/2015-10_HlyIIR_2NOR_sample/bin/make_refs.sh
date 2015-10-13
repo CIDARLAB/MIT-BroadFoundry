@@ -1,0 +1,1 @@
+python ../../../bin/regex_from_seq.py ../data/pcr_seqs/HlyIIR_NOR2_XZinv.fa 200 ../data/regex_refs/HlyIIR_2NOR_regexs.txt

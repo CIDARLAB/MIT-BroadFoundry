@@ -113,8 +113,7 @@ line_idx = 0
 max_line_idx = len(r1_content)
 designs_list = design_regexs.keys()
 
-barcodes_to_check_set_0 = set()
-barcodes_to_check_set_1 = set()
+barcodes_to_check = set()
 found_barcodes_set = set()
 found_designs_set = set()
 

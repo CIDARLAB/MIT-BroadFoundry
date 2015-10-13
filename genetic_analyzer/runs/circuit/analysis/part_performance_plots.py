@@ -34,8 +34,8 @@ matplotlib.rcParams['pdf.fonttype']          = 42
 DATA_PREFIX = '../results'
 OUTPUT_PREFIX = './plots_transfer'
 
-MIN_READS_TERM = 500.0
-MIN_READS_RIBO = 500.0
+MIN_READS_TERM = 250.0
+MIN_READS_RIBO = 250.0
 
 tube_samples = ['tube_1', 'tube_2', 'tube_3', 'tube_4', 'tube_5', 'tube_6', 'tube_7', 'tube_8']
 flask_samples = ['flask_1', 'flask_2', 'flask_3', 'flask_4', 'flask_5', 'flask_6', 'flask_7', 'flask_8']
@@ -95,15 +95,18 @@ def plot_terminator_transfer (data, samples, fpkm_in, filename_out, point_shape=
 			d_max_term = data_point[5]
 			good_val = True
 			point_col = (0,0,0)
+			p_zorder = 100
 			if d_us_reads < min_upstream_read:
 				point_col = (0.7,0.7,0.7)
 				good_val = False
+				p_zorder = 90
 			elif d_max_term == 'Y':
 				point_col = (0.95,0.30,0.25)
 			if good_val == True:
 				y_vals.append(d_t_s)
-			ax.scatter([fpkm_in[data_point[0]]], [d_t_s], marker=point_shape, zorder=100, s=40, color=(1,1,1,0), edgecolor=point_col, linewidth=2.0)
+			ax.scatter([fpkm_in[data_point[0]]], [d_t_s], marker=point_shape, zorder=p_zorder, s=40, color=(1,1,1,0), edgecolor=point_col, linewidth=2.0)
 	plt.axhline(y=np.median(y_vals), linestyle='--', color=(0,0,0), linewidth=fmt_char_data_linewidth)
+	print filename_out, np.median(y_vals)
 	ax.tick_params(axis='x', labelsize=fmt_label_size)
 	ax.tick_params(axis='y', labelsize=fmt_label_size)
 	ax.set_xlim([30,200000])
@@ -147,16 +150,19 @@ def plot_ribozyme_transfer (data, samples, fpkm_out, filename_out, point_shape='
 			d_cut_site = int(data_point[5])
 			good_val = True
 			point_col = (0,0,0)
+			p_zorder = 100
 			if d_ds_reads < min_downstream_read:
 				point_col = (0.7,0.7,0.7)
 				good_val = False
+				p_zorder = 90
 			elif d_max_term == 'Y':
 				point_col = (0.95,0.30,0.25)
 			if good_val == True:
 				x_vals.append(d_ds_reads)
 				y_vals.append(d_c_e)
-			ax.scatter([fpkm_out[data_point[0]]], [d_c_e], marker=point_shape, zorder=100, s=40, color=(1,1,1,0), edgecolor=point_col, linewidth=2.0)
+			ax.scatter([fpkm_out[data_point[0]]], [d_c_e], marker=point_shape, zorder=p_zorder, s=40, color=(1,1,1,0), edgecolor=point_col, linewidth=2.0)
 	plt.axhline(y=np.median(y_vals), linestyle='--', color=(0,0,0), linewidth=fmt_char_data_linewidth)
+	print filename_out, np.median(y_vals)
 	ax.tick_params(axis='x', labelsize=fmt_label_size)
 	ax.tick_params(axis='y', labelsize=fmt_label_size)
 	ax.set_xlim([30,200000])
@@ -251,6 +257,5 @@ for g in gene_to_term.keys():
 			f_out_2.write(' '.join([g,'t',t_e]) + '\n')
 f_out_1.close()
 f_out_2.close()
-
 
 

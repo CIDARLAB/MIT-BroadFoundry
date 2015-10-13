@@ -102,7 +102,7 @@ n_barcoded_designs = 0
 found_designs = {}
 found_barcodes = {}
 found_barcode_reads = {}
-barcodes_to_check = [{},{}]
+barcodes_to_check = {}
 
 # Read it all in (hope there is enough memory)
 file_r1 = open(r1_filename, "rU")
@@ -113,8 +113,7 @@ line_idx = 0
 max_line_idx = len(r1_content)
 designs_list = design_regexs.keys()
 
-barcodes_to_check_set_0 = set()
-barcodes_to_check_set_1 = set()
+barcodes_to_check_set = set()
 found_barcodes_set = set()
 found_designs_set = set()
 
@@ -188,21 +187,15 @@ while line_idx < max_line_idx:
 			found_barcode = [fwd_barcode, rev_barcode] + other_bcs
 			barcode_key = "-".join(found_barcode)
 			
-			# CHECK BARCODES ##################################################
-			if fwd_barcode not in barcodes_to_check_set_0:
-				barcodes_to_check[0][fwd_barcode] = [found_design]
-				barcodes_to_check_set_0.add(fwd_barcode)
+			# CHECK BARCODES ##############################################
+			check_bc = "-".join([fwd_barcode, rev_barcode])
+			if check_bc not in barcodes_to_check_set:
+				barcodes_to_check[check_bc] = [found_design]
+				barcodes_to_check_set.add(check_bc)
 			else:
-				if found_design not in barcodes_to_check[0][fwd_barcode]:
-					barcodes_to_check[0][fwd_barcode].append(found_design)
-					barcodes_to_check_set_0.add(fwd_barcode)
-			if rev_barcode not in barcodes_to_check_set_1:
-				barcodes_to_check[1][rev_barcode] = [found_design]
-				barcodes_to_check_set_1.add(rev_barcode)
-			else:
-				if found_design not in barcodes_to_check[1][rev_barcode]:
-					barcodes_to_check[1][rev_barcode].append(found_design)
-					barcodes_to_check_set_1.add(rev_barcode)
+				if found_design not in barcodes_to_check_set[check_bc]:
+					barcodes_to_check[check_bc].append(found_design)
+					barcodes_to_check_set.add(check_bc)
 			###############################################################
 
 			if barcode_key not in found_barcodes_set:
@@ -248,15 +241,9 @@ for design in sorted(found_designs.keys()):
 	unique_barcodes = []
 	unique_for_design = False
 	for bc in found_designs[design]:
-		# Check to see where barcode is used (if unique for design)
-		if ( (len(barcodes_to_check[0][bc[0]]) == 1) and
-		     (revcomp(bc[0]) not in barcodes_to_check_set_0) and
-		     (bc[0] not in barcodes_to_check_set_1) and
-		     (revcomp(bc[0]) not in barcodes_to_check_set_1) and
-		     (len(barcodes_to_check[1][bc[1]]) == 1) and
-		     (revcomp(bc[1]) not in barcodes_to_check_set_1) and
-		     (bc[1] not in barcodes_to_check_set_0) and
-		     (revcomp(bc[1]) not in barcodes_to_check_set_0) ):
+		# extract BC from bc - don't filter so harshly
+		cur_bc = bc[0]+'-'+bc[1]
+		if len(barcodes_to_check[cur_bc]) == 1:
 			unique_barcodes.append(bc)
 			n_unique_bc += 1
 			unique_for_design = True

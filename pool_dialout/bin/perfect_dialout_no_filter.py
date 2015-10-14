@@ -193,7 +193,7 @@ while line_idx < max_line_idx:
 				barcodes_to_check[check_bc] = [found_design]
 				barcodes_to_check_set.add(check_bc)
 			else:
-				if found_design not in barcodes_to_check_set[check_bc]:
+				if found_design not in barcodes_to_check[check_bc]:
 					barcodes_to_check[check_bc].append(found_design)
 					barcodes_to_check_set.add(check_bc)
 			###############################################################

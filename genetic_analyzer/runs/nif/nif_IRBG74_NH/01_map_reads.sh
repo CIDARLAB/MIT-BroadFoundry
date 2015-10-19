@@ -18,4 +18,5 @@ bsub -q forest -o ./logs/01_map_reads_Rhizobium_1.out.log -e ./logs/01_map_reads
 bsub -q forest -o ./logs/01_map_reads_Rhizobium_2.out.log -e ./logs/01_map_reads_Rhizobium_2.err.log "python $BIN_PATH/map_reads.py -settings ./data/settings.txt -samples Rhizobium_2"
 bsub -q forest -o ./logs/01_map_reads_Rhizobium_synnifI4_1.out.log -e ./logs/01_map_reads_Rhizobium_synnifI4_1.err.log "python $BIN_PATH/map_reads.py -settings ./data/settings.txt -samples Rhizobium_synnifI4_1"
 bsub -q forest -o ./logs/01_map_reads_Rhizobium_synnifI4_2.out.log -e ./logs/01_map_reads_Rhizobium_synnifI4_2.err.log "python $BIN_PATH/map_reads.py -settings ./data/settings.txt -samples Rhizobium_synnifI4_2"
-
+bsub -q forest -o ./logs/01_map_reads_N22.out.log -e ./logs/01_map_reads_N22.err.log "python $BIN_PATH/map_reads.py -settings ./data/settings.txt -samples N22"
+bsub -q forest -o ./logs/01_map_reads_N23.out.log -e ./logs/01_map_reads_N23.err.log "python $BIN_PATH/map_reads.py -settings ./data/settings.txt -samples N23"

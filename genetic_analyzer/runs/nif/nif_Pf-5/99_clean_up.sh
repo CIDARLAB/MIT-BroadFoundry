@@ -11,6 +11,9 @@ rm /broad/hptmp/tgorocho/nif_N18/*.*
 rm /broad/hptmp/tgorocho/nif_N19/*.*
 rm /broad/hptmp/tgorocho/nif_N20/*.*
 rm /broad/hptmp/tgorocho/nif_N21/*.*
+rm /broad/hptmp/tgorocho/nif_N25/*.*
+rm /broad/hptmp/tgorocho/nif_N26/*.*
+rm /broad/hptmp/tgorocho/nif_N27/*.*
 
 rmdir /broad/hptmp/tgorocho/nif_N3
 rmdir /broad/hptmp/tgorocho/nif_N4
@@ -18,6 +21,9 @@ rmdir /broad/hptmp/tgorocho/nif_N18
 rmdir /broad/hptmp/tgorocho/nif_N19
 rmdir /broad/hptmp/tgorocho/nif_N20
 rmdir /broad/hptmp/tgorocho/nif_N21
+rmdir /broad/hptmp/tgorocho/nif_N25
+rmdir /broad/hptmp/tgorocho/nif_N26
+rmdir /broad/hptmp/tgorocho/nif_N27
 
 rm ./logs/*.*
 rmdir ./logs

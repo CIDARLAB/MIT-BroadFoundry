@@ -1,1 +1,0 @@
-chromosome	part_name	sample	reads_us	reads_ds	c_e	max_cut	cut_site

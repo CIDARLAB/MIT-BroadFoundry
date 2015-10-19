@@ -16,6 +16,9 @@ mkdir ./results/N18
 mkdir ./results/N19
 mkdir ./results/N20
 mkdir ./results/N21
+mkdir ./results/N25
+mkdir ./results/N26
+mkdir ./results/N27
 
 mkdir /broad/hptmp/tgorocho/nif_N3
 mkdir /broad/hptmp/tgorocho/nif_N4
@@ -23,3 +26,6 @@ mkdir /broad/hptmp/tgorocho/nif_N18
 mkdir /broad/hptmp/tgorocho/nif_N19
 mkdir /broad/hptmp/tgorocho/nif_N20
 mkdir /broad/hptmp/tgorocho/nif_N21
+mkdir /broad/hptmp/tgorocho/nif_N25
+mkdir /broad/hptmp/tgorocho/nif_N26
+mkdir /broad/hptmp/tgorocho/nif_N27

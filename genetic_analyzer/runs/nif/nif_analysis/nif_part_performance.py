@@ -493,7 +493,7 @@ def load_norm_factors (filename):
 			data[chrom] = [lib_size*norm_fac, norm_fac, lib_size]
 	return data
 
-Pf5_norm_facs = load_norm_factors(../nif_IRBG74_NH/results/)
+Pf5_norm_facs = load_norm_factors('../nif_IRBG74_NH/results/')
 
 
 

@@ -16,6 +16,9 @@ mkdir ./results/EcoliMG1655_synnifI4_1
 mkdir ./results/EcoliMG1655_synnifI4_2
 mkdir ./results/N1
 mkdir ./results/N2
+mkdir ./results/N29
+mkdir ./results/N30
+mkdir ./results/N31
 
 mkdir /broad/hptmp/tgorocho/nif_EcoliMG1655_LBWB_1
 mkdir /broad/hptmp/tgorocho/nif_EcoliMG1655_LBWB_2
@@ -23,3 +26,6 @@ mkdir /broad/hptmp/tgorocho/nif_EcoliMG1655_synnifI4_1
 mkdir /broad/hptmp/tgorocho/nif_EcoliMG1655_synnifI4_2
 mkdir /broad/hptmp/tgorocho/nif_N1
 mkdir /broad/hptmp/tgorocho/nif_N2
+mkdir /broad/hptmp/tgorocho/nif_N29
+mkdir /broad/hptmp/tgorocho/nif_N30
+mkdir /broad/hptmp/tgorocho/nif_N31

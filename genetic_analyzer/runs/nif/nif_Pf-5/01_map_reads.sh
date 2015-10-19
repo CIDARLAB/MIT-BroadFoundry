@@ -14,3 +14,6 @@ bsub -q forest -o ./logs/01_map_reads_N18.out.log -e ./logs/01_map_reads_N18.err
 bsub -q forest -o ./logs/01_map_reads_N19.out.log -e ./logs/01_map_reads_N19.err.log "python $BIN_PATH/map_reads.py -settings ./data/settings.txt -samples N19"
 bsub -q forest -o ./logs/01_map_reads_N20.out.log -e ./logs/01_map_reads_N20.err.log "python $BIN_PATH/map_reads.py -settings ./data/settings.txt -samples N20"
 bsub -q forest -o ./logs/01_map_reads_N21.out.log -e ./logs/01_map_reads_N21.err.log "python $BIN_PATH/map_reads.py -settings ./data/settings.txt -samples N21"
+bsub -q forest -o ./logs/01_map_reads_N25.out.log -e ./logs/01_map_reads_N25.err.log "python $BIN_PATH/map_reads.py -settings ./data/settings.txt -samples N25"
+bsub -q forest -o ./logs/01_map_reads_N26.out.log -e ./logs/01_map_reads_N26.err.log "python $BIN_PATH/map_reads.py -settings ./data/settings.txt -samples N26"
+bsub -q forest -o ./logs/01_map_reads_N27.out.log -e ./logs/01_map_reads_N27.err.log "python $BIN_PATH/map_reads.py -settings ./data/settings.txt -samples N27"

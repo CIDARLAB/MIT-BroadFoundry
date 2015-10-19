@@ -1,3 +1,0 @@
-sample	total_mapped_reads
-N6	402106
-N7	498409

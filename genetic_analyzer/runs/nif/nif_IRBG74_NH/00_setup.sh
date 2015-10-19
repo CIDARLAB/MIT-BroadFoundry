@@ -16,6 +16,8 @@ mkdir ./results/N14
 mkdir ./results/N15
 mkdir ./results/N16
 mkdir ./results/N17
+mkdir ./results/N22
+mkdir ./results/N23
 mkdir ./results/Rhizobium_1
 mkdir ./results/Rhizobium_2
 mkdir ./results/Rhizobium_synnifI4_1
@@ -27,6 +29,8 @@ mkdir /broad/hptmp/tgorocho/nif_N14
 mkdir /broad/hptmp/tgorocho/nif_N15
 mkdir /broad/hptmp/tgorocho/nif_N16
 mkdir /broad/hptmp/tgorocho/nif_N17
+mkdir /broad/hptmp/tgorocho/nif_N22
+mkdir /broad/hptmp/tgorocho/nif_N23
 mkdir /broad/hptmp/tgorocho/nif_Rhizobium_1
 mkdir /broad/hptmp/tgorocho/nif_Rhizobium_2
 mkdir /broad/hptmp/tgorocho/nif_Rhizobium_synnifI4_1

@@ -12,6 +12,7 @@ import math
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import matplotlib.ticker as ticker
 import csv
 
 matplotlib.rcParams['lines.dash_joinstyle']  = 'miter'
@@ -143,6 +144,7 @@ def reverse_region (region):
 	return [region[1][::-1], region[0][::-1]]
 
 def plot_terminator_profile (profiles, trace_region, part_region, filename_out):
+	loc = ticker.MultipleLocator(base=100.0)
 	fmt_char_data_linewidth = 1.5
 	fmt_axis_outline_width = fmt_edge_width
 	fmt_char_line_width = 5.0
@@ -151,12 +153,13 @@ def plot_terminator_profile (profiles, trace_region, part_region, filename_out):
 	ax = plt.subplot(1,1,1)
 	for s in profiles:
 		profile_data = extract_profile_region(profiles[s], trace_region[0], trace_region[1], trace_region[2])
-		plt.axvspan(part_region[1], part_region[2], facecolor=(0.8,0.8,0.8), linewidth=0, zorder=-10)
-		ax.plot(range(trace_region[1], trace_region[2]), np.array(profile_data[0]), color=(0.0,0.0,0.0), alpha=1, linewidth=1.5)
+		plt.axvspan(part_region[1]-trace_region[1], part_region[2]-trace_region[1], facecolor=(0.8,0.8,0.8), linewidth=0, zorder=-10)
+		ax.plot(range(trace_region[2]-trace_region[1]), np.array(profile_data[0]), color=(0.0,0.0,0.0), alpha=1, linewidth=1.5)
 	ax.tick_params(axis='x', labelsize=fmt_label_size)
 	ax.tick_params(axis='y', labelsize=fmt_label_size)
-	ax.set_xlim([trace_region[1],trace_region[2]])
+	ax.set_xlim([0,trace_region[2]-trace_region[1]])
 	ax.set_xscale('linear')
+	ax.xaxis.set_major_locator(loc)
 	ax.set_ylim([0,1000000])
 	ax.set_yscale('symlog', linthreshy=10)
 	for axis in ['top','bottom','left','right']:
@@ -166,12 +169,11 @@ def plot_terminator_profile (profiles, trace_region, part_region, filename_out):
 	plt.subplots_adjust(left=0.18, right=0.90, top=0.90, bottom=0.18)
 	ax.tick_params(axis='x', labelsize=fmt_label_size)
 	ax.tick_params(axis='y', labelsize=fmt_label_size)
-	ax.set_xticks([])
-	ax.set_xticklabels([], visible=False)
 	plt.savefig(filename_out, transparent=True)
 	plt.close('all')
 
 def plot_ribozyme_profile (profiles, trace_region, part_region, cut_site, filename_out):
+	loc = ticker.MultipleLocator(base=20.0)
 	fmt_char_data_linewidth = 1.5
 	fmt_axis_outline_width = fmt_edge_width
 	fmt_char_line_width = 5.0
@@ -180,13 +182,14 @@ def plot_ribozyme_profile (profiles, trace_region, part_region, cut_site, filena
 	ax = plt.subplot(1,1,1)
 	for s in profiles:
 		profile_data = extract_profile_region(profiles[s], trace_region[0], trace_region[1], trace_region[2])
-		plt.axvspan(part_region[1], part_region[2], facecolor=(0.8,0.8,0.8), linewidth=0, zorder=-10)
-		ax.plot(range(trace_region[1], trace_region[2]), np.array(profile_data[0]), color=(0.0,0.0,0.0), alpha=1, linewidth=1.5)
-	plt.axvline(x=cut_site, linewidth=1.5, linestyle='--', color=(0.0,0.0,0.0))
+		plt.axvspan(part_region[1]-trace_region[1], part_region[2]-trace_region[1], facecolor=(0.8,0.8,0.8), linewidth=0, zorder=-10)
+		ax.plot(range(trace_region[2]-trace_region[1]), np.array(profile_data[0]), color=(0.0,0.0,0.0), alpha=1, linewidth=1.5)
+	plt.axvline(x=cut_site-trace_region[1], linewidth=1.5, linestyle='--', color=(0.0,0.0,0.0))
 	ax.tick_params(axis='x', labelsize=fmt_label_size)
 	ax.tick_params(axis='y', labelsize=fmt_label_size)
-	ax.set_xlim([trace_region[1],trace_region[2]])
+	ax.set_xlim([0,trace_region[2]-trace_region[1]])
 	ax.set_xscale('linear')
+	ax.xaxis.set_major_locator(loc)
 	ax.set_ylim([0,1000000])
 	ax.set_yscale('symlog', linthreshy=10)
 	for axis in ['top','bottom','left','right']:
@@ -196,13 +199,11 @@ def plot_ribozyme_profile (profiles, trace_region, part_region, cut_site, filena
 	plt.subplots_adjust(left=0.18, right=0.90, top=0.90, bottom=0.18)
 	ax.tick_params(axis='x', labelsize=fmt_label_size)
 	ax.tick_params(axis='y', labelsize=fmt_label_size)
-	#ax.set_xticks([])
-	#ax.set_xticklabels([100, 500], visible=False)
-	ax.set_xticklabels([500, 1500, 2500])
 	plt.savefig(filename_out, transparent=True)
 	plt.close('all')
 
 def plot_promoter_profile (profiles, trace_region, part_region, filename_out):
+	loc = ticker.MultipleLocator(base=300.0)
 	fmt_char_data_linewidth = 1.5
 	fmt_axis_outline_width = fmt_edge_width
 	fmt_char_line_width = 5.0
@@ -211,12 +212,13 @@ def plot_promoter_profile (profiles, trace_region, part_region, filename_out):
 	ax = plt.subplot(1,1,1)
 	for s in profiles:
 		profile_data = extract_profile_region(profiles[s], trace_region[0], trace_region[1], trace_region[2])
-		plt.axvspan(part_region[1], part_region[2], facecolor=(0.8,0.8,0.8), linewidth=0, zorder=-10)
-		ax.plot(range(trace_region[1], trace_region[2]), np.array(profile_data[0]), color=(0.0,0.0,0.0), alpha=1, linewidth=1.5)
+		plt.axvspan(part_region[1]-trace_region[1], part_region[2]-trace_region[1], facecolor=(0.8,0.8,0.8), linewidth=0, zorder=-10)
+		ax.plot(range(trace_region[2]-trace_region[1]), np.array(profile_data[0]), color=(0.0,0.0,0.0), alpha=1, linewidth=1.5)
 	ax.tick_params(axis='x', labelsize=fmt_label_size)
 	ax.tick_params(axis='y', labelsize=fmt_label_size)
-	ax.set_xlim([trace_region[1],trace_region[2]])
+	ax.set_xlim([0,trace_region[2]-trace_region[1]])
 	ax.set_xscale('linear')
+	ax.xaxis.set_major_locator(loc)
 	ax.set_ylim([0,1000000])
 	ax.set_yscale('symlog', linthreshy=10)
 	for axis in ['top','bottom','left','right']:
@@ -226,8 +228,6 @@ def plot_promoter_profile (profiles, trace_region, part_region, filename_out):
 	plt.subplots_adjust(left=0.18, right=0.90, top=0.90, bottom=0.18)
 	ax.tick_params(axis='x', labelsize=fmt_label_size)
 	ax.tick_params(axis='y', labelsize=fmt_label_size)
-	ax.set_xticks([])
-	ax.set_xticklabels([], visible=False)
 	plt.savefig(filename_out, transparent=True)
 	plt.close('all')
 

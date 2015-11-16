@@ -92,7 +92,7 @@ def load_settings (filename):
 	return settings
 
 def map_reads (settings, sample):
-	"""Map reads using BWA
+	"""Map reads using BWA-MEM
 	"""
 	# Make the indexes
 	cmd_index = 'bwa index' + \
@@ -114,7 +114,7 @@ def map_reads (settings, sample):
 	                  ' ' + settings[sample]['R1_fastq_file'] + \
 	                  ' ' + settings[sample]['R2_fastq_file'] + \
 	                  ' > ' + sam_file
-	print("Mapping Reads: "+cmd_mapping)
+	print("Mapping Reads (BWM-MEM): "+cmd_mapping)
 	subprocess.call(cmd_mapping, shell=True)
 	# Convert to BAM for some tools
 	cmd_to_bam = 'samtools view -bS' + \
@@ -131,8 +131,8 @@ def count_reads (settings, sample, feature='gene', attribute='Name', strand_opt=
 	"""Count reads falling in a specific feature type, group on an attribute
 	"""
 	# Use HTSeq to count the reads in specific features
-	if settings[sample]['R2_fastq_file'] == '':
-		strand_opt = 'no'
+	if settings[sample]['R2_fastq_file'] == '' and strand_opt == 'reverse':
+		strand_opt = 'yes'
 	cmd_count = 'htseq-count' + \
 	            ' -f bam' + \
 	            ' -s ' + strand_opt + \
@@ -269,12 +269,22 @@ def make_profile (settings, sample):
 		http://seqanswers.com/forums/showthread.php?t=29399
 	"""
 	if settings[sample]['R2_fastq_file'] == '':
-		cmd_coverage = 'bedtools coverage -d -abam' + \
-		               ' ' + bam_filename(settings, sample, extension=True) + \
-		               ' -b ' + settings[sample]['bed_file'] + \
-		               ' > ' + profile_filename(settings, sample)
-		print("Making profile: "+cmd_coverage)
-		subprocess.call(cmd_coverage, shell=True)
+		# https://www.biostars.org/p/14378/
+		fwd_filename = bam_filename(settings, sample, extension=False) + '.fwd.bam'
+		cmd_fwd_coverage = 'samtools view -b -F 20 '+bam_filename(settings, sample, extension=True)+' > '+fwd_filename+' && '+\
+			'samtools index '+fwd_filename+' && '+\
+			'bedtools coverage -d -abam '+fwd_filename+' -b '+settings[sample]['bed_file'] + \
+		    ' > '+profile_fwd_filename(settings, sample)
+		print("Making forward profile: "+cmd_fwd_coverage)
+		subprocess.call(cmd_fwd_coverage, shell=True)
+		rev_filename = bam_filename(settings, sample, extension=False) + '.rev.bam'
+		cmd_rev_coverage = 'samtools view -b -f 16 '+bam_filename(settings, sample, extension=True)+' > '+rev_filename+' && '+\
+			'samtools index '+rev_filename+' && '+\
+			'bedtools coverage -d -abam '+rev_filename+' -b '+settings[sample]['bed_file'] + \
+		    ' > '+profile_rev_filename(settings, sample)
+		print("Making reverse profile: "+cmd_rev_coverage)
+		subprocess.call(cmd_rev_coverage, shell=True)
+
 	else:
 		fwd_filename = bam_filename(settings, sample, extension=False) + '.fwd.bam'
 		fwd1_filename = bam_filename(settings, sample, extension=False) + '.fwd.1.bam'

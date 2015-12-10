@@ -1,0 +1,10 @@
+id	enrichment	description	ratio_in_study	ratio_in_pop	p_uncorrected	p_bonferroni	p_holm	p_sidak	p_fdr
+.......GO:0070689	e	L-threonine catabolic process to propionate	5/42	7/3770	2.78e-09	1.6e-06	1.6e-06	1.56e-06	n.a.
+.......GO:0006567	e	threonine catabolic process	5/42	9/3770	1.64e-08	9.42e-06	9.41e-06	9.18e-06	n.a.
+......GO:0009068	e	aspartate family amino acid catabolic process	5/42	13/3770	1.62e-07	9.31e-05	9.28e-05	9.08e-05	n.a.
+......GO:0019541	e	propionate metabolic process	5/42	14/3770	2.5e-07	0.000144	0.000143	0.00014	n.a.
+.....GO:1901606	e	alpha-amino acid catabolic process	7/42	44/3770	3.58e-07	0.000206	0.000204	0.0002	n.a.
+......GO:0006566	e	threonine metabolic process	5/42	17/3770	7.54e-07	0.000433	0.000429	0.000422	n.a.
+.....GO:0046459	e	short-chain fatty acid metabolic process	5/42	17/3770	7.54e-07	0.000433	0.000429	0.000422	n.a.
+....GO:0009063	e	cellular amino acid catabolic process	7/42	56/3770	1.96e-06	0.00113	0.00111	0.0011	n.a.
+...GO:0019400	e	alditol metabolic process	5/42	29/3770	1.31e-05	0.00753	0.00743	0.00734	n.a.

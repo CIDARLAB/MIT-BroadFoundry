@@ -1,0 +1,12 @@
+id	enrichment	description	ratio_in_study	ratio_in_pop	p_uncorrected	p_bonferroni	p_holm	p_sidak	p_fdr
+.......GO:0042882	e	L-arabinose transport	3/9	3/3770	9.41e-09	1.73e-06	1.73e-06	1.69e-06	n.a.
+......GO:0015751	e	arabinose transport	3/9	6/3770	1.88e-07	3.45e-05	3.43e-05	3.37e-05	n.a.
+.....GO:0015750	e	pentose transport	3/9	10/3770	1.12e-06	0.000206	0.000204	0.000201	n.a.
+........GO:0015147	e	L-arabinose transmembrane transporter activity	2/9	2/3770	5.07e-06	0.000932	0.000917	0.000909	n.a.
+.......GO:0042900	e	arabinose transmembrane transporter activity	2/9	3/3770	1.52e-05	0.00279	0.00273	0.00272	n.a.
+...GO:0009271	e	phage shock	2/9	3/3770	1.52e-05	0.00279	0.00273	0.00272	n.a.
+....GO:0098586	e	cellular response to virus	2/9	3/3770	1.52e-05	0.00279	0.00273	0.00272	n.a.
+.....GO:0015145	e	monosaccharide transmembrane transporter activity	3/9	23/3770	1.63e-05	0.00299	0.00288	0.00292	n.a.
+....GO:0015749	e	monosaccharide transport	3/9	27/3770	2.68e-05	0.00492	0.00471	0.0048	n.a.
+..GO:1901476	e	carbohydrate transporter activity	4/9	89/3770	3.34e-05	0.00615	0.00585	0.006	n.a.
+...GO:0015144	e	carbohydrate transmembrane transporter activity	4/9	89/3770	3.34e-05	0.00615	0.00585	0.006	n.a.

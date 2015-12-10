@@ -7,15 +7,16 @@ __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '1.0'
 
+
+import dnaplotlib as dpl
+import fragmentation_model as fm
+
 import numpy as np
 import math
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import csv
-
-import dnaplotlib as dpl
-import fragmentation_model as fm
 
 matplotlib.rcParams['lines.dash_joinstyle']  = 'miter'
 matplotlib.rcParams['lines.dash_capstyle']   = 'butt'
@@ -186,8 +187,52 @@ def load_norm_factors (filename):
 	# Process each line
 	for row in data_reader:
 		if len(row) == 3:
-			factors[row[0]] = float(row[1])*float(row[2])
+			factors[row[0]] = (float(row[1])*float(row[2]))/1000000.0
 	return factors
+
+#############################################################################
+# Inducer systems
+#############################################################################
+
+def plot_inducer_system (gene_name, promoter_name, output_filename, repression=True):
+	design_induce = []
+	design_induce.append({'name':'pro', 'type':'Promoter', 'start':1, 'end':2, 'opts':{'color':(0,0,0), 'end_pad':-5}})
+	design_induce.append({'name':'rbs', 'type':'RBS', 'start':3, 'end':4, 'opts':{'color':(0,0,0), 'x_extent':6}})
+	gene_part = {'name':'gene', 'type':'CDS', 'start':5, 'end':6, 'opts':{'label':gene_name, 'label_style':'italic', 'label_x_offset':-2, 'label_y_offset':-0.7, 'linewidth':1.0, 'y_extent':5.5}}
+	design_induce.append(gene_part)
+	ind_term_part = {'name':'ter', 'type':'Terminator', 'start':7, 'end':8, 'opts':{'start_pad':-2,'x_extent':10}}
+	design_induce.append(ind_term_part)
+	design_induce.append({'name':'spa', 'type':'EmptySpace', 'start':9, 'end':10, 'opts':{'x_extent':20}})
+	ind_pro_part = {'name':'pro2', 'type':'Promoter', 'start':11, 'end':12, 'opts':{'label':promoter_name}}
+	design_induce.append(ind_pro_part)
+
+	arr_len = 2.5
+	if repression == False:
+		arr_len = 0
+	regs = [{'type':'Repression', 'from_part':gene_part, 'to_part':ind_pro_part, 'opts':{'color':(0.5,0.5,0.5), 'arc_start_x_offset':-3, 'arrowhead_length':arr_len, 'arc_height_start':9, 'arc_height_const':17, 'arc_height_end':16, 'linewidth':1.0}}]
+
+	fig = plt.figure(figsize=(1.0,0.4)) 
+	gs = gridspec.GridSpec(1, 1)
+	ax = plt.subplot(gs[0])
+	# Plot the traces
+	dr = dpl.DNARenderer(linewidth=1.5)
+	# Draw the design
+	start, end = dr.renderDNA(ax, design_induce, dr.SBOL_part_renderers(), plot_backbone=False,
+		regs=regs, reg_renderers=dr.std_reg_renderers())
+	ax.set_xlim([start, end])
+	ax.set_ylim([-12,23])
+	ax.plot([start,ind_term_part['end']], [0,0], color=(0,0,0), linewidth=1.5, zorder=1)
+	ax.plot([ind_pro_part['start'],end], [0,0], color=(0,0,0), linewidth=1.5, zorder=1)
+	ax.set_xticks([])
+	ax.set_yticks([])
+	ax.axis('off')
+	plt.subplots_adjust(hspace=.00, wspace=.00, left=.01, right=.99, top=.99, bottom=.01)
+	fig.savefig(output_filename, transparent=True)
+	plt.close('all')
+
+plot_inducer_system ('LacI', '', OUTPUT_PREFIX+'/induce_IPTG.pdf', repression=True)
+plot_inducer_system ('TetR', '', OUTPUT_PREFIX+'/induce_aTc.pdf', repression=True)
+plot_inducer_system ('AraC', '', OUTPUT_PREFIX+'/induce_Ara.pdf', repression=False)
 
 #############################################################################
 # PREDICTED profiles
@@ -283,7 +328,7 @@ for s in range(8):
 # PLOT profiles
 #############################################################################
 
-def plot_act_vs_pred_traces (act_traces, pred_traces_on, pred_traces_off, dna_design, x_range, out_filename):
+def plot_act_vs_pred_traces (act_traces, pred_traces_on, pred_traces_off, dna_design, x_range, out_filename, gff):
 	fig = plt.figure(figsize=(5.0,3.6)) # 5,5 for SI 5.8,5.0
 	gs = gridspec.GridSpec(9, 1, height_ratios=[1,1,1,1,1,1,1,1,0.8])
 	# Plot the DNA
@@ -303,6 +348,21 @@ def plot_act_vs_pred_traces (act_traces, pred_traces_on, pred_traces_off, dna_de
 		ax.fill_between(range(x_range[1]), act_trace, np.zeros(len(act_trace)), facecolor=col_sense_rd, linewidth=0)
 		ax.plot(range(len(pred_traces_on[s])), pred_traces_on[s], color=col_on_state, linewidth=1.0)
 		ax.plot(range(len(pred_traces_on[s])), pred_traces_off[s], color=col_off_state, linewidth=1.0)
+		
+		offset_y = 4
+		if s in [0,4]:
+			ax.annotate(r'$\blacktriangledown$',(gff['0x58v50']['AmtR'][2]+183, offset_y), ha='center', va='bottom', fontsize=6)
+			#ax.annotate(r'$\blacktriangledown$',(gff['0x58v50']['AmtR'][2]+535, offset_y), ha='center', va='bottom', fontsize=6)
+			#ax.annotate(r'$\blacktriangledown$',(gff['0x58v50']['AmtR'][2]+260, offset_y), ha='center', va='bottom', fontsize=6)
+			#ax.annotate(r'$\blacktriangledown$',(gff['0x58v50']['AmtR'][2]+401, offset_y), ha='center', va='bottom', fontsize=6)
+			#ax.annotate(r'$\blacktriangledown$',(gff['0x58v50']['AmtR'][2]+404, offset_y), ha='center', va='bottom', fontsize=6)
+			#ax.annotate(r'$\blacktriangledown$',(gff['0x58v50']['AmtR'][2]+467, offset_y), ha='center', va='bottom', fontsize=6)
+		if s in [6,7]:
+			#ax.annotate(r'$\blacktriangledown$',(gff['0x58v50']['SrpR'][2]+639, offset_y), ha='center', va='bottom', fontsize=6)
+			ax.annotate(r'$\blacktriangledown$',(gff['0x58v50']['SrpR'][2]+175, offset_y), ha='center', va='bottom', fontsize=6)
+			#ax.annotate(r'$\blacktriangledown$',(gff['0x58v50']['SrpR'][2]+376, offset_y), ha='center', va='bottom', fontsize=6)
+			
+
 		ax.set_xlim([x_range[0],x_range[1]])
 		ax.set_xticks([])
 		ax.set_yscale('symlog', linthreshx=10000)
@@ -347,7 +407,9 @@ def gff_to_dnaplotlib (gff, chrom):
 	return sorted(design, key=lambda k: k['start']) 
 
 def plot_tube_vs_flask_traces (tube_traces, flask_traces, dna_design, x_range, out_filename, text_size=8):
-	fig = plt.figure(figsize=(5.0,3.6)) # 5,5 for SI 5.8,5.0
+	matplotlib.rcParams['lines.solid_joinstyle'] = 'round'
+	matplotlib.rcParams['lines.solid_capstyle']  = 'round'
+	fig = plt.figure(figsize=(5.0,3.6)) 
 	gs = gridspec.GridSpec(9, 1, height_ratios=[1,1,1,1,1,1,1,1,0.8])
 	# Plot the DNA
 	dr = dpl.DNARenderer(scale=2, linewidth=0.75)
@@ -364,12 +426,72 @@ def plot_tube_vs_flask_traces (tube_traces, flask_traces, dna_design, x_range, o
 		ax = plt.subplot(gs[s])
 		flask_trace = flask_traces[s]
 		tube_trace = tube_traces[s]
-		ax.fill_between(range(x_range[1]), flask_trace, np.zeros(len(flask_trace)), facecolor=col_sense_rd, linewidth=0)
+		#ax.fill_between(range(x_range[1]), tube_trace, np.zeros(len(flask_trace)), facecolor=(0.6,0.6,1.0,0.3), linewidth=0, zorder=10)
+		#ax.fill_between(range(x_range[1]), flask_trace, np.zeros(len(flask_trace)), facecolor=(1.0,0.6,0.6), linewidth=0)
+		# Increases and decreases between conditions
+		flask_inc = np.array(flask_trace)-np.array(tube_trace)
+		for idx in range(len(flask_inc)):
+			if flask_inc[idx] < 0:
+				flask_inc[idx] = 0.0
+		flask_dec = np.array(flask_trace)-np.array(tube_trace)
+		for idx in range(len(flask_dec)):
+			if flask_dec[idx] > 0:
+				flask_dec[idx] = 0.0
+		# Plot the tube profile and then deviations
+		ax.fill_between(range(x_range[1]), tube_trace, np.array(tube_trace)+flask_inc, facecolor=cmap['BM3R1'], linewidth=0)
+		ax.fill_between(range(x_range[1]), tube_trace, np.array(tube_trace)+flask_dec, facecolor=cmap['SrpR'], linewidth=0)
 		ax.plot(range(x_range[1]), tube_trace, color=(0,0,0), linewidth=1, linestyle='-')
 		ax.set_xlim([x_range[0],x_range[1]])
 		ax.set_xticks([])
 		ax.set_yscale('symlog', linthreshx=10000)
 		ax.set_ylim([5, 10e5])
+		ax.set_yticks([10e1, 10e3])
+		ax.tick_params(axis='y', which='major', labelsize=text_size, pad=1, length=2, width=0.5)
+		for axis in ['top','bottom','left','right']:
+			ax.spines[axis].set_linewidth(0.8)
+	plt.subplots_adjust(hspace=.00, wspace=.00, left=.07, right=.99, top=.99, bottom=.01)
+	fig.savefig(out_filename, transparent=True)
+	plt.close('all')
+
+def plot_tube_vs_flask_diff (tube_traces, flask_traces, dna_design, x_range, out_filename, text_size=8):
+	matplotlib.rcParams['lines.solid_joinstyle'] = 'round'
+	matplotlib.rcParams['lines.solid_capstyle']  = 'round'
+	fig = plt.figure(figsize=(5.0,3.6)) 
+	gs = gridspec.GridSpec(9, 1, height_ratios=[1,1,1,1,1,1,1,1,0.8])
+	# Plot the DNA
+	dr = dpl.DNARenderer(scale=2, linewidth=0.75)
+	ax = plt.subplot(gs[8])
+	start, end = dr.renderDNA(ax, dna_design, dr.trace_part_renderers())
+	ax.set_xlim([0, 6124])
+	ax.set_ylim([-10,8])
+	ax.plot([0,6124], [0,0], color=(0,0,0), linewidth=1.0, zorder=1)
+	ax.set_xticks([])
+	ax.set_yticks([])
+	ax.axis('off')
+	# Plot the traces
+	for s in range(8):
+		ax = plt.subplot(gs[s])
+		flask_trace = flask_traces[s]
+		tube_trace = tube_traces[s]
+		#ax.fill_between(range(x_range[1]), tube_trace, np.zeros(len(flask_trace)), facecolor=(0.6,0.6,1.0,0.3), linewidth=0, zorder=10)
+		#ax.fill_between(range(x_range[1]), flask_trace, np.zeros(len(flask_trace)), facecolor=(1.0,0.6,0.6), linewidth=0)
+		# Increases and decreases between conditions
+		flask_inc = np.array(flask_trace)-np.array(tube_trace)
+		for idx in range(len(flask_inc)):
+			if flask_inc[idx] < 0:
+				flask_inc[idx] = 0.0
+		flask_dec = np.array(flask_trace)-np.array(tube_trace)
+		for idx in range(len(flask_dec)):
+			if flask_dec[idx] > 0:
+				flask_dec[idx] = 0.0
+		# Plot the tube profile and then deviations
+		ax.fill_between(range(x_range[1]), np.zeros(x_range[1]), flask_inc, facecolor=cmap['BM3R1'], linewidth=0)
+		ax.fill_between(range(x_range[1]), np.zeros(x_range[1]), flask_dec, facecolor=cmap['SrpR'], linewidth=0)
+		#ax.plot(range(x_range[1]), tube_trace, color=(0,0,0), linewidth=1, linestyle='-')
+		ax.set_xlim([x_range[0],x_range[1]])
+		ax.set_xticks([])
+		ax.set_yscale('symlog', linthreshy=1000, linscaley=0.1)
+		ax.set_ylim([-10e5, 10e5])
 		ax.set_yticks([10e1, 10e3])
 		ax.tick_params(axis='y', which='major', labelsize=text_size, pad=1, length=2, width=0.5)
 		for axis in ['top','bottom','left','right']:
@@ -393,6 +515,7 @@ for s in flask_samples:
 YFP_reads = np.array(extract_profile_region(tube_profiles['tube_4'], '0x58v50', gff['0x58v50']['YFP'][2]+100, gff['0x58v50']['YFP'][3]-100)[0])/norm_factors['tube_4']
 YFP_FPKM = 38977.39525
 reads_FPKM_fac = YFP_FPKM/np.median(YFP_reads)
+print('Conversion factor norm reads to FPKM: '+str(reads_FPKM_fac))
 
 # Load the trace data
 tube_traces = []
@@ -416,8 +539,7 @@ flask_traces.append( (np.array(extract_profile_region(flask_profiles['flask_8'],
 x_range = [0, gff['0x58v50']['L3S2P21'][3]]
 
 # Plot the two figures
-plot_act_vs_pred_traces(tube_traces, pred_traces_on, pred_traces_off, dna_design, x_range, OUTPUT_PREFIX+'/circuit_profile_tube.pdf')
-
+plot_act_vs_pred_traces(tube_traces, pred_traces_on, pred_traces_off, dna_design, x_range, OUTPUT_PREFIX+'/circuit_profile_tube.pdf', gff)
 
 #Make text bigger
 for part in dna_design:
@@ -426,4 +548,94 @@ for part in dna_design:
 		part['opts']['label_size'] = 9.5
 
 plot_tube_vs_flask_traces(tube_traces, flask_traces, dna_design, x_range, OUTPUT_PREFIX+'/circuit_profile_flask_vs_tube.pdf', text_size=9.5)
+plot_tube_vs_flask_diff(tube_traces, flask_traces, dna_design, x_range, OUTPUT_PREFIX+'/circuit_profile_flask_vs_tube_diff.pdf', text_size=9.5)
 
+#############################################################################
+# PLOT circuit states
+#############################################################################
+
+def get_part (dna_design, part_name):
+	for part in dna_design:
+		if part['name'] == part_name:
+			return part
+	return None
+
+def plot_circuit_states (dna_design, truth_table, reg_arcs, out_filename):
+	fig = plt.figure(figsize=(1.8,3.6)) 
+	gs = gridspec.GridSpec(9, 1, height_ratios=[1,1,1,1,1,1,1,1,0.8])
+	# Plot the traces
+	dr = dpl.DNARenderer(linewidth=0.65)
+	for s in range(8):
+		ax = plt.subplot(gs[s])
+		# Set up the design based on the truth table levels
+		cur_reg = []
+		for part_name in truth_table.keys():
+			cur_part = get_part(dna_design, part_name)
+			if truth_table[part_name][s] == 1:
+				cur_part['opts']['color'] = cmap[part_name]
+				if cur_part['type'] == 'CDS':
+					cur_part['opts']['edge_color'] = (0,0,0)
+					if part_name in reg_arcs.keys():
+						cur_reg.append(reg_arcs[part_name])	
+			else:
+				if cur_part['type'] == 'CDS':
+					cur_part['opts']['color'] = (1,1,1)
+					cur_part['opts']['edge_color'] = (0.8,0.8,0.8)
+				else:
+					cur_part['opts']['color'] = (0.8,0.8,0.8)
+		# Draw the design
+		start, end = dr.renderDNA(ax, dna_design, dr.SBOL_part_renderers(),
+			regs=cur_reg, reg_renderers=dr.std_reg_renderers())
+		ax.set_xlim([start, end])
+		ax.set_ylim([-20,40])
+		ax.plot([start,end], [0,0], color=(0,0,0), linewidth=1.0, zorder=1)
+		ax.set_xticks([])
+		ax.set_yticks([])
+		ax.axis('off')
+	plt.subplots_adjust(hspace=.00, wspace=.00, left=.01, right=.99, top=.99, bottom=.01)
+	fig.savefig(out_filename, transparent=True)
+	plt.close('all')
+
+truth_table = {}
+# Repressors
+truth_table['AmtR']  = [0,1,1,1,0,1,1,1]
+truth_table['LitR']  = [0,0,1,1,1,1,1,1]
+truth_table['BM3R1'] = [0,0,0,0,1,1,1,1]
+truth_table['SrpR']  = [1,1,1,1,1,0,0,0]
+truth_table['PhlF']  = [1,1,0,0,0,1,1,1]
+truth_table['YFP']   = [0,0,1,1,1,0,0,0]
+# Promoters
+truth_table['pTac']  = [0,1,0,1,0,1,0,1]
+truth_table['pTet1']  = [0,0,1,1,0,0,1,1]
+truth_table['pTet2']  = [0,0,1,1,0,0,1,1]
+truth_table['pBAD1']  = [0,0,0,0,1,1,1,1]
+truth_table['pBAD2']  = [0,0,0,0,1,1,1,1]
+truth_table['pAmtR']  = [1,0,0,0,1,0,0,0]
+truth_table['pLitR']  = [1,1,0,0,0,0,0,0]
+truth_table['pBM3R1'] = [1,1,1,1,0,0,0,0]
+truth_table['pSrpR']  = [0,0,0,0,0,1,1,1]
+truth_table['pPhlF']  = [0,0,1,1,1,0,0,0]
+
+reg_arcs = {} # Repression
+reg_arcs['AmtR']  = {'type':'Repression', 'from_part':get_part(dna_design, 'AmtR'), 'to_part':get_part(dna_design, 'pAmtR'), 'opts':{'color':cmap['AmtR'], 'arc_start_x_offset':-6, 'arrowhead_length':2.5, 'arc_height_start':10}}
+reg_arcs['LitR']  = {'type':'Repression', 'from_part':get_part(dna_design, 'LitR'), 'to_part':get_part(dna_design, 'pLitR'), 'opts':{'color':cmap['LitR'], 'arc_start_x_offset':-6, 'arrowhead_length':2.5, 'arc_height_start':10}}
+reg_arcs['BM3R1'] = {'type':'Repression', 'from_part':get_part(dna_design, 'BM3R1'), 'to_part':get_part(dna_design, 'pBM3R1'), 'opts':{'color':cmap['BM3R1'], 'arc_start_x_offset':-6, 'arrowhead_length':2.5, 'arc_height_start':10}}
+reg_arcs['SrpR']  = {'type':'Repression', 'from_part':get_part(dna_design, 'SrpR'), 'to_part':get_part(dna_design, 'pSrpR'), 'opts':{'color':cmap['SrpR'], 'arc_start_x_offset':-6, 'arrowhead_length':2.5, 'arc_height_start':10}}
+reg_arcs['PhlF']  = {'type':'Repression', 'from_part':get_part(dna_design, 'PhlF'), 'to_part':get_part(dna_design, 'pPhlF'), 'opts':{'color':cmap['PhlF'], 'arc_start_x_offset':-6, 'arrowhead_length':2.5, 'arc_height_start':10}}
+
+# Remove all labels from design
+new_dna_design = []
+for part in dna_design:
+	if 'opts' in part.keys():
+		part['opts']['label'] = ''
+		if part['type'] == 'CDS':
+			part['opts']['arrowhead_length'] = 10
+			part['opts']['x_extent'] = 20
+			part['opts']['start_pad'] = -4
+		if part['type'] == 'Terminator':
+			part['opts']['start_pad'] = -2
+	if part['start'] <= 6064: 
+		new_dna_design.append(part)
+
+# Plot the sub-states
+plot_circuit_states (new_dna_design, truth_table, reg_arcs, OUTPUT_PREFIX+'/circuit_states.pdf')

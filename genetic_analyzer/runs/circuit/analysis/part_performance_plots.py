@@ -98,7 +98,7 @@ def plot_terminator_transfer (data, samples, fpkm_in, filename_out, point_shape=
 			p_zorder = 100
 			if d_us_reads < min_upstream_read:
 				point_col = (0.7,0.7,0.7)
-				good_val = False
+				#good_val = False
 				p_zorder = 90
 			elif d_max_term == 'Y':
 				point_col = (0.95,0.30,0.25)
@@ -131,7 +131,7 @@ def plot_terminator_transfer (data, samples, fpkm_in, filename_out, point_shape=
 	plt.close('all')
 
 def plot_ribozyme_transfer (data, samples, fpkm_out, filename_out, point_shape='o', min_downstream_read=None):
-	plt.rcParams['ytick.major.pad']='5'
+	plt.rcParams['ytick.major.pad']='1'
 	plt.rcParams['xtick.major.pad']='5'
 	fmt_char_data_linewidth = 1.5
 	fmt_axis_outline_width = fmt_edge_width
@@ -153,7 +153,7 @@ def plot_ribozyme_transfer (data, samples, fpkm_out, filename_out, point_shape='
 			p_zorder = 100
 			if d_ds_reads < min_downstream_read:
 				point_col = (0.7,0.7,0.7)
-				good_val = False
+				#good_val = False
 				p_zorder = 90
 			elif d_max_term == 'Y':
 				point_col = (0.95,0.30,0.25)
@@ -167,7 +167,8 @@ def plot_ribozyme_transfer (data, samples, fpkm_out, filename_out, point_shape='
 	ax.tick_params(axis='y', labelsize=fmt_label_size)
 	ax.set_xlim([30,200000])
 	ax.set_xscale('symlog')
-	ax.set_ylim([-0.1,1.1])
+	ax.set_yscale('symlog', linthreshy=1.0)
+	ax.set_ylim([0.0,100000])
 	for axis in ['top','bottom','left','right']:
 		ax.spines[axis].set_linewidth(fmt_axis_outline_width)
 		ax.spines[axis].set_linewidth(fmt_axis_outline_width)

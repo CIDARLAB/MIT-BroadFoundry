@@ -61,3 +61,10 @@ save_reformatted_deg_data(deg_data, OUTPUT_PREFIX+'/atc_comp_tube_de_data.txt')
 
 deg_data = load_deg_data(RESULTS_PREFIX+'/iptg_comp_tube.de.analysis.txt')
 save_reformatted_deg_data(deg_data, OUTPUT_PREFIX+'/iptg_comp_tube_de_data.txt')
+
+deg_data = load_deg_data(RESULTS_PREFIX+'/rep_3_yfp_tube.de.analysis.txt')
+save_reformatted_deg_data(deg_data, OUTPUT_PREFIX+'/rep_3_yfp_tube_de_data.txt')
+
+deg_data = load_deg_data(RESULTS_PREFIX+'/rep_4_tube.de.analysis.txt')
+save_reformatted_deg_data(deg_data, OUTPUT_PREFIX+'/rep_4_tube_de_data.txt')
+

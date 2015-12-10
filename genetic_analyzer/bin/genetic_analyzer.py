@@ -5,6 +5,7 @@
 # 	All rights reserved.
 #	OSI Non-Profit Open Software License ("Non-Profit OSL") 3.0 license.
 
+
 # Requires following software is available and in user path:
 #   - BWA
 #   - SAMTools
@@ -12,10 +13,14 @@
 #   - BEDTools
 #   - R + edgeR package (Rscript)
 
+
 # Required modules
 import csv
 import subprocess
 import numpy as np
+import re
+import math
+
 
 def bwa_index_filename (settings, sample):
 	return settings[sample]['temp_path']+sample
@@ -28,6 +33,9 @@ def bam_filename (settings,  sample, extension=True):
 	if extension == True:
 		bam_filename += '.bam'
 	return bam_filename
+
+def fragment_dist_filename (settings, sample):
+	return settings[sample]['output_path']+sample+'.fragment.distribution.txt'
 
 def count_filename (settings, sample):
 	return settings[sample]['output_path']+sample+'.counts.txt'
@@ -49,6 +57,12 @@ def profile_fwd_filename (settings, sample):
 
 def profile_rev_filename (settings, sample):
 	return settings[sample]['output_path']+sample+'.rev.profiles.txt'
+
+def profile_norm_fwd_filename (settings, sample):
+	return settings[sample]['output_path']+sample+'.fwd.norm.profiles.txt'
+
+def profile_norm_rev_filename (settings, sample):
+	return settings[sample]['output_path']+sample+'.rev.norm.profiles.txt'
 
 def count_matrix_filename (settings):
 	return settings['None']['output_path']+'counts.matrix.txt'
@@ -96,8 +110,8 @@ def map_reads (settings, sample):
 	"""
 	# Make the indexes
 	cmd_index = 'bwa index' + \
-	            ' -p ' + bwa_index_filename(settings, sample) + \
-	            ' ' + settings[sample]['fasta_file']
+				' -p ' + bwa_index_filename(settings, sample) + \
+				' ' + settings[sample]['fasta_file']
 	print("Making index: "+cmd_index)
 	subprocess.call(cmd_index, shell=True)
 	# Perform the mapping
@@ -105,25 +119,25 @@ def map_reads (settings, sample):
 	cmd_mapping = ''
 	if settings[sample]['R2_fastq_file'] == '':
 		cmd_mapping = 'bwa mem' + \
-	                  ' ' + bwa_index_filename(settings, sample) + \
-	                  ' ' + settings[sample]['R1_fastq_file'] + \
-	                  ' > ' + sam_file
+					  ' ' + bwa_index_filename(settings, sample) + \
+					  ' ' + settings[sample]['R1_fastq_file'] + \
+					  ' > ' + sam_file
 	else:
 		cmd_mapping = 'bwa mem' + \
-	                  ' ' + bwa_index_filename(settings, sample) + \
-	                  ' ' + settings[sample]['R1_fastq_file'] + \
-	                  ' ' + settings[sample]['R2_fastq_file'] + \
-	                  ' > ' + sam_file
+					  ' ' + bwa_index_filename(settings, sample) + \
+					  ' ' + settings[sample]['R1_fastq_file'] + \
+					  ' ' + settings[sample]['R2_fastq_file'] + \
+					  ' > ' + sam_file
 	print("Mapping Reads (BWM-MEM): "+cmd_mapping)
 	subprocess.call(cmd_mapping, shell=True)
 	# Convert to BAM for some tools
 	cmd_to_bam = 'samtools view -bS' + \
-	             ' ' + sam_file + \
-	             ' | samtools sort' + \
-	             ' -o ' + bam_filename(settings, sample, extension=True) + \
-	             ' -T ' + bam_filename(settings, sample, extension=False) + \
-	             ' -' + \
-	             ' && samtools index ' + bam_filename(settings, sample, extension=True)
+				 ' ' + sam_file + \
+				 ' | samtools sort' + \
+				 ' -o ' + bam_filename(settings, sample, extension=True) + \
+				 ' -T ' + bam_filename(settings, sample, extension=False) + \
+				 ' -' + \
+				 ' && samtools index ' + bam_filename(settings, sample, extension=True)
 	print("Converting SAM to position sorted BAM: "+cmd_to_bam)
 	subprocess.call(cmd_to_bam, shell=True)
 
@@ -134,23 +148,23 @@ def count_reads (settings, sample, feature='gene', attribute='Name', strand_opt=
 	if settings[sample]['R2_fastq_file'] == '' and strand_opt == 'reverse':
 		strand_opt = 'yes'
 	cmd_count = 'htseq-count' + \
-	            ' -f bam' + \
-	            ' -s ' + strand_opt + \
-	            ' -a 10' + \
-	            ' -m union' + \
-	            ' -r pos' + \
-	            ' -t ' + feature + \
-	            ' -i ' + attribute + \
-	            ' ' + bam_filename(settings, sample, extension=True) + \
-	            ' ' + settings[sample]['gff_file'] + \
-	            ' > ' + count_filename(settings, sample)
+				' -f bam' + \
+				' -s ' + strand_opt + \
+				' -a 10' + \
+				' -m union' + \
+				' -r pos' + \
+				' -t ' + feature + \
+				' -i ' + attribute + \
+				' ' + bam_filename(settings, sample, extension=True) + \
+				' ' + settings[sample]['gff_file'] + \
+				' > ' + count_filename(settings, sample)
 	print("Counting reads: "+cmd_count)
 	subprocess.call(cmd_count, shell=True)
 
 def mapped_reads (settings, sample):
 	cmd_total = 'samtools view -c -F 4' + \
-	            ' ' + bam_filename(settings, sample) + \
-	            ' > ' + mapped_reads_filename(settings, sample)
+				' ' + bam_filename(settings, sample) + \
+				' > ' + mapped_reads_filename(settings, sample)
 	print("Total mapped reads: "+cmd_total)
 	subprocess.call(cmd_total, shell=True)
 
@@ -242,7 +256,7 @@ def count_matrix (settings):
 	sample_names = counts.keys()
 	count_matrix = combine_counts(counts, sample_names)
 	save_count_matrix(count_matrix, sample_names, 
-		              settings['None']['output_path']+'read_count.matrix')
+					  settings['None']['output_path']+'read_count.matrix')
 
 def gene_lengths (settings, sample, feature='gene', attribute='Name'):
 	""" Calculate the gene lengths from set of GTF references
@@ -274,14 +288,14 @@ def make_profile (settings, sample):
 		cmd_fwd_coverage = 'samtools view -b -F 20 '+bam_filename(settings, sample, extension=True)+' > '+fwd_filename+' && '+\
 			'samtools index '+fwd_filename+' && '+\
 			'bedtools coverage -d -abam '+fwd_filename+' -b '+settings[sample]['bed_file'] + \
-		    ' > '+profile_fwd_filename(settings, sample)
+			' > '+profile_fwd_filename(settings, sample)
 		print("Making forward profile: "+cmd_fwd_coverage)
 		subprocess.call(cmd_fwd_coverage, shell=True)
 		rev_filename = bam_filename(settings, sample, extension=False) + '.rev.bam'
 		cmd_rev_coverage = 'samtools view -b -f 16 '+bam_filename(settings, sample, extension=True)+' > '+rev_filename+' && '+\
 			'samtools index '+rev_filename+' && '+\
 			'bedtools coverage -d -abam '+rev_filename+' -b '+settings[sample]['bed_file'] + \
-		    ' > '+profile_rev_filename(settings, sample)
+			' > '+profile_rev_filename(settings, sample)
 		print("Making reverse profile: "+cmd_rev_coverage)
 		subprocess.call(cmd_rev_coverage, shell=True)
 
@@ -296,7 +310,7 @@ def make_profile (settings, sample):
 			'samtools merge -f '+fwd_filename+' '+fwd1_filename+' '+fwd2_filename+' && '+\
 			'samtools index '+fwd_filename+' && '+\
 			'bedtools coverage -d -abam '+fwd_filename+' -b '+settings[sample]['bed_file'] + \
-		    ' > '+profile_fwd_filename(settings, sample)
+			' > '+profile_fwd_filename(settings, sample)
 		print("Making forward profile: "+cmd_fwd_coverage)
 		subprocess.call(cmd_fwd_coverage, shell=True)
 		rev_filename = bam_filename(settings, sample, extension=False) + '.rev.bam'
@@ -309,7 +323,7 @@ def make_profile (settings, sample):
 			'samtools merge -f '+rev_filename+' '+rev1_filename+' '+rev2_filename+' && '+\
 			'samtools index '+rev_filename+' && '+\
 			'bedtools coverage -d -abam '+rev_filename+' -b '+settings[sample]['bed_file'] + \
-		    ' > '+profile_rev_filename(settings, sample)
+			' > '+profile_rev_filename(settings, sample)
 		print("Making reverse profile: "+cmd_rev_coverage)
 		subprocess.call(cmd_rev_coverage, shell=True)
 
@@ -317,10 +331,10 @@ def norm_fpkm (settings, bin_path=''):
 	""" Calculate normalised RPKM/FPKM expression levels
 	"""
 	cmd_fpkm = 'Rscript '+bin_path+'norm_fpkm.r ' + \
-	           ' ' + count_matrix_filename(settings) + \
-	           ' ' + mapped_reads_matrix_filename(settings) + \
-	           ' ' + gene_length_matrix_filename (settings) + \
-	           ' ' + settings['None']['output_path']
+			   ' ' + count_matrix_filename(settings) + \
+			   ' ' + mapped_reads_matrix_filename(settings) + \
+			   ' ' + gene_length_matrix_filename (settings) + \
+			   ' ' + settings['None']['output_path']
 	print("Generating normalised RPKM/FPKMs: "+cmd_fpkm)
 	subprocess.call(cmd_fpkm, shell=True)
 
@@ -328,11 +342,11 @@ def de_analysis (settings, group1, group2, output_prefix, bin_path=''):
 	""" Calculate DEG analysis between two groups (column numbers 1-indexed)
 	"""
 	cmd_deg = 'Rscript '+bin_path+'de_analysis.r ' + \
-	           ' ' + count_matrix_filename (settings) + \
-	           ' ' + group1 + \
-	           ' ' + group2 + \
-	           ' ' + mapped_reads_matrix_filename(settings) + \
-	           ' ' + settings['None']['output_path'] + output_prefix
+			   ' ' + count_matrix_filename (settings) + \
+			   ' ' + group1 + \
+			   ' ' + group2 + \
+			   ' ' + mapped_reads_matrix_filename(settings) + \
+			   ' ' + settings['None']['output_path'] + output_prefix
 	print("Generating normalised RPKM/FPKMs: "+cmd_deg)
 	subprocess.call(cmd_deg, shell=True)
 
@@ -365,11 +379,13 @@ def load_gff (settings, sample):
 				gff[chromo][part_name] = [part_type, part_dir, start_bp, end_bp, part_attribs]
 	return gff
 
-def load_profiles (settings, sample):
+def load_profiles (settings, sample, normed=False):
 	""" Profiles have the form of a list chr: [start_bp, end_bp, [profile_fwd],[profile_rev]]
 	"""
 	profiles = {}
 	fwd_profile_filename = profile_fwd_filename(settings, sample)
+	if normed == True:
+		fwd_profile_filename = profile_norm_fwd_filename(settings, sample)
 	data_reader = csv.reader(open(fwd_profile_filename, 'rU'), delimiter='\t')
 	# Process each line in fwd profile
 	for row in data_reader:
@@ -382,11 +398,13 @@ def load_profiles (settings, sample):
 			cur_profile = find_profile(profiles, cur_chrom, cur_start_bp, cur_end_bp)
 			if cur_profile == None:
 				new_profile = [cur_start_bp, cur_end_bp, np.zeros(cur_end_bp-cur_start_bp), np.zeros(cur_end_bp-cur_start_bp)]
-				new_profile[2][int(row[3])-1] = int(row[4])
+				new_profile[2][int(row[3])-1] = float(row[4])
 				profiles[cur_chrom].append(new_profile)
 			else:
-				cur_profile[0][int(row[3])-1] = int(row[4])
+				cur_profile[0][int(row[3])-1] = float(row[4])
 	rev_profile_filename = profile_rev_filename(settings, sample)
+	if normed == True:
+		rev_profile_filename = profile_norm_rev_filename(settings, sample)
 	data_reader = csv.reader(open(rev_profile_filename, 'rU'), delimiter='\t')
 	# Process each line in fwd profile
 	for row in data_reader:
@@ -398,7 +416,7 @@ def load_profiles (settings, sample):
 			cur_end_bp = int(row[2])
 			cur_profile = find_profile(profiles, cur_chrom, cur_start_bp, cur_end_bp)
 			if cur_profile != None:
-				cur_profile[1][int(row[3])-1] = int(row[4])
+				cur_profile[1][int(row[3])-1] = float(row[4])
 	return profiles
 
 def find_profile (profiles, chrom, start_bp, end_bp):
@@ -440,15 +458,37 @@ def extract_profile_region (profiles, chrom, start_bp, end_bp):
 				new_fwd_profile = ext_start_fwd+fwd_profile+ext_end_fwd
 				new_rev_profile = ext_start_rev+rev_profile+ext_end_rev
 				region = [new_fwd_profile[new_start_bp:new_end_bp], 
-				          new_rev_profile[new_start_bp:new_end_bp]]
+						  new_rev_profile[new_start_bp:new_end_bp]]
 				break
 	return region
 
 def reverse_region (region):
 	return [region[1][::-1], region[0][::-1]]
 
-def characterize_promoters (settings, sample, upstream_bp=50, downstream_bp=200):
-	profiles = load_profiles(settings, sample)
+def characterize_promoter_units (settings, sample, upstream_bp=25, downstream_skip_bp=0, downstream_bp=50, normed=False):
+	profiles = load_profiles(settings, sample, normed=normed)
+	char_data = []
+	raw_region = None
+	gff = load_gff (settings, sample)
+	for chrom in gff.keys():
+		for part_name in gff[chrom].keys():
+			part_data = gff[chrom][part_name]
+			if part_data[0] == 'promoter_unit':
+				if part_data[1] == '+': 
+					raw_region = extract_profile_region(profiles, chrom, 
+									 (part_data[2]-1)-upstream_bp, part_data[3]+downstream_skip_bp+downstream_bp)
+				else:
+					raw_region = reverse_region(extract_profile_region(profiles, chrom, 
+									 (part_data[2]-1)-downstream_skip_bp-downstream_bp, part_data[3]+upstream_bp))
+				# Calculate performance
+				avg_us = np.median(raw_region[0][0:upstream_bp])
+				avg_ds = np.median(raw_region[0][-downstream_bp:])
+				perf = avg_ds-avg_us
+				char_data.append([chrom, part_name, avg_us, avg_ds, perf])
+	return char_data
+
+def characterize_promoters (settings, sample, upstream_bp=25, downstream_skip_bp=0, downstream_bp=50, normed=False):
+	profiles = load_profiles(settings, sample, normed=normed)
 	char_data = []
 	raw_region = None
 	gff = load_gff (settings, sample)
@@ -458,10 +498,10 @@ def characterize_promoters (settings, sample, upstream_bp=50, downstream_bp=200)
 			if part_data[0] == 'promoter':
 				if part_data[1] == '+': 
 					raw_region = extract_profile_region(profiles, chrom, 
-						             (part_data[2]-1)-upstream_bp, part_data[3]+downstream_bp)
+									 (part_data[2]-1)-upstream_bp, part_data[3]+downstream_skip_bp+downstream_bp)
 				else:
 					raw_region = reverse_region(extract_profile_region(profiles, chrom, 
-						             (part_data[2]-1)-downstream_bp, part_data[3]+upstream_bp))
+									 (part_data[2]-1)-downstream_skip_bp-downstream_bp, part_data[3]+upstream_bp))
 				# Calculate performance
 				avg_us = np.median(raw_region[0][0:upstream_bp])
 				avg_ds = np.median(raw_region[0][-downstream_bp:])
@@ -469,8 +509,8 @@ def characterize_promoters (settings, sample, upstream_bp=50, downstream_bp=200)
 				char_data.append([chrom, part_name, avg_us, avg_ds, perf])
 	return char_data
 
-def characterize_terminators (settings, sample, upstream_bp=200, downstream_bp=50):
-	profiles = load_profiles(settings, sample)
+def characterize_terminators (settings, sample, upstream_bp=50, upstream_skip_bp=0, downstream_bp=25, normed=False):
+	profiles = load_profiles(settings, sample, normed=normed)
 	char_data = []
 	raw_region = None
 	gff = load_gff (settings, sample)
@@ -480,10 +520,10 @@ def characterize_terminators (settings, sample, upstream_bp=200, downstream_bp=5
 			if part_data[0] == 'terminator':
 				if part_data[1] == '+': 
 					raw_region = extract_profile_region(profiles, chrom, 
-						             (part_data[2]-1)-upstream_bp, part_data[3]+downstream_bp)
+									 (part_data[2]-1)-upstream_skip_bp-upstream_bp, part_data[3]+downstream_bp)
 				else:
 					raw_region = reverse_region(extract_profile_region(profiles, chrom, 
-						             (part_data[2]-1)-downstream_bp, part_data[3]+upstream_bp))
+									 (part_data[2]-1)-downstream_bp, part_data[3]+upstream_skip_bp+upstream_bp))
 				# Calculate performance
 				avg_us = np.mean(raw_region[0][0:upstream_bp])
 				avg_ds = np.mean(raw_region[0][-downstream_bp:])
@@ -505,8 +545,8 @@ def characterize_terminators (settings, sample, upstream_bp=200, downstream_bp=5
 				char_data.append([chrom, part_name, avg_us, avg_ds, t_e, t_s, max_term])
 	return char_data
 
-def characterize_ribozymes (settings, sample, upstream_bp=50, downstream_bp=50):
-	profiles = load_profiles(settings, sample)
+def characterize_ribozymes (settings, sample, upstream_bp=50, downstream_skip_bp=0, downstream_bp=50, normed=False):
+	profiles = load_profiles(settings, sample, normed=normed)
 	char_data = []
 	raw_region = None
 	gff = load_gff (settings, sample)
@@ -520,11 +560,11 @@ def characterize_ribozymes (settings, sample, upstream_bp=50, downstream_bp=50):
 				if part_data[1] == '+':
 					cur_site_bp = (part_data[2]-1)+cut_site
 					raw_region = extract_profile_region(profiles, chrom, 
-						             cur_site_bp-upstream_bp, cur_site_bp+downstream_bp)
+									 cur_site_bp-upstream_bp, cur_site_bp+downstream_skip_bp+downstream_bp)
 				else:
 					cur_site_bp = (part_data[3])-cut_site
 					raw_region = reverse_region(extract_profile_region(profiles, chrom, 
-						             cur_site_bp-downstream_bp, cur_site_bp+upstream_bp))
+									 cur_site_bp-downstream_skip_bp-downstream_bp, cur_site_bp+upstream_bp))
 				# Calculate performance
 				avg_us = np.mean(raw_region[0][0:upstream_bp])
 				avg_ds = np.mean(raw_region[0][-downstream_bp:])
@@ -538,13 +578,15 @@ def characterize_ribozymes (settings, sample, upstream_bp=50, downstream_bp=50):
 						if avg_ds < avg_us:
 							c_e = 0.0
 						else:
-							c_e = 1.0-(1.0/float(avg_ds))
+							#c_e = 1.0-(1.0/float(avg_ds))
+							c_e = ((float(avg_ds)+1.0)/1.0) - 1.0
 						max_cut = 'Y'
 					else:
 						if avg_ds < avg_us:
 							c_e = 0.0
 						else:
-							c_e = 1.0-(float(avg_us)/float(avg_ds))
+							#c_e = 1.0-(float(avg_us)/float(avg_ds))
+							c_e = (float(avg_ds)/float(avg_us)) - 1.0
 				char_data.append([chrom, part_name, avg_us, avg_ds, c_e, max_cut, cut_site])
 	return char_data
 
@@ -642,3 +684,159 @@ def combine_ribozyme_characterizations (settings, samples):
 			for data_rec in chrom_part_data:
 				f_out.write( '\t'.join([chrom, part]+data_rec)+'\n' )
 	f_out.close()
+
+########## FRAGMENT DISTRIBUTIONS ##########
+
+def fragment_length_dists (settings, sample, reads_to_sample=1000000):
+	""" Adapted from get_insert_size.py (Wei Li)
+	"""
+	frag_file = fragment_dist_filename(settings, sample)
+	sam_file = sam_filename(settings, sample)
+	f_in = open(sam_file, 'rU')
+	plrdlen={}
+	plrdspan={}
+	objmrl=re.compile('([0-9]+)M$')
+	objmtj=re.compile('NH:i:(\d+)')
+	nline=0
+	with open(sam_file, 'rU') as ins:
+		for lines in ins:
+			field=lines.strip().split()
+			nline=nline+1
+			if nline >= reads_to_sample:
+				break
+			if len(field)<12:
+				continue
+			try:
+				mrl=objmrl.match(field[5])
+				if mrl==None: # ignore non-perfect reads
+					continue
+				readlen=int(mrl.group(1))
+				if readlen in plrdlen.keys():
+					plrdlen[readlen]=plrdlen[readlen]+1
+				else:
+					plrdlen[readlen]=1
+				if field[6]!='=':
+					continue
+				dist=int(field[8])
+				if dist<=0: # ignore neg dist
+					continue
+				mtj=objmtj.search(lines)
+				if dist in plrdspan.keys():
+					plrdspan[dist]=plrdspan[dist]+1
+				else:
+					plrdspan[dist]=1
+			except ValueError:
+				continue
+	f_out = open(frag_file, 'w')
+	for k in sorted(plrdspan.keys()):
+		f_out.write(str(k)+'\t'+str(plrdspan[k])+'\n')
+
+def load_norm_factor (settings, sample):
+	norm_facs = {}
+	norm_fac_file = settings['None']['output_path']+'norm.factors.matrix.txt'
+	data_reader = csv.reader(open(norm_fac_file, 'rU'), delimiter='\t')
+	# Ignore the header
+	data_reader.next()
+	# Process each line
+	for row in data_reader:
+		if len(row) == 3:
+			norm_facs[row[0]] = [float(row[1]), float(row[2])]
+	return (norm_facs[sample][0]*norm_facs[sample][1])/1000000.0
+
+def load_fragmentation_dist (settings, sample, max_frag_len=1000):
+	frag_dist = np.zeros(max_frag_len+1)
+	frag_file = fragment_dist_filename(settings, sample)
+	data_reader = csv.reader(open(frag_file, 'rU'), delimiter='\t')
+	# Process each line
+	for row in data_reader:
+		frag_len = int(row[0])
+		frag_count = int(row[1])
+		if frag_len <= max_frag_len:
+			frag_dist[frag_len] = frag_count
+	return frag_dist
+
+def correction_prob (frag_dist, transcript_len, bp_idx):
+	frag_sum = 0.0
+	for l in range(len(frag_dist)):
+		frag_sum += frag_dist[l] * l # min([l, transcript_len-l+1])
+	frag_N = 0.0
+	for l in range(len(frag_dist)):
+		frag_N += frag_dist[l] * min([l, bp_idx, 
+			                          (transcript_len-bp_idx+1),
+			                          (transcript_len-l+1)])
+	return frag_N/frag_sum
+
+def correction_profile (frag_dist, transcript_len):
+	corr_profile = np.ones(transcript_len)
+	for idx in range(transcript_len):
+		corr_prob = correction_prob(frag_dist, transcript_len, idx+1)
+		if corr_prob > 0.0:
+			corr_profile[idx] = 1.0/corr_prob
+	return corr_profile
+
+def normalise_profiles (settings, sample, correction=False, baseline_us_bp=5):
+	""" Will normalise the profiles and correct for edge effects using fragment distribution
+	"""
+	# Load the profiles for the sample
+	profiles = load_profiles(settings, sample)
+	# If correction of edge effect required
+	if correction == True:
+		frag_dist = load_fragmentation_dist(settings, sample)
+		gff = load_gff (settings, sample)
+		for chrom in gff.keys():
+			for part_name in gff[chrom].keys():
+				part_data = gff[chrom][part_name]
+				if part_data[0] == 'transcript':
+					trans_start = part_data[2]-1
+					trans_end = part_data[3]
+					# Update each profile that contains the transcript
+					for p_data_idx in range(len(profiles[chrom])):
+						p_data = profiles[chrom][p_data_idx]
+						if p_data[0] <= trans_start and p_data[1] >= trans_end:
+							trans_len = trans_end-trans_start
+
+							# Calc corr_prob_dist (symetrical)
+							corr_prob_dist = correction_profile(frag_dist, trans_len)
+
+							if part_data[1] == '+':
+								rel_start = trans_start-p_data[0]
+								rel_end = trans_end-p_data[0]
+								# Calc baseline to subtract
+								bl_start = rel_start-baseline_us_bp
+								baseline_reads = 0.0
+								if bl_start >= 0:
+									baseline_reads = np.mean(p_data[2][bl_start:rel_start])
+								# Calculate profile corrected for edge effects and update
+								corr_profile = corr_prob_dist*(p_data[3][rel_start:rel_end]-baseline_reads).clip(min=0.0)
+								profiles[chrom][p_data_idx][2][rel_start:rel_end] = corr_profile+baseline_reads
+							else:
+								rel_start = trans_start-p_data[0]
+								rel_end = trans_end-p_data[0]
+								# Calc baseline to subtract
+								bl_start = rel_end+baseline_us_bp
+								baseline_reads = 0.0
+								if bl_start >= p_data[1]-p_data[0]:
+									baseline_reads = np.mean(p_data[3][rel_end:bl_start])
+								# Calculate profile corrected for edge effects and update
+								corr_profile = corr_prob_dist*(p_data[3][rel_start:rel_end]-baseline_reads).clip(min=0.0)
+								profiles[chrom][p_data_idx][3][rel_start:rel_end] = corr_profile+baseline_reads
+
+	# Save normalised profiles to file
+	norm_fac = load_norm_factor(settings, sample)
+	fwd_file = profile_norm_fwd_filename(settings, sample)
+	rev_file = profile_norm_rev_filename(settings, sample)
+	f_out_fwd = open(fwd_file, 'w')
+	f_out_rev = open(rev_file, 'w')
+	for chrom in profiles.keys():
+		for region in profiles[chrom]:
+			cur_start_bp = region[0]
+			cur_end_bp = region[1]
+			cur_fwd_profile = region[2]
+			cur_rev_profile = region[3]
+			for idx in range(len(cur_fwd_profile)):
+				cur_fwd_data = [chrom, str(cur_start_bp), str(cur_end_bp), str(idx+1), str(cur_fwd_profile[idx]/norm_fac)]
+				cur_rev_data = [chrom, str(cur_start_bp), str(cur_end_bp), str(idx+1), str(cur_rev_profile[idx]/norm_fac)]
+				f_out_fwd.write('\t'.join(cur_fwd_data)+'\n')
+				f_out_rev.write('\t'.join(cur_rev_data)+'\n')
+	f_out_fwd.close()
+	f_out_rev.close()

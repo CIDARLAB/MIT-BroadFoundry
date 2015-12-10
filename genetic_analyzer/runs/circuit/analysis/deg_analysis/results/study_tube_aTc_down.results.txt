@@ -1,0 +1,7 @@
+id	enrichment	description	ratio_in_study	ratio_in_pop	p_uncorrected	p_bonferroni	p_holm	p_sidak	p_fdr
+...GO:0015980	e	energy derivation by oxidation of organic compounds	10/28	70/3770	2.53e-11	8.66e-09	8.66e-09	8.45e-09	n.a.
+....GO:0045333	e	cellular respiration	9/28	60/3770	1.93e-10	6.58e-08	6.56e-08	6.42e-08	n.a.
+...GO:0006091	e	generation of precursor metabolites and energy	11/28	120/3770	2.92e-10	9.99e-08	9.93e-08	9.74e-08	n.a.
+.....GO:0009061	e	anaerobic respiration	7/28	35/3770	3.25e-09	1.11e-06	1.1e-06	1.08e-06	n.a.
+...GO:0009390	e	dimethyl sulfoxide reductase complex	3/28	3/3770	3.67e-07	0.000126	0.000124	0.000122	n.a.
+....GO:0006113	e	fermentation	3/28	8/3770	2.01e-05	0.00686	0.00676	0.00669	n.a.

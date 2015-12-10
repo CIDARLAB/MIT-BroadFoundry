@@ -17,3 +17,9 @@ python $BIN_PATH/find_enrichment.py --pval=0.01 --indent ./studies/iptg_comp_tub
 
 python $BIN_PATH/find_enrichment.py --pval=0.01 --indent ./studies/atc_comp_tube.down.txt ./data/ecoli_go_population.txt ./data/ecoli_go_association.txt > ./results/atc_comp_tube.down.go.txt
 python $BIN_PATH/find_enrichment.py --pval=0.01 --indent ./studies/atc_comp_tube.up.txt ./data/ecoli_go_population.txt ./data/ecoli_go_association.txt > ./results/atc_comp_tube.up.go.txt
+
+python $BIN_PATH/find_enrichment.py --pval=0.01 --indent ./studies/rep_3_yfp_tube.down.txt ./data/ecoli_go_population.txt ./data/ecoli_go_association.txt > ./results/rep_3_yfp_tube.down.go.txt
+python $BIN_PATH/find_enrichment.py --pval=0.01 --indent ./studies/rep_3_yfp_tube.up.txt ./data/ecoli_go_population.txt ./data/ecoli_go_association.txt > ./results/rep_3_yfp_tube.up.go.txt
+
+python $BIN_PATH/find_enrichment.py --pval=0.01 --indent ./studies/rep_4_tube.down.txt ./data/ecoli_go_population.txt ./data/ecoli_go_association.txt > ./results/rep_4_tube.down.go.txt
+python $BIN_PATH/find_enrichment.py --pval=0.01 --indent ./studies/rep_4_tube.up.txt ./data/ecoli_go_population.txt ./data/ecoli_go_association.txt > ./results/rep_4_tube.up.go.txt

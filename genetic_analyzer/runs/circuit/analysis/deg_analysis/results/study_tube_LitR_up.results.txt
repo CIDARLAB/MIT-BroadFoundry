@@ -1,0 +1,7 @@
+id	enrichment	description	ratio_in_study	ratio_in_pop	p_uncorrected	p_bonferroni	p_holm	p_sidak	p_fdr
+.......GO:0006598	e	polyamine catabolic process	4/19	10/3770	9.5e-08	3.53e-05	3.53e-05	3.45e-05	n.a.
+........GO:0009447	e	putrescine catabolic process	4/19	10/3770	9.5e-08	3.53e-05	3.53e-05	3.45e-05	n.a.
+.......GO:0009445	e	putrescine metabolic process	4/19	14/3770	4.47e-07	0.000166	0.000165	0.000162	n.a.
+......GO:0006595	e	polyamine metabolic process	4/19	17/3770	1.05e-06	0.000392	0.000389	0.000382	n.a.
+.....GO:0009310	e	amine catabolic process	4/19	30/3770	1.16e-05	0.00433	0.00428	0.00422	n.a.
+......GO:0042402	e	cellular biogenic amine catabolic process	4/19	30/3770	1.16e-05	0.00433	0.00428	0.00422	n.a.

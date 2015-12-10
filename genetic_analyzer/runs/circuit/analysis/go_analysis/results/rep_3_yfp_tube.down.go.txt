@@ -1,0 +1,17 @@
+id	enrichment	description	ratio_in_study	ratio_in_pop	p_uncorrected	p_bonferroni	p_holm	p_sidak	p_fdr
+...GO:0006091	e	generation of precursor metabolites and energy	30/244	120/3770	3.61e-11	4.76e-08	4.76e-08	4.64e-08	n.a.
+...GO:0015980	e	energy derivation by oxidation of organic compounds	22/244	70/3770	1.45e-10	1.9e-07	1.9e-07	1.86e-07	n.a.
+....GO:0045333	e	cellular respiration	19/244	60/3770	2.41e-09	3.17e-06	3.16e-06	3.09e-06	n.a.
+.....GO:0009061	e	anaerobic respiration	14/244	35/3770	1.07e-08	1.41e-05	1.4e-05	1.37e-05	n.a.
+...GO:0055114	e	oxidation-reduction process	61/244	472/3770	3.33e-08	4.39e-05	4.37e-05	4.28e-05	n.a.
+...GO:1901576	p	organic substance biosynthetic process	37/244	1114/3770	9.14e-08	0.00012	0.00012	0.000117	n.a.
+...GO:0044249	p	cellular biosynthetic process	37/244	1103/3770	1.83e-07	0.000241	0.00024	0.000235	n.a.
+..GO:0009058	p	biosynthetic process	40/244	1149/3770	2.62e-07	0.000345	0.000343	0.000337	n.a.
+...GO:0044711	p	single-organism biosynthetic process	15/244	614/3770	1.51e-06	0.00199	0.00198	0.00194	n.a.
+...GO:0003676	p	nucleic acid binding	18/244	678/3770	1.63e-06	0.00215	0.00214	0.0021	n.a.
+GO:0008150	p	biological_process	191/244	3343/3770	1.68e-06	0.00221	0.00219	0.00215	n.a.
+...GO:0044260	p	cellular macromolecule metabolic process	39/244	1083/3770	2.39e-06	0.00315	0.00312	0.00307	n.a.
+.....GO:0019751	e	polyol metabolic process	11/244	32/3770	2.55e-06	0.00336	0.00333	0.00328	n.a.
+....GO:0051539	e	4 iron, 4 sulfur cluster binding	21/244	108/3770	3.49e-06	0.00459	0.00455	0.00448	n.a.
+......GO:0016151	e	nickel cation binding	8/244	17/3770	4.01e-06	0.00528	0.00523	0.00515	n.a.
+...GO:0019400	e	alditol metabolic process	10/244	29/3770	7.19e-06	0.00947	0.00936	0.00923	n.a.

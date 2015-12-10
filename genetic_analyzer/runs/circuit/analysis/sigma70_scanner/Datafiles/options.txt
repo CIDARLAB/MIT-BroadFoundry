@@ -1,0 +1,17 @@
+
+Sigma 70 Promoter Scan 1/20/2012
+Usage: s70_scanner.pl -f <seqfile> -o <outputfile> -z <z-score> (options)
+
+Required options with values:
+ -f <seqfile>	Input sequence filename (FASTA format or single line of sequence)
+ -o <outputfile>	Output filename
+ -z <z-score>	Motif search cutoff threshold (must be a number, e.g. -1)
+
+Options with values:
+ -p <z-score>	Promoter cutoff threshold (must be a number, e.g. -1)
+
+Options with no values:
+ -b	Search both strands (default is forward strand only)
+ -h	Output highest score only for each sequence
+ -u	Scores upstream sequence for UP-element (overlapping 3 nt A- or T-tracts)
+ -a	Outputs all predictions (default removes lower scoring predictions that share -10 and/or -35 motifs)

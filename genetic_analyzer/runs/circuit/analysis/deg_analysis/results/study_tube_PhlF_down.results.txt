@@ -1,0 +1,13 @@
+id	enrichment	description	ratio_in_study	ratio_in_pop	p_uncorrected	p_bonferroni	p_holm	p_sidak	p_fdr
+....GO:0033692	e	cellular polysaccharide biosynthetic process	4/4	111/3770	7.13e-07	8.27e-05	8.27e-05	8.06e-05	n.a.
+.....GO:0000271	e	polysaccharide biosynthetic process	4/4	113/3770	7.66e-07	8.89e-05	8.81e-05	8.67e-05	n.a.
+...GO:0034637	e	cellular carbohydrate biosynthetic process	4/4	115/3770	8.23e-07	9.54e-05	9.38e-05	9.3e-05	n.a.
+....GO:0044264	e	cellular polysaccharide metabolic process	4/4	120/3770	9.78e-07	0.000113	0.00011	0.000111	n.a.
+....GO:0005976	e	polysaccharide metabolic process	4/4	125/3770	1.15e-06	0.000134	0.000129	0.00013	n.a.
+....GO:0016051	e	carbohydrate biosynthetic process	4/4	141/3770	1.88e-06	0.000218	0.000208	0.000212	n.a.
+......GO:0009298	e	GDP-mannose biosynthetic process	2/4	3/3770	2.53e-06	0.000294	0.000279	0.000286	n.a.
+.....GO:0019673	e	GDP-mannose metabolic process	2/4	4/3770	5.06e-06	0.000587	0.000552	0.000573	n.a.
+...GO:0044262	e	cellular carbohydrate metabolic process	4/4	201/3770	7.85e-06	0.000911	0.000848	0.000888	n.a.
+.....GO:0009103	e	lipopolysaccharide biosynthetic process	3/4	76/3770	3.11e-05	0.0036	0.00332	0.00351	n.a.
+....GO:0008653	e	lipopolysaccharide metabolic process	3/4	79/3770	3.49e-05	0.00405	0.0037	0.00395	n.a.
+...GO:0044723	e	single-organism carbohydrate metabolic process	4/4	319/3770	5.04e-05	0.00584	0.00529	0.0057	n.a.

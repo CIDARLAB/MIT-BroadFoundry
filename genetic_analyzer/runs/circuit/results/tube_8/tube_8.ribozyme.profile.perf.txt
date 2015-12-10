@@ -1,7 +1,7 @@
 sample	chromosome	part_name	reads_us	reads_ds	c_e	max_cut	cut_site
-tube_8	0x58v50	RiboJ	0.0	115.56	0.991346486674	Y	7
-tube_8	0x58v50	SarJ	17.0	0.34	0.0	N	8
-tube_8	0x58v50	PlmJ	6.72	331.64	0.979737064287	N	11
-tube_8	0x58v50	BydvJ	0.0	125.54	0.992034411343	Y	8
-tube_8	0x58v50	RiboJ53	0.0	38.98	0.974345818368	Y	7
+tube_8	0x58v50	RiboJ	0.0	673.4	0.998514998515	Y	7
+tube_8	0x58v50	SarJ	17.0	41.0	0.585365853659	N	8
+tube_8	0x58v50	PlmJ	1.44	1390.88	0.998964684229	N	11
 tube_8	0x58v50	RiboJ10	0.0	0.0	0.0	Y	7
+tube_8	0x58v50	RiboJ53	0.0	167.36	0.994024856597	Y	7
+tube_8	0x58v50	BydvJ	0.0	371.8	0.997310381926	Y	8

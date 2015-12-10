@@ -60,3 +60,13 @@ de_genes_tube_atc = load_de_genes(DEG_PREFIX+'atc_comp_tube.de.analysis.txt', p_
 save_study(de_genes_tube_ara, OUT_PREFIX+'ara_comp_tube.up.txt', OUT_PREFIX+'ara_comp_tube.down.txt')
 save_study(de_genes_tube_iptg, OUT_PREFIX+'iptg_comp_tube.up.txt', OUT_PREFIX+'iptg_comp_tube.down.txt')
 save_study(de_genes_tube_atc, OUT_PREFIX+'atc_comp_tube.up.txt', OUT_PREFIX+'atc_comp_tube.down.txt')
+
+
+
+
+
+de_genes_tube_rep_3_yfp = load_de_genes(DEG_PREFIX+'rep_3_yfp_tube.de.analysis.txt', p_val=0.01, fdr=1.0)
+de_genes_tube_rep_4 = load_de_genes(DEG_PREFIX+'rep_4_tube.de.analysis.txt', p_val=0.01, fdr=1.0)
+
+save_study(de_genes_tube_rep_3_yfp, OUT_PREFIX+'rep_3_yfp_tube.up.txt', OUT_PREFIX+'rep_3_yfp_tube.down.txt')
+save_study(de_genes_tube_rep_4, OUT_PREFIX+'rep_4_tube.up.txt', OUT_PREFIX+'rep_4_tube.down.txt')

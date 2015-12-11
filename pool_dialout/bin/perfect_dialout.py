@@ -23,8 +23,7 @@ import re
 import string
 import timeit
 
-__author__  = 'Tarjei Mikkelsen, BTL, Broad Institute\n\
-               Thomas E. Gorochowski, Voigt Lab, MIT'
+__author__  = 'Thomas E. Gorochowski, Voigt Lab, MIT'
 __license__ = 'OSI Non-Profit OSL 3.0'
 __version__ = '2.0'
 
@@ -160,61 +159,63 @@ while line_idx < max_line_idx:
 	found_design = None
 	found_barcode = None
 	for design in designs_list:
+		# Do the checking straight away.
 		m1 = re.match(design_regexs[design][0], seq1)
-		m2 = re.match(design_regexs[design][1], seq2)
-		# Assumes paired matches are unique
-		if (m1 != None) and (m2 != None):
-			found_design = design
-			found_fwd_barcodes = list(m1.groups())
-			found_rev_barcodes = [revcomp(x) for x in m2.groups()]
+		if m1 != None:
+			m2 = re.match(design_regexs[design][1], seq2)
+			# Assumes paired matches are unique
+			if m2 != None:
+				found_design = design
+				found_fwd_barcodes = list(m1.groups())
+				found_rev_barcodes = [revcomp(x) for x in m2.groups()]
 
-			# Select the correct barcode
-			if fwd_bc_read == 1:
-				fwd_barcode = found_fwd_barcodes[fwd_bc_idx]
-			else:
-				fwd_barcode = found_rev_barcodes[fwd_bc_idx]
-			if rev_bc_read == 1:
-				rev_barcode = found_fwd_barcodes[rev_bc_idx]
-			else:
-				rev_barcode = found_rev_barcodes[rev_bc_idx]
-
-			other_bcs = []
-			for other_bc_idx in other_fwd_bc_idxs:
-				other_bcs.append(found_fwd_barcodes[other_bc_idx])
-			for other_bc_idx in other_rev_bc_idxs:
-				other_bcs.append(found_rev_barcodes[other_bc_idx])
-
-			# Create the barcode fwd,rev (primers), then all others
-			found_barcode = [fwd_barcode, rev_barcode] + other_bcs
-			barcode_key = "-".join(found_barcode)
-			
-			# CHECK BARCODES ##################################################
-			if fwd_barcode not in barcodes_to_check_set_0:
-				barcodes_to_check[0][fwd_barcode] = [found_design]
-				barcodes_to_check_set_0.add(fwd_barcode)
-			else:
-				if found_design not in barcodes_to_check[0][fwd_barcode]:
-					barcodes_to_check[0][fwd_barcode].append(found_design)
-					barcodes_to_check_set_0.add(fwd_barcode)
-			if rev_barcode not in barcodes_to_check_set_1:
-				barcodes_to_check[1][rev_barcode] = [found_design]
-				barcodes_to_check_set_1.add(rev_barcode)
-			else:
-				if found_design not in barcodes_to_check[1][rev_barcode]:
-					barcodes_to_check[1][rev_barcode].append(found_design)
-					barcodes_to_check_set_1.add(rev_barcode)
-			###############################################################
-
-			if barcode_key not in found_barcodes_set:
-				found_barcodes[barcode_key] = {}
-				found_barcodes[barcode_key][found_design] = 1
-				found_barcodes_set.add(barcode_key)
-			else:
-				if found_design in found_barcodes[barcode_key].keys():
-					found_barcodes[barcode_key][found_design] += 1
+				# Select the correct barcode
+				if fwd_bc_read == 1:
+					fwd_barcode = found_fwd_barcodes[fwd_bc_idx]
 				else:
+					fwd_barcode = found_rev_barcodes[fwd_bc_idx]
+				if rev_bc_read == 1:
+					rev_barcode = found_fwd_barcodes[rev_bc_idx]
+				else:
+					rev_barcode = found_rev_barcodes[rev_bc_idx]
+
+				other_bcs = []
+				for other_bc_idx in other_fwd_bc_idxs:
+					other_bcs.append(found_fwd_barcodes[other_bc_idx])
+				for other_bc_idx in other_rev_bc_idxs:
+					other_bcs.append(found_rev_barcodes[other_bc_idx])
+
+				# Create the barcode fwd,rev (primers), then all others
+				found_barcode = [fwd_barcode, rev_barcode] + other_bcs
+				barcode_key = "-".join(found_barcode)
+				
+				# CHECK BARCODES ##################################################
+				if fwd_barcode not in barcodes_to_check_set_0:
+					barcodes_to_check[0][fwd_barcode] = [found_design]
+					barcodes_to_check_set_0.add(fwd_barcode)
+				else:
+					if found_design not in barcodes_to_check[0][fwd_barcode]:
+						barcodes_to_check[0][fwd_barcode].append(found_design)
+						barcodes_to_check_set_0.add(fwd_barcode)
+				if rev_barcode not in barcodes_to_check_set_1:
+					barcodes_to_check[1][rev_barcode] = [found_design]
+					barcodes_to_check_set_1.add(rev_barcode)
+				else:
+					if found_design not in barcodes_to_check[1][rev_barcode]:
+						barcodes_to_check[1][rev_barcode].append(found_design)
+						barcodes_to_check_set_1.add(rev_barcode)
+				###############################################################
+
+				if barcode_key not in found_barcodes_set:
+					found_barcodes[barcode_key] = {}
 					found_barcodes[barcode_key][found_design] = 1
-			break
+					found_barcodes_set.add(barcode_key)
+				else:
+					if found_design in found_barcodes[barcode_key].keys():
+						found_barcodes[barcode_key][found_design] += 1
+					else:
+						found_barcodes[barcode_key][found_design] = 1
+				break
 	# If found match then process else continue to next read
 	if found_design is None:
 		continue

@@ -11,7 +11,7 @@
 #   - SAMTools
 #   - HTSeq
 #   - BEDTools
-#   - R + edgeR package (Rscript)
+#   - R + edgeR package (RScript)
 
 
 # Required modules
@@ -20,6 +20,7 @@ import subprocess
 import numpy as np
 import re
 import math
+import scipy.optimize
 
 
 def bwa_index_filename (settings, sample):
@@ -88,6 +89,9 @@ def combined_terminator_profile_perf_filename (settings):
 def combined_ribozyme_profile_perf_filename (settings):
 	return settings['None']['output_path']+'ribozyme.profile.perf.txt'
 
+def combined_fitted_promoter_perf_filename (settings, output_name):
+	return settings['None']['output_path']+'fitted.promoter.perf.'+output_name+'.txt'
+
 def load_settings (filename):
 	"""Load the settings file
 	"""
@@ -104,6 +108,29 @@ def load_settings (filename):
 				sample_data[el] = row[el_idx+1]
 			settings[sample] = sample_data
 	return settings
+
+def trim_adaptors (settings, sample):
+	adaptor_seq = settings[sample]['seq_adaptor']
+	cmd_index = 'bowtie-build index' + \
+				' -p ' + bwa_index_filename(settings, sample) + \
+				' ' + settings[sample]['fasta_file']
+	print("Making index: "+cmd_index)
+	subprocess.call(cmd_index, shell=True)
+
+
+def map_ribo_reads (settings, sample):
+	cmd_index = 'bowtie-build index' + \
+				' -p ' + bwa_index_filename(settings, sample) + \
+				' ' + settings[sample]['fasta_file']
+	print("Making index: "+cmd_index)
+	subprocess.call(cmd_index, shell=True)
+
+	cmd_index = 'bowtie ' + \
+				' -p ' + bwa_index_filename(settings, sample) + \
+				' ' + settings[sample]['fasta_file']
+	print("Perform mapping: "+cmd_index)
+	subprocess.call(cmd_index, shell=True)
+
 
 def map_reads (settings, sample):
 	"""Map reads using BWA-MEM
@@ -775,7 +802,7 @@ def correction_profile (frag_dist, transcript_len):
 	return corr_profile
 
 def normalise_profiles (settings, sample, correction=False, baseline_us_bp=5):
-	""" Will normalise the profiles and correct for edge effects using fragment distribution
+	""" Will normalise the profiles using TMM factors and correct for edge effects using fragment distribution
 	"""
 	# Load the profiles for the sample
 	profiles = load_profiles(settings, sample)
@@ -840,3 +867,201 @@ def normalise_profiles (settings, sample, correction=False, baseline_us_bp=5):
 				f_out_rev.write('\t'.join(cur_rev_data)+'\n')
 	f_out_fwd.close()
 	f_out_rev.close()
+
+########## FITTING OF RESPONSE FUNCTIONS ##########
+
+def load_promoter_characterizations (filename, samples):
+	pro_data = {}
+	data_reader = csv.reader(open(filename, 'rU'), delimiter='\t')
+	# Ignore header
+	data_reader.next()
+	# Process each line
+	for row in data_reader:
+		cur_chrom = row[0]
+		cur_pu = row[1]
+		cur_sample = row[2]
+		cur_perf = float(row[5])
+		if cur_sample in samples:
+			if cur_sample not in pro_data.keys():
+				pro_data[cur_sample] = {}
+			if cur_chrom not in pro_data[cur_sample].keys():
+				pro_data[cur_sample][cur_chrom] = {}
+			pro_data[cur_sample][cur_chrom][cur_pu] = cur_perf
+	return pro_data
+
+
+def hill_func (x, Pmin, Pmin_inc, K, n, repress=False):
+	if x < 0.0:
+		x = 0.0
+	if repress == True:
+		return Pmin + (Pmin+Pmin_inc)*( math.pow(K,n) / (math.pow(K,n)+math.pow(x,n)) )
+	else: 
+		return Pmin + (Pmin+Pmin_inc)*( math.pow(x,n) / (math.pow(K,n)+math.pow(x,n)) )
+
+
+def extract_fit_params (x, P_names, P_types):
+	# Extract the parameters into more user friendly dict
+	fit_params = {}
+	cur_idx = 0
+	for p_idx in range(len(P_names)):
+		p_name = P_names[p_idx]
+		p_type = P_types[p_idx]
+		if p_type == 'induced':
+			# If an induced promoter then 2 parameters
+			fit_params[p_name] = {}
+			fit_params[p_name]['Pmin'] = x[cur_idx]
+			fit_params[p_name]['Pmin_inc'] = x[cur_idx+1]
+			cur_idx += 2
+		else:
+			# If a repessed promoter then 4 parameters
+			fit_params[p_name] = {}
+			fit_params[p_name]['Pmin'] = x[cur_idx]
+			fit_params[p_name]['Pmin_inc'] = x[cur_idx+1]
+			fit_params[p_name]['K'] = x[cur_idx+2]
+			fit_params[p_name]['n'] = x[cur_idx+3]
+			cur_idx += 4
+	return fit_params
+
+
+def promoter_unit_err_func (x, exp_data, chrom_to_fit, PU_to_fit, chrom_inputs, PU_inputs, P_names, P_types, fac_reduce_size):		
+	# Extract the parameters into more user friendly dict
+	fit_params = extract_fit_params(x, P_names, P_types)
+	# Only calculate error based on samples specified
+	err_diffs = []
+	for sample in exp_data.keys():
+		sample_data = exp_data[sample]
+		exp_val = exp_data[sample][chrom_to_fit][PU_to_fit]
+		# Calculate fitted output assuming additive fluxes
+		fit_outs = []
+		cur_param_idx = 0
+		for p_idx in range(len(P_names)):
+			cur_p = P_names[p_idx]
+			# Check the type of promoter and calculate 
+			if P_types[p_idx] == 'induced':
+				# Inducible promoter
+				input_val = extract_key_vals(PU_inputs[p_idx])[sample]
+				if input_val == 1.0:
+					fit_outs.append(fit_params[cur_p]['Pmin']+fit_params[cur_p]['Pmin_inc'])
+				else:
+					fit_outs.append(fit_params[cur_p]['Pmin'])
+			else:
+				# Repressor promoter
+				input_val = exp_data[sample][chrom_inputs[p_idx]][PU_inputs[p_idx]]
+				fit_outs.append( hill_func(input_val, 
+					                       fit_params[cur_p]['Pmin'], 
+					                       fit_params[cur_p]['Pmin_inc'],
+					                       fit_params[cur_p]['K'],
+					                       fit_params[cur_p]['n'],
+					                       repress=True) )
+		fit_val = np.sum(fit_outs)
+		# Numbers are generally in read-depths (reduce to reduce squared values being too large)
+		err_diffs.append((exp_val-fit_val)/fac_reduce_size)
+	# Return SSE
+	return np.sum(np.power(err_diffs, 2.0))
+
+
+def extract_key_vals (data_str):
+	split_str = data_str.split(':')
+ 	key_vals = {}
+	for el in split_str:
+		key_val_split = el.split('>')
+		if len(key_val_split) == 2:
+			key_vals[key_val_split[0]] = float(key_val_split[1])
+	return key_vals
+
+
+def extract_list (data_str):
+	split_str = data_str.split(',')
+	return split_str
+	
+
+def fit_promoter_response_functions (settings, samples, output_name, fac_reduce_size=1000.0):
+	# All the data needed for the fitting
+	promoter_filename = combined_promoter_profile_perf_filename(settings)
+	pro_data = load_promoter_characterizations(promoter_filename, samples)
+	gff = load_gff(settings, samples[0])
+	# Somewhere to save the results
+	fitted_pro_params = {}
+	# Parameters required for each fiting
+	chrom_to_fit = ''
+	PU_to_fit = ''
+	chrom_inputs = []
+	PU_inputs = []
+	P_names = []
+	P_types = []
+	# Cycle through each promoter unit and fit the internal promoter functions
+	for chrom in gff.keys():
+		for part_name in gff[chrom].keys():
+			part_data = gff[chrom][part_name]
+			if part_data[0] == 'promoter_unit':
+				part_attribs = part_data[-1]
+				# Populate all the parameters of the promoter unit
+				chrom_to_fit = chrom
+				PU_to_fit = part_name
+				chrom_inputs = extract_list(part_attribs['chrom_inputs'])
+				P_names = extract_list(part_attribs['promoter_names'])
+				P_types = extract_list(part_attribs['promoter_types'])
+				PU_inputs = extract_list(part_attribs['promoter_unit_inputs'])
+				# Calculate the number of parameters we have
+				num_of_params = 0
+				for p_idx in range(len(P_names)):
+					if P_types[p_idx] == 'induced':
+						num_of_params += 2
+					else:
+						num_of_params += 4
+				# Parameters for fit
+				x0 = np.zeros(num_of_params)
+				# Some contraints (keep everything positive)
+				bnds = []
+				cur_param_idx = 0
+				for p_idx in range(len(P_names)):
+					if P_types[p_idx] == 'induced':
+						# Initial conditions (start realistic to improve fitting)
+						x0[cur_param_idx] = 0.0
+						x0[cur_param_idx+1] = 1000.0
+						# Set bounds
+						bnds.append((0.0, None))
+						bnds.append((0.0, None))
+						cur_param_idx += 2
+					else:
+						# Initial conditions (start realistic to improve fitting)
+						x0[cur_param_idx] = 0.0
+						x0[cur_param_idx+1] = 1000.0
+						x0[cur_param_idx+2] = 100.0
+						x0[cur_param_idx+3] = 2.0
+						# Set bounds
+						bnds.append((0.0, None))
+						bnds.append((0.0, None))
+						bnds.append((1.0, None))
+						bnds.append((1.0, 3.9))
+						cur_param_idx += 4
+				# methods = BFGS, nelder-mead, Powell, TNC, SLSQP,  L-BFGS-B
+				res = scipy.optimize.minimize(promoter_unit_err_func, x0, args=(pro_data, chrom_to_fit, PU_to_fit, chrom_inputs, PU_inputs, P_names, P_types, fac_reduce_size),
+											  bounds=bnds,
+					                          method='SLSQP', jac=False,
+					                          options={'disp': True, 'maxiter': 10000})
+				# Save the fitted parameters
+				cur_param_idx = 0
+				for p_idx in range(len(P_names)):
+					p_name = P_names[p_idx]
+					if P_types[p_idx] == 'induced':
+						fitted_pro_params[p_name] = {}
+						fitted_pro_params[p_name]['Pmin'] = res.x[cur_param_idx]
+						fitted_pro_params[p_name]['Pmin_inc'] = res.x[cur_param_idx+1]
+						cur_param_idx += 2
+					else:
+						fitted_pro_params[p_name] = {}
+						fitted_pro_params[p_name]['Pmin'] = res.x[cur_param_idx]
+						fitted_pro_params[p_name]['Pmin_inc'] = res.x[cur_param_idx+1]
+						fitted_pro_params[p_name]['K'] = res.x[cur_param_idx+2]
+						fitted_pro_params[p_name]['n'] = res.x[cur_param_idx+3]
+						cur_param_idx += 4
+	# Save the results to file	
+	out_filename = combined_fitted_promoter_perf_filename(settings, output_name)
+	f_out = open(out_filename, 'w')
+	for p_name in fitted_pro_params.keys():
+		f_out.write(p_name)
+		for param in fitted_pro_params[p_name].keys():
+			f_out.write('\t'+param+'\t'+str(fitted_pro_params[p_name][param]))
+		f_out.write('\n')
+	f_out.close()

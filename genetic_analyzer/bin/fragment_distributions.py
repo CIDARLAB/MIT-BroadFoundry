@@ -8,18 +8,22 @@
 # Supporting modules
 import argparse
 import genetic_analyzer as ga
+import sys
+
 
 def main():
-	# Parse the command line inputs
-	parser = argparse.ArgumentParser(description="fragment_distributions")
-	parser.add_argument("-settings",  dest="settings",  required=True,  help="settings.txt", metavar="string")
-	parser.add_argument("-samples",  dest="samples",  required=True,  help="1,2", metavar="string")
-	args = parser.parse_args()
-	# Run the command
-	samples = args.samples.split(',')
-	settings = ga.load_settings(args.settings)
-	for s in samples:
-		ga.fragment_length_dists(settings, s, reads_to_sample=1000000)
+    # Parse the command line inputs
+    parser = argparse.ArgumentParser(description="fragment_distributions")
+    parser.add_argument("-settings", dest="settings", required=True, help="settings.txt", metavar="string")
+    parser.add_argument("-samples", dest="samples", required=True, help="1,2", metavar="string")
+    args = parser.parse_args()
+    # Run the command
+    samples = args.samples.split(',')
+    settings = ga.load_settings(args.settings)
+    for s in samples:
+        status = ga.fragment_length_dists(settings, s, reads_to_sample=1000000)
+    return status
+
 
 if __name__ == "__main__":
-	main()
+    status = main()
